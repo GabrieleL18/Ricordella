@@ -161,7 +161,7 @@ private fun Welcome(onNext: () -> Unit) {
         CrystalBallMascot(size = 160.dp)
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
         Text(tr("Ciao, sono"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-        Text(tr("Remindella"), style = BrandTitleStyle.copy(fontSize = 44.sp, color = MaterialTheme.ricordellaColors.boltEdge), textAlign = TextAlign.Center)
+        Text(tr("Remindella"), style = BrandTitleStyle.copy(fontSize = 44.sp), textAlign = TextAlign.Center)
         Spacer(Modifier.height(RicordellaDimensions.spaceS))
         Text(
             tr("Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?"),

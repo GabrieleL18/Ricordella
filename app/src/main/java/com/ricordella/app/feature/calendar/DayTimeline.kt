@@ -38,7 +38,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -102,7 +107,7 @@ fun DayTimeline(
         }
         hours.forEach { hour ->
             if (!nowPlaced && hour > now.hour) {
-                NowRow(now.minute)
+                NowRow()
                 nowPlaced = true
             }
             val entries = byHour.getValue(hour).sortedBy { it.reminder.dueTime }
@@ -115,17 +120,17 @@ fun DayTimeline(
                 }
             }
         }
-        if (!nowPlaced) NowRow(now.minute)
+        if (!nowPlaced) if (occurrences.isEmpty()) EmptyClock(now) else NowRow()
         AddRow(if (occurrences.isEmpty()) tr("Nessun impegno: aggiungine uno") else tr("Aggiungi"), onAdd)
     }
 }
 
 /** Riga "adesso" quando in quest'ora non c'è nulla. */
 @Composable
-private fun NowRow(minute: Int) {
+private fun NowRow() {
     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.width(68.dp))
-        Box(Modifier.weight(1f)) { NowIndicator(minute) }
+        Box(Modifier.weight(1f)) { NowIndicator() }
     }
 }
 
@@ -167,15 +172,15 @@ private fun HourRow(label: String, nowMinute: Int?, content: @Composable () -> U
             Modifier.weight(1f).padding(start = 6.dp, bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            if (nowMinute != null) NowIndicator(nowMinute)
+            if (nowMinute != null) NowIndicator()
             content()
         }
     }
 }
 
-/** "Adesso": linea corallo con un pallino che pulsa. */
+/** "Adesso": linea corallo con un pallino che pulsa, senza scritte. */
 @Composable
-private fun NowIndicator(minute: Int) {
+private fun NowIndicator() {
     val colors = MaterialTheme.ricordellaColors
     val pulse = if (rememberReducedMotion()) 1f else rememberInfiniteTransition(label = "now").animateFloat(
         0.6f,
@@ -183,10 +188,33 @@ private fun NowIndicator(minute: Int) {
         infiniteRepeatable(tween(900, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse),
         label = "pulse",
     ).value
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(10.dp).graphicsLayer { scaleX = pulse; scaleY = pulse }.background(colors.coral.solid, CircleShape))
         Box(Modifier.weight(1f).height(2.dp).background(colors.coral.solid))
-        Text(tr("adesso :%02d").format(minute), style = MaterialTheme.typography.labelSmall, color = colors.coral.content)
+    }
+}
+
+/** Ora "viva": i due punti lampeggiano come in una sveglia digitale. */
+@Composable
+fun LiveTime(now: LocalDateTime, style: TextStyle, color: Color, modifier: Modifier = Modifier) {
+    val blink = if (rememberReducedMotion()) 1f else rememberInfiniteTransition(label = "colon").animateFloat(
+        1f,
+        0.15f,
+        infiniteRepeatable(tween(500, delayMillis = 500), RepeatMode.Reverse),
+        label = "blink",
+    ).value
+    Row(modifier.semantics(mergeDescendants = true) { contentDescription = DateTexts.time(now.toLocalTime()) }) {
+        Text("%02d".format(now.hour), style = style, color = color)
+        Text(":", style = style, color = MaterialTheme.ricordellaColors.coral.solid, modifier = Modifier.graphicsLayer { alpha = blink })
+        Text("%02d".format(now.minute), style = style, color = color)
+    }
+}
+
+/** Giornata libera: al posto della timeline, un grande orologio. */
+@Composable
+private fun EmptyClock(now: LocalDateTime) {
+    Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+        LiveTime(now, MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.SemiBold), MaterialTheme.colorScheme.onSurface)
     }
 }
 

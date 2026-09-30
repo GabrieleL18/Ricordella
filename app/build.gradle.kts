@@ -74,6 +74,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
 
+    // Carte d'imbarco: scansione con la fotocamera (senza permesso) e lettura da foto/PDF.
+    implementation(libs.play.services.code.scanner)
+    implementation(libs.mlkit.barcode.scanning)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 

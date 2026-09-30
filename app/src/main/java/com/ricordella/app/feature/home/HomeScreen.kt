@@ -43,6 +43,8 @@ import androidx.compose.material.icons.rounded.EventAvailable
 import androidx.compose.material.icons.automirrored.rounded.EventNote
 import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material.icons.rounded.WbTwilight
+import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.rounded.CleaningServices
@@ -91,6 +93,8 @@ import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.ReminderOccurrence
 import com.ricordella.app.feature.calendar.DayTimeline
+import com.ricordella.app.feature.calendar.LiveTime
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
@@ -247,16 +251,11 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 @Composable
 private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.ricordellaColors
-    val today = state.now.toLocalDate()
     Column(modifier.padding(top = RicordellaDimensions.spaceS, bottom = RicordellaDimensions.spaceS)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(
-                    DateTexts.fullDate(today).replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(tr("Oggi ci penso io"), style = MaterialTheme.typography.headlineMedium)
+                DayPill(state.now)
+                Text(greeting(state.now.hour), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 6.dp))
                 val count = state.attention.size
                 val subtitle = when {
                     state.isLoading -> " "
@@ -278,6 +277,39 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                 CountPill(state.today.size, tr("oggi"), Icons.Rounded.WbSunny, colors.pear)
                 CountPill(state.upcoming.size, tr("in arrivo"), Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming)
             }
+        }
+    }
+}
+
+private fun greeting(hour: Int): String = when (hour) {
+    in 5..12 -> tr("Buongiorno")
+    in 13..17 -> tr("Buon pomeriggio")
+    else -> tr("Buonasera")
+}
+
+/** Giorno e ora in una pillola: l'icona segue il momento della giornata, i due punti lampeggiano. */
+@Composable
+private fun DayPill(now: java.time.LocalDateTime) {
+    val tone = when (now.hour) {
+        in 5..17 -> MaterialTheme.ricordellaColors.pear
+        else -> MaterialTheme.ricordellaColors.lavender
+    }
+    val icon = when (now.hour) {
+        in 5..8 -> Icons.Rounded.WbTwilight
+        in 9..17 -> Icons.Rounded.WbSunny
+        in 18..20 -> Icons.Rounded.WbTwilight
+        else -> Icons.Rounded.Bedtime
+    }
+    Surface(color = tone.container, contentColor = tone.content, shape = CircleShape) {
+        Row(
+            modifier = Modifier.padding(start = 10.dp, end = 12.dp, top = 5.dp, bottom = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
+            Text(DateTexts.weekdayAndDay(now.toLocalDate()).replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.labelLarge)
+            Text("·", style = MaterialTheme.typography.labelLarge)
+            LiveTime(now, MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), tone.content)
         }
     }
 }

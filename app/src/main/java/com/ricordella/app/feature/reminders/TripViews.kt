@@ -5,7 +5,32 @@ import com.ricordella.app.core.i18n.trf
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.rounded.Directions
+import androidx.compose.material.icons.rounded.PictureAsPdf
+import androidx.compose.material.icons.rounded.QrCodeScanner
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.viewinterop.AndroidView
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import com.google.mlkit.vision.common.InputImage
+import com.ricordella.app.domain.model.BoardingPass
+import java.time.LocalDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -119,8 +144,68 @@ fun TripFields(trip: TripInfo, onChange: (TripInfo) -> Unit) {
             )
         }
     }
+    BoardingPassImport { legs -> onChange(trip.copy(legs = trip.legs + legs)) }
     StayCard(trip.stay ?: TripStay(), onChange = { onChange(trip.copy(stay = it)) })
 }
+
+/** Come Google Wallet: la carta d'imbarco (fotocamera, foto o PDF) compila da sola le tratte aeree. */
+@Composable
+private fun BoardingPassImport(onLegs: (List<TripLeg>) -> Unit) {
+    val context = LocalContext.current
+    val onCodes: (List<String>) -> Unit = { codes ->
+        val legs = codes.firstNotNullOfOrNull { BoardingPass.parse(it, LocalDate.now()) }
+        if (legs == null) Toast.makeText(context, tr("Nessuna carta d'imbarco trovata"), Toast.LENGTH_LONG).show() else onLegs(legs)
+    }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let { readBarcodes(context, it, onCodes) }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), modifier = Modifier.fillMaxWidth()) {
+        AssistChip(
+            onClick = {
+                val options = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(BARCODE_FORMAT, *OTHER_BARCODE_FORMATS).build()
+                GmsBarcodeScanning.getClient(context, options).startScan()
+                    .addOnSuccessListener { onCodes(listOfNotNull(it.rawValue)) }
+                    .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+            },
+            label = { Text(tr("Scansiona carta d'imbarco")) },
+            leadingIcon = { Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp)) },
+        )
+        AssistChip(
+            onClick = { picker.launch(arrayOf("image/*", "application/pdf")) },
+            label = { Text(tr("Da foto o PDF")) },
+            leadingIcon = { Icon(Icons.Rounded.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp)) },
+        )
+    }
+}
+
+/** Le carte d'imbarco usano PDF417 o Aztec; QR e Data Matrix per sicurezza. */
+private const val BARCODE_FORMAT = Barcode.FORMAT_PDF417
+private val OTHER_BARCODE_FORMATS = intArrayOf(Barcode.FORMAT_AZTEC, Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX)
+
+private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<String>) -> Unit) {
+    val image = runCatching {
+        if (context.contentResolver.getType(uri) == "application/pdf") InputImage.fromBitmap(renderFirstPage(context, uri), 0)
+        else InputImage.fromFilePath(context, uri)
+    }.getOrElse { return onCodes(emptyList()) }
+    val options = BarcodeScannerOptions.Builder().setBarcodeFormats(BARCODE_FORMAT, *OTHER_BARCODE_FORMATS).build()
+    BarcodeScanning.getClient(options).process(image)
+        .addOnSuccessListener { codes -> onCodes(codes.mapNotNull { it.rawValue }) }
+        .addOnFailureListener { onCodes(emptyList()) }
+}
+
+// ponytail: legge solo la prima pagina del PDF, dove c'è quasi sempre il codice; scorrere le pagine se servisse.
+private fun renderFirstPage(context: Context, uri: Uri): Bitmap =
+    context.contentResolver.openFileDescriptor(uri, "r")!!.use { fd ->
+        PdfRenderer(fd).use { pdf ->
+            pdf.openPage(0).use { page ->
+                val width = 2000
+                Bitmap.createBitmap(width, width * page.height / page.width, Bitmap.Config.ARGB_8888).apply {
+                    eraseColor(android.graphics.Color.WHITE)
+                    page.render(this, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                }
+            }
+        }
+    }
 
 @Composable
 private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRemove: () -> Unit) {
@@ -137,7 +222,10 @@ private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRe
             DateField(tr("Partenza"), leg.date, { onChange(leg.copy(date = it)) }, Modifier.weight(1.6f), clearable = true)
             TimeField(tr("Ora"), leg.time, { onChange(leg.copy(time = it)) }, Modifier.weight(1f))
         }
-        Text_(leg.seat, leg.mode.seatLabel) { onChange(leg.copy(seat = it)) }
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+            Text_(leg.seat, leg.mode.seatLabel, Modifier.weight(1f)) { onChange(leg.copy(seat = it)) }
+            Text_(leg.bookingCode, tr("Codice prenotazione"), Modifier.weight(1f), KeyboardCapitalization.Characters) { onChange(leg.copy(bookingCode = it)) }
+        }
     }
 }
 
@@ -214,12 +302,21 @@ fun TripSection(trip: TripInfo) {
             Text(destination, style = MaterialTheme.typography.titleMedium, textDecoration = TextDecoration.Underline)
         }
     }
+    (trip.stay?.address ?: trip.destination)?.let { place ->
+        OnlineMap(place)
+        AssistChip(
+            onClick = { openDirections(context, place) },
+            label = { Text(tr("Portami lì")) },
+            leadingIcon = { Icon(Icons.Rounded.Directions, contentDescription = null, modifier = Modifier.size(18.dp)) },
+        )
+    }
     trip.legs.forEach { leg ->
         FormCard(title = listOfNotNull(leg.from, leg.to).joinToString(" → ").ifEmpty { leg.mode.label }, icon = leg.mode.icon, tone = colors.cyan) {
             val whenText = listOfNotNull(leg.date?.let { DateTexts.date(it, format) }, leg.time?.let(DateTexts::time)).joinToString(" · ")
             if (whenText.isNotEmpty()) InfoRow(tr("Partenza"), whenText)
             listOfNotNull(leg.carrier, leg.code).joinToString(" ").takeIf { it.isNotBlank() }?.let { InfoRow(leg.mode.label, it) }
             leg.seat?.let { InfoRow(leg.mode.seatLabel, it) }
+            leg.bookingCode?.let { InfoRow(tr("Prenotazione"), it) }
         }
     }
     trip.stay?.takeIf { !it.isEmpty }?.let { stay ->
@@ -245,6 +342,43 @@ fun TripSection(trip: TripInfo) {
                 )
             }
         }
+    }
+}
+
+/** Anteprima Google Maps, solo se c'è internet. Toccandola si apre l'app Mappe. */
+@Composable
+private fun OnlineMap(place: String) {
+    val context = LocalContext.current
+    val online = remember { isOnline(context) }
+    if (!online) return
+    Box(Modifier.fillMaxWidth().height(180.dp).clip(MaterialTheme.shapes.large)) {
+        key(place) {
+            AndroidView(
+                factory = {
+                    WebView(it).apply {
+                        settings.javaScriptEnabled = true
+                        webViewClient = WebViewClient()
+                        loadUrl("https://maps.google.com/maps?q=${Uri.encode(place)}&z=14&output=embed")
+                    }
+                },
+                modifier = Modifier.matchParentSize(),
+            )
+        }
+        // Velo trasparente: il tocco apre Mappe invece di trascinare la mappa dentro la pagina.
+        Box(Modifier.matchParentSize().clickable { openMaps(context, place) })
+    }
+}
+
+private fun isOnline(context: Context): Boolean {
+    val manager = context.getSystemService(ConnectivityManager::class.java)
+    return manager.getNetworkCapabilities(manager.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+}
+
+/** Apre Google Maps già con il percorso verso il luogo (o il browser se Maps non c'è). */
+private fun openDirections(context: Context, place: String) {
+    runCatching {
+        val uri = Uri.parse("https://www.google.com/maps/dir/?api=1&destination=" + Uri.encode(place))
+        context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 }
 

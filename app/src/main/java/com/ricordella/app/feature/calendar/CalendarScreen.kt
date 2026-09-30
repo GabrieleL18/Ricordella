@@ -4,6 +4,8 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -103,8 +105,17 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
 
     // Il "+" crea promemoria ed eventi nel giorno selezionato, non oggi.
     TopLevelScaffold(title = tr("Calendario"), navigator = navigator, onAdd = { onAddOn(state.selectedDate) }) { padding ->
+        // In Mese e Giorno si cambia giornata trascinando in qualunque punto dello schermo
+        // (sulla griglia del mese, invece, si cambia mese: vince il gesto più interno).
+        val swipesDays = state.mode != CalendarMode.AGENDA
         LazyColumn(
-            modifier = Modifier.fillMaxSize().contentWidth(),
+            modifier = Modifier
+                .fillMaxSize()
+                .contentWidth()
+                .horizontalSwipe(
+                    onPrevious = { if (swipesDays) viewModel.onShiftDay(-1) },
+                    onNext = { if (swipesDays) viewModel.onShiftDay(1) },
+                ),
             contentPadding = PaddingValues(
                 start = RicordellaDimensions.screenPadding,
                 end = RicordellaDimensions.screenPadding,
@@ -139,15 +150,23 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                             onToday = { viewModel.onToday(today) },
                         )
                     }
-                    item(key = "timeline-${state.selectedDate}") {
-                        DayTimeline(
-                            date = state.selectedDate,
-                            occurrences = state.selectedOccurrences,
-                            now = state.now,
-                            onOpen = { navigator.openReminder(it.reminder.id) },
-                            onAdd = { navigator.newReminder(date = state.selectedDate) },
-                            modifier = Modifier.animateItem(),
-                        )
+                    item(key = "timeline") {
+                        // Le giornate si sfogliano trascinando a destra/sinistra.
+                        AnimatedContent(
+                            targetState = state.selectedDate to state.selectedOccurrences,
+                            contentKey = { it.first },
+                            transitionSpec = { slideTowards(targetState.first > initialState.first) },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = "day",
+                        ) { (date, occurrences) ->
+                            DayTimeline(
+                                date = date,
+                                occurrences = occurrences,
+                                now = state.now,
+                                onOpen = { navigator.openReminder(it.reminder.id) },
+                                onAdd = { navigator.newReminder(date = date) },
+                            )
+                        }
                     }
                 }
                 CalendarMode.AGENDA -> {
@@ -193,7 +212,7 @@ private fun LazyListScope.dayItems(
         }
     }
     items(occurrences, key = { "day-$date-${it.reminder.id}" }) { occurrence ->
-        OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem())
+        OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem(), swipeToComplete = false)
     }
 }
 
@@ -204,6 +223,7 @@ private fun OccurrenceCard(
     navigator: AppNavigator,
     viewModel: CalendarViewModel,
     modifier: Modifier = Modifier,
+    swipeToComplete: Boolean = true,
 ) {
     ReminderCard(
         entry = occurrence.entry,
@@ -214,6 +234,7 @@ private fun OccurrenceCard(
         dateMode = ReminderDateMode.TIME_ONLY,
         occurrenceDate = occurrence.date,
         modifier = modifier,
+        swipeToComplete = swipeToComplete,
     )
 }
 
@@ -235,6 +256,33 @@ private fun PeriodHeader(title: String, onPrevious: () -> Unit, onNext: () -> Un
         TextButton(onClick = onToday) { Text(tr("Oggi")) }
     }
 }
+
+/** Trascinando a destra si va indietro, a sinistra avanti. */
+@Composable
+private fun Modifier.horizontalSwipe(onPrevious: () -> Unit, onNext: () -> Unit): Modifier {
+    val threshold = with(LocalDensity.current) { 64.dp.toPx() }
+    val previous by rememberUpdatedState(onPrevious)
+    val next by rememberUpdatedState(onNext)
+    return pointerInput(Unit) {
+        var total = 0f
+        detectHorizontalDragGestures(
+            onDragStart = { total = 0f },
+            onDragEnd = {
+                when {
+                    total > threshold -> previous()
+                    total < -threshold -> next()
+                }
+            },
+        ) { _, delta -> total += delta }
+    }
+}
+
+/** Il contenuto nuovo entra dal lato verso cui si va. */
+private fun slideTowards(forward: Boolean): ContentTransform =
+    (slideInHorizontally(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { if (forward) it / 3 else -it / 3 } +
+        fadeIn(tween(RicordellaMotion.SHORT))) togetherWith
+        (slideOutHorizontally(tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseIn)) { if (forward) -it / 3 else it / 3 } +
+            fadeOut(tween(RicordellaMotion.MICRO)))
 
 @Composable
 private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, today: LocalDate) {
@@ -271,28 +319,10 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
             }
         }
         // Il mese scorre nella direzione in cui si va; si può anche trascinare a destra/sinistra.
-        val swipeThreshold = with(LocalDensity.current) { 64.dp.toPx() }
         AnimatedContent(
             targetState = state.month,
-            transitionSpec = {
-                val forward = targetState > initialState
-                (slideInHorizontally(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { if (forward) it / 3 else -it / 3 } +
-                    fadeIn(tween(RicordellaMotion.SHORT))) togetherWith
-                    (slideOutHorizontally(tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseIn)) { if (forward) -it / 3 else it / 3 } +
-                        fadeOut(tween(RicordellaMotion.MICRO)))
-            },
-            modifier = Modifier.pointerInput(Unit) {
-                var total = 0f
-                detectHorizontalDragGestures(
-                    onDragStart = { total = 0f },
-                    onDragEnd = {
-                        when {
-                            total > swipeThreshold -> viewModel.onShiftMonth(-1)
-                            total < -swipeThreshold -> viewModel.onShiftMonth(1)
-                        }
-                    },
-                ) { _, delta -> total += delta }
-            },
+            transitionSpec = { slideTowards(targetState > initialState) },
+            modifier = Modifier.horizontalSwipe(onPrevious = { viewModel.onShiftMonth(-1) }, onNext = { viewModel.onShiftMonth(1) }),
             label = "month",
         ) { month ->
             val lanes = remember(state.occurrences) { spanLanes(state.occurrences) }

@@ -36,6 +36,8 @@ data class TripLeg(
     val time: LocalTime? = null,
     /** Posto, cabina o carrozza. */
     val seat: String? = null,
+    /** Codice di prenotazione (PNR). */
+    val bookingCode: String? = null,
 )
 
 @Serializable

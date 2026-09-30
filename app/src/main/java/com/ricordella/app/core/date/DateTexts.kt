@@ -61,6 +61,9 @@ object DateTexts {
     /** Es. "lunedì 29 settembre 2026", per descrizioni accessibili. */
     fun fullDate(date: LocalDate): String = fullDate.format(date)
 
+    /** "mercoledì 30 settembre", senza anno. */
+    fun weekdayAndDay(date: LocalDate): String = pattern(if (Lang.english) "EEEE, MMMM d" else "EEEE d MMMM").format(date)
+
     fun monthTitle(month: YearMonth): String =
         month.month.getDisplayName(TextStyle.FULL_STANDALONE, locale).replaceFirstChar { it.uppercase() } + " " + month.year
 

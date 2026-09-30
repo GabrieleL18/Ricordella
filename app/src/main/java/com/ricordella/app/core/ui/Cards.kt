@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material3.Card
@@ -37,7 +38,11 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.material3.TextButton
+import kotlinx.coroutines.Job
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -85,6 +90,7 @@ enum class ReminderDateMode { ABSOLUTE, RELATIVE, TIME_ONLY }
 
 /** Tempo lasciato alla festa della spunta prima di aggiornare i dati (e far sparire la card). */
 private const val CELEBRATION_MS = 420L
+private const val UNDO_MS = 3_000L
 
 /**
  * Card di un promemoria. Si completa toccando il cerchio a destra oppure trascinando la card
@@ -100,6 +106,8 @@ fun ReminderCard(
     dateMode: ReminderDateMode = ReminderDateMode.ABSOLUTE,
     occurrenceDate: LocalDate = entry.reminder.dueDate,
     highlighted: Boolean = false,
+    /** false dove lo swipe orizzontale serve ad altro (es. cambiare giorno nel calendario). */
+    swipeToComplete: Boolean = true,
 ) {
     val reminder = entry.reminder
     val isDone = reminder.status == ReminderStatus.COMPLETED
@@ -110,13 +118,24 @@ fun ReminderCard(
 
     // Le feste non hanno la spunta (né lo swipe per completare).
     val sounds = rememberUiSounds()
+    // Completamento con lo swipe: per UNDO_MS si può annullare, poi viene salvato.
+    var undoJob by remember(reminder.id) { mutableStateOf<Job?>(null) }
+    var awaitingUndo by remember(reminder.id) { mutableStateOf(false) }
+    val latestCallback by rememberUpdatedState(onToggleComplete)
+    DisposableEffect(reminder.id) {
+        // Se la scheda esce dallo schermo durante l'attesa, il completamento non va perso.
+        onDispose { if (awaitingUndo) latestCallback?.invoke() }
+    }
+    val celebrate = {
+        celebrating = true
+        sounds(UiSound.DING)
+        burst++
+        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+    }
     val toggle: (() -> Unit)? = onToggleComplete?.takeIf { reminder.type.isCompletable }?.let { callback ->
         {
             if (!isDone && !celebrating) {
-                celebrating = true
-                sounds(UiSound.DING)
-                burst++
-                haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                celebrate()
                 scope.launch {
                     delay(CELEBRATION_MS)
                     callback()
@@ -127,6 +146,23 @@ fun ReminderCard(
             }
         }
     }
+    val swipeComplete: () -> Unit = {
+        if (!isDone && !celebrating) {
+            celebrate()
+            awaitingUndo = true
+            undoJob = scope.launch {
+                delay(UNDO_MS)
+                awaitingUndo = false
+                onToggleComplete?.invoke()
+            }
+        }
+    }
+    val undo: () -> Unit = {
+        undoJob?.cancel()
+        awaitingUndo = false
+        celebrating = false
+        haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+    }
 
     val body: @Composable () -> Unit = {
         ReminderCardBody(
@@ -134,6 +170,7 @@ fun ReminderCard(
             now = now,
             onClick = onClick,
             toggle = toggle,
+            onUndo = if (awaitingUndo) undo else null,
             checked = isDone || celebrating,
             burst = burst,
             dateMode = dateMode,
@@ -142,14 +179,14 @@ fun ReminderCard(
         )
     }
 
-    if (toggle != null && !isDone) {
+    if (swipeToComplete && toggle != null && !isDone) {
         val swipeState = rememberSwipeToDismissBoxState()
         SwipeToDismissBox(
             state = swipeState,
             modifier = modifier,
             enableDismissFromEndToStart = false,
             onDismiss = { value ->
-                if (value == SwipeToDismissBoxValue.StartToEnd) toggle()
+                if (value == SwipeToDismissBoxValue.StartToEnd) swipeComplete()
                 // La card torna al suo posto: la festa della spunta fa il resto.
                 scope.launch { swipeState.reset() }
             },
@@ -190,6 +227,7 @@ private fun ReminderCardBody(
     now: LocalDateTime,
     onClick: () -> Unit,
     toggle: (() -> Unit)?,
+    onUndo: (() -> Unit)?,
     checked: Boolean,
     burst: Int,
     dateMode: ReminderDateMode,
@@ -264,7 +302,12 @@ private fun ReminderCardBody(
                 ReminderBadges(entry, overdue)
             }
             if (reminder.status == ReminderStatus.ACTIVE && !checked) DaysLeft(occurrenceDate, lastDay, today, overdue)
-            if (toggle != null) {
+            if (onUndo != null) {
+                TextButton(onClick = onUndo) {
+                    Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(tr("Annulla"), modifier = Modifier.padding(start = 4.dp))
+                }
+            } else if (toggle != null) {
                 CompleteToggle(checked = checked, burst = burst, onClick = toggle)
             } else {
                 Box(Modifier.size(RicordellaDimensions.spaceS))

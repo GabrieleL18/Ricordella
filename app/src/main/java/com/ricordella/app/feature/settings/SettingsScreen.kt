@@ -1,6 +1,8 @@
 package com.ricordella.app.feature.settings
 
 import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.ui.UiSound
+import com.ricordella.app.core.ui.UiSoundPlayer
 import com.ricordella.app.core.i18n.AppLanguage
 import com.ricordella.app.core.i18n.Lang
 import com.ricordella.app.core.widget.CalendarWidgetProvider
@@ -197,7 +199,8 @@ fun SettingsScreen(onBack: () -> Unit) {
             SettingRow(
                 icon = Icons.Rounded.MusicNote,
                 title = tr("Suoni delle scelte"),
-                subtitle = tr("Un piccolo suono quando scegli categorie e cose."),
+                subtitle = tr("Un piccolo suono quando scegli categorie e cose. Tocca per provarlo."),
+                onClick = { UiSoundPlayer.play(UiSound.DING) },
                 trailing = {
                     Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
                 },

@@ -78,7 +78,7 @@ fun TopLevelScaffold(
                 title = {
                     Text(
                         title,
-                        style = if (brandTitle) BrandTitleStyle.copy(color = MaterialTheme.ricordellaColors.boltEdge) else MaterialTheme.typography.headlineSmall,
+                        style = if (brandTitle) BrandTitleStyle else MaterialTheme.typography.headlineSmall,
                     )
                 },
                 scrollBehavior = scrollBehavior,

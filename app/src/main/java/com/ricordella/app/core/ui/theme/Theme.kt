@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -190,8 +191,14 @@ val BrandFont = FontFamily(
     Font(R.font.fredoka, weight = FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
 )
 
-/** Il nome dell'app, in Fredoka semibold. */
-val BrandTitleStyle = TextStyle(fontFamily = BrandFont, fontWeight = FontWeight.SemiBold, fontSize = 30.sp, letterSpacing = 0.sp)
+/** Il nome dell'app, in Fredoka semibold, con una sfumatura giallo-arancio accesa. */
+val BrandTitleStyle = TextStyle(
+    brush = Brush.linearGradient(listOf(Color(0xFFFFC400), Color(0xFFFF7A00))),
+    fontFamily = BrandFont,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 30.sp,
+    letterSpacing = 0.sp,
+)
 
 /** Plus Jakarta Sans (OFL), incorporato nell'app: nessun download di font. */
 val JakartaSans = FontFamily(

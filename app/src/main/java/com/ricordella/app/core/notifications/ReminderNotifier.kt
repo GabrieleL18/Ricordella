@@ -6,6 +6,7 @@ import com.ricordella.app.core.i18n.trf
 import android.os.Build
 import android.Manifest
 import android.app.NotificationChannel
+import android.media.AudioAttributes
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
@@ -40,8 +41,16 @@ class ReminderNotifier(private val context: Context) {
         ).apply {
             description = context.getString(R.string.notification_channel_reminders_description)
             enableVibration(true)
+            // Suono di Ricordella: una saetta e poi un arpeggio magico.
+            setSound(
+                "android.resource://${context.packageName}/${R.raw.notification_magic}".toUri(),
+                AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build(),
+            )
         }
-        context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        val system = context.getSystemService(NotificationManager::class.java)
+        // Il suono di un canale non si può cambiare dopo la creazione: il vecchio canale senza suono va eliminato.
+        system.deleteNotificationChannel("reminders")
+        system.createNotificationChannel(channel)
     }
 
     fun canPostNotifications(): Boolean =
@@ -165,7 +174,7 @@ class ReminderNotifier(private val context: Context) {
     }
 
     companion object {
-        const val CHANNEL_REMINDERS = "reminders"
+        const val CHANNEL_REMINDERS = "reminders_magic"
         private const val NOTIFICATION_ID = 1
     }
 }
