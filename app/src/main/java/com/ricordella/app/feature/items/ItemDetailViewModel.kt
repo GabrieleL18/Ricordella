@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -88,7 +90,7 @@ class ItemDetailViewModel(
 
     fun onUpdateOdometer(km: Int) {
         val item = uiState.value.entry?.item ?: return
-        launchAction("Chilometraggio aggiornato") { items.update(item.copy(odometerKm = km, updatedAt = time.now())) }
+        launchAction(tr("Chilometraggio aggiornato")) { items.update(item.copy(odometerKm = km, updatedAt = time.now())) }
     }
 
     fun onAddMaintenance(
@@ -98,7 +100,7 @@ class ItemDetailViewModel(
         costCents: Long?,
         description: String?,
         next: NextMaintenance?,
-    ) = launchAction("Intervento registrato") {
+    ) = launchAction(tr("Intervento registrato")) {
         addMaintenanceRecord(
             MaintenanceRecord(
                 itemId = itemId,
@@ -113,13 +115,13 @@ class ItemDetailViewModel(
         )
     }
 
-    fun onDeleteMaintenance(record: MaintenanceRecord) = launchAction("Intervento eliminato") { maintenance.delete(record.id) }
+    fun onDeleteMaintenance(record: MaintenanceRecord) = launchAction(tr("Intervento eliminato")) { maintenance.delete(record.id) }
 
     fun onCompleteReminder(id: String) = launchAction(null) { completeReminder(id) }
 
     fun onToggleArchived() {
         val item = uiState.value.entry?.item ?: return
-        launchAction(if (item.isArchived) "Ripristinata" else "Archiviata") {
+        launchAction(if (item.isArchived) tr("Ripristinata") else tr("Archiviata")) {
             items.update(item.copy(isArchived = !item.isArchived, updatedAt = time.now()))
         }
     }
@@ -156,7 +158,7 @@ class ItemDetailViewModel(
                 action()
                 successMessage?.let(::showMessage)
             } catch (_: Exception) {
-                showMessage("Operazione non riuscita. Riprova.")
+                showMessage(tr("Operazione non riuscita. Riprova."))
             }
         }
     }

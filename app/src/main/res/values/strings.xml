@@ -4,4 +4,5 @@
     <string name="notification_channel_reminders">Promemoria</string>
     <string name="notification_channel_reminders_description">Notifiche dei promemoria e delle scadenze</string>
     <string name="widget_description">Calendario del mese con i tuoi promemoria e i pulsanti per aggiungere al volo</string>
+    <string name="widget_label">Calendario Remindella</string>
 </resources>

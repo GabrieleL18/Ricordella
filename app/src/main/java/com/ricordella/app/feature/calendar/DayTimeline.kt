@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.calendar
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -113,7 +116,7 @@ fun DayTimeline(
             }
         }
         if (!nowPlaced) NowRow(now.minute)
-        AddRow(if (occurrences.isEmpty()) "Nessun impegno: aggiungine uno" else "Aggiungi", onAdd)
+        AddRow(if (occurrences.isEmpty()) tr("Nessun impegno: aggiungine uno") else tr("Aggiungi"), onAdd)
     }
 }
 
@@ -183,7 +186,7 @@ private fun NowIndicator(minute: Int) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Box(Modifier.size(10.dp).graphicsLayer { scaleX = pulse; scaleY = pulse }.background(colors.coral.solid, CircleShape))
         Box(Modifier.weight(1f).height(2.dp).background(colors.coral.solid))
-        Text("adesso :%02d".format(minute), style = MaterialTheme.typography.labelSmall, color = colors.coral.content)
+        Text(tr("adesso :%02d").format(minute), style = MaterialTheme.typography.labelSmall, color = colors.coral.content)
     }
 }
 
@@ -228,7 +231,7 @@ private fun TimelineCard(
             )
             Text(
                 listOfNotNull(
-                    if (occurrence.isMultiDay) "Giorno ${occurrence.dayNumber} di ${reminder.extraDays + 1}" else reminder.dueTime?.let(DateTexts::time),
+                    if (occurrence.isMultiDay) trf("Giorno %1\$s di %2\$s", occurrence.dayNumber, reminder.extraDays + 1) else reminder.dueTime?.let(DateTexts::time),
                     reminder.type.label,
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.labelMedium,
@@ -246,7 +249,7 @@ private fun TimelineCard(
                     .size(32.dp)
                     .clip(CircleShape)
                     .border(2.5.dp, tone.solid, CircleShape)
-                    .clickable(role = Role.Checkbox, onClickLabel = "Completa") { sounds(UiSound.DING); onToggle!!(occurrence) },
+                    .clickable(role = Role.Checkbox, onClickLabel = tr("Completa")) { sounds(UiSound.DING); onToggle!!(occurrence) },
             )
         }
     }

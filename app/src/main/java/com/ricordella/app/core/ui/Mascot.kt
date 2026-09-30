@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -138,7 +140,7 @@ fun CrystalBallMascot(
         modifier = modifier
             .size(size)
             .semantics {
-                contentDescription = if (overdue) "Remindella: c'è qualcosa di scaduto" else "Remindella, la palla di vetro"
+                contentDescription = if (overdue) tr("Remindella: c'è qualcosa di scaduto") else tr("Remindella, la palla di vetro")
             }
             .then(
                 if (interactive) {

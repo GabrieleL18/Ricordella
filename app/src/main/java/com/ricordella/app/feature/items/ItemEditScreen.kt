@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.foundation.clickable
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -119,11 +122,11 @@ private enum class ItemStep { CATEGORY, THING, DETAILS }
 
 private val ItemGroup.examples: String
     get() = when (this) {
-        ItemGroup.VEHICLES -> "Auto, moto, scooter"
-        ItemGroup.HOME -> "Lavatrice, caldaia, TV"
-        ItemGroup.ELECTRONICS -> "Smartphone, computer"
-        ItemGroup.DOCUMENTS -> "Documenti, contratti"
-        ItemGroup.GENERIC -> "Attrezzi e oggetti"
+        ItemGroup.VEHICLES -> tr("Auto, moto, scooter")
+        ItemGroup.HOME -> tr("Lavatrice, caldaia, TV")
+        ItemGroup.ELECTRONICS -> tr("Smartphone, computer")
+        ItemGroup.DOCUMENTS -> tr("Documenti, contratti")
+        ItemGroup.GENERIC -> tr("Attrezzi e oggetti")
     }
 
 /**
@@ -159,11 +162,11 @@ fun ItemEditScreen(onBack: () -> Unit) {
     BackHandler(enabled = step == ItemStep.THING || (step == ItemStep.DETAILS && form.isNew)) { goBack() }
 
     DetailScaffold(
-        title = if (form.isNew) "Nuova cosa" else "Modifica",
+        title = if (form.isNew) tr("Nuova cosa") else tr("Modifica"),
         onBack = onBack,
         snackbarHostState = snackbar,
         actions = {
-            if (step == ItemStep.DETAILS) TextButton(onClick = viewModel::save, enabled = !form.isSaving && !form.isLoading) { Text("Salva") }
+            if (step == ItemStep.DETAILS) TextButton(onClick = viewModel::save, enabled = !form.isSaving && !form.isLoading) { Text(tr("Salva")) }
         },
     ) { padding ->
         if (step == null) return@DetailScaffold
@@ -181,8 +184,8 @@ fun ItemEditScreen(onBack: () -> Unit) {
             ) { current ->
                 when (current) {
                     ItemStep.CATEGORY -> ChoiceGrid(
-                        title = "Che tipo di cosa è?",
-                        subtitle = "Scegli la categoria",
+                        title = tr("Che tipo di cosa è?"),
+                        subtitle = tr("Scegli la categoria"),
                         choices = ItemGroup.entries.map { g -> Choice(g.name, g.icon, g.label, g.examples, g.tone, g == group) },
                         onChoice = { key ->
                             sounds(UiSound.POP)
@@ -193,11 +196,11 @@ fun ItemEditScreen(onBack: () -> Unit) {
                     ItemStep.THING -> {
                         val selectedGroup = group ?: ItemGroup.GENERIC
                         ChoiceGrid(
-                            title = "Quale ${selectedGroup.label.lowercase()}?",
-                            subtitle = "Scegli la cosa",
+                            title = trf("Quale %1\$s?", selectedGroup.label.lowercase()),
+                            subtitle = tr("Scegli la cosa"),
                             header = { GroupCrumb(selectedGroup, onChange = goBack) },
                             choices = categories.filter { it.itemGroup == selectedGroup }.map { category ->
-                                Choice(category.id, category.kind.icon, category.name, null, selectedGroup.tone, category.id == form.category?.id)
+                                Choice(category.id, category.kind.icon, category.label, null, selectedGroup.tone, category.id == form.category?.id)
                             },
                             onChoice = { id ->
                                 sounds(UiSound.DING)
@@ -218,7 +221,7 @@ fun ItemEditScreen(onBack: () -> Unit) {
 private fun StepIndicator(current: Int, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.ricordellaColors
     Row(modifier.fillMaxWidth().padding(vertical = RicordellaDimensions.spaceS), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        listOf("Categoria", "Cosa", "Dettagli").forEachIndexed { index, label ->
+        listOf(tr("Categoria"), tr("Cosa"), tr("Dettagli")).forEachIndexed { index, label ->
             val fill by animateFloatAsState(if (index <= current) 1f else 0f, tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut), label = "step")
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Box(Modifier.fillMaxWidth().height(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceContainerHigh)) {
@@ -319,7 +322,7 @@ private fun GroupCrumb(group: ItemGroup, onChange: () -> Unit, kindName: String?
                 Icon(group.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(16.dp))
             }
             Text(listOfNotNull(group.label, kindName).joinToString("  ›  "), style = MaterialTheme.typography.labelLarge)
-            Icon(Icons.Rounded.Edit, contentDescription = "Cambia", modifier = Modifier.size(16.dp))
+            Icon(Icons.Rounded.Edit, contentDescription = tr("Cambia"), modifier = Modifier.size(16.dp))
         }
     }
 }
@@ -334,30 +337,30 @@ private fun DetailsForm(form: ItemForm, viewModel: ItemEditViewModel, onChangeCa
             .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceS),
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
-        GroupCrumb(form.group, onChange = onChangeCategory, kindName = form.category?.name)
-        FormSection("Com'è fatta", Icons.Rounded.Info, form.group.tone) {
+        GroupCrumb(form.group, onChange = onChangeCategory, kindName = form.category?.label)
+        FormSection(tr("Com'è fatta"), Icons.Rounded.Info, form.group.tone) {
             PhotoRow(form, viewModel)
             MainFields(form, viewModel)
         }
         if (ItemReminderTemplates.supportsWarranty(form.group)) {
-            FormSection("Garanzia", Icons.Rounded.VerifiedUser, MaterialTheme.ricordellaColors.mint) { WarrantyFields(form, viewModel) }
+            FormSection(tr("Garanzia"), Icons.Rounded.VerifiedUser, MaterialTheme.ricordellaColors.mint) { WarrantyFields(form, viewModel) }
         }
-        FormSection("Persone", Icons.Rounded.People, MaterialTheme.ricordellaColors.coral) { PeopleFields(form, viewModel) }
+        FormSection(tr("Persone"), Icons.Rounded.People, MaterialTheme.ricordellaColors.coral) { PeopleFields(form, viewModel) }
         if (form.isNew && form.suggestions.isNotEmpty()) {
-            FormSection("Cosa vuoi ricordare?", Icons.Rounded.NotificationsActive, MaterialTheme.ricordellaColors.pear) { SuggestionFields(form, viewModel) }
+            FormSection(tr("Cosa vuoi ricordare?"), Icons.Rounded.NotificationsActive, MaterialTheme.ricordellaColors.pear) { SuggestionFields(form, viewModel) }
         }
-        FormSection("Note", Icons.AutoMirrored.Rounded.Notes, MaterialTheme.ricordellaColors.lavender) {
+        FormSection(tr("Note"), Icons.AutoMirrored.Rounded.Notes, MaterialTheme.ricordellaColors.lavender) {
             OutlinedTextField(
                 value = form.notes,
                 onValueChange = { value -> viewModel.update { it.copy(notes = value) } },
-                label = { Text("Note") },
+                label = { Text(tr("Note")) },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
         PushButton(
-            text = "Salva",
+            text = tr("Salva"),
             onClick = viewModel::save,
             icon = Icons.Rounded.Check,
             loading = form.isSaving,
@@ -395,16 +398,16 @@ private fun PhotoRow(form: ItemForm, viewModel: ItemEditViewModel) {
         val placeholder: @Composable () -> Unit = { IconBadge(form.category?.kind.icon, modifier = Modifier.size(72.dp)) }
         val photo = form.photoUri
         if (photo != null) {
-            UriImage(photo, contentDescription = "Foto", modifier = Modifier.size(72.dp).clip(RoundedCornerShape(16.dp)), fallback = placeholder)
+            UriImage(photo, contentDescription = tr("Foto"), modifier = Modifier.size(72.dp).clip(RoundedCornerShape(16.dp)), fallback = placeholder)
         } else {
             placeholder()
         }
         Column {
             OutlinedButton(onClick = pickPhoto) {
                 Icon(Icons.Rounded.AddAPhoto, contentDescription = null)
-                Text(if (photo == null) "Aggiungi foto" else "Cambia foto", modifier = Modifier.padding(start = 8.dp))
+                Text(if (photo == null) tr("Aggiungi foto") else tr("Cambia foto"), modifier = Modifier.padding(start = 8.dp))
             }
-            if (photo != null) TextButton(onClick = { viewModel.update { it.copy(photoUri = null) } }) { Text("Rimuovi foto") }
+            if (photo != null) TextButton(onClick = { viewModel.update { it.copy(photoUri = null) } }) { Text(tr("Rimuovi foto")) }
         }
     }
 }
@@ -415,30 +418,30 @@ private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
     OutlinedTextField(
         value = form.name,
         onValueChange = { value -> update { it.copy(name = value) } },
-        label = { Text("Nome *") },
+        label = { Text(tr("Nome *")) },
         isError = form.nameError,
-        supportingText = if (form.nameError) ({ Text("Inserisci un nome") }) else ({ Text("Es. Fiat Panda, Lavatrice Samsung") }),
+        supportingText = if (form.nameError) ({ Text(tr("Inserisci un nome")) }) else ({ Text(tr("Es. Fiat Panda, Lavatrice Samsung")) }),
         singleLine = true,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth(),
     )
     if (form.group != ItemGroup.DOCUMENTS) {
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            TextInput("Marca", form.brand, Modifier.weight(1f)) { value -> update { it.copy(brand = value) } }
-            TextInput("Modello", form.model, Modifier.weight(1f)) { value -> update { it.copy(model = value) } }
+            TextInput(tr("Marca"), form.brand, Modifier.weight(1f)) { value -> update { it.copy(brand = value) } }
+            TextInput(tr("Modello"), form.model, Modifier.weight(1f)) { value -> update { it.copy(model = value) } }
         }
     }
     if (form.isVehicle) {
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            TextInput("Targa", form.licensePlate, Modifier.weight(1f), capitalization = KeyboardCapitalization.Characters) { value ->
+            TextInput(tr("Targa"), form.licensePlate, Modifier.weight(1f), capitalization = KeyboardCapitalization.Characters) { value ->
                 update { it.copy(licensePlate = value) }
             }
-            NumberInput("Anno", form.productionYear, Modifier.weight(0.7f), maxLength = 4) { value -> update { it.copy(productionYear = value) } }
+            NumberInput(tr("Anno"), form.productionYear, Modifier.weight(0.7f), maxLength = 4) { value -> update { it.copy(productionYear = value) } }
         }
-        NumberInput("Chilometri attuali", form.odometerKm, Modifier.fillMaxWidth(), maxLength = 7) { value -> update { it.copy(odometerKm = value) } }
+        NumberInput(tr("Chilometri attuali"), form.odometerKm, Modifier.fillMaxWidth(), maxLength = 7) { value -> update { it.copy(odometerKm = value) } }
     }
     if (form.group != ItemGroup.DOCUMENTS) {
-        TextInput("Numero di serie", form.serialNumber, Modifier.fillMaxWidth(), capitalization = KeyboardCapitalization.Characters) { value ->
+        TextInput(tr("Numero di serie"), form.serialNumber, Modifier.fillMaxWidth(), capitalization = KeyboardCapitalization.Characters) { value ->
             update { it.copy(serialNumber = value) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
@@ -452,7 +455,7 @@ private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
             OutlinedTextField(
                 value = form.purchasePrice,
                 onValueChange = { value -> update { it.copy(purchasePrice = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(10)) } },
-                label = { Text("Prezzo €") },
+                label = { Text(tr("Prezzo €")) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 modifier = Modifier.weight(1f),
@@ -467,7 +470,7 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
     val update = viewModel::update
     val pickDocument = rememberFilePicker { file -> update { it.copy(warrantyDocumentUri = file.uri) } }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Ha una garanzia", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(tr("Ha una garanzia"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         Switch(checked = form.hasWarranty, onCheckedChange = { value ->
             update { it.copy(hasWarranty = value) }
             if (value && form.warrantyEnd == null) viewModel.onWarrantyDuration(24)
@@ -485,7 +488,7 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
             FilterChip(
                 selected = form.warrantyStart != null && form.warrantyEnd == form.warrantyStart.plusMonths(months),
                 onClick = { viewModel.onWarrantyDuration(months) },
-                label = { Text("${months / 12} ${if (months == 12L) "anno" else "anni"}") },
+                label = { Text(if (months == 12L) tr("1 anno") else trf("%1\$s anni", months / 12)) },
             )
         }
     }
@@ -496,18 +499,18 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
         isError = form.warrantyError,
         modifier = Modifier.fillMaxWidth(),
     )
-    TextInput("Venditore", form.warrantySeller, Modifier.fillMaxWidth()) { value -> update { it.copy(warrantySeller = value) } }
+    TextInput(tr("Venditore"), form.warrantySeller, Modifier.fillMaxWidth()) { value -> update { it.copy(warrantySeller = value) } }
     Row(verticalAlignment = Alignment.CenterVertically) {
         OutlinedButton(onClick = pickDocument) {
             Icon(Icons.Rounded.AttachFile, contentDescription = null)
-            Text(if (form.warrantyDocumentUri == null) "Allega documento" else "Cambia documento", modifier = Modifier.padding(start = 8.dp))
+            Text(if (form.warrantyDocumentUri == null) tr("Allega documento") else tr("Cambia documento"), modifier = Modifier.padding(start = 8.dp))
         }
         if (form.warrantyDocumentUri != null) {
-            TextButton(onClick = { update { it.copy(warrantyDocumentUri = null) } }) { Text("Rimuovi") }
+            TextButton(onClick = { update { it.copy(warrantyDocumentUri = null) } }) { Text(tr("Rimuovi")) }
         }
     }
     Text(
-        "Remindella ti avviserà 30 giorni prima della scadenza.",
+        tr("Remindella ti avviserà 30 giorni prima della scadenza."),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -532,7 +535,7 @@ private fun PeopleFields(form: ItemForm, viewModel: ItemEditViewModel) {
                         )
                     }
                     DropdownMenuItem(
-                        text = { Text("Rimuovi") },
+                        text = { Text(tr("Rimuovi")) },
                         onClick = { menu = false; viewModel.update { it.copy(people = it.people - person.id) } },
                     )
                 }
@@ -541,18 +544,18 @@ private fun PeopleFields(form: ItemForm, viewModel: ItemEditViewModel) {
         FilterChip(
             selected = false,
             onClick = { showPicker = true },
-            label = { Text("Persona") },
+            label = { Text(tr("Persona")) },
             leadingIcon = { Icon(Icons.Rounded.Add, contentDescription = null) },
         )
     }
     if (showPicker) {
         MultiSelectDialog(
-            title = "Persone associate",
+            title = tr("Persone associate"),
             options = people,
             initiallySelected = form.people.keys,
             idOf = { it.id },
             labelOf = { it.displayName },
-            emptyMessage = "Non hai ancora aggiunto persone.",
+            emptyMessage = tr("Non hai ancora aggiunto persone."),
             onDismiss = { showPicker = false },
             onConfirm = { ids ->
                 viewModel.update { current ->
@@ -585,7 +588,7 @@ private fun SuggestionFields(form: ItemForm, viewModel: ItemEditViewModel) {
         }
     }
     Text(
-        "Potrai modificare date e dettagli in qualsiasi momento.",
+        tr("Potrai modificare date e dettagli in qualsiasi momento."),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -600,14 +603,14 @@ private fun SuggestionFields(form: ItemForm, viewModel: ItemEditViewModel) {
 
 private fun ReminderSuggestion.describe(): String {
     val recurrence = when (frequency) {
-        RecurrenceFrequency.DAILY -> if (interval == 1) "Ogni giorno" else "Ogni $interval giorni"
-        RecurrenceFrequency.WEEKLY -> if (interval == 1) "Ogni settimana" else "Ogni $interval settimane"
-        RecurrenceFrequency.MONTHLY -> if (interval == 1) "Ogni mese" else "Ogni $interval mesi"
-        RecurrenceFrequency.YEARLY -> if (interval == 1) "Ogni anno" else "Ogni $interval anni"
+        RecurrenceFrequency.DAILY -> if (interval == 1) tr("Ogni giorno") else trf("Ogni %1\$s giorni", interval)
+        RecurrenceFrequency.WEEKLY -> if (interval == 1) tr("Ogni settimana") else trf("Ogni %1\$s settimane", interval)
+        RecurrenceFrequency.MONTHLY -> if (interval == 1) tr("Ogni mese") else trf("Ogni %1\$s mesi", interval)
+        RecurrenceFrequency.YEARLY -> if (interval == 1) tr("Ogni anno") else trf("Ogni %1\$s anni", interval)
         null -> null
     }
-    val km = odometerIntervalKm?.let { "ogni ${DateTexts.kilometers(it)} o un anno" }
-    return listOfNotNull(recurrence, km).joinToString(" · ").ifEmpty { "Una volta" }.replaceFirstChar { it.uppercase() }
+    val km = odometerIntervalKm?.let { trf("ogni %1\$s o un anno", DateTexts.kilometers(it)) }
+    return listOfNotNull(recurrence, km).joinToString(" · ").ifEmpty { tr("Una volta") }.replaceFirstChar { it.uppercase() }
 }
 
 @Composable

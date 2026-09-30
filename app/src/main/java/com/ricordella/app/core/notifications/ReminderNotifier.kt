@@ -1,5 +1,8 @@
 package com.ricordella.app.core.notifications
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.os.Build
 import android.Manifest
 import android.app.NotificationChannel
@@ -63,9 +66,9 @@ class ReminderNotifier(private val context: Context) {
             .setContentIntent(openIntent(reminder.id))
             .apply {
                 if (reminder.type.isCompletable) {
-                    addAction(0, "Completa", actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
-                    addAction(0, "Tra 10 min", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_10_MINUTES))
-                    addAction(0, "Domani", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_TOMORROW))
+                    addAction(0, tr("Completa"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
+                    addAction(0, tr("Tra 10 min"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_10_MINUTES))
+                    addAction(0, tr("Domani"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_TOMORROW))
                 }
             }
             .build()
@@ -101,10 +104,10 @@ class ReminderNotifier(private val context: Context) {
             setTextViewText(R.id.notif_title, reminder.title)
             setTextViewText(R.id.notif_subtitle, contentText(entry, today))
             setTextViewText(R.id.notif_countdown, when {
-                days == 0L -> "Oggi"
-                days == 1L -> "Domani"
-                days > 1 -> "tra $days gg"
-                else -> "${-days} gg fa"
+                days == 0L -> tr("Oggi")
+                days == 1L -> tr("Domani")
+                days > 1 -> trf("tra %1\$s gg", days)
+                else -> trf("%1\$s gg fa", -days)
             })
             setInt(R.id.notif_countdown, "setBackgroundResource", if (days < 0) NotifTone.CORAL.pill else tone.pill)
             if (layout == R.layout.notification_reminder_big) {

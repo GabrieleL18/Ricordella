@@ -1,5 +1,8 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -172,7 +175,7 @@ fun ReminderCard(
                             scaleY = scale
                         },
                     )
-                    Text("Completa", style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    Text(tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content)
                 }
             },
         ) { body() }
@@ -204,10 +207,10 @@ private fun ReminderCardBody(
 
     val lastDay = occurrenceDate.plusDays(reminder.extraDays)
     val dateText = if (reminder.isMultiDay) {
-        "Dal ${DateTexts.date(occurrenceDate, settings.dateFormat, today)} al ${DateTexts.date(lastDay, settings.dateFormat, today)}"
+        trf("Dal %1\$s al %2\$s", DateTexts.date(occurrenceDate, settings.dateFormat, today), DateTexts.date(lastDay, settings.dateFormat, today))
     } else when (dateMode) {
         ReminderDateMode.ABSOLUTE -> DateTexts.dateWithTime(occurrenceDate, reminder.dueTime, settings.dateFormat, today)
-        ReminderDateMode.TIME_ONLY -> reminder.dueTime?.let(DateTexts::time) ?: "Tutto il giorno"
+        ReminderDateMode.TIME_ONLY -> reminder.dueTime?.let(DateTexts::time) ?: tr("Tutto il giorno")
         ReminderDateMode.RELATIVE ->
             if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(occurrenceDate, today)
             else DateTexts.relativeWithTime(occurrenceDate, reminder.dueTime, today)
@@ -252,7 +255,7 @@ private fun ReminderCardBody(
                         fontWeight = if (overdue) FontWeight.Bold else FontWeight.Medium,
                     )
                     if (entry.recurrenceRule != null) {
-                        Icon(Icons.Rounded.Repeat, contentDescription = "Ricorrente", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Rounded.Repeat, contentDescription = tr("Ricorrente"), modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 if (links.isNotEmpty()) {
@@ -281,8 +284,8 @@ private fun DaysLeft(date: LocalDate, lastDay: LocalDate, today: LocalDate, over
             Modifier.widthIn(min = 52.dp).background(colors.mint.container, RoundedCornerShape(14.dp)).padding(horizontal = 8.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("In corso", style = MaterialTheme.typography.labelMedium, color = colors.mint.content)
-            Text(if (left == 0L) "ultimo giorno" else "ancora $left gg", style = MaterialTheme.typography.labelSmall, color = colors.mint.content)
+            Text(tr("In corso"), style = MaterialTheme.typography.labelMedium, color = colors.mint.content)
+            Text(if (left == 0L) tr("ultimo giorno") else trf("ancora %1\$s gg", left), style = MaterialTheme.typography.labelSmall, color = colors.mint.content)
         }
         return
     }
@@ -294,11 +297,11 @@ private fun DaysLeft(date: LocalDate, lastDay: LocalDate, today: LocalDate, over
         else -> colors.cyan
     }
     val (value, unit) = when {
-        days == 0L -> "Oggi" to ""
-        days == 1L -> "1" to "giorno"
-        days > 1 -> "$days" to "giorni"
-        days == -1L -> "1" to "giorno fa"
-        else -> "${-days}" to "giorni fa"
+        days == 0L -> tr("Oggi") to ""
+        days == 1L -> "1" to tr("giorno")
+        days > 1 -> "$days" to tr("giorni")
+        days == -1L -> "1" to tr("giorno fa")
+        else -> "${-days}" to tr("giorni fa")
     }
     Column(
         Modifier
@@ -306,11 +309,11 @@ private fun DaysLeft(date: LocalDate, lastDay: LocalDate, today: LocalDate, over
             .background(tone.container, RoundedCornerShape(14.dp))
             .padding(horizontal = 8.dp, vertical = 6.dp)
             .semantics(mergeDescendants = true) {
-                contentDescription = if (days == 0L) "Oggi" else if (days > 0) "Mancano $value $unit" else "$value $unit"
+                contentDescription = if (days == 0L) tr("Oggi") else if (days > 0) trf("Mancano %1\$s %2\$s", value, unit) else "$value $unit"
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (days > 0) Text("mancano", style = MaterialTheme.typography.labelSmall, color = tone.content)
+        if (days > 0) Text(tr("mancano"), style = MaterialTheme.typography.labelSmall, color = tone.content)
         Text(value, style = if (days == 0L) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleLarge, color = tone.content, maxLines = 1)
         if (unit.isNotEmpty()) Text(unit, style = MaterialTheme.typography.labelSmall, color = tone.content, maxLines = 1)
     }
@@ -335,8 +338,8 @@ private fun CompleteToggle(checked: Boolean, burst: Int, onClick: () -> Unit) {
         modifier = Modifier
             .size(RicordellaDimensions.minTouchTarget)
             .semantics {
-                contentDescription = "Completato"
-                stateDescription = if (checked) "Fatto" else "Da fare"
+                contentDescription = tr("Completato")
+                stateDescription = if (checked) tr("Fatto") else tr("Da fare")
             }
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -374,10 +377,10 @@ private fun ReminderBadges(entry: ReminderWithLinks, overdue: Boolean) {
     val colors = MaterialTheme.ricordellaColors
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 4.dp)) {
         if (overdue) {
-            StatusBadge("Scaduto", colors.coral.container, colors.coral.content)
+            StatusBadge(tr("Scaduto"), colors.coral.container, colors.coral.content)
         }
         if (odometer != null) {
-            StatusBadge("Km: ${odometer.label}", colors.pear.container, colors.pear.content)
+            StatusBadge(trf("Km: %1\$s", odometer.label), colors.pear.container, colors.pear.content)
         }
         PriorityIndicator(entry.reminder.priority)
     }
@@ -459,7 +462,7 @@ fun ItemCard(entry: ItemWithCategory, onClick: () -> Unit, modifier: Modifier = 
             }
             Column(Modifier.weight(1f)) {
                 Text(item.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val details = subtitle ?: listOfNotNull(entry.category?.name, item.brand, item.model).joinToString(" · ")
+                val details = subtitle ?: listOfNotNull(entry.category?.label, item.brand, item.model).joinToString(" · ")
                 if (details.isNotEmpty()) {
                     Text(details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }

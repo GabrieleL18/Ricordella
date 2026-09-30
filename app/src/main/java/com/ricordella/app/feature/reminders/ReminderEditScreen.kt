@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -85,11 +88,15 @@ fun ReminderEditScreen(onBack: () -> Unit) {
     }
 
     DetailScaffold(
-        title = if (form.isNew) "Nuovo ${if (form.type == ReminderType.EVENT) "evento" else "promemoria"}" else "Modifica",
+        title = when {
+            !form.isNew -> tr("Modifica")
+            form.type == ReminderType.EVENT -> tr("Nuovo evento")
+            else -> tr("Nuovo promemoria")
+        },
         onBack = onBack,
         snackbarHostState = snackbar,
         actions = {
-            TextButton(onClick = viewModel::save, enabled = !form.isSaving && !form.isLoading) { Text("Salva") }
+            TextButton(onClick = viewModel::save, enabled = !form.isSaving && !form.isLoading) { Text(tr("Salva")) }
         },
     ) { padding ->
         if (form.isLoading) return@DetailScaffold
@@ -109,13 +116,13 @@ fun ReminderEditScreen(onBack: () -> Unit) {
             }
             TextButton(onClick = { viewModel.update { it.copy(showAdvanced = !it.showAdvanced) } }) {
                 Icon(if (form.showAdvanced) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
-                Text(if (form.showAdvanced) "Nascondi opzioni" else "Altre opzioni", modifier = Modifier.padding(start = 8.dp))
+                Text(if (form.showAdvanced) tr("Nascondi opzioni") else tr("Altre opzioni"), modifier = Modifier.padding(start = 8.dp))
             }
             if (form.showAdvanced) {
                 AdvancedFields(form, viewModel)
             }
             PushButton(
-                text = "Salva",
+                text = tr("Salva"),
                 onClick = viewModel::save,
                 icon = Icons.Rounded.Check,
                 loading = form.isSaving,
@@ -131,9 +138,9 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     OutlinedTextField(
         value = form.title,
         onValueChange = { value -> update { it.copy(title = value) } },
-        label = { Text("Titolo *") },
+        label = { Text(tr("Titolo *")) },
         isError = form.titleError,
-        supportingText = if (form.titleError) ({ Text("Inserisci un titolo") }) else null,
+        supportingText = if (form.titleError) ({ Text(tr("Inserisci un titolo")) }) else null,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
@@ -156,8 +163,8 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     // Eventi di più giorni: vacanze, viaggi, ricoveri... Nel calendario appaiono come una barra continua.
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text("Dura più giorni", style = MaterialTheme.typography.bodyLarge)
-            Text("Es. una vacanza o un viaggio", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(tr("Dura più giorni"), style = MaterialTheme.typography.bodyLarge)
+            Text(tr("Es. una vacanza o un viaggio"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Switch(checked = form.multiDay, onCheckedChange = { value ->
             update { it.copy(multiDay = value, endDate = if (value) it.endDate ?: it.date?.plusDays(1) else it.endDate) }
@@ -173,12 +180,12 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
         )
     }
     if (form.endDateError) {
-        Text("L'ultimo giorno deve venire dopo il primo.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        Text(tr("L'ultimo giorno deve venire dopo il primo."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
     }
     if (form.time == null) {
-        Text("Senza orario il promemoria vale per tutto il giorno.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr("Senza orario il promemoria vale per tutto il giorno."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    Text("Tipo", style = MaterialTheme.typography.labelLarge)
+    Text(tr("Tipo"), style = MaterialTheme.typography.labelLarge)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         ReminderType.entries.forEach { type ->
             val tone = type.tone
@@ -210,13 +217,13 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
     OutlinedTextField(
         value = form.description,
         onValueChange = { value -> update { it.copy(description = value) } },
-        label = { Text("Descrizione") },
+        label = { Text(tr("Descrizione")) },
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth(),
         minLines = 2,
     )
 
-    SectionHeader("Ricorrenza")
+    SectionHeader(tr("Ricorrenza"))
     DropdownField(
         label = "Si ripete",
         options = RecurrencePreset.entries,
@@ -229,7 +236,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
             OutlinedTextField(
                 value = form.customInterval,
                 onValueChange = { value -> update { it.copy(customInterval = value.filter(Char::isDigit).take(3)) } },
-                label = { Text("Ogni") },
+                label = { Text(tr("Ogni")) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(0.4f),
@@ -264,7 +271,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         )
     }
 
-    SectionHeader("Priorità")
+    SectionHeader(tr("Priorità"))
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
         Priority.entries.forEachIndexed { index, priority ->
             SegmentedButton(
@@ -275,11 +282,11 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         }
     }
 
-    SectionHeader("Categoria")
+    SectionHeader(tr("Categoria"))
     OutlinedTextField(
         value = form.category,
         onValueChange = { value -> update { it.copy(category = value) } },
-        label = { Text("Categoria (es. Casa, Lavoro)") },
+        label = { Text(tr("Categoria (es. Casa, Lavoro)")) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth(),
@@ -293,33 +300,33 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         }
     }
 
-    SectionHeader("Collegamenti")
-    Text("Persone", style = MaterialTheme.typography.labelLarge)
+    SectionHeader(tr("Collegamenti"))
+    Text(tr("Persone"), style = MaterialTheme.typography.labelLarge)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         people.filter { it.id in form.personIds }.forEach { person ->
             InputChip(selected = true, onClick = { update { it.copy(personIds = it.personIds - person.id) } }, label = { Text(person.displayName) })
         }
-        AssistAddChip("Persona") { showPeoplePicker = true }
+        AssistAddChip(tr("Persona")) { showPeoplePicker = true }
     }
-    Text("Cose", style = MaterialTheme.typography.labelLarge)
+    Text(tr("Cose"), style = MaterialTheme.typography.labelLarge)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         items.filter { it.item.id in form.itemIds }.forEach { entry ->
             InputChip(selected = true, onClick = { update { it.copy(itemIds = it.itemIds - entry.item.id) } }, label = { Text(entry.item.name) })
         }
-        AssistAddChip("Cosa") { showItemPicker = true }
+        AssistAddChip(tr("Cosa")) { showItemPicker = true }
     }
 
     val linkedVehicle = items.firstOrNull { it.item.id in form.itemIds && it.isVehicle }
     if (linkedVehicle != null || form.dueOdometerKm.isNotEmpty()) {
-        SectionHeader("Chilometraggio")
+        SectionHeader(tr("Chilometraggio"))
         linkedVehicle?.item?.odometerKm?.let {
-            Text("Attuali: ${DateTexts.kilometers(it)}", style = MaterialTheme.typography.bodyMedium)
+            Text(trf("Attuali: %1\$s", DateTexts.kilometers(it)), style = MaterialTheme.typography.bodyMedium)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             OutlinedTextField(
                 value = form.dueOdometerKm,
                 onValueChange = { value -> update { it.copy(dueOdometerKm = value.filter(Char::isDigit).take(7)) } },
-                label = { Text("Scadenza a km") },
+                label = { Text(tr("Scadenza a km")) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f),
@@ -327,7 +334,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
             OutlinedTextField(
                 value = form.odometerIntervalKm,
                 onValueChange = { value -> update { it.copy(odometerIntervalKm = value.filter(Char::isDigit).take(7)) } },
-                label = { Text("Ogni km") },
+                label = { Text(tr("Ogni km")) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f),
@@ -335,9 +342,9 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         }
     }
 
-    SectionHeader("Notifica")
+    SectionHeader(tr("Notifica"))
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Avvisami", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+        Text(tr("Avvisami"), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
         Switch(checked = form.notificationsEnabled, onCheckedChange = { value -> update { it.copy(notificationsEnabled = value) } })
     }
     if (form.notificationsEnabled) {
@@ -355,7 +362,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
     OutlinedTextField(
         value = form.notes,
         onValueChange = { value -> update { it.copy(notes = value) } },
-        label = { Text("Note") },
+        label = { Text(tr("Note")) },
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth(),
         minLines = 2,
@@ -363,24 +370,24 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
 
     if (showPeoplePicker) {
         MultiSelectDialog(
-            title = "Persone collegate",
+            title = tr("Persone collegate"),
             options = people,
             initiallySelected = form.personIds,
             idOf = { it.id },
             labelOf = { it.displayName },
-            emptyMessage = "Non hai ancora aggiunto persone.",
+            emptyMessage = tr("Non hai ancora aggiunto persone."),
             onDismiss = { showPeoplePicker = false },
             onConfirm = { ids -> update { it.copy(personIds = ids) }; showPeoplePicker = false },
         )
     }
     if (showItemPicker) {
         MultiSelectDialog(
-            title = "Cose collegate",
+            title = tr("Cose collegate"),
             options = items,
             initiallySelected = form.itemIds,
             idOf = { it.item.id },
             labelOf = { it.item.name },
-            emptyMessage = "Non hai ancora aggiunto cose.",
+            emptyMessage = tr("Non hai ancora aggiunto cose."),
             onDismiss = { showItemPicker = false },
             onConfirm = { ids -> update { it.copy(itemIds = ids) }; showItemPicker = false },
         )

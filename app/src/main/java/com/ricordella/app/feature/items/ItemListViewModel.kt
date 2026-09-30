@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.ui.label
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ricordella.app.domain.model.ItemGroup
@@ -41,7 +43,7 @@ class ItemListViewModel(items: ItemRepository) : ViewModel() {
         val needle = text.trim()
         val filtered = list.filter { entry ->
             (group == null || entry.group == group) &&
-                (needle.isEmpty() || listOfNotNull(entry.item.name, entry.item.brand, entry.item.model, entry.item.licensePlate, entry.category?.name)
+                (needle.isEmpty() || listOfNotNull(entry.item.name, entry.item.brand, entry.item.model, entry.item.licensePlate, entry.category?.label)
                     .any { it.contains(needle, ignoreCase = true) })
         }
         ItemListUiState(

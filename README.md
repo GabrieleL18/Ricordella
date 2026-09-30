@@ -111,6 +111,14 @@ Scelte principali:
   elenchi). Foto e immagini allegate sono salvate come copie WebP ridotte; i documenti restano riferimenti.
 - **Font**: Plus Jakarta Sans per l'interfaccia, Fredoka per il nome "Remindella" (entrambi OFL).
 
+- **Vacanze**: tipo dedicato con destinazione, tratte (aereo, nave, treno, auto) e alloggio; salvati come JSON
+  nella colonna `trip` del promemoria (migrazione 2 → 3), quindi inclusi nel backup.
+- **Lingue**: italiano e inglese. I testi sono scritti in italiano nel codice e tradotti con `tr()`/`trf()`;
+  le traduzioni stanno in `tools/i18n/en.txt` e `python tools/i18n/generate.py` rigenera `EnglishStrings.kt`
+  e segnala i testi senza traduzione. La lingua segue il sistema, ma si cambia nelle Impostazioni.
+- **Sviluppatore**: 7 tocchi su "Versione" nelle Impostazioni sbloccano notifiche di prova, dati di esempio
+  e comandi per forzare backup, pulizia annuale, feste, allarmi e widget.
+
 ## Compilare ed eseguire
 
 Requisiti: Android Studio recente (o JDK 17+ e Android SDK 37).

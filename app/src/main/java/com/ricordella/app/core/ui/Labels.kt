@@ -1,5 +1,8 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Autorenew
@@ -52,18 +55,18 @@ import java.util.Locale
 
 val ReminderType.label: String
     get() = when (this) {
-        ReminderType.TASK -> "Attività"
-        ReminderType.EVENT -> "Evento"
-        ReminderType.VACATION -> "Vacanza"
-        ReminderType.MEDICAL_VISIT -> "Visita medica"
-        ReminderType.HOLIDAY -> "Festa"
-        ReminderType.DEADLINE -> "Scadenza"
-        ReminderType.BIRTHDAY -> "Compleanno"
-        ReminderType.WARRANTY -> "Garanzia"
-        ReminderType.MAINTENANCE -> "Manutenzione"
-        ReminderType.PAYMENT -> "Pagamento"
-        ReminderType.RENEWAL -> "Rinnovo"
-        ReminderType.OTHER -> "Altro"
+        ReminderType.TASK -> tr("Attività")
+        ReminderType.EVENT -> tr("Evento")
+        ReminderType.VACATION -> tr("Vacanza")
+        ReminderType.MEDICAL_VISIT -> tr("Visita medica")
+        ReminderType.HOLIDAY -> tr("Festa")
+        ReminderType.DEADLINE -> tr("Scadenza")
+        ReminderType.BIRTHDAY -> tr("Compleanno")
+        ReminderType.WARRANTY -> tr("Garanzia")
+        ReminderType.MAINTENANCE -> tr("Manutenzione")
+        ReminderType.PAYMENT -> tr("Pagamento")
+        ReminderType.RENEWAL -> tr("Rinnovo")
+        ReminderType.OTHER -> tr("Altro")
     }
 
 val ReminderType.icon: ImageVector
@@ -101,9 +104,9 @@ val ReminderType.emoji: String
 
 val Priority.label: String
     get() = when (this) {
-        Priority.NORMAL -> "Normale"
-        Priority.IMPORTANT -> "Importante"
-        Priority.URGENT -> "Urgente"
+        Priority.NORMAL -> tr("Normale")
+        Priority.IMPORTANT -> tr("Importante")
+        Priority.URGENT -> tr("Urgente")
     }
 
 val Priority.icon: ImageVector?
@@ -115,11 +118,11 @@ val Priority.icon: ImageVector?
 
 val ItemGroup.label: String
     get() = when (this) {
-        ItemGroup.VEHICLES -> "Veicoli"
-        ItemGroup.HOME -> "Casa"
-        ItemGroup.ELECTRONICS -> "Elettronica"
-        ItemGroup.DOCUMENTS -> "Documenti"
-        ItemGroup.GENERIC -> "Generico"
+        ItemGroup.VEHICLES -> tr("Veicoli")
+        ItemGroup.HOME -> tr("Casa")
+        ItemGroup.ELECTRONICS -> tr("Elettronica")
+        ItemGroup.DOCUMENTS -> tr("Documenti")
+        ItemGroup.GENERIC -> tr("Generico")
     }
 
 val ItemGroup.icon: ImageVector
@@ -156,19 +159,23 @@ val ItemKind?.icon: ImageVector
         ItemKind.OTHER, null -> Icons.Rounded.Category
     }
 
+/** Nome della categoria: quelle predefinite si traducono, quelle create dall'utente restano come sono. */
+val com.ricordella.app.domain.model.Category.label: String
+    get() = if (isBuiltIn) tr(name) else name
+
 val PersonItemRole.label: String
     get() = when (this) {
-        PersonItemRole.OWNER -> "Proprietario"
-        PersonItemRole.USER -> "Utilizzatore"
-        PersonItemRole.OTHER -> "Altro"
+        PersonItemRole.OWNER -> tr("Proprietario")
+        PersonItemRole.USER -> tr("Utilizzatore")
+        PersonItemRole.OTHER -> tr("Altro")
     }
 
 val OdometerStatus.label: String
     get() = when (this) {
-        OdometerStatus.FAR -> "Lontana"
-        OdometerStatus.NEAR -> "Vicina"
-        OdometerStatus.DUE -> "Da fare"
-        OdometerStatus.OVERDUE -> "Superata"
+        OdometerStatus.FAR -> tr("Lontana")
+        OdometerStatus.NEAR -> tr("Vicina")
+        OdometerStatus.DUE -> tr("Da fare")
+        OdometerStatus.OVERDUE -> tr("Superata")
     }
 
 private val dayMonth get() = DateTimeFormatter.ofPattern(if (com.ricordella.app.core.i18n.Lang.english) "MMMM d" else "d MMMM", com.ricordella.app.core.i18n.Lang.locale)
@@ -177,10 +184,10 @@ private val dayMonth get() = DateTimeFormatter.ofPattern(if (com.ricordella.app.
 fun RecurrenceRule.describe(): String {
     val n = interval.coerceAtLeast(1)
     val base = when (frequency) {
-        RecurrenceFrequency.DAILY -> if (n == 1) "Ogni giorno" else "Ogni $n giorni"
-        RecurrenceFrequency.WEEKLY -> if (n == 1) "Ogni settimana" else "Ogni $n settimane"
-        RecurrenceFrequency.MONTHLY -> if (n == 1) "Ogni mese" else "Ogni $n mesi"
-        RecurrenceFrequency.YEARLY -> (if (n == 1) "Ogni anno" else "Ogni $n anni") + " il " + dayMonth.format(startDate)
+        RecurrenceFrequency.DAILY -> if (n == 1) tr("Ogni giorno") else trf("Ogni %1\$s giorni", n)
+        RecurrenceFrequency.WEEKLY -> if (n == 1) tr("Ogni settimana") else trf("Ogni %1\$s settimane", n)
+        RecurrenceFrequency.MONTHLY -> if (n == 1) tr("Ogni mese") else trf("Ogni %1\$s mesi", n)
+        RecurrenceFrequency.YEARLY -> (if (n == 1) tr("Ogni anno") else trf("Ogni %1\$s anni", n)) + tr(" il ") + dayMonth.format(startDate)
     }
     val days = if (frequency == RecurrenceFrequency.WEEKLY && daysOfWeek.isNotEmpty()) {
         daysOfWeek.sortedBy { it.value }.joinToString(prefix = " (", postfix = ")") {
@@ -189,19 +196,19 @@ fun RecurrenceRule.describe(): String {
     } else {
         ""
     }
-    val end = endDate?.let { " fino al " + DateTexts.date(it, com.ricordella.app.domain.model.DateFormatStyle.NUMERIC) } ?: ""
+    val end = endDate?.let { tr(" fino al ") + DateTexts.date(it, com.ricordella.app.domain.model.DateFormatStyle.NUMERIC) } ?: ""
     return base + days + end
 }
 
 /** Etichetta dell'anticipo di notifica. */
 fun notifyOffsetLabel(minutes: Int): String = when (minutes) {
-    0 -> "All'orario del promemoria"
-    in 1..59 -> "$minutes minuti prima"
-    60 -> "1 ora prima"
-    in 61..1439 -> "${minutes / 60} ore prima"
-    1440 -> "1 giorno prima"
-    10080 -> "1 settimana prima"
-    else -> "${minutes / 1440} giorni prima"
+    0 -> tr("All'orario del promemoria")
+    in 1..59 -> trf("%1\$s minuti prima", minutes)
+    60 -> tr("1 ora prima")
+    in 61..1439 -> trf("%1\$s ore prima", minutes / 60)
+    1440 -> tr("1 giorno prima")
+    10080 -> tr("1 settimana prima")
+    else -> trf("%1\$s giorni prima", minutes / 1440)
 }
 
 val NotifyOffsetPresets = listOf(0, 10, 60, 1440, 2 * 1440, 10080, 30 * 1440)

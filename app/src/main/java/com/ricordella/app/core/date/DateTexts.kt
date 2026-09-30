@@ -1,5 +1,8 @@
 package com.ricordella.app.core.date
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import com.ricordella.app.domain.model.DateFormatStyle
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -39,19 +42,19 @@ object DateTexts {
     fun relativeWithTime(date: LocalDate, time: LocalTime?, today: LocalDate): String {
         val days = ChronoUnit.DAYS.between(today, date)
         val day = when {
-            days == 0L -> "Oggi"
-            days == 1L -> "Domani"
-            days == -1L -> "Ieri"
+            days == 0L -> tr("Oggi")
+            days == 1L -> tr("Domani")
+            days == -1L -> tr("Ieri")
             days in 2..6 -> date.dayOfWeek.getDisplayName(TextStyle.FULL, locale).replaceFirstChar { it.uppercase() }
             else -> extendedWithYear.format(date)
         }
-        return if (time == null) day else "$day alle ${time(time)}"
+        return if (time == null) day else trf("%1\$s alle %2\$s", day, time(time))
     }
 
     /** Intestazione di un giorno in agenda: "OGGI", "DOMANI" o "LUNEDÌ 29 SETTEMBRE". */
     fun dayHeader(date: LocalDate, today: LocalDate): String = when (date) {
-        today -> "Oggi · " + dayHeader.format(date)
-        today.plusDays(1) -> "Domani · " + dayHeader.format(date)
+        today -> tr("Oggi · ") + dayHeader.format(date)
+        today.plusDays(1) -> tr("Domani · ") + dayHeader.format(date)
         else -> dayHeader.format(date)
     }.uppercase(locale)
 
@@ -67,5 +70,5 @@ object DateTexts {
 
     fun money(cents: Long): String = "€ " + String.format(locale, "%,.2f", cents / 100.0)
 
-    fun kilometers(km: Int): String = String.format(locale, "%,d km", km)
+    fun kilometers(km: Int): String = String.format(locale, tr("%,d km"), km)
 }

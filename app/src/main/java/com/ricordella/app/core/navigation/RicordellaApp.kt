@@ -1,5 +1,7 @@
 package com.ricordella.app.core.navigation
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.Animatable
@@ -101,7 +103,7 @@ import kotlin.reflect.KClass
 private enum class TopLevelDestination(
     val route: Any,
     val routeClass: KClass<*>,
-    val label: String,
+    private val italianLabel: String,
     val icon: ImageVector,
     val selectedIcon: ImageVector,
 ) {
@@ -109,7 +111,9 @@ private enum class TopLevelDestination(
     CALENDAR(CalendarRoute, CalendarRoute::class, "Calendario", Icons.Outlined.CalendarMonth, Icons.Rounded.CalendarMonth),
     REMINDERS(RemindersRoute, RemindersRoute::class, "Promemoria", Icons.Outlined.Notifications, Icons.Rounded.Notifications),
     ITEMS(ItemsRoute, ItemsRoute::class, "Cose", Icons.Outlined.Inventory2, Icons.Rounded.Inventory2),
-    PEOPLE(PeopleRoute, PeopleRoute::class, "Persone", Icons.Outlined.People, Icons.Rounded.People),
+    PEOPLE(PeopleRoute, PeopleRoute::class, "Persone", Icons.Outlined.People, Icons.Rounded.People);
+
+    val label: String get() = tr(italianLabel)
 }
 
 private enum class QuickAddKind { REMINDER, EVENT, VACATION, MEDICAL_VISIT, ITEM, PERSON }
@@ -267,13 +271,13 @@ private fun NavIcon(top: TopLevelDestination, selected: Boolean) {
 
 private data class QuickAddOption(val kind: QuickAddKind, val icon: ImageVector, val title: String, val subtitle: String)
 
-private val QuickAddOptions = listOf(
-    QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, "Promemoria", "Da fare o da non dimenticare"),
-    QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, "Evento", "Appuntamento o ricorrenza"),
-    QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, "Vacanza", "Voli, navi e alloggio"),
-    QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, "Visita medica", "Medico, esami, dentista"),
-    QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, "Cosa", "Auto, casa, dispositivi, documenti"),
-    QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, "Persona", "A chi collegare promemoria e cose"),
+private val QuickAddOptions get() = listOf(
+    QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Da fare o da non dimenticare")),
+    QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Appuntamento o ricorrenza")),
+    QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
+    QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
+    QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, tr("Cosa"), tr("Auto, casa, dispositivi, documenti")),
+    QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, tr("Persona"), tr("A chi collegare promemoria e cose")),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -294,7 +298,7 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text("Cosa vuoi aggiungere?", style = MaterialTheme.typography.headlineSmall)
+            Text(tr("Cosa vuoi aggiungere?"), style = MaterialTheme.typography.headlineSmall)
             QuickAddOptions.chunked(2).forEachIndexed { row, pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     pair.forEachIndexed { column, option ->

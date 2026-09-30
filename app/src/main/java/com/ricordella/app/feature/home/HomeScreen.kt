@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.home
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -96,8 +99,8 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     LaunchedEffect(backupEvent) {
         when (backupEvent) {
             BackupEvent.ChooseFile -> chooseFile.launch("remindella-backup.zip")
-            BackupEvent.Updated -> Toast.makeText(context, "Backup aggiornato", Toast.LENGTH_SHORT).show()
-            BackupEvent.Failed -> Toast.makeText(context, "Backup non riuscito, riprova", Toast.LENGTH_SHORT).show()
+            BackupEvent.Updated -> Toast.makeText(context, tr("Backup aggiornato"), Toast.LENGTH_SHORT).show()
+            BackupEvent.Failed -> Toast.makeText(context, tr("Backup non riuscito, riprova"), Toast.LENGTH_SHORT).show()
             null -> return@LaunchedEffect
         }
         viewModel.onBackupEventHandled()
@@ -110,7 +113,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         mascot.celebrate()
     }
 
-    TopLevelScaffold(title = "Remindella", navigator = navigator, onAdd = onAdd, brandTitle = true) { padding ->
+    TopLevelScaffold(title = tr("Remindella"), navigator = navigator, onAdd = onAdd, brandTitle = true) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
@@ -131,9 +134,9 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 item(key = "empty") {
                     EmptyState(
                         icon = Icons.Rounded.EventAvailable,
-                        title = "Niente all'orizzonte",
-                        message = "Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io.",
-                        actionLabel = "Aggiungi",
+                        title = tr("Niente all'orizzonte"),
+                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io."),
+                        actionLabel = tr("Aggiungi"),
                         onAction = onAdd,
                         modifier = Modifier.animateItem(),
                         illustration = { HappyWizard(size = 150.dp) },
@@ -143,7 +146,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 
             if (state.attention.isNotEmpty()) {
                 item(key = "attention-header") {
-                    SectionHeader("Da guardare", icon = Icons.Rounded.Bolt, tone = colors.coral, modifier = Modifier.animateItem())
+                    SectionHeader(tr("Da guardare"), icon = Icons.Rounded.Bolt, tone = colors.coral, modifier = Modifier.animateItem())
                 }
             }
             itemsIndexed(state.attention, key = { _, it -> "attention-" + it.reminder.id }) { index, entry ->
@@ -160,7 +163,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 
             if (!state.isLoading) {
                 item(key = "today-header") {
-                    SectionHeader("La tua giornata", icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
+                    SectionHeader(tr("La tua giornata"), icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
                 }
                 item(key = "today-timeline") {
                     val today = state.now.toLocalDate()
@@ -178,8 +181,8 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 
             if (state.upcoming.isNotEmpty()) {
                 item(key = "upcoming-header") {
-                    SectionHeader("Prossimamente", icon = Icons.AutoMirrored.Rounded.EventNote, tone = colors.lavender, modifier = Modifier.animateItem()) {
-                        TextButton(onClick = navigator::openReminders) { Text("Vedi tutto") }
+                    SectionHeader(tr("Prossimamente"), icon = Icons.AutoMirrored.Rounded.EventNote, tone = colors.lavender, modifier = Modifier.animateItem()) {
+                        TextButton(onClick = navigator::openReminders) { Text(tr("Vedi tutto")) }
                     }
                 }
                 itemsIndexed(state.upcoming, key = { _, it -> "upcoming-" + it.reminder.id }) { index, entry ->
@@ -213,14 +216,14 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text("Oggi ci penso io", style = MaterialTheme.typography.headlineMedium)
+                Text(tr("Oggi ci penso io"), style = MaterialTheme.typography.headlineMedium)
                 val count = state.attention.size
                 val subtitle = when {
                     state.isLoading -> " "
-                    count == 0 && state.today.isEmpty() -> "Tutto sotto controllo. Goditi la giornata."
-                    count == 0 -> "Niente di urgente: solo le cose di oggi."
-                    count == 1 -> "C'è 1 cosa che richiede attenzione."
-                    else -> "Ci sono $count cose che richiedono attenzione."
+                    count == 0 && state.today.isEmpty() -> tr("Tutto sotto controllo. Goditi la giornata.")
+                    count == 0 -> tr("Niente di urgente: solo le cose di oggi.")
+                    count == 1 -> tr("C'è 1 cosa che richiede attenzione.")
+                    else -> trf("Ci sono %1\$s cose che richiedono attenzione.", count)
                 }
                 Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -231,9 +234,9 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                 horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
             ) {
-                CountPill(state.attention.size, "da guardare", Icons.Rounded.Bolt, colors.coral)
-                CountPill(state.today.size, "oggi", Icons.Rounded.WbSunny, colors.pear)
-                CountPill(state.upcoming.size, "in arrivo", Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming)
+                CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral)
+                CountPill(state.today.size, tr("oggi"), Icons.Rounded.WbSunny, colors.pear)
+                CountPill(state.upcoming.size, tr("in arrivo"), Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming)
             }
         }
     }
@@ -246,7 +249,7 @@ private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, 
         color = tone.container,
         contentColor = tone.content,
         shape = CircleShape,
-        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = "$count${if (plus) " o più" else ""} $label" },
+        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = if (plus) trf("%1\$s o più %2\$s", count, label) else "$count $label" },
     ) {
         Row(
             modifier = Modifier.padding(start = 10.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
@@ -290,14 +293,14 @@ private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> U
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
                 Icon(Icons.Rounded.CloudUpload, contentDescription = null, tint = tone.content)
                 Column(Modifier.weight(1f)) {
-                    Text("È ora di aggiornare il backup", style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    Text(tr("È ora di aggiornare il backup"), style = MaterialTheme.typography.titleMedium, color = tone.content)
                     Text(
                         when (intervalDays) {
-                            1 -> "Aggiorna il backup di oggi: sovrascrivo quello precedente."
-                            7 -> "È passata una settimana: aggiorno il backup sovrascrivendo il precedente."
-                            30 -> "È passato un mese: aggiorno il backup sovrascrivendo il precedente."
-                            365 -> "È passato un anno: aggiorno il backup sovrascrivendo il precedente."
-                            else -> "Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente."
+                            1 -> tr("Aggiorna il backup di oggi: sovrascrivo quello precedente.")
+                            7 -> tr("È passata una settimana: aggiorno il backup sovrascrivendo il precedente.")
+                            30 -> tr("È passato un mese: aggiorno il backup sovrascrivendo il precedente.")
+                            365 -> tr("È passato un anno: aggiorno il backup sovrascrivendo il precedente.")
+                            else -> tr("Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente.")
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = tone.content,
@@ -305,8 +308,8 @@ private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> U
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
-                PushButton("Aggiorna ora", onClick = onExport, modifier = Modifier.weight(1f))
-                TextButton(onClick = onLater) { Text("Più tardi") }
+                PushButton(tr("Aggiorna ora"), onClick = onExport, modifier = Modifier.weight(1f))
+                TextButton(onClick = onLater) { Text(tr("Più tardi")) }
             }
         }
     }
@@ -318,16 +321,16 @@ private fun CleanupDialog(count: Int, onConfirm: () -> Unit, onDismiss: () -> Un
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Rounded.CleaningServices, contentDescription = null) },
-        title = { Text("Pulizia di inizio anno") },
+        title = { Text(tr("Pulizia di inizio anno")) },
         text = {
             Text(
-                "Ho trovato $count ${if (count == 1) "promemoria o evento" else "promemoria ed eventi"} degli anni precedenti " +
-                    "non importanti o senza persone e cose collegate. Vuoi eliminarli per fare spazio?\n\n" +
-                    "Quelli importanti e collegati a persone o cose restano.",
+                (if (count == 1) tr("Ho trovato 1 promemoria o evento degli anni precedenti ") else trf("Ho trovato %1\$s promemoria ed eventi degli anni precedenti ", count)) +
+                    tr("non importanti o senza persone e cose collegate. Vuoi eliminarli per fare spazio?\n\n") +
+                    tr("Quelli importanti e collegati a persone o cose restano."),
             )
         },
-        confirmButton = { TextButton(onClick = onConfirm) { Text("Elimina $count", color = MaterialTheme.colorScheme.error) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Tienili") } },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(trf("Elimina %1\$s", count), color = MaterialTheme.colorScheme.error) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Tienili")) } },
     )
 }
 
@@ -360,15 +363,15 @@ private fun NotificationPermissionCard() {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
                 Icon(Icons.Rounded.NotificationsOff, contentDescription = null, tint = tone.content)
                 Column(Modifier.weight(1f)) {
-                    Text("Le notifiche sono spente", style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    Text(tr("Le notifiche sono spente"), style = MaterialTheme.typography.titleMedium, color = tone.content)
                     Text(
-                        "Accendile e ti avviso io, anche con l'app chiusa.",
+                        tr("Accendile e ti avviso io, anche con l'app chiusa."),
                         style = MaterialTheme.typography.bodyMedium,
                         color = tone.content,
                     )
                 }
             }
-            PushButton("Accendi le notifiche", onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
+            PushButton(tr("Accendi le notifiche"), onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
         }
     }
 }

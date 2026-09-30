@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.viewer
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color as AndroidColor
@@ -91,7 +94,7 @@ fun DocumentViewerScreen(route: ViewerRoute, onBack: () -> Unit) {
         onBack = onBack,
         actions = {
             IconButton(onClick = { openFile(context, route.uri, route.mimeType) }) {
-                Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = "Apri con un'altra app")
+                Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = tr("Apri con un'altra app"))
             }
         },
     ) { padding ->
@@ -156,7 +159,7 @@ private fun PdfViewer(uri: Uri) {
     }
     DisposableEffect(renderer) { onDispose { runCatching { renderer?.close() } } }
     if (renderer == null) {
-        Unsupported("Non riesco ad aprire questo PDF.")
+        Unsupported(tr("Non riesco ad aprire questo PDF."))
         return
     }
     val mutex = remember { Mutex() }
@@ -185,7 +188,7 @@ private fun PdfViewer(uri: Uri) {
                 if (bitmap == null) {
                     Box(Modifier.fillMaxWidth().aspectRatio(0.707f).background(Color.White), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 } else {
-                    Image(bitmap.asImageBitmap(), contentDescription = "Pagina ${index + 1}", modifier = Modifier.fillMaxWidth())
+                    Image(bitmap.asImageBitmap(), contentDescription = trf("Pagina %1\$s", index + 1), modifier = Modifier.fillMaxWidth())
                 }
             }
         }
@@ -203,7 +206,7 @@ private fun DocxViewer(uri: Uri) {
     val list = paragraphs
     when {
         list == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        list.isEmpty() -> Unsupported("Il documento è vuoto o non si riesce a leggere.")
+        list.isEmpty() -> Unsupported(tr("Il documento è vuoto o non si riesce a leggere."))
         else -> SelectionContainer {
             LazyColumn(
                 Modifier.fillMaxSize(),
@@ -233,7 +236,7 @@ private fun DocxViewer(uri: Uri) {
 }
 
 @Composable
-private fun Unsupported(message: String = "Questo tipo di file non si può vedere nell'app.") {
+private fun Unsupported(message: String = tr("Questo tipo di file non si può vedere nell'app.")) {
     Column(
         Modifier.fillMaxSize().padding(RicordellaDimensions.spaceXl),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -242,7 +245,7 @@ private fun Unsupported(message: String = "Questo tipo di file non si può veder
         Icon(Icons.Rounded.Description, contentDescription = null, modifier = Modifier.padding(bottom = 12.dp))
         Text(message, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
         Text(
-            "Usa il pulsante in alto a destra per aprirlo con un'altra app.",
+            tr("Usa il pulsante in alto a destra per aprirlo con un'altra app."),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

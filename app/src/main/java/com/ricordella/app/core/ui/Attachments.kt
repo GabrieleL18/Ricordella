@@ -1,5 +1,8 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.core.net.toUri
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -92,7 +95,7 @@ private fun describe(context: Context, uri: Uri): PickedFile {
             if (cursor.moveToFirst()) cursor.getString(0) else null
         }
     }.getOrNull()
-    return PickedFile(uri.toString(), name ?: "Documento", context.contentResolver.getType(uri))
+    return PickedFile(uri.toString(), name ?: tr("Documento"), context.contentResolver.getType(uri))
 }
 
 private fun persistReadPermission(context: Context, uri: Uri) {
@@ -132,11 +135,11 @@ fun AttachmentsSection(
     SectionHeader(title) {
         TextButton(onClick = pickFile) {
             Icon(Icons.Rounded.AttachFile, contentDescription = null)
-            Text("Allega", modifier = Modifier.padding(start = 4.dp))
+            Text(tr("Allega"), modifier = Modifier.padding(start = 4.dp))
         }
     }
     if (attachments.isEmpty()) {
-        Text("Nessun documento allegato.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr("Nessun documento allegato."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     attachments.forEach { attachment ->
         Row(
@@ -154,7 +157,7 @@ fun AttachmentsSection(
                 overflow = TextOverflow.Ellipsis,
             )
             IconButton(onClick = { onRemove(attachment) }) {
-                Icon(Icons.Rounded.Close, contentDescription = "Rimuovi ${attachment.displayName}")
+                Icon(Icons.Rounded.Close, contentDescription = trf("Rimuovi %1\$s", attachment.displayName))
             }
         }
     }
@@ -166,7 +169,7 @@ fun shareBackup(context: Context, uri: Uri) {
     val send = Intent(Intent.ACTION_SEND)
         .setType("application/zip")
         .putExtra(Intent.EXTRA_STREAM, uri)
-        .putExtra(Intent.EXTRA_SUBJECT, "Backup di Remindella")
+        .putExtra(Intent.EXTRA_SUBJECT, tr("Backup di Remindella"))
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    context.startActivity(Intent.createChooser(send, "Salva o condividi il backup").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    context.startActivity(Intent.createChooser(send, tr("Salva o condividi il backup")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 }

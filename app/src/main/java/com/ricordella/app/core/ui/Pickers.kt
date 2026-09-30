@@ -1,5 +1,8 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -123,12 +126,12 @@ private fun ClickableField(
             Modifier
                 .matchParentSize()
                 .padding(end = if (onClear != null) 48.dp else 0.dp)
-                .semantics { contentDescription = "$label: ${text.ifEmpty { "non impostato" }}" }
+                .semantics { contentDescription = "$label: ${text.ifEmpty { tr("non impostato") }}" }
                 .clickable(role = Role.Button, onClick = onClick),
         )
         if (onClear != null) {
             IconButton(onClick = onClear, modifier = Modifier.align(Alignment.CenterEnd).padding(top = 8.dp)) {
-                Icon(Icons.Rounded.Clear, contentDescription = "Rimuovi $label")
+                Icon(Icons.Rounded.Clear, contentDescription = trf("Rimuovi %1\$s", label))
             }
         }
     }
@@ -140,10 +143,10 @@ fun TimePickerDialogFor(initial: LocalTime, onDismiss: () -> Unit, onConfirm: (L
     val state = rememberTimePickerState(initialHour = initial.hour, initialMinute = initial.minute, is24Hour = true)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Scegli l'orario") },
+        title = { Text(tr("Scegli l'orario")) },
         text = { TimePicker(state = state) },
         confirmButton = { TextButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }) { Text("OK") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
     )
 }
 
@@ -185,7 +188,7 @@ fun <T> MultiSelectDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { onConfirm(selected) }) { Text("Conferma") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } },
+        confirmButton = { TextButton(onClick = { onConfirm(selected) }) { Text(tr("Conferma")) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
     )
 }

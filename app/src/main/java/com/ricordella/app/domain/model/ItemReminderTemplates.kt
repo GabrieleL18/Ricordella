@@ -1,5 +1,7 @@
 package com.ricordella.app.domain.model
 
+import com.ricordella.app.core.i18n.tr
+
 import java.time.LocalDate
 
 /** Promemoria proposto durante la creazione guidata di una "Cosa". */
@@ -24,51 +26,51 @@ data class ReminderSuggestion(
 object ItemReminderTemplates {
 
     private val vehicle = listOf(
-        ReminderSuggestion("Assicurazione", ReminderType.RENEWAL, RecurrenceFrequency.YEARLY),
-        ReminderSuggestion("Revisione", ReminderType.DEADLINE, RecurrenceFrequency.YEARLY, interval = 2),
-        ReminderSuggestion("Tagliando", ReminderType.MAINTENANCE, null, odometerIntervalKm = 15_000),
-        ReminderSuggestion("Bollo", ReminderType.PAYMENT, RecurrenceFrequency.YEARLY, selectedByDefault = false),
+        ReminderSuggestion(tr("Assicurazione"), ReminderType.RENEWAL, RecurrenceFrequency.YEARLY),
+        ReminderSuggestion(tr("Revisione"), ReminderType.DEADLINE, RecurrenceFrequency.YEARLY, interval = 2),
+        ReminderSuggestion(tr("Tagliando"), ReminderType.MAINTENANCE, null, odometerIntervalKm = 15_000),
+        ReminderSuggestion(tr("Bollo"), ReminderType.PAYMENT, RecurrenceFrequency.YEARLY, selectedByDefault = false),
     )
 
     private val byKind: Map<ItemKind, List<ReminderSuggestion>> = mapOf(
-        ItemKind.CAR to vehicle + ReminderSuggestion("Cambio gomme", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 6),
+        ItemKind.CAR to vehicle + ReminderSuggestion(tr("Cambio gomme"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 6),
         ItemKind.MOTORBIKE to vehicle,
         ItemKind.SCOOTER to vehicle,
         ItemKind.OTHER_VEHICLE to vehicle,
         ItemKind.WASHING_MACHINE to listOf(
-            ReminderSuggestion("Pulizia filtro", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3),
-            ReminderSuggestion("Pulizia guarnizione", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 1),
-            ReminderSuggestion("Manutenzione", ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY, selectedByDefault = false),
+            ReminderSuggestion(tr("Pulizia filtro"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3),
+            ReminderSuggestion(tr("Pulizia guarnizione"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 1),
+            ReminderSuggestion(tr("Manutenzione"), ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY, selectedByDefault = false),
         ),
         ItemKind.DISHWASHER to listOf(
-            ReminderSuggestion("Pulizia filtro", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 1),
-            ReminderSuggestion("Sale e brillantante", ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
+            ReminderSuggestion(tr("Pulizia filtro"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 1),
+            ReminderSuggestion(tr("Sale e brillantante"), ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
         ),
         ItemKind.FRIDGE to listOf(
-            ReminderSuggestion("Pulizia frigorifero", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3),
+            ReminderSuggestion(tr("Pulizia frigorifero"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3),
         ),
         ItemKind.OVEN to listOf(
-            ReminderSuggestion("Pulizia forno", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3, selectedByDefault = false),
+            ReminderSuggestion(tr("Pulizia forno"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 3, selectedByDefault = false),
         ),
         ItemKind.AIR_CONDITIONER to listOf(
-            ReminderSuggestion("Pulizia filtri", ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 6),
-            ReminderSuggestion("Sanificazione", ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY, selectedByDefault = false),
+            ReminderSuggestion(tr("Pulizia filtri"), ReminderType.MAINTENANCE, RecurrenceFrequency.MONTHLY, 6),
+            ReminderSuggestion(tr("Sanificazione"), ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY, selectedByDefault = false),
         ),
         ItemKind.BOILER to listOf(
-            ReminderSuggestion("Manutenzione caldaia", ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY),
-            ReminderSuggestion("Controllo fumi", ReminderType.DEADLINE, RecurrenceFrequency.YEARLY, 2, selectedByDefault = false),
+            ReminderSuggestion(tr("Manutenzione caldaia"), ReminderType.MAINTENANCE, RecurrenceFrequency.YEARLY),
+            ReminderSuggestion(tr("Controllo fumi"), ReminderType.DEADLINE, RecurrenceFrequency.YEARLY, 2, selectedByDefault = false),
         ),
         ItemKind.SMARTPHONE to listOf(
-            ReminderSuggestion("Backup", ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
+            ReminderSuggestion(tr("Backup"), ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
         ),
         ItemKind.COMPUTER to listOf(
-            ReminderSuggestion("Backup", ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
+            ReminderSuggestion(tr("Backup"), ReminderType.TASK, RecurrenceFrequency.MONTHLY, 1, selectedByDefault = false),
         ),
         ItemKind.PERSONAL_DOCUMENT to listOf(
-            ReminderSuggestion("Rinnovo documento", ReminderType.RENEWAL, null, interval = 10, selectedByDefault = false),
+            ReminderSuggestion(tr("Rinnovo documento"), ReminderType.RENEWAL, null, interval = 10, selectedByDefault = false),
         ),
         ItemKind.CONTRACT to listOf(
-            ReminderSuggestion("Rinnovo contratto", ReminderType.RENEWAL, RecurrenceFrequency.YEARLY, selectedByDefault = false),
+            ReminderSuggestion(tr("Rinnovo contratto"), ReminderType.RENEWAL, RecurrenceFrequency.YEARLY, selectedByDefault = false),
         ),
     )
 

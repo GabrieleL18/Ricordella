@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -60,7 +62,7 @@ fun HappyWizard(modifier: Modifier = Modifier, size: Dp = 140.dp) {
     Canvas(
         modifier
             .size(size)
-            .semantics { contentDescription = "Un mago felice e soddisfatto" }
+            .semantics { contentDescription = tr("Un mago felice e soddisfatto") }
             .graphicsLayer {
                 scaleX = entrance.value
                 scaleY = entrance.value

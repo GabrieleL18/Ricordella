@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.people
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -134,7 +136,7 @@ class PersonEditViewModel(
                 people.save(person)
                 _form.update { it.copy(savedId = person.id) }
             } catch (_: Exception) {
-                _form.update { it.copy(errorMessage = "Non è stato possibile salvare la persona. Riprova.") }
+                _form.update { it.copy(errorMessage = tr("Non è stato possibile salvare la persona. Riprova.")) }
             }
         }
     }

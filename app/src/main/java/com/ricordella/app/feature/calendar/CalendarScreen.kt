@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.calendar
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -80,9 +83,9 @@ import java.time.LocalDate
 
 private val CalendarMode.label: String
     get() = when (this) {
-        CalendarMode.MONTH -> "Mese"
-        CalendarMode.DAY -> "Giorno"
-        CalendarMode.AGENDA -> "Agenda"
+        CalendarMode.MONTH -> tr("Mese")
+        CalendarMode.DAY -> tr("Giorno")
+        CalendarMode.AGENDA -> tr("Agenda")
     }
 
 @Composable
@@ -94,7 +97,7 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
     val today = state.now.toLocalDate()
 
     // Il "+" crea promemoria ed eventi nel giorno selezionato, non oggi.
-    TopLevelScaffold(title = "Calendario", navigator = navigator, onAdd = { onAddOn(state.selectedDate) }) { padding ->
+    TopLevelScaffold(title = tr("Calendario"), navigator = navigator, onAdd = { onAddOn(state.selectedDate) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
@@ -148,8 +151,8 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                         item(key = "agenda-empty") {
                             EmptyState(
                                 icon = Icons.Rounded.EventAvailable,
-                                title = "Agenda libera",
-                                message = "Nessun promemoria nei prossimi 90 giorni.",
+                                title = tr("Agenda libera"),
+                                message = tr("Nessun promemoria nei prossimi 90 giorni."),
                             )
                         }
                     }
@@ -177,9 +180,9 @@ private fun LazyListScope.dayItems(
         item(key = "day-empty-$date") {
             EmptyState(
                 icon = Icons.Rounded.EventAvailable,
-                title = "Nessun promemoria",
-                message = "Non c'è nulla da ricordare in questa giornata.",
-                actionLabel = "Aggiungi",
+                title = tr("Nessun promemoria"),
+                message = tr("Non c'è nulla da ricordare in questa giornata."),
+                actionLabel = tr("Aggiungi"),
                 onAction = { navigator.newReminder(date = date) },
             )
         }
@@ -212,10 +215,10 @@ private fun OccurrenceCard(
 @Composable
 private fun PeriodHeader(title: String, onPrevious: () -> Unit, onNext: () -> Unit, onToday: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onPrevious) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = "Precedente") }
+        IconButton(onClick = onPrevious) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = tr("Precedente")) }
         Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-        IconButton(onClick = onNext) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = "Successivo") }
-        TextButton(onClick = onToday) { Text("Oggi") }
+        IconButton(onClick = onNext) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Successivo")) }
+        TextButton(onClick = onToday) { Text(tr("Oggi")) }
     }
 }
 
@@ -322,8 +325,8 @@ private fun DayCell(
     val hasTask = single.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY }
     val description = buildString {
         append(DateTexts.fullDate(date))
-        if (occurrences.isNotEmpty()) append(", ${occurrences.size} promemoria")
-        if (hasDeadline) append(", con scadenze")
+        if (occurrences.isNotEmpty()) append(trf(", %1\$s promemoria", occurrences.size))
+        if (hasDeadline) append(tr(", con scadenze"))
     }
     Column(modifier) {
     Column(
@@ -458,9 +461,9 @@ private fun Legend() {
         horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        LegendEntry(MarkerShape.DOT, "Attività")
-        LegendEntry(MarkerShape.RING, "Eventi")
-        LegendEntry(MarkerShape.SQUARE, "Scadenze")
+        LegendEntry(MarkerShape.DOT, tr("Attività"))
+        LegendEntry(MarkerShape.RING, tr("Eventi"))
+        LegendEntry(MarkerShape.SQUARE, tr("Scadenze"))
     }
 }
 

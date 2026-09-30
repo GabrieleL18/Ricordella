@@ -1,0 +1,639 @@
+# Traduzioni inglesi di Remindella: "testo italiano ||| testo inglese", una per riga.
+# ⏎ = a capo. I segnaposto (%1$s, %2$s, %02d) vanno mantenuti. Genera EnglishStrings.kt con:
+#   python tools/i18n/generate.py
+Notifica di prova ||| Test notification
+Se leggi questo messaggio le notifiche di Remindella funzionano. ||| If you can read this, Remindella notifications work.
+Esempio ||| Sample
+Persona di esempio ||| Sample person
+Auto di esempio ||| Sample car
+Compleanno di Anna ||| Anna's birthday
+Visita dal dentista ||| Dentist appointment
+Pagare la bolletta ||| Pay the bill
+Revisione auto ||| Car inspection
+Riunione ||| Meeting
+Vacanza al mare ||| Seaside holiday
+Roma FCO ||| Rome FCO
+Napoli ||| Naples
+Cabina 204 ||| Cabin 204
+Hotel Esempio ||| Sample Hotel
+Oggi ||| Today
+Domani ||| Tomorrow
+Ieri ||| Yesterday
+%1$s alle %2$s ||| %1$s at %2$s
+Oggi ·  ||| Today ·
+Domani ·  ||| Tomorrow ·
+Promemoria ||| Reminders
+Da fare o da non dimenticare ||| To do or not to forget
+Evento ||| Event
+Appuntamento o ricorrenza ||| Appointment or occasion
+Vacanza ||| Holiday
+Voli, navi e alloggio ||| Flights, ferries and stay
+Visita medica ||| Medical visit
+Medico, esami, dentista ||| Doctor, tests, dentist
+Cosa ||| Thing
+Auto, casa, dispositivi, documenti ||| Car, home, devices, documents
+Persona ||| Person
+A chi collegare promemoria e cose ||| Who to link reminders and things to
+Cosa vuoi aggiungere? ||| What do you want to add?
+Completa ||| Done
+Tra 10 min ||| In 10 min
+tra %1$s gg ||| in %1$s d
+%1$s gg fa ||| %1$s d ago
+Documento ||| Document
+Allega ||| Attach
+Nessun documento allegato. ||| No attached documents.
+Rimuovi %1$s ||| Remove %1$s
+Backup di Remindella ||| Remindella backup
+Salva o condividi il backup ||| Save or share the backup
+Dal %1$s al %2$s ||| From %1$s to %2$s
+Tutto il giorno ||| All day
+Ricorrente ||| Recurring
+In corso ||| Ongoing
+ultimo giorno ||| last day
+ancora %1$s gg ||| %1$s days left
+giorno fa ||| day ago
+giorni fa ||| days ago
+giorno ||| day
+giorni ||| days
+mancano ||| in
+Mancano %1$s %2$s ||| In %1$s %2$s
+Completato ||| Completed
+Fatto ||| Done
+Da fare ||| To do
+Scaduto ||| Overdue
+Km: %1$s ||| Km: %1$s
+Cancella ricerca ||| Clear search
+Annulla ||| Cancel
++1 settimana ||| +1 week
++1 mese ||| +1 month
+tra %1$s giorni ||| in %1$s days
+%1$s giorni fa ||| %1$s days ago
+oggi ||| today
+domani ||| tomorrow
+ieri ||| yesterday
+Scegli mese e anno ||| Choose month and year
+Mese precedente ||| Previous month
+Mese successivo ||| Next month
+Anno precedente ||| Previous year
+Anno successivo ||| Next year
+Attività ||| Task
+Festa ||| Holiday
+Scadenza ||| Deadline
+Compleanno ||| Birthday
+Garanzia ||| Warranty
+Manutenzione ||| Maintenance
+Pagamento ||| Payment
+Rinnovo ||| Renewal
+Altro ||| Other
+Normale ||| Normal
+Importante ||| Important
+Urgente ||| Urgent
+Veicoli ||| Vehicles
+Casa ||| Home
+Elettronica ||| Electronics
+Documenti ||| Documents
+Generico ||| General
+Proprietario ||| Owner
+Utilizzatore ||| User
+Lontana ||| Far
+Vicina ||| Near
+Superata ||| Passed
+Ogni giorno ||| Every day
+Ogni %1$s giorni ||| Every %1$s days
+Ogni settimana ||| Every week
+Ogni %1$s settimane ||| Every %1$s weeks
+Ogni mese ||| Every month
+Ogni %1$s mesi ||| Every %1$s months
+Ogni anno ||| Every year
+Ogni %1$s anni ||| Every %1$s years
+ il  |||  on
+ fino al  |||  until
+All'orario del promemoria ||| At the time of the reminder
+%1$s minuti prima ||| %1$s minutes before
+1 ora prima ||| 1 hour before
+%1$s ore prima ||| %1$s hours before
+1 giorno prima ||| 1 day before
+1 settimana prima ||| 1 week before
+%1$s giorni prima ||| %1$s days before
+Remindella: c'è qualcosa di scaduto ||| Remindella: something is overdue
+Remindella, la palla di vetro ||| Remindella, the crystal ball
+non impostato ||| not set
+Scegli l'orario ||| Choose the time
+Conferma ||| Confirm
+Cerca ||| Search
+Impostazioni ||| Settings
+Aggiungi ||| Add
+Indietro ||| Back
+Ho capito ||| Got it
+Salta ||| Skip
+Avanti ||| Next
+Home: cosa ricordare oggi ||| Home: what to remember today
+In alto trovi quello che richiede attenzione, poi le cose di oggi e quelle in arrivo.  ||| At the top you find what needs attention, then today's things and what's coming up.
+Tocca il cerchio per completare: se qualcosa è scaduto la palla si riempie di fumo rosso. ||| Tap the circle to complete: if something is overdue the ball fills with red smoke.
+Calendario ||| Calendar
+Il mese a colpo d'occhio: i giorni con un puntino hanno promemoria. Tocca un giorno per vederli, scorri per cambiare mese. In "Giorno" trovi la timeline ora per ora. ||| The month at a glance: days with a dot have reminders. Tap a day to see them, swipe to change month. In "Day" you get the hour-by-hour timeline.
+Tutti i promemoria, filtrabili per tipo e stato: attività, eventi, visite mediche, scadenze, compleanni. Ti avviso io con una notifica. ||| All your reminders, filterable by type and status: tasks, events, medical visits, deadlines, birthdays. I'll let you know with a notification.
+Cose ||| Things
+Auto, elettrodomestici, dispositivi, documenti. Scegli prima la categoria, poi la cosa: ti propongo io revisioni, tagliandi e garanzie. ||| Cars, appliances, devices, documents. Pick the category first, then the thing: I'll suggest inspections, services and warranties.
+Persone ||| People
+Collega promemoria e cose alle persone: nella loro scheda trovi compleanni, eventi e tutto ciò che le riguarda. ||| Link reminders and things to people: their page shows birthdays, events and everything about them.
+Il pulsante + ||| The + button
+Da qualunque sezione, il + giallo aggiunge al volo un promemoria, un evento, una cosa o una persona. ||| From any section, the yellow + quickly adds a reminder, an event, a thing or a person.
+Il widget ||| The widget
+Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo e inserisci promemoria, eventi, cose e persone con un tocco. ||| Add the Calendar widget to your phone's home screen: see this month and the next and add reminders, events, things and people with one tap.
+Esporta: un solo file ||| Export: a single file
+La prima volta scegli dove salvare il .zip (es. Drive). Le volte dopo lo sovrascrivo, a meno che tu non chieda una nuova versione. Puoi anche condividerlo. ||| The first time you choose where to save the .zip (e.g. Drive). After that I overwrite it, unless you ask for a new version. You can also share it.
+Leggero come una piuma ||| Light as a feather
+Il backup è compresso al massimo e le foto vengono ridotte: pesa il meno possibile, senza perdere i tuoi dati. ||| The backup is compressed to the max and photos are shrunk: it weighs as little as possible, without losing your data.
+Te lo ricordo io ||| I'll remind you
+Ogni 3 mesi (o ogni giorno, settimana, mese, anno: lo scegli nelle Impostazioni) ti chiedo di aggiornare il backup. ||| Every 3 months (or every day, week, month, year: you choose in Settings) I'll ask you to update the backup.
+Importa ||| Import
+Su un nuovo telefono, "Importa backup" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto. ||| On a new phone, tap "Import backup" and choose the .zip file: I'll show you what's inside and, if you confirm, restore everything.
+Un mago felice e soddisfatto ||| A happy, satisfied wizard
+Niente in arrivo ✨ ||| Nothing coming up ✨
+Prossimo: %1$s · %2$s ||| Next: %1$s · %2$s
+Niente in programma ✨ ||| Nothing planned ✨
+più giorni ||| several days
+tutto il giorno ||| all day
++ altri %1$s: apri l'app ||| + %1$s more: open the app
+archivio danneggiato ||| damaged archive
+lettura del file non riuscita ||| could not read the file
+manifest non leggibile ||| unreadable manifest
+dati mancanti ||| missing data
+i dati non corrispondono alla firma del backup ||| data doesn't match the backup signature
+dati non leggibili ||| unreadable data
+identificatori duplicati ||| duplicate identifiers
+categoria mancante ||| missing category
+ricorrenza mancante ||| missing recurrence
+storico senza promemoria ||| history without reminder
+manutenzione senza cosa ||| maintenance without thing
+collegamento promemoria-persona non valido ||| invalid reminder-person link
+collegamento promemoria-cosa non valido ||| invalid reminder-thing link
+collegamento persona-cosa non valido ||| invalid person-thing link
+Destinazione non disponibile ||| Destination not available
+File non disponibile ||| File not available
+tra %1$s ||| in %1$s
+%1$s fa ||| %1$s ago
+anno ||| year
+anni ||| years
+mese ||| month
+mesi ||| months
+Scade oggi ||| Due today
+Scade domani ||| Due tomorrow
+Scade tra %1$s ||| Due in %1$s
+Scaduto ieri ||| Expired yesterday
+Scaduto da %1$s ||| Expired %1$s ago
+Assicurazione ||| Insurance
+Revisione ||| Inspection
+Tagliando ||| Service
+Bollo ||| Road tax
+Cambio gomme ||| Tyre change
+Pulizia filtro ||| Filter cleaning
+Pulizia guarnizione ||| Seal cleaning
+Sale e brillantante ||| Salt and rinse aid
+Pulizia frigorifero ||| Fridge cleaning
+Pulizia forno ||| Oven cleaning
+Pulizia filtri ||| Filters cleaning
+Sanificazione ||| Sanitising
+Manutenzione caldaia ||| Boiler maintenance
+Controllo fumi ||| Flue gas check
+Rinnovo documento ||| Document renewal
+Rinnovo contratto ||| Contract renewal
+Ogni 3 mesi ||| Every 3 months
+Garanzia %1$s ||| Warranty %1$s
+Mese ||| Month
+Giorno ||| Day
+Agenda ||| Agenda
+Agenda libera ||| Free agenda
+Nessun promemoria nei prossimi 90 giorni. ||| No reminders in the next 90 days.
+Nessun promemoria ||| No reminders
+Non c'è nulla da ricordare in questa giornata. ||| Nothing to remember on this day.
+Precedente ||| Previous
+Successivo ||| Next
+, %1$s promemoria ||| , %1$s reminders
+, con scadenze ||| , with deadlines
+Eventi ||| Events
+Scadenze ||| Deadlines
+Nessun impegno: aggiungine uno ||| Nothing planned: add something
+adesso :%02d ||| now :%02d
+Giorno %1$s di %2$s ||| Day %1$s of %2$s
+Backup aggiornato ||| Backup updated
+Backup non riuscito, riprova ||| Backup failed, try again
+Niente all'orizzonte ||| Nothing on the horizon
+Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io. ||| Nothing to remember in the coming days. Add something and I'll take care of it.
+Da guardare ||| Needs attention
+La tua giornata ||| Your day
+Prossimamente ||| Coming up
+Vedi tutto ||| See all
+Oggi ci penso io ||| Today I've got it
+Tutto sotto controllo. Goditi la giornata. ||| All under control. Enjoy your day.
+Niente di urgente: solo le cose di oggi. ||| Nothing urgent: just today's things.
+C'è 1 cosa che richiede attenzione. ||| 1 thing needs your attention.
+Ci sono %1$s cose che richiedono attenzione. ||| %1$s things need your attention.
+da guardare ||| to check
+in arrivo ||| coming up
+%1$s o più %2$s ||| %1$s or more %2$s
+È ora di aggiornare il backup ||| Time to update the backup
+Aggiorna il backup di oggi: sovrascrivo quello precedente. ||| Update today's backup: I'll overwrite the previous one.
+È passata una settimana: aggiorno il backup sovrascrivendo il precedente. ||| A week has passed: I'll update the backup, overwriting the previous one.
+È passato un mese: aggiorno il backup sovrascrivendo il precedente. ||| A month has passed: I'll update the backup, overwriting the previous one.
+È passato un anno: aggiorno il backup sovrascrivendo il precedente. ||| A year has passed: I'll update the backup, overwriting the previous one.
+Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente. ||| 3 months have passed: I'll update the backup, overwriting the previous one.
+Aggiorna ora ||| Update now
+Più tardi ||| Later
+Pulizia di inizio anno ||| New year clean-up
+Ho trovato 1 promemoria o evento degli anni precedenti  ||| I found 1 reminder or event from previous years
+Ho trovato %1$s promemoria ed eventi degli anni precedenti  ||| I found %1$s reminders and events from previous years
+non importanti o senza persone e cose collegate. Vuoi eliminarli per fare spazio?⏎⏎ ||| that are not important or have no linked people or things. Delete them to make room?⏎⏎
+Quelli importanti e collegati a persone o cose restano. ||| Important ones and those linked to people or things stay.
+Elimina %1$s ||| Delete %1$s
+Tienili ||| Keep them
+Le notifiche sono spente ||| Notifications are off
+Accendile e ti avviso io, anche con l'app chiusa. ||| Turn them on and I'll let you know, even when the app is closed.
+Accendi le notifiche ||| Turn on notifications
+Modifica ||| Edit
+Altre azioni ||| More actions
+Ripristina dall'archivio ||| Restore from archive
+Archivia ||| Archive
+Elimina ||| Delete
+Documento di garanzia ||| Warranty document
+Intervento ||| Service
+Nessun intervento registrato. ||| No service recorded.
+Nessun altro promemoria. ||| No other reminders.
+Note ||| Notes
+Eliminare questa cosa? ||| Delete this thing?
+Verranno eliminati anche lo storico delle manutenzioni e il promemoria della garanzia.  ||| Its maintenance history and warranty reminder will be deleted too.
+Gli altri promemoria restano. Se vuoi solo nasconderla, usa "Archivia". ||| Other reminders stay. If you only want to hide it, use "Archive".
+Foto di %1$s ||| Photo of %1$s
+Archiviata ||| Archived
+Targa ||| Plate
+Anno ||| Year
+Marca ||| Brand
+Modello ||| Model
+N. di serie ||| Serial no.
+Acquistata ||| Purchased
+Prezzo ||| Price
+Informazioni ||| About
+Km ||| Km
+Non indicati ||| Not set
+Aggiorna ||| Update
+Attiva ||| Active
+Scaduta ||| Expired
+Dal ||| From
+Venditore ||| Seller
+Apri documento di garanzia ||| Open warranty document
+Elimina intervento %1$s ||| Delete service %1$s
+Eliminare l'intervento? ||| Delete this service?
+"%1$s" verrà rimosso dallo storico. ||| "%1$s" will be removed from the history.
+Aggiorna chilometri ||| Update mileage
+Km attuali ||| Current km
+Salva ||| Save
+Pneumatici ||| Tyres
+Pulizia ||| Cleaning
+Riparazione ||| Repair
+Controllo ||| Check-up
+Nuovo intervento ||| New service
+Intervento * ||| Service *
+Data ||| Date
+Costo € ||| Cost €
+Descrizione ||| Description
+Ricordami il prossimo ||| Remind me of the next one
+Tra mesi ||| In months
+o tra km ||| or in km
+Chilometraggio aggiornato ||| Mileage updated
+Intervento registrato ||| Service recorded
+Intervento eliminato ||| Service deleted
+Ripristinata ||| Restored
+Operazione non riuscita. Riprova. ||| Something went wrong. Try again.
+Auto, moto, scooter ||| Car, motorbike, scooter
+Lavatrice, caldaia, TV ||| Washer, boiler, TV
+Smartphone, computer ||| Smartphone, computer
+Documenti, contratti ||| Documents, contracts
+Attrezzi e oggetti ||| Tools and objects
+Nuova cosa ||| New thing
+Che tipo di cosa è? ||| What kind of thing is it?
+Scegli la categoria ||| Choose the category
+Quale %1$s? ||| Which %1$s?
+Scegli la cosa ||| Choose the thing
+Categoria ||| Category
+Dettagli ||| Details
+Cambia ||| Change
+Com'è fatta ||| What it's like
+Cosa vuoi ricordare? ||| What do you want to remember?
+Foto ||| Photo
+Aggiungi foto ||| Add photo
+Cambia foto ||| Change photo
+Rimuovi foto ||| Remove photo
+Nome * ||| Name *
+Inserisci un nome ||| Enter a name
+Es. Fiat Panda, Lavatrice Samsung ||| E.g. Fiat Panda, Samsung washer
+Chilometri attuali ||| Current mileage
+Numero di serie ||| Serial number
+Prezzo € ||| Price €
+Ha una garanzia ||| Has a warranty
+Allega documento ||| Attach document
+Cambia documento ||| Change document
+Rimuovi ||| Remove
+Remindella ti avviserà 30 giorni prima della scadenza. ||| Remindella will remind you 30 days before it expires.
+1 anno ||| 1 year
+%1$s anni ||| %1$s years
+Persone associate ||| Linked people
+Non hai ancora aggiunto persone. ||| You haven't added any people yet.
+Potrai modificare date e dettagli in qualsiasi momento. ||| You can change dates and details at any time.
+ogni %1$s o un anno ||| every %1$s or one year
+Una volta ||| Once
+Non è stato possibile salvare. Riprova. ||| Couldn't save. Try again.
+Cerca per nome, marca, modello, targa ||| Search by name, brand, model, plate
+Attive ||| Active
+Archiviate ||| Archived
+Nessuna cosa ||| No things
+Aggiungi auto, elettrodomestici, dispositivi e documenti per ricordarne scadenze e manutenzioni. ||| Add cars, appliances, devices and documents to keep track of deadlines and maintenance.
+Aggiungi cosa ||| Add thing
+Garanzia al  ||| Warranty until
+Ciao, sono ||| Hi, I'm
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce? ||| I remember deadlines, events, visits, maintenance and birthdays for you. Shall I show you around?
+Iniziamo ||| Let's start
+Inizia a usare Remindella ||| Start using Remindella
+Importa da Google Calendar ||| Import from Google Calendar
+Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi di un tuo account Google già presente sul telefono.  ||| I can copy events, holidays, birthdays and reminders for the next 12 months from a Google account already on your phone.
+Niente Internet: leggo solo il calendario del dispositivo. ||| No Internet: I only read the calendar on your device.
+Nessun evento da importare. ||| No events to import.
+Fatto! Ho importato %1$s eventi. ||| Done! I imported %1$s events.
+Senza il permesso al calendario non posso importare. Puoi farlo più tardi dalle Impostazioni. ||| Without calendar permission I can't import. You can do it later from Settings.
+Scegli l'account ||| Choose the account
+Sul telefono non ci sono account Google con un calendario. ||| There are no Google accounts with a calendar on this phone.
+Import non riuscito, riprova. ||| Import failed, try again.
+Importa eventi ||| Import events
+Salta per ora ||| Skip for now
+Cerca persone ||| Search people
+Nessuna persona archiviata ||| No archived people
+Nessuna persona ||| No people
+Aggiungi le persone a cui collegare promemoria e cose. ||| Add the people you want to link reminders and things to.
+Aggiungi persona ||| Add person
+La tua cerchia ||| Your circle
+1 persona ||| 1 person
+%1$s persone ||| %1$s people
+Nuova persona ||| New person
+Modifica persona ||| Edit person
+Cognome ||| Surname
+Note (es. Mamma, Partner) ||| Notes (e.g. Mum, Partner)
+Prossimi eventi ||| Upcoming events
+Eliminare la persona? ||| Delete this person?
+La persona verrà eliminata. I promemoria e le cose collegate restano, ma senza questo collegamento.  ||| The person will be deleted. Linked reminders and things stay, but without this link.
+Se vuoi solo nasconderla, usa "Archivia". ||| If you only want to hide them, use "Archive".
+Non è stato possibile salvare la persona. Riprova. ||| Couldn't save the person. Try again.
+Questo promemoria non esiste più. ||| This reminder no longer exists.
+Allegati ||| Attachments
+Storico ||| History
+Occorrenza del %1$s — completata il  ||| Occurrence of %1$s — completed on
+Eliminare il promemoria? ||| Delete this reminder?
+Il promemoria e il suo storico verranno eliminati definitivamente. Le persone e le cose collegate non vengono toccate. ||| The reminder and its history will be permanently deleted. Linked people and things are not affected.
+Annullato ||| Cancelled
+In arrivo ||| Upcoming
+Archiviato ||| Archived
+Al ||| To
+Ora ||| Time
+Quando ||| When
+Ricorrenza ||| Repeats
+Scadenza km ||| Due at km
+ (ogni %1$s) |||  (every %1$s)
+Notifica ||| Notification
+Disattivata ||| Off
+Rimandato a ||| Snoozed until
+Rimanda ||| Snooze
+Tra 10 minuti ||| In 10 minutes
+Tra 1 ora ||| In 1 hour
+Domani mattina ||| Tomorrow morning
+Scegli data e ora… ||| Pick date and time…
+Segna come da fare ||| Mark as to do
+Riaperto ||| Reopened
+Notifica rimandata ||| Notification snoozed
+Ripristinato ||| Restored
+Nascondi opzioni ||| Hide options
+Altre opzioni ||| More options
+Titolo * ||| Title *
+Inserisci un titolo ||| Enter a title
+Dura più giorni ||| Lasts several days
+Es. una vacanza o un viaggio ||| E.g. a holiday or a trip
+L'ultimo giorno deve venire dopo il primo. ||| The last day must come after the first.
+Senza orario il promemoria vale per tutto il giorno. ||| Without a time, the reminder lasts all day.
+Tipo ||| Type
+Ogni ||| Every
+Priorità ||| Priority
+Categoria (es. Casa, Lavoro) ||| Category (e.g. Home, Work)
+Collegamenti ||| Links
+Chilometraggio ||| Mileage
+Attuali: %1$s ||| Current: %1$s
+Scadenza a km ||| Due at km
+Ogni km ||| Every km
+Avvisami ||| Notify me
+Persone collegate ||| Linked people
+Cose collegate ||| Linked things
+Non hai ancora aggiunto cose. ||| You haven't added any things yet.
+Non è stato possibile salvare il promemoria. Riprova. ||| Couldn't save the reminder. Try again.
+Nuovo evento ||| New event
+Nuovo promemoria ||| New reminder
+Tutti ||| All
+Scaduti ||| Overdue
+Completati ||| Completed
+Data (prima i più vicini) ||| Date (soonest first)
+Data (prima i più lontani) ||| Date (latest first)
+Titolo (A-Z) ||| Title (A-Z)
+Cerca promemoria, cose, persone ||| Search reminders, things, people
+Nessun risultato con questi filtri. ||| No results with these filters.
+Non c'è nulla da ricordare qui. ||| Nothing to remember here.
+Sempre ||| Always
+Tutto il mese ||| Whole month
+Tutto l'anno ||| Whole year
+Periodo precedente ||| Previous period
+Anno %1$s ||| Year %1$s
+Periodo successivo ||| Next period
+Filtri e ordine ||| Filters and sort
+Filtri · %1$s ||| Filters · %1$s
+Ordine: %1$s ||| Sort: %1$s
+Azzera tutto ||| Clear all
+Togli filtro %1$s ||| Remove filter %1$s
+Azzera ||| Clear
+Periodo ||| Period
+Collegati a ||| Linked to
+Tutte ||| All
+Ordina per ||| Sort by
+Mostra 1 promemoria ||| Show 1 reminder
+Mostra %1$s promemoria ||| Show %1$s reminders
+Aereo ||| Plane
+Nave ||| Ferry
+Treno ||| Train
+Auto ||| Car
+Numero volo ||| Flight number
+Nave / traghetto ||| Ship / ferry
+Numero treno ||| Train number
+Targa / noleggio ||| Plate / rental
+Posto ||| Seat
+Cabina / posto ||| Cabin / seat
+Carrozza e posto ||| Coach and seat
+Viaggio ||| Trip
+Compagnia ||| Company
+Da ||| From
+A ||| To
+Partenza ||| Departure
+Alloggio ||| Stay
+Nome (hotel, casa, campeggio...) ||| Name (hotel, house, campsite...)
+Indirizzo ||| Address
+Check-in ||| Check-in
+Check-out ||| Check-out
+Codice prenotazione ||| Booking code
+Telefono ||| Phone
+Prenotazione ||| Booking
+Luogo / destinazione ||| Place / destination
+Persone, cose, promemoria, note… ||| People, things, reminders, notes…
+Nessun risultato ||| No results
+Prova con un'altra parola. ||| Try another word.
+Promemoria ed eventi ||| Reminders and events
+Manutenzioni ||| Maintenance
+Aggiorna il backup ||| Update the backup
+Salva il backup ||| Save the backup
+Sovrascrive il file precedente. ||| Overwrites the previous file.
+Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto. ||| Choose where to save it (e.g. Drive): next times it will be overwritten.
+Nuova versione ||| New version
+Crea un nuovo file e tiene quello vecchio. ||| Creates a new file and keeps the old one.
+Condividi ||| Share
+Invialo con un'app (email, chat...). ||| Send it with an app (email, chat...).
+Scegli il file ||| Choose the file
+Il file .zip di Remindella. Prima di sostituire i dati ti mostro cosa contiene. ||| Remindella's .zip file. Before replacing your data I'll show you what's inside.
+Esporta backup ||| Export backup
+Importa backup ||| Import backup
+Chiudi ||| Close
+Versione ||| Version
+Sei già uno sviluppatore ||| You're already a developer
+Ora sei uno sviluppatore! 🧙 ||| You're now a developer! 🧙
+Ancora 1 tocco ||| 1 more tap
+Ancora %1$s tocchi ||| %1$s more taps
+Sviluppatore ||| Developer
+Invia notifica di prova ||| Send test notification
+Subito, per vedere l'aspetto della notifica. ||| Right now, to see what it looks like.
+Notifica di prova tra 10 secondi ||| Test notification in 10 seconds
+Chiudi l'app per vederla arrivare in background. ||| Close the app to see it arrive in the background.
+Arriva tra 10 secondi ||| Arriving in 10 seconds
+Crea dati di esempio ||| Create sample data
+Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno e un pagamento scaduto. ||| A person, a car, a holiday with flight and ferry, a visit, a birthday and an overdue payment.
+Dati di esempio creati ||| Sample data created
+Mostra l'invito al backup ||| Show the backup prompt
+Fa comparire subito in Home la richiesta di aggiornare il backup. ||| Shows the "update your backup" card in Home right away.
+Guarda la Home ||| Check Home
+Proponi la pulizia annuale ||| Propose the yearly clean-up
+Alla prossima apertura della Home. ||| Next time Home opens.
+Sposta le feste all'anno corrente ||| Move holidays to this year
+Esegue ora il passaggio che avviene a gennaio. ||| Runs now the step that happens in January.
+Feste aggiornate ||| Holidays updated
+Ricalcola le notifiche ||| Reschedule notifications
+Riprogramma gli allarmi di tutti i promemoria. ||| Reschedules the alarms of all reminders.
+Notifiche riprogrammate ||| Notifications rescheduled
+Aggiorna il widget ||| Refresh the widget
+Ridisegna subito il widget del calendario. ||| Redraws the calendar widget right away.
+Widget aggiornato ||| Widget refreshed
+Rifai la configurazione iniziale ||| Redo the initial setup
+Mostra di nuovo benvenuto, tutorial e import dal calendario. ||| Shows welcome, tutorial and calendar import again.
+Configurazione riavviata ||| Setup restarted
+Spazio occupato ||| Storage used
+Calcolo... ||| Calculating...
+Database: %1$s (versione %2$s) ·  ||| Database: %1$s (version %2$s) ·
+Foto: %1$s file, %2$s ·  ||| Photos: %1$s files, %2$s ·
+Cache: %1$s ||| Cache: %1$s
+Svuota la cache ||| Clear cache
+Backup temporanei, suoni e file di lavoro (si ricreano da soli). ||| Temporary backups, sounds and work files (they're recreated automatically).
+Cache svuotata ||| Cache cleared
+Esci dalla modalità sviluppatore ||| Leave developer mode
+La sezione sparisce; 7 tocchi sulla versione per riaverla. ||| The section disappears; tap the version 7 times to get it back.
+Aspetto ||| Appearance
+Tema ||| Theme
+Sistema ||| System
+Chiaro ||| Light
+Scuro ||| Dark
+Lingua ||| Language
+Primo giorno della settimana ||| First day of the week
+Formato data ||| Date format
+Suoni ||| Sounds
+Suoni delle scelte ||| Choice sounds
+Un piccolo suono quando scegli categorie e cose. ||| A little sound when you pick categories and things.
+Notifiche ||| Notifications
+Notifiche abilitate ||| Notifications on
+Remindella ti avvisa anche ad app chiusa. ||| Remindella notifies you even when the app is closed.
+Suono e vibrazione ||| Sound and vibration
+Gestiti dalle impostazioni di sistema del canale "Promemoria". ||| Managed in the system settings of the "Reminders" channel.
+Orario promemoria senza ora ||| Time for reminders without a time
+Notifica alle %1$s ||| Notify at %1$s
+Anticipo predefinito ||| Default advance notice
+Dati ||| Data
+Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione. ||| A maximally compressed .zip file: each time it overwrites the previous one, unless you ask for a new version.
+Ripristina un backup sostituendo i dati attuali. ||| Restore a backup, replacing the current data.
+Copia gli eventi di un account Google presente sul telefono. ||| Copies events from a Google account on this phone.
+Ricordami di aggiornare il backup ||| Remind me to update the backup
+Elimina tutti i dati ||| Delete all data
+Cancella persone, cose, promemoria e storico da questo dispositivo. ||| Deletes people, things, reminders and history from this device.
+Rivedi il tutorial ||| See the tutorial again
+Come funzionano le sezioni dell'app. ||| How the app's sections work.
+Privacy ||| Privacy
+I tuoi dati restano sul dispositivo. ||| Your data stays on your device.
+Ripristinare il backup? ||| Restore the backup?
+Backup del %1$s⏎⏎ ||| Backup of %1$s⏎⏎
+• %1$s persone⏎• %2$s cose⏎• %3$s promemoria⏎ ||| • %1$s people⏎• %2$s things⏎• %3$s reminders⏎
+• %1$s manutenzioni⏎• %2$s file allegati⏎⏎ ||| • %1$s maintenance records⏎• %2$s attached files⏎⏎
+Attenzione: tutti i dati attuali verranno sostituiti da quelli del backup. ||| Warning: all current data will be replaced by the backup.
+Ripristina sostituendo i dati ||| Restore and replace data
+Eliminare tutti i dati? ||| Delete all data?
+Verranno eliminati definitivamente persone, cose, promemoria, manutenzioni e storico.  ||| People, things, reminders, maintenance and history will be permanently deleted.
+Se vuoi conservarli, esporta prima un backup. ||| If you want to keep them, export a backup first.
+Continua ||| Continue
+Sei sicuro? ||| Are you sure?
+Questa operazione non si può annullare. ||| This can't be undone.
+Elimina tutto ||| Delete everything
+Remindella funziona completamente offline e non richiede alcun account.  ||| Remindella works completely offline and needs no account.
+Tutti i dati restano sul tuo dispositivo: l'app non ha accesso a Internet,  ||| All data stays on your device: the app has no Internet access,
+non usa servizi cloud né statistiche di utilizzo.⏎⏎ ||| uses no cloud services and no usage statistics.⏎⏎
+I dati sono esclusi dal backup automatico di Android.  ||| Data is excluded from Android's automatic backup.
+Per trasferirli usa "Esporta backup": il file resta sotto il tuo controllo. ||| To move it, use "Export backup": the file stays under your control.
+Permesso di notifica ||| Notification permission
+Concesso ||| Granted
+Non concesso: tocca per attivarlo ||| Not granted: tap to enable
+Promemoria puntuali ||| On-time reminders
+Le notifiche con orario arrivano al minuto esatto. ||| Timed notifications arrive to the minute.
+Non consentito: le notifiche possono arrivare con qualche minuto di ritardo. Tocca per consentire. ||| Not allowed: notifications may arrive a few minutes late. Tap to allow.
+Backup aggiornato (file precedente sovrascritto). ||| Backup updated (previous file overwritten).
+Backup salvato. ||| Backup saved.
+Il file scelto non è un backup di Remindella. ||| The chosen file isn't a Remindella backup.
+Questo backup è stato creato con una versione più recente di Remindella. Aggiorna l'app e riprova. ||| This backup was made with a newer version of Remindella. Update the app and try again.
+Il backup è danneggiato (%1$s). Nessun dato è stato modificato. ||| The backup is damaged (%1$s). No data was changed.
+Backup ripristinato. ||| Backup restored.
+Tutti i dati sono stati eliminati. ||| All data has been deleted.
+Operazione non riuscita. Nessun dato è stato perso: riprova. ||| Something went wrong. No data was lost: try again.
+Apri con un'altra app ||| Open with another app
+Non riesco ad aprire questo PDF. ||| I can't open this PDF.
+Pagina %1$s ||| Page %1$s
+Il documento è vuoto o non si riesce a leggere. ||| The document is empty or can't be read.
+Questo tipo di file non si può vedere nell'app. ||| This type of file can't be viewed in the app.
+Usa il pulsante in alto a destra per aprirlo con un'altra app. ||| Use the button at the top right to open it with another app.
+Moto ||| Motorbike
+Altro veicolo ||| Other vehicle
+Lavatrice ||| Washing machine
+Lavastoviglie ||| Dishwasher
+Frigorifero ||| Fridge
+Forno ||| Oven
+Condizionatore ||| Air conditioner
+Caldaia ||| Boiler
+Altro per la casa ||| Other home item
+Fotocamera ||| Camera
+Altra elettronica ||| Other electronics
+Documento personale ||| Personal document
+Contratto ||| Contract
+Altro documento ||| Other document
+Attrezzatura ||| Equipment
+Oggetto ||| Object
+Sempre, ogni giorno ||| Always, every day
+Ogni giorno alle ||| Every day at
+Ogni settimana ||| Every week
+Nessuna ||| None
+Ogni 2 settimane ||| Every 2 weeks
+Ogni 6 mesi ||| Every 6 months
+Personalizzata ||| Custom
+settimane ||| weeks
+Home ||| Home

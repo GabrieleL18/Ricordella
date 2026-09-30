@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -184,7 +186,7 @@ class ReminderEditViewModel(
                 saveReminder(buildDraft(form, date))
                 _form.update { it.copy(isSaving = false, saved = true) }
             } catch (_: Exception) {
-                _form.update { it.copy(isSaving = false, errorMessage = "Non è stato possibile salvare il promemoria. Riprova.") }
+                _form.update { it.copy(isSaving = false, errorMessage = tr("Non è stato possibile salvare il promemoria. Riprova.")) }
             }
         }
     }

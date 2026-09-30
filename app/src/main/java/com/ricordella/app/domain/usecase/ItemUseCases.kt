@@ -1,5 +1,7 @@
 package com.ricordella.app.domain.usecase
 
+import com.ricordella.app.core.i18n.trf
+
 import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.Item
@@ -65,7 +67,7 @@ class SaveItemUseCase(
             updatedAt = now,
         )
         val reminder = base.copy(
-            title = "Garanzia ${item.name.trim()}",
+            title = trf("Garanzia %1\$s", item.name.trim()),
             dueDate = endDate,
             // Se la data di scadenza cambia, la garanzia torna attiva.
             status = if (base.dueDate != endDate) ReminderStatus.ACTIVE else base.status,

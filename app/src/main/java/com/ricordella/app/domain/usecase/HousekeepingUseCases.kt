@@ -1,5 +1,8 @@
 package com.ricordella.app.domain.usecase
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.net.Uri
 import androidx.core.net.toUri
 import com.ricordella.app.data.backup.BackupRepository
@@ -126,12 +129,12 @@ class Housekeeping(
         }
 
         fun intervalLabel(days: Int): String = when (days) {
-            1 -> "Ogni giorno"
-            7 -> "Ogni settimana"
-            30 -> "Ogni mese"
-            90 -> "Ogni 3 mesi"
-            365 -> "Ogni anno"
-            else -> "Ogni $days giorni"
+            1 -> tr("Ogni giorno")
+            7 -> tr("Ogni settimana")
+            30 -> tr("Ogni mese")
+            90 -> tr("Ogni 3 mesi")
+            365 -> tr("Ogni anno")
+            else -> trf("Ogni %1\$s giorni", days)
         }
     }
 }

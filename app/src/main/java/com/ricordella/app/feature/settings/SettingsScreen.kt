@@ -1,5 +1,11 @@
 package com.ricordella.app.feature.settings
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.AppLanguage
+import com.ricordella.app.core.i18n.Lang
+import com.ricordella.app.core.widget.CalendarWidgetProvider
+import com.ricordella.app.core.i18n.trf
+
 import androidx.core.net.toUri
 import android.Manifest
 import android.app.AlarmManager
@@ -135,7 +141,7 @@ fun SettingsScreen(onBack: () -> Unit) {
         state.message?.let { snackbar.showSnackbar(it); viewModel.onMessageShown() }
     }
 
-    DetailScaffold(title = "Impostazioni", onBack = onBack, snackbarHostState = snackbar) { padding ->
+    DetailScaffold(title = tr("Impostazioni"), onBack = onBack, snackbarHostState = snackbar) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -146,24 +152,38 @@ fun SettingsScreen(onBack: () -> Unit) {
         ) {
             if (state.isBusy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
-            SectionHeader("Aspetto")
-            Text("Tema", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+            SectionHeader(tr("Aspetto"))
+            Text(tr("Tema"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
             Segmented(
                 options = ThemeMode.entries,
                 selected = settings.themeMode,
-                label = { when (it) { ThemeMode.SYSTEM -> "Sistema"; ThemeMode.LIGHT -> "Chiaro"; ThemeMode.DARK -> "Scuro" } },
+                label = { when (it) { ThemeMode.SYSTEM -> tr("Sistema"); ThemeMode.LIGHT -> tr("Chiaro"); ThemeMode.DARK -> tr("Scuro") } },
                 onSelected = { mode -> viewModel.update { it.copy(themeMode = mode) } },
             )
+            Text(tr("Lingua"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+            // Di default segue il sistema; cambiandola l'app si ridisegna subito nella nuova lingua.
+            var language by remember { mutableStateOf(Lang.current(context)) }
+            Segmented(
+                options = AppLanguage.entries,
+                selected = language,
+                label = { when (it) { AppLanguage.SYSTEM -> tr("Sistema"); AppLanguage.ITALIAN -> "Italiano"; AppLanguage.ENGLISH -> "English" } },
+                onSelected = { chosen ->
+                    language = chosen
+                    Lang.set(context, chosen)
+                    CalendarWidgetProvider.requestUpdate(context)
+                    (context as? android.app.Activity)?.recreate()
+                },
+            )
 
-            SectionHeader("Calendario")
-            Text("Primo giorno della settimana", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+            SectionHeader(tr("Calendario"))
+            Text(tr("Primo giorno della settimana"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
             Segmented(
                 options = listOf(DayOfWeek.MONDAY, DayOfWeek.SUNDAY, DayOfWeek.SATURDAY),
                 selected = settings.firstDayOfWeek,
                 label = DateTexts::weekdayFull,
                 onSelected = { day -> viewModel.update { it.copy(firstDayOfWeek = day) } },
             )
-            Text("Formato data", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+            Text(tr("Formato data"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
             val sample = LocalDate.of(2026, 3, 12)
             Segmented(
                 options = DateFormatStyle.entries,
@@ -172,21 +192,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
             )
 
-            SectionHeader("Suoni")
+            SectionHeader(tr("Suoni"))
             SettingRow(
                 icon = Icons.Rounded.MusicNote,
-                title = "Suoni delle scelte",
-                subtitle = "Un piccolo suono quando scegli categorie e cose.",
+                title = tr("Suoni delle scelte"),
+                subtitle = tr("Un piccolo suono quando scegli categorie e cose."),
                 trailing = {
                     Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
                 },
             )
 
-            SectionHeader("Notifiche")
+            SectionHeader(tr("Notifiche"))
             SettingRow(
                 icon = Icons.Rounded.Notifications,
-                title = "Notifiche abilitate",
-                subtitle = "Remindella ti avvisa anche ad app chiusa.",
+                title = tr("Notifiche abilitate"),
+                subtitle = tr("Remindella ti avvisa anche ad app chiusa."),
                 trailing = {
                     Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
                 },
@@ -195,14 +215,14 @@ fun SettingsScreen(onBack: () -> Unit) {
             ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
             SettingRow(
                 icon = Icons.AutoMirrored.Rounded.VolumeUp,
-                title = "Suono e vibrazione",
-                subtitle = "Gestiti dalle impostazioni di sistema del canale \"Promemoria\".",
+                title = tr("Suono e vibrazione"),
+                subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),
                 onClick = { openChannelSettings(context) },
             )
             SettingRow(
                 icon = Icons.Rounded.Schedule,
-                title = "Orario promemoria senza ora",
-                subtitle = "Notifica alle ${DateTexts.time(settings.allDayNotificationTime)}",
+                title = tr("Orario promemoria senza ora"),
+                subtitle = trf("Notifica alle %1\$s", DateTexts.time(settings.allDayNotificationTime)),
                 onClick = { pickAllDayTime = true },
             )
             DropdownField(
@@ -214,11 +234,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
 
-            SectionHeader("Dati")
+            SectionHeader(tr("Dati"))
             SettingRow(
                 icon = Icons.Rounded.Upload,
-                title = "Esporta backup",
-                subtitle = "Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione.",
+                title = tr("Esporta backup"),
+                subtitle = tr("Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione."),
                 onClick = { backupAction(BACKUP_EXPORT) },
             )
             DropdownField(
@@ -231,35 +251,35 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
             SettingRow(
                 icon = Icons.Rounded.Download,
-                title = "Importa backup",
-                subtitle = "Ripristina un backup sostituendo i dati attuali.",
+                title = tr("Importa backup"),
+                subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
                 onClick = { backupAction(BACKUP_IMPORT) },
             )
             SettingRow(
                 icon = Icons.Rounded.CalendarMonth,
-                title = "Importa da Google Calendar",
-                subtitle = "Copia gli eventi di un account Google presente sul telefono.",
+                title = tr("Importa da Google Calendar"),
+                subtitle = tr("Copia gli eventi di un account Google presente sul telefono."),
                 onClick = { showCalendarImport = true },
             )
             SettingRow(
                 icon = Icons.Rounded.DeleteForever,
-                title = "Elimina tutti i dati",
-                subtitle = "Cancella persone, cose, promemoria e storico da questo dispositivo.",
+                title = tr("Elimina tutti i dati"),
+                subtitle = tr("Cancella persone, cose, promemoria e storico da questo dispositivo."),
                 onClick = { confirmDelete = 1 },
             )
 
-            SectionHeader("Informazioni")
+            SectionHeader(tr("Informazioni"))
             SettingRow(
                 icon = Icons.Rounded.School,
-                title = "Rivedi il tutorial",
-                subtitle = "Come funzionano le sezioni dell'app.",
+                title = tr("Rivedi il tutorial"),
+                subtitle = tr("Come funzionano le sezioni dell'app."),
                 onClick = { showSectionsTutorial = true },
             )
             VersionRow(settings.developerMode, onUnlock = { viewModel.update { it.copy(developerMode = true) } })
             SettingRow(
                 icon = Icons.Rounded.PrivacyTip,
-                title = "Privacy",
-                subtitle = "I tuoi dati restano sul dispositivo.",
+                title = tr("Privacy"),
+                subtitle = tr("I tuoi dati restano sul dispositivo."),
                 onClick = { showPrivacy = true },
             )
             if (settings.developerMode) {
@@ -272,38 +292,38 @@ fun SettingsScreen(onBack: () -> Unit) {
     state.restoreSummary?.let { summary ->
         AlertDialog(
             onDismissRequest = viewModel::cancelRestore,
-            title = { Text("Ripristinare il backup?") },
+            title = { Text(tr("Ripristinare il backup?")) },
             text = {
                 Text(
-                    "Backup del ${summary.createdAt.take(10)}\n\n" +
-                        "• ${summary.people} persone\n• ${summary.items} cose\n• ${summary.reminders} promemoria\n" +
-                        "• ${summary.maintenance} manutenzioni\n• ${summary.files} file allegati\n\n" +
-                        "Attenzione: tutti i dati attuali verranno sostituiti da quelli del backup.",
+                    trf("Backup del %1\$s\n\n", summary.createdAt.take(10)) +
+                        trf("• %1\$s persone\n• %2\$s cose\n• %3\$s promemoria\n", summary.people, summary.items, summary.reminders) +
+                        trf("• %1\$s manutenzioni\n• %2\$s file allegati\n\n", summary.maintenance, summary.files) +
+                        tr("Attenzione: tutti i dati attuali verranno sostituiti da quelli del backup."),
                 )
             },
             confirmButton = {
                 TextButton(onClick = viewModel::confirmRestore) {
-                    Text("Ripristina sostituendo i dati", color = MaterialTheme.colorScheme.error)
+                    Text(tr("Ripristina sostituendo i dati"), color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = { TextButton(onClick = viewModel::cancelRestore) { Text("Annulla") } },
+            dismissButton = { TextButton(onClick = viewModel::cancelRestore) { Text(tr("Annulla")) } },
         )
     }
 
     when (confirmDelete) {
         1 -> ConfirmDialog(
-            title = "Eliminare tutti i dati?",
-            message = "Verranno eliminati definitivamente persone, cose, promemoria, manutenzioni e storico. " +
-                "Se vuoi conservarli, esporta prima un backup.",
-            confirmLabel = "Continua",
+            title = tr("Eliminare tutti i dati?"),
+            message = tr("Verranno eliminati definitivamente persone, cose, promemoria, manutenzioni e storico. ") +
+                tr("Se vuoi conservarli, esporta prima un backup."),
+            confirmLabel = tr("Continua"),
             destructive = true,
             onConfirm = { confirmDelete = 2 },
             onDismiss = { if (confirmDelete == 1) confirmDelete = 0 },
         )
         2 -> ConfirmDialog(
-            title = "Sei sicuro?",
-            message = "Questa operazione non si può annullare.",
-            confirmLabel = "Elimina tutto",
+            title = tr("Sei sicuro?"),
+            message = tr("Questa operazione non si può annullare."),
+            confirmLabel = tr("Elimina tutto"),
             destructive = true,
             onConfirm = viewModel::deleteEverything,
             onDismiss = { confirmDelete = 0 },
@@ -313,14 +333,14 @@ fun SettingsScreen(onBack: () -> Unit) {
     if (showPrivacy) {
         AlertDialog(
             onDismissRequest = { showPrivacy = false },
-            title = { Text("Privacy") },
+            title = { Text(tr("Privacy")) },
             text = {
                 Text(
-                    "Remindella funziona completamente offline e non richiede alcun account. " +
-                        "Tutti i dati restano sul tuo dispositivo: l'app non ha accesso a Internet, " +
-                        "non usa servizi cloud né statistiche di utilizzo.\n\n" +
-                        "I dati sono esclusi dal backup automatico di Android. " +
-                        "Per trasferirli usa \"Esporta backup\": il file resta sotto il tuo controllo.",
+                    tr("Remindella funziona completamente offline e non richiede alcun account. ") +
+                        tr("Tutti i dati restano sul tuo dispositivo: l'app non ha accesso a Internet, ") +
+                        tr("non usa servizi cloud né statistiche di utilizzo.\n\n") +
+                        tr("I dati sono esclusi dal backup automatico di Android. ") +
+                        tr("Per trasferirli usa \"Esporta backup\": il file resta sotto il tuo controllo."),
                 )
             },
             confirmButton = { TextButton(onClick = { showPrivacy = false }) { Text("OK") } },
@@ -348,7 +368,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
             Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
-                CalendarImportStep(importViewModel, onDone = { showCalendarImport = false }, doneLabel = "Chiudi")
+                CalendarImportStep(importViewModel, onDone = { showCalendarImport = false }, doneLabel = tr("Chiudi"))
             }
         }
     }
@@ -420,8 +440,8 @@ private fun NotificationPermissionRow(onChanged: () -> Unit) {
     }
     SettingRow(
         icon = Icons.Rounded.Notifications,
-        title = "Permesso di notifica",
-        subtitle = if (isGranted) "Concesso" else "Non concesso: tocca per attivarlo",
+        title = tr("Permesso di notifica"),
+        subtitle = if (isGranted) tr("Concesso") else tr("Non concesso: tocca per attivarlo"),
         onClick = if (isGranted) null else ({
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }),
@@ -442,9 +462,9 @@ private fun ExactAlarmRow(onChanged: () -> Unit) {
     }
     SettingRow(
         icon = Icons.Rounded.AlarmOn,
-        title = "Promemoria puntuali",
-        subtitle = if (allowed) "Le notifiche con orario arrivano al minuto esatto."
-        else "Non consentito: le notifiche possono arrivare con qualche minuto di ritardo. Tocca per consentire.",
+        title = tr("Promemoria puntuali"),
+        subtitle = if (allowed) tr("Le notifiche con orario arrivano al minuto esatto.")
+        else tr("Non consentito: le notifiche possono arrivare con qualche minuto di ritardo. Tocca per consentire."),
         onClick = {
             context.startActivity(
                 Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:${context.packageName}".toUri())

@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,15 +63,15 @@ class ReminderDetailViewModel(
         local.copy(isLoading = false, entry = entry, completions = completions, attachments = files, now = now)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ReminderDetailUiState())
 
-    fun onComplete() = launchAction("Completato") { completeReminder(reminderId) }
+    fun onComplete() = launchAction(tr("Completato")) { completeReminder(reminderId) }
 
-    fun onReopen() = launchAction("Riaperto") { reopenReminder(reminderId) }
+    fun onReopen() = launchAction(tr("Riaperto")) { reopenReminder(reminderId) }
 
-    fun onSnooze(option: SnoozeOption) = launchAction("Notifica rimandata") { snoozeReminder(reminderId, option) }
+    fun onSnooze(option: SnoozeOption) = launchAction(tr("Notifica rimandata")) { snoozeReminder(reminderId, option) }
 
     fun onToggleArchived() {
         val reminder = uiState.value.entry?.reminder ?: return
-        launchAction(if (reminder.isArchived) "Ripristinato" else "Archiviato") {
+        launchAction(if (reminder.isArchived) tr("Ripristinato") else tr("Archiviato")) {
             reminders.update(reminder.copy(isArchived = !reminder.isArchived, updatedAt = time.now()))
         }
     }
@@ -106,7 +108,7 @@ class ReminderDetailViewModel(
                 action()
                 successMessage?.let(::showMessage)
             } catch (_: Exception) {
-                showMessage("Operazione non riuscita. Riprova.")
+                showMessage(tr("Operazione non riuscita. Riprova."))
             }
         }
     }

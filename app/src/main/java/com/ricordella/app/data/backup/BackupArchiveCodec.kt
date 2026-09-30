@@ -1,5 +1,7 @@
 package com.ricordella.app.data.backup
 
+import com.ricordella.app.core.i18n.tr
+
 import com.ricordella.app.data.local.database.BuiltInCategories
 import com.ricordella.app.domain.model.AppSettings
 import kotlinx.serialization.SerializationException
@@ -103,24 +105,24 @@ class BackupArchiveCodec {
                 }
             }
         } catch (_: ZipException) {
-            return if (manifestBytes == null) BackupReadResult.NotABackup else BackupReadResult.Corrupted("archivio danneggiato")
+            return if (manifestBytes == null) BackupReadResult.NotABackup else BackupReadResult.Corrupted(tr("archivio danneggiato"))
         } catch (_: IOException) {
-            return BackupReadResult.Corrupted("lettura del file non riuscita")
+            return BackupReadResult.Corrupted(tr("lettura del file non riuscita"))
         }
 
         val manifestData = manifestBytes ?: return BackupReadResult.NotABackup
         val manifest = decode(manifestData, BackupManifest.serializer())
-            ?: return BackupReadResult.Corrupted("manifest non leggibile")
+            ?: return BackupReadResult.Corrupted(tr("manifest non leggibile"))
         if (manifest.formatVersion > BACKUP_FORMAT_VERSION || manifest.formatVersion < 1) {
             return BackupReadResult.IncompatibleVersion(manifest.formatVersion)
         }
-        val databaseData = databaseBytes ?: return BackupReadResult.Corrupted("dati mancanti")
+        val databaseData = databaseBytes ?: return BackupReadResult.Corrupted(tr("dati mancanti"))
         if (sha256(databaseData) != manifest.databaseSha256) {
-            return BackupReadResult.Corrupted("i dati non corrispondono alla firma del backup")
+            return BackupReadResult.Corrupted(tr("i dati non corrispondono alla firma del backup"))
         }
         val database = decode(databaseData, BackupDatabaseContent.serializer())
             ?.let { it.copy(categories = it.categories + BuiltInCategories.all.filter { builtIn -> it.categories.none { c -> c.id == builtIn.id } }) }
-            ?: return BackupReadResult.Corrupted("dati non leggibili")
+            ?: return BackupReadResult.Corrupted(tr("dati non leggibili"))
         database.findIntegrityProblem()?.let { return BackupReadResult.Corrupted(it) }
         val settings = settingsBytes?.let { decode(it, AppSettings.serializer()) }
         return BackupReadResult.Valid(BackupContents(manifest, database, settings))

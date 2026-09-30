@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.settings
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -74,14 +77,14 @@ class SettingsViewModel(
 
     /** Aggiorna il backup sovrascrivendo il file precedente; se manca, chiede dove salvarlo. */
     fun exportOverwrite() = runBusy {
-        if (housekeeping.overwriteBackup()) showMessage("Backup aggiornato (file precedente sovrascritto).")
+        if (housekeeping.overwriteBackup()) showMessage(tr("Backup aggiornato (file precedente sovrascritto)."))
         else local.update { it.copy(askNewFile = true) }
     }
 
     /** Primo backup o nuova versione: da ora in poi è questo il file che viene sovrascritto. */
     fun exportNewFile(destination: Uri) = runBusy {
         housekeeping.exportToNewFile(destination)
-        showMessage("Backup salvato.")
+        showMessage(tr("Backup salvato."))
     }
 
     fun onAskedNewFile() = local.update { it.copy(askNewFile = false) }
@@ -93,10 +96,10 @@ class SettingsViewModel(
                 pendingRestore = pending
                 local.update { it.copy(restoreSummary = result.contents.summary) }
             }
-            BackupReadResult.NotABackup -> showMessage("Il file scelto non è un backup di Remindella.")
+            BackupReadResult.NotABackup -> showMessage(tr("Il file scelto non è un backup di Remindella."))
             is BackupReadResult.IncompatibleVersion ->
-                showMessage("Questo backup è stato creato con una versione più recente di Remindella. Aggiorna l'app e riprova.")
-            is BackupReadResult.Corrupted -> showMessage("Il backup è danneggiato (${result.reason}). Nessun dato è stato modificato.")
+                showMessage(tr("Questo backup è stato creato con una versione più recente di Remindella. Aggiorna l'app e riprova."))
+            is BackupReadResult.Corrupted -> showMessage(trf("Il backup è danneggiato (%1\$s). Nessun dato è stato modificato.", result.reason))
         }
     }
 
@@ -106,7 +109,7 @@ class SettingsViewModel(
         local.update { it.copy(restoreSummary = null) }
         runBusy {
             restoreBackup(pending)
-            showMessage("Backup ripristinato.")
+            showMessage(tr("Backup ripristinato."))
         }
     }
 
@@ -118,7 +121,7 @@ class SettingsViewModel(
 
     fun deleteEverything() = runBusy {
         deleteAllData()
-        showMessage("Tutti i dati sono stati eliminati.")
+        showMessage(tr("Tutti i dati sono stati eliminati."))
     }
 
     fun onMessageShown() = local.update { it.copy(message = null) }
@@ -131,7 +134,7 @@ class SettingsViewModel(
             try {
                 action()
             } catch (_: Exception) {
-                showMessage("Operazione non riuscita. Nessun dato è stato perso: riprova.")
+                showMessage(tr("Operazione non riuscita. Nessun dato è stato perso: riprova."))
             } finally {
                 local.update { it.copy(isBusy = false) }
             }

@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -85,8 +87,8 @@ fun TopLevelScaffold(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
-                    IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = "Cerca") }
-                    IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = "Impostazioni") }
+                    IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }
+                    IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = tr("Impostazioni")) }
                 },
             )
         },
@@ -124,7 +126,7 @@ private fun AddFab(onAdd: () -> Unit) {
     ) {
         Icon(
             Icons.Rounded.Add,
-            contentDescription = "Aggiungi",
+            contentDescription = tr("Aggiungi"),
             modifier = Modifier
                 .size(28.dp)
                 .graphicsLayer { rotationZ = rotation },
@@ -152,7 +154,7 @@ fun DetailScaffold(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Indietro")
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = tr("Indietro"))
                     }
                 },
                 actions = { actions() },

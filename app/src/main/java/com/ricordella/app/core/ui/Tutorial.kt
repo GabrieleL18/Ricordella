@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -85,14 +87,14 @@ fun TutorialPager(
     pages: List<TutorialPage>,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    doneLabel: String = "Ho capito",
+    doneLabel: String = tr("Ho capito"),
 ) {
     val pager = rememberPagerState { pages.size }
     val scope = rememberCoroutineScope()
     val last = pager.currentPage == pages.lastIndex
     Column(modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = onDone) { Text(if (last) " " else "Salta") }
+            TextButton(onClick = onDone) { Text(if (last) " " else tr("Salta")) }
         }
         HorizontalPager(pager, modifier = Modifier.weight(1f)) { index ->
             val page = pages[index]
@@ -144,7 +146,7 @@ fun TutorialPager(
         ) {
             PageDots(pages.size, pager.currentPage, Modifier.weight(1f))
             PushButton(
-                text = if (last) doneLabel else "Avanti",
+                text = if (last) doneLabel else tr("Avanti"),
                 icon = if (last) Icons.Rounded.Check else Icons.AutoMirrored.Rounded.ArrowForward,
                 onClick = { if (last) onDone() else scope.launch { pager.animateScrollToPage(pager.currentPage + 1) } },
             )
@@ -154,7 +156,7 @@ fun TutorialPager(
 
 /** Tutorial a tutto schermo sopra la schermata corrente. */
 @Composable
-fun TutorialDialog(pages: List<TutorialPage>, onDismiss: () -> Unit, doneLabel: String = "Ho capito") {
+fun TutorialDialog(pages: List<TutorialPage>, onDismiss: () -> Unit, doneLabel: String = tr("Ho capito")) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
             TutorialPager(pages, onDone = onDismiss, doneLabel = doneLabel)
@@ -500,35 +502,35 @@ fun WidgetIllustration() {
 }
 
 /** Pagine del tutorial delle sezioni: usate nella configurazione iniziale e dalle Impostazioni. */
-val SectionTutorialPages: List<TutorialPage> = listOf(
+val SectionTutorialPages: List<TutorialPage> get() = listOf(
     TutorialPage(
-        "Home: cosa ricordare oggi",
-        "In alto trovi quello che richiede attenzione, poi le cose di oggi e quelle in arrivo. " +
-            "Tocca il cerchio per completare: se qualcosa è scaduto la palla si riempie di fumo rosso.",
+        tr("Home: cosa ricordare oggi"),
+        tr("In alto trovi quello che richiede attenzione, poi le cose di oggi e quelle in arrivo. ") +
+            tr("Tocca il cerchio per completare: se qualcosa è scaduto la palla si riempie di fumo rosso."),
     ) { HomeIllustration() },
     TutorialPage(
-        "Calendario",
-        "Il mese a colpo d'occhio: i giorni con un puntino hanno promemoria. Tocca un giorno per vederli, scorri per cambiare mese. In \"Giorno\" trovi la timeline ora per ora.",
+        tr("Calendario"),
+        tr("Il mese a colpo d'occhio: i giorni con un puntino hanno promemoria. Tocca un giorno per vederli, scorri per cambiare mese. In \"Giorno\" trovi la timeline ora per ora."),
     ) { CalendarIllustration() },
     TutorialPage(
-        "Promemoria",
-        "Tutti i promemoria, filtrabili per tipo e stato: attività, eventi, visite mediche, scadenze, compleanni. Ti avviso io con una notifica.",
+        tr("Promemoria"),
+        tr("Tutti i promemoria, filtrabili per tipo e stato: attività, eventi, visite mediche, scadenze, compleanni. Ti avviso io con una notifica."),
     ) { RemindersIllustration() },
     TutorialPage(
-        "Cose",
-        "Auto, elettrodomestici, dispositivi, documenti. Scegli prima la categoria, poi la cosa: ti propongo io revisioni, tagliandi e garanzie.",
+        tr("Cose"),
+        tr("Auto, elettrodomestici, dispositivi, documenti. Scegli prima la categoria, poi la cosa: ti propongo io revisioni, tagliandi e garanzie."),
     ) { ItemsIllustration() },
     TutorialPage(
-        "Persone",
-        "Collega promemoria e cose alle persone: nella loro scheda trovi compleanni, eventi e tutto ciò che le riguarda.",
+        tr("Persone"),
+        tr("Collega promemoria e cose alle persone: nella loro scheda trovi compleanni, eventi e tutto ciò che le riguarda."),
     ) { PeopleIllustration() },
     TutorialPage(
-        "Il pulsante +",
-        "Da qualunque sezione, il + giallo aggiunge al volo un promemoria, un evento, una cosa o una persona.",
+        tr("Il pulsante +"),
+        tr("Da qualunque sezione, il + giallo aggiunge al volo un promemoria, un evento, una cosa o una persona."),
     ) { AddIllustration() },
     TutorialPage(
-        "Il widget",
-        "Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo e inserisci promemoria, eventi, cose e persone con un tocco.",
+        tr("Il widget"),
+        tr("Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo e inserisci promemoria, eventi, cose e persone con un tocco."),
     ) { WidgetIllustration() },
 )
 
@@ -649,22 +651,22 @@ fun ImportIllustration() {
     }
 }
 
-val BackupTutorialPages: List<TutorialPage> = listOf(
+val BackupTutorialPages: List<TutorialPage> get() = listOf(
     TutorialPage(
-        "Esporta: un solo file",
-        "La prima volta scegli dove salvare il .zip (es. Drive). Le volte dopo lo sovrascrivo, a meno che tu non chieda una nuova versione. Puoi anche condividerlo.",
+        tr("Esporta: un solo file"),
+        tr("La prima volta scegli dove salvare il .zip (es. Drive). Le volte dopo lo sovrascrivo, a meno che tu non chieda una nuova versione. Puoi anche condividerlo."),
     ) { ExportIllustration() },
     TutorialPage(
-        "Leggero come una piuma",
-        "Il backup è compresso al massimo e le foto vengono ridotte: pesa il meno possibile, senza perdere i tuoi dati.",
+        tr("Leggero come una piuma"),
+        tr("Il backup è compresso al massimo e le foto vengono ridotte: pesa il meno possibile, senza perdere i tuoi dati."),
     ) { LightBackupIllustration() },
     TutorialPage(
-        "Te lo ricordo io",
-        "Ogni 3 mesi (o ogni giorno, settimana, mese, anno: lo scegli nelle Impostazioni) ti chiedo di aggiornare il backup.",
+        tr("Te lo ricordo io"),
+        tr("Ogni 3 mesi (o ogni giorno, settimana, mese, anno: lo scegli nelle Impostazioni) ti chiedo di aggiornare il backup."),
     ) { BackupReminderIllustration() },
     TutorialPage(
-        "Importa",
-        "Su un nuovo telefono, \"Importa backup\" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto.",
+        tr("Importa"),
+        tr("Su un nuovo telefono, \"Importa backup\" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto."),
     ) { ImportIllustration() },
 )
 

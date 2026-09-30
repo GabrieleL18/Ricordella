@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,23 +118,23 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
 
     val entry = state.entry
     DetailScaffold(
-        title = entry?.reminder?.type?.label ?: "Promemoria",
+        title = entry?.reminder?.type?.label ?: tr("Promemoria"),
         onBack = navigator::back,
         snackbarHostState = snackbar,
         actions = {
             if (entry != null) {
                 IconButton(onClick = { navigator.editReminder(entry.reminder.id) }) {
-                    Icon(Icons.Rounded.Edit, contentDescription = "Modifica")
+                    Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica"))
                 }
                 Box {
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = "Altre azioni") }
+                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         DropdownMenuItem(
-                            text = { Text(if (entry.reminder.isArchived) "Ripristina dall'archivio" else "Archivia") },
+                            text = { Text(if (entry.reminder.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
                             onClick = { menuOpen = false; viewModel.onToggleArchived() },
                         )
                         DropdownMenuItem(
-                            text = { Text("Elimina") },
+                            text = { Text(tr("Elimina")) },
                             leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
                             onClick = { menuOpen = false; showDeleteConfirm = true },
                         )
@@ -143,7 +146,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
     ) { padding ->
         if (entry == null) {
             if (!state.isLoading) {
-                Text("Questo promemoria non esiste più.", modifier = Modifier.padding(padding).padding(RicordellaDimensions.screenPadding))
+                Text(tr("Questo promemoria non esiste più."), modifier = Modifier.padding(padding).padding(RicordellaDimensions.screenPadding))
             }
             return@DetailScaffold
         }
@@ -160,19 +163,19 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
             Details(entry, state.now)
             Links(entry, navigator)
             AttachmentsSection(
-                title = "Allegati",
+                title = tr("Allegati"),
                 attachments = state.attachments,
                 onAdd = viewModel::onAddAttachment,
                 onRemove = viewModel::onRemoveAttachment,
                 onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             if (state.completions.isNotEmpty()) {
-                SectionHeader("Storico")
+                SectionHeader(tr("Storico"))
                 val dateFormat = LocalAppSettings.current.dateFormat
                 state.completions.forEach { completion ->
                     val completedOn = LocalDateTime.ofInstant(completion.completedAt, ZoneId.systemDefault())
                     Text(
-                        "Occorrenza del ${DateTexts.date(completion.occurrenceDate, dateFormat)} — completata il " +
+                        trf("Occorrenza del %1\$s — completata il ", DateTexts.date(completion.occurrenceDate, dateFormat)) +
                             DateTexts.dateWithTime(completedOn.toLocalDate(), completedOn.toLocalTime(), dateFormat),
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -183,9 +186,9 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
 
     if (showDeleteConfirm) {
         ConfirmDialog(
-            title = "Eliminare il promemoria?",
-            message = "Il promemoria e il suo storico verranno eliminati definitivamente. Le persone e le cose collegate non vengono toccate.",
-            confirmLabel = "Elimina",
+            title = tr("Eliminare il promemoria?"),
+            message = tr("Il promemoria e il suo storico verranno eliminati definitivamente. Le persone e le cose collegate non vengono toccate."),
+            confirmLabel = tr("Elimina"),
             destructive = true,
             onConfirm = viewModel::onDelete,
             onDismiss = { showDeleteConfirm = false },
@@ -230,18 +233,18 @@ private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         when (status) {
             ReminderTimeStatus.OVERDUE ->
-                StatusBadge("Scaduto", MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer)
+                StatusBadge(tr("Scaduto"), MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer)
             ReminderTimeStatus.TODAY ->
-                StatusBadge("Oggi", MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
+                StatusBadge(tr("Oggi"), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
             ReminderTimeStatus.COMPLETED ->
-                StatusBadge("Completato", MaterialTheme.ricordellaColors.successContainer, MaterialTheme.ricordellaColors.onSuccessContainer, icon = Icons.Rounded.Check)
+                StatusBadge(tr("Completato"), MaterialTheme.ricordellaColors.successContainer, MaterialTheme.ricordellaColors.onSuccessContainer, icon = Icons.Rounded.Check)
             ReminderTimeStatus.CANCELLED ->
-                StatusBadge("Annullato", MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
+                StatusBadge(tr("Annullato"), MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
             ReminderTimeStatus.UPCOMING ->
-                StatusBadge("In arrivo", MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer)
+                StatusBadge(tr("In arrivo"), MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer)
         }
         if (reminder.isArchived) {
-            StatusBadge("Archiviato", MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
+            StatusBadge(tr("Archiviato"), MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
         }
         PriorityIndicator(reminder.priority)
     }
@@ -254,40 +257,40 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
     val today = now.toLocalDate()
     Surface(color = MaterialTheme.colorScheme.surfaceContainerLow, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(RicordellaDimensions.spaceL)) {
-            InfoRow(if (reminder.endDate != null) "Dal" else "Data", DateTexts.date(reminder.dueDate, settings.dateFormat))
-            reminder.endDate?.let { InfoRow("Al", DateTexts.date(it, settings.dateFormat)) }
-            InfoRow("Ora", reminder.dueTime?.let(DateTexts::time) ?: "Tutto il giorno")
+            InfoRow(if (reminder.endDate != null) tr("Dal") else tr("Data"), DateTexts.date(reminder.dueDate, settings.dateFormat))
+            reminder.endDate?.let { InfoRow(tr("Al"), DateTexts.date(it, settings.dateFormat)) }
+            InfoRow(tr("Ora"), reminder.dueTime?.let(DateTexts::time) ?: tr("Tutto il giorno"))
             InfoRow(
-                "Quando",
+                tr("Quando"),
                 if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(reminder.dueDate, today)
                 else RelativeDateDescriber.describe(reminder.dueDate, today).replaceFirstChar { it.uppercase() },
             )
-            entry.recurrenceRule?.let { InfoRow("Ricorrenza", it.describe()) }
-            reminder.category?.let { InfoRow("Categoria", it) }
+            entry.recurrenceRule?.let { InfoRow(tr("Ricorrenza"), it.describe()) }
+            reminder.category?.let { InfoRow(tr("Categoria"), it) }
             reminder.dueOdometerKm?.let { dueKm ->
                 val current = entry.odometerItem?.odometerKm
-                InfoRow("Scadenza km", DateTexts.kilometers(dueKm) + (reminder.odometerIntervalKm?.let { " (ogni ${DateTexts.kilometers(it)})" } ?: ""))
-                current?.let { InfoRow("Km attuali", DateTexts.kilometers(it) + (entry.odometerStatus?.let { s -> " · ${s.label}" } ?: "")) }
+                InfoRow(tr("Scadenza km"), DateTexts.kilometers(dueKm) + (reminder.odometerIntervalKm?.let { trf(" (ogni %1\$s)", DateTexts.kilometers(it)) } ?: ""))
+                current?.let { InfoRow(tr("Km attuali"), DateTexts.kilometers(it) + (entry.odometerStatus?.let { s -> " · ${s.label}" } ?: "")) }
             }
             InfoRow(
-                "Notifica",
-                if (reminder.notificationsEnabled) notifyOffsetLabel(reminder.notifyOffsetMinutes) else "Disattivata",
+                tr("Notifica"),
+                if (reminder.notificationsEnabled) notifyOffsetLabel(reminder.notifyOffsetMinutes) else tr("Disattivata"),
             )
             reminder.snoozedUntil?.takeIf { reminder.status == ReminderStatus.ACTIVE }?.let {
                 val local = LocalDateTime.ofInstant(it, ZoneId.systemDefault())
                 if (local.isAfter(now)) {
-                    InfoRow("Rimandato a", DateTexts.dateWithTime(local.toLocalDate(), local.toLocalTime(), settings.dateFormat))
+                    InfoRow(tr("Rimandato a"), DateTexts.dateWithTime(local.toLocalDate(), local.toLocalTime(), settings.dateFormat))
                 }
             }
         }
     }
     reminder.trip?.takeIf { !it.isEmpty }?.let { TripSection(it) }
     reminder.description?.let {
-        SectionHeader("Descrizione")
+        SectionHeader(tr("Descrizione"))
         Text(it, style = MaterialTheme.typography.bodyLarge)
     }
     reminder.notes?.let {
-        SectionHeader("Note")
+        SectionHeader(tr("Note"))
         Text(it, style = MaterialTheme.typography.bodyLarge)
     }
 }
@@ -296,13 +299,13 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
 @Composable
 private fun Links(entry: ReminderWithLinks, navigator: AppNavigator) {
     if (entry.people.isNotEmpty()) {
-        SectionHeader("Persone")
+        SectionHeader(tr("Persone"))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             entry.people.forEach { person -> LinkChip(person.displayName, onClick = { navigator.openPerson(person.id) }) }
         }
     }
     if (entry.items.isNotEmpty()) {
-        SectionHeader("Cose")
+        SectionHeader(tr("Cose"))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             entry.items.forEach { item -> LinkChip(item.name, onClick = { navigator.openItem(item.id) }) }
         }
@@ -334,13 +337,13 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
                 Box(Modifier.weight(1f)) {
                     OutlinedButton(onClick = { snoozeMenu = true }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Rounded.Snooze, contentDescription = null)
-                        Text("Rimanda", modifier = Modifier.padding(start = 8.dp))
+                        Text(tr("Rimanda"), modifier = Modifier.padding(start = 8.dp))
                     }
                     DropdownMenu(expanded = snoozeMenu, onDismissRequest = { snoozeMenu = false }) {
-                        DropdownMenuItem(text = { Text("Tra 10 minuti") }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.TEN_MINUTES) })
-                        DropdownMenuItem(text = { Text("Tra 1 ora") }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.ONE_HOUR) })
-                        DropdownMenuItem(text = { Text("Domani mattina") }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.TomorrowMorning) })
-                        DropdownMenuItem(text = { Text("Scegli data e ora…") }, onClick = { snoozeMenu = false; pickDate = true })
+                        DropdownMenuItem(text = { Text(tr("Tra 10 minuti")) }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.TEN_MINUTES) })
+                        DropdownMenuItem(text = { Text(tr("Tra 1 ora")) }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.ONE_HOUR) })
+                        DropdownMenuItem(text = { Text(tr("Domani mattina")) }, onClick = { snoozeMenu = false; viewModel.onSnooze(SnoozeOption.TomorrowMorning) })
+                        DropdownMenuItem(text = { Text(tr("Scegli data e ora…")) }, onClick = { snoozeMenu = false; pickDate = true })
                     }
                 }
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -350,7 +353,7 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
                         modifier = Modifier.requiredSize(160.dp),
                     )
                     PushButton(
-                        text = "Completa",
+                        text = tr("Completa"),
                         icon = Icons.Rounded.Check,
                         onClick = {
                             burst++
@@ -366,7 +369,7 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
             } else {
                 OutlinedButton(onClick = viewModel::onReopen, modifier = Modifier.weight(1f)) {
                     Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = null)
-                    Text("Segna come da fare", modifier = Modifier.padding(start = 8.dp))
+                    Text(tr("Segna come da fare"), modifier = Modifier.padding(start = 8.dp))
                 }
             }
         }

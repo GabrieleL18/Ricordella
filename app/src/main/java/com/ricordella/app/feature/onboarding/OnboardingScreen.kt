@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.onboarding
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -133,7 +136,7 @@ fun OnboardingScreen() {
         ) { current ->
             when (current) {
                 Stage.WELCOME -> Welcome(onNext = { stage = 1 })
-                Stage.TUTORIAL -> TutorialPager(SectionTutorialPages, onDone = { stage = 2 }, doneLabel = "Avanti")
+                Stage.TUTORIAL -> TutorialPager(SectionTutorialPages, onDone = { stage = 2 }, doneLabel = tr("Avanti"))
                 Stage.CALENDAR -> CalendarImportStep(viewModel, onDone = viewModel::finishOnboarding)
             }
         }
@@ -149,23 +152,23 @@ private fun Welcome(onNext: () -> Unit) {
     ) {
         CrystalBallMascot(size = 160.dp)
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
-        Text("Ciao, sono", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-        Text("Remindella", style = BrandTitleStyle.copy(fontSize = 44.sp, color = MaterialTheme.ricordellaColors.boltEdge), textAlign = TextAlign.Center)
+        Text(tr("Ciao, sono"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+        Text(tr("Remindella"), style = BrandTitleStyle.copy(fontSize = 44.sp, color = MaterialTheme.ricordellaColors.boltEdge), textAlign = TextAlign.Center)
         Spacer(Modifier.height(RicordellaDimensions.spaceS))
         Text(
-            "Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?",
+            tr("Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?"),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
-        PushButton("Iniziamo", onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward)
+        PushButton(tr("Iniziamo"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward)
     }
 }
 
 /** Import facoltativo: permesso calendario → scelta account Google → import. */
 @Composable
-fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = "Inizia a usare Remindella") {
+fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = tr("Inizia a usare Remindella")) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission(), viewModel::onPermission)
     val tone = MaterialTheme.ricordellaColors.lavender
@@ -184,10 +187,10 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
         Surface(color = tone.container, shape = MaterialTheme.shapes.extraLarge) {
             androidx.compose.material3.Icon(Icons.Rounded.CalendarMonth, null, tint = tone.content, modifier = Modifier.padding(24.dp).height(56.dp).fillMaxWidth(0.3f))
         }
-        Text("Importa da Google Calendar", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+        Text(tr("Importa da Google Calendar"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
         Text(
-            "Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi di un tuo account Google già presente sul telefono. " +
-                "Niente Internet: leggo solo il calendario del dispositivo.",
+            tr("Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi di un tuo account Google già presente sul telefono. ") +
+                tr("Niente Internet: leggo solo il calendario del dispositivo."),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -197,7 +200,7 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
         when {
             state.imported != null -> {
                 Text(
-                    if (state.imported == 0) "Nessun evento da importare." else "Fatto! Ho importato ${state.imported} eventi.",
+                    if (state.imported == 0) tr("Nessun evento da importare.") else trf("Fatto! Ho importato %1\$s eventi.", state.imported),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.ricordellaColors.mint.content,
                 )
@@ -207,16 +210,16 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
             state.importing -> CircularProgressIndicator()
             accounts == null -> {
                 if (state.permissionDenied) {
-                    Text("Senza il permesso al calendario non posso importare. Puoi farlo più tardi dalle Impostazioni.", textAlign = TextAlign.Center)
+                    Text(tr("Senza il permesso al calendario non posso importare. Puoi farlo più tardi dalle Impostazioni."), textAlign = TextAlign.Center)
                 }
                 PushButton(
-                    "Scegli l'account",
+                    tr("Scegli l'account"),
                     onClick = { permission.launch(Manifest.permission.READ_CALENDAR) },
                     icon = Icons.Rounded.CalendarMonth,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            accounts.isEmpty() -> Text("Sul telefono non ci sono account Google con un calendario.", textAlign = TextAlign.Center)
+            accounts.isEmpty() -> Text(tr("Sul telefono non ci sono account Google con un calendario."), textAlign = TextAlign.Center)
             else -> {
                 accounts.forEach { account ->
                     Row(
@@ -230,10 +233,10 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                         Text(account, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
-                if (state.error) Text("Import non riuscito, riprova.", color = MaterialTheme.colorScheme.error)
-                PushButton("Importa eventi", onClick = viewModel::import, icon = Icons.Rounded.Download, modifier = Modifier.fillMaxWidth())
+                if (state.error) Text(tr("Import non riuscito, riprova."), color = MaterialTheme.colorScheme.error)
+                PushButton(tr("Importa eventi"), onClick = viewModel::import, icon = Icons.Rounded.Download, modifier = Modifier.fillMaxWidth())
             }
         }
-        TextButton(onClick = onDone, enabled = !state.importing) { Text("Salta per ora") }
+        TextButton(onClick = onDone, enabled = !state.importing) { Text(tr("Salta per ora")) }
     }
 }

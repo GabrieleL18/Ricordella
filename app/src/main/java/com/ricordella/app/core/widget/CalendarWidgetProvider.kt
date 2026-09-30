@@ -1,5 +1,8 @@
 package com.ricordella.app.core.widget
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -112,13 +115,13 @@ class CalendarWidgetProvider : AppWidgetProvider() {
     }
 
     private fun describeNext(next: Pair<String, LocalDate>?, today: LocalDate): String {
-        val (title, date) = next ?: return "Niente in arrivo ✨"
+        val (title, date) = next ?: return tr("Niente in arrivo ✨")
         val when_ = when (val days = ChronoUnit.DAYS.between(today, date)) {
-            0L -> "oggi"
-            1L -> "domani"
-            else -> "tra $days giorni"
+            0L -> tr("oggi")
+            1L -> tr("domani")
+            else -> trf("tra %1\$s giorni", days)
         }
-        return "Prossimo: $title · $when_"
+        return trf("Prossimo: %1\$s · %2\$s", title, when_)
     }
 
     private fun monthPage(
@@ -173,10 +176,10 @@ class CalendarWidgetProvider : AppWidgetProvider() {
 
     private fun actions(context: Context, views: RemoteViews) {
         listOf(
-            Action(R.id.widget_add_reminder, ACTION_REMINDER, "Promemoria", R.drawable.ic_widget_add_reminder, R.drawable.widget_action_cyan),
-            Action(R.id.widget_add_event, ACTION_EVENT, "Evento", R.drawable.ic_widget_add_event, R.drawable.widget_action_lavender),
-            Action(R.id.widget_add_item, ACTION_ITEM, "Cosa", R.drawable.ic_widget_add_item, R.drawable.widget_action_pear),
-            Action(R.id.widget_add_person, ACTION_PERSON, "Persona", R.drawable.ic_widget_add_person, R.drawable.widget_action_coral),
+            Action(R.id.widget_add_reminder, ACTION_REMINDER, tr("Promemoria"), R.drawable.ic_widget_add_reminder, R.drawable.widget_action_cyan),
+            Action(R.id.widget_add_event, ACTION_EVENT, tr("Evento"), R.drawable.ic_widget_add_event, R.drawable.widget_action_lavender),
+            Action(R.id.widget_add_item, ACTION_ITEM, tr("Cosa"), R.drawable.ic_widget_add_item, R.drawable.widget_action_pear),
+            Action(R.id.widget_add_person, ACTION_PERSON, tr("Persona"), R.drawable.ic_widget_add_person, R.drawable.widget_action_coral),
         ).forEachIndexed { index, action ->
             views.setTextViewText(action.id, action.label)
             views.setTextViewCompoundDrawables(action.id, 0, action.icon, 0, 0)
@@ -199,13 +202,13 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         val sorted = entries.distinctBy { it.reminder.id }.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder })
         if (sorted.isEmpty()) {
             val row = RemoteViews(context.packageName, R.layout.widget_preview_row)
-            row.setTextViewText(R.id.widget_preview_row, "Niente in programma ✨")
+            row.setTextViewText(R.id.widget_preview_row, tr("Niente in programma ✨"))
             views.addView(R.id.widget_preview_list, row)
         }
         sorted.take(PREVIEW_ROWS).forEachIndexed { index, entry ->
             val reminder = entry.reminder
             val row = RemoteViews(context.packageName, R.layout.widget_preview_row)
-            val time = if (reminder.isMultiDay) "più giorni" else reminder.dueTime?.let(DateTexts::time) ?: "tutto il giorno"
+            val time = if (reminder.isMultiDay) tr("più giorni") else reminder.dueTime?.let(DateTexts::time) ?: tr("tutto il giorno")
             row.setTextViewText(R.id.widget_preview_row, "${reminder.type.emoji}  $time · ${reminder.title}")
             val open = Intent(context, MainActivity::class.java)
                 .putExtra(MainActivity.EXTRA_REMINDER_ID, reminder.id)
@@ -218,7 +221,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         }
         if (sorted.size > PREVIEW_ROWS) {
             val more = RemoteViews(context.packageName, R.layout.widget_preview_row)
-            more.setTextViewText(R.id.widget_preview_row, "+ altri ${sorted.size - PREVIEW_ROWS}: apri l'app")
+            more.setTextViewText(R.id.widget_preview_row, trf("+ altri %1\$s: apri l'app", sorted.size - PREVIEW_ROWS))
             more.setOnClickPendingIntent(R.id.widget_preview_row, open(context, REQUEST_OPEN, null, null))
             views.addView(R.id.widget_preview_list, more)
         }

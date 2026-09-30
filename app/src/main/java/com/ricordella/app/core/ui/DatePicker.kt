@@ -1,5 +1,8 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -108,7 +111,7 @@ fun DatePickerDialogFor(initial: LocalDate?, onDismiss: () -> Unit, onConfirm: (
                             else DaysGrid(month, selected, today, onSelect = { selected = it }, onShift = { month = month.plusMonths(it) })
                         }
                         Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = onDismiss) { Text("Annulla") }
+                            TextButton(onClick = onDismiss) { Text(tr("Annulla")) }
                             PushButton("OK", onClick = { onConfirm(selected) }, icon = Icons.Rounded.Check, modifier = Modifier.padding(start = 8.dp))
                         }
                     }
@@ -162,7 +165,7 @@ private fun Header(selected: LocalDate, today: LocalDate, onSelect: (LocalDate) 
         }
         // Scorciatoie: vanno a capo se lo spazio non basta.
         androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("Oggi" to today, "Domani" to today.plusDays(1), "+1 settimana" to today.plusWeeks(1), "+1 mese" to today.plusMonths(1))
+            listOf(tr("Oggi") to today, tr("Domani") to today.plusDays(1), tr("+1 settimana") to today.plusWeeks(1), tr("+1 mese") to today.plusMonths(1))
                 .forEach { (label, date) -> Shortcut(label, date == selected) { onSelect(date) } }
         }
     }
@@ -172,11 +175,11 @@ private object RelativeLabel {
     fun of(date: LocalDate, today: LocalDate): String {
         val days = java.time.temporal.ChronoUnit.DAYS.between(today, date)
         return when {
-            days == 0L -> "oggi"
-            days == 1L -> "domani"
-            days == -1L -> "ieri"
-            days > 0 -> "tra $days giorni"
-            else -> "${-days} giorni fa"
+            days == 0L -> tr("oggi")
+            days == 1L -> tr("domani")
+            days == -1L -> tr("ieri")
+            days > 0 -> trf("tra %1\$s giorni", days)
+            else -> trf("%1\$s giorni fa", -days)
         }
     }
 }
@@ -203,7 +206,7 @@ private fun MonthBar(month: YearMonth, pickingMonth: Boolean, onShift: (Long) ->
             Modifier
                 .weight(1f)
                 .clip(CircleShape)
-                .clickable(role = Role.Button, onClickLabel = "Scegli mese e anno", onClick = onToggle)
+                .clickable(role = Role.Button, onClickLabel = tr("Scegli mese e anno"), onClick = onToggle)
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -211,8 +214,8 @@ private fun MonthBar(month: YearMonth, pickingMonth: Boolean, onShift: (Long) ->
             Icon(if (pickingMonth) Icons.Rounded.ArrowDropUp else Icons.Rounded.ArrowDropDown, contentDescription = null)
         }
         if (!pickingMonth) {
-            IconButton(onClick = { onShift(-1) }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = "Mese precedente") }
-            IconButton(onClick = { onShift(1) }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = "Mese successivo") }
+            IconButton(onClick = { onShift(-1) }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = tr("Mese precedente")) }
+            IconButton(onClick = { onShift(1) }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Mese successivo")) }
         }
     }
 }
@@ -320,9 +323,9 @@ private fun MonthYearGrid(current: YearMonth, onPicked: (YearMonth) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { year-- }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = "Anno precedente") }
+            IconButton(onClick = { year-- }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = tr("Anno precedente")) }
             AnimatedContent(year, label = "year") { Text("$it", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.width(88.dp), textAlign = TextAlign.Center) }
-            IconButton(onClick = { year++ }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = "Anno successivo") }
+            IconButton(onClick = { year++ }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Anno successivo")) }
         }
         Month.entries.chunked(3).forEach { row ->
             Row(Modifier.fillMaxWidth()) {

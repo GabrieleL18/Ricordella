@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.people
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
@@ -105,7 +108,7 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val tracker = rememberRevealTracker()
 
-    TopLevelScaffold(title = "Persone", navigator = navigator, onAdd = onAdd) { padding ->
+    TopLevelScaffold(title = tr("Persone"), navigator = navigator, onAdd = onAdd) { padding ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 156.dp),
             modifier = Modifier.fillMaxSize().contentWidth(),
@@ -124,13 +127,13 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 }
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
-                SearchField(state.query, viewModel::onQueryChange, placeholder = "Cerca persone")
+                SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca persone"))
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "archived") {
                 FilterChipRow(
                     options = listOf(false, true),
                     selected = state.showArchived,
-                    label = { if (it) "Archiviate" else "Attive" },
+                    label = { if (it) tr("Archiviate") else tr("Attive") },
                     onSelected = viewModel::onShowArchived,
                 )
             }
@@ -138,9 +141,9 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "empty") {
                     EmptyState(
                         icon = Icons.Rounded.People,
-                        title = if (state.showArchived) "Nessuna persona archiviata" else "Nessuna persona",
-                        message = "Aggiungi le persone a cui collegare promemoria e cose.",
-                        actionLabel = if (state.showArchived) null else "Aggiungi persona",
+                        title = if (state.showArchived) tr("Nessuna persona archiviata") else tr("Nessuna persona"),
+                        message = tr("Aggiungi le persone a cui collegare promemoria e cose."),
+                        actionLabel = if (state.showArchived) null else tr("Aggiungi persona"),
                         onAction = navigator::newPerson,
                     )
                 }
@@ -176,9 +179,9 @@ private fun CircleHeader(people: List<Person>, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text("La tua cerchia", style = MaterialTheme.typography.titleLarge, color = tone.content)
+            Text(tr("La tua cerchia"), style = MaterialTheme.typography.titleLarge, color = tone.content)
             Text(
-                if (people.size == 1) "1 persona" else "${people.size} persone",
+                if (people.size == 1) tr("1 persona") else trf("%1\$s persone", people.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = tone.content,
             )
@@ -264,10 +267,10 @@ fun PersonEditScreen(navigator: AppNavigator) {
     }
 
     DetailScaffold(
-        title = if (form.isNew) "Nuova persona" else "Modifica persona",
+        title = if (form.isNew) tr("Nuova persona") else tr("Modifica persona"),
         onBack = navigator::back,
         snackbarHostState = snackbar,
-        actions = { TextButton(onClick = viewModel::save, enabled = !form.isLoading) { Text("Salva") } },
+        actions = { TextButton(onClick = viewModel::save, enabled = !form.isLoading) { Text(tr("Salva")) } },
     ) { padding ->
         if (form.isLoading) return@DetailScaffold
         Column(
@@ -293,19 +296,19 @@ fun PersonEditScreen(navigator: AppNavigator) {
                 Column {
                     OutlinedButton(onClick = pickPhoto) {
                         Icon(Icons.Rounded.AddAPhoto, contentDescription = null)
-                        Text(if (form.photoUri == null) "Aggiungi foto" else "Cambia foto", modifier = Modifier.padding(start = 8.dp))
+                        Text(if (form.photoUri == null) tr("Aggiungi foto") else tr("Cambia foto"), modifier = Modifier.padding(start = 8.dp))
                     }
                     if (form.photoUri != null) {
-                        TextButton(onClick = { viewModel.update { it.copy(photoUri = null) } }) { Text("Rimuovi foto") }
+                        TextButton(onClick = { viewModel.update { it.copy(photoUri = null) } }) { Text(tr("Rimuovi foto")) }
                     }
                 }
             }
             OutlinedTextField(
                 value = form.name,
                 onValueChange = { value -> viewModel.update { it.copy(name = value) } },
-                label = { Text("Nome *") },
+                label = { Text(tr("Nome *")) },
                 isError = form.nameError,
-                supportingText = if (form.nameError) ({ Text("Inserisci un nome") }) else null,
+                supportingText = if (form.nameError) ({ Text(tr("Inserisci un nome")) }) else null,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                 modifier = Modifier.fillMaxWidth(),
@@ -313,7 +316,7 @@ fun PersonEditScreen(navigator: AppNavigator) {
             OutlinedTextField(
                 value = form.surname,
                 onValueChange = { value -> viewModel.update { it.copy(surname = value) } },
-                label = { Text("Cognome") },
+                label = { Text(tr("Cognome")) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                 modifier = Modifier.fillMaxWidth(),
@@ -321,12 +324,12 @@ fun PersonEditScreen(navigator: AppNavigator) {
             OutlinedTextField(
                 value = form.notes,
                 onValueChange = { value -> viewModel.update { it.copy(notes = value) } },
-                label = { Text("Note (es. Mamma, Partner)") },
+                label = { Text(tr("Note (es. Mamma, Partner)")) },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth(),
             )
-            PushButton(text = "Salva", onClick = viewModel::save, icon = Icons.Rounded.Check, modifier = Modifier.fillMaxWidth())
+            PushButton(text = tr("Salva"), onClick = viewModel::save, icon = Icons.Rounded.Check, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -344,20 +347,20 @@ fun PersonDetailScreen(navigator: AppNavigator) {
 
     val person = state.person
     DetailScaffold(
-        title = person?.displayName ?: "Persona",
+        title = person?.displayName ?: tr("Persona"),
         onBack = navigator::back,
         actions = {
             if (person != null) {
-                IconButton(onClick = { navigator.editPerson(person.id) }) { Icon(Icons.Rounded.Edit, contentDescription = "Modifica") }
+                IconButton(onClick = { navigator.editPerson(person.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
                 Box {
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = "Altre azioni") }
+                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         DropdownMenuItem(
-                            text = { Text(if (person.isArchived) "Ripristina dall'archivio" else "Archivia") },
+                            text = { Text(if (person.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
                             onClick = { menuOpen = false; viewModel.onToggleArchived() },
                         )
                         DropdownMenuItem(
-                            text = { Text("Elimina") },
+                            text = { Text(tr("Elimina")) },
                             leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
                             onClick = { menuOpen = false; confirmDelete = true },
                         )
@@ -382,11 +385,11 @@ fun PersonDetailScreen(navigator: AppNavigator) {
                 onAddItem = { navigator.newItem(personId = person.id) },
             )
 
-            ReminderSection("Oggi", state.today, state, navigator, viewModel, ReminderDateMode.RELATIVE)
-            ReminderSection("Prossimi eventi", state.events, state, navigator, viewModel, ReminderDateMode.ABSOLUTE)
-            ReminderSection("Promemoria", state.reminders, state, navigator, viewModel, ReminderDateMode.ABSOLUTE)
+            ReminderSection(tr("Oggi"), state.today, state, navigator, viewModel, ReminderDateMode.RELATIVE)
+            ReminderSection(tr("Prossimi eventi"), state.events, state, navigator, viewModel, ReminderDateMode.ABSOLUTE)
+            ReminderSection(tr("Promemoria"), state.reminders, state, navigator, viewModel, ReminderDateMode.ABSOLUTE)
             if (state.items.isNotEmpty()) {
-                SectionHeader("Cose")
+                SectionHeader(tr("Cose"))
                 state.items.forEach { entry -> ItemCard(entry, onClick = { navigator.openItem(entry.item.id) }) }
             }
         }
@@ -394,10 +397,10 @@ fun PersonDetailScreen(navigator: AppNavigator) {
 
     if (confirmDelete) {
         ConfirmDialog(
-            title = "Eliminare la persona?",
-            message = "La persona verrà eliminata. I promemoria e le cose collegate restano, ma senza questo collegamento. " +
-                "Se vuoi solo nasconderla, usa \"Archivia\".",
-            confirmLabel = "Elimina",
+            title = tr("Eliminare la persona?"),
+            message = tr("La persona verrà eliminata. I promemoria e le cose collegate restano, ma senza questo collegamento. ") +
+                tr("Se vuoi solo nasconderla, usa \"Archivia\"."),
+            confirmLabel = tr("Elimina"),
             destructive = true,
             onConfirm = viewModel::onDelete,
             onDismiss = { confirmDelete = false },
@@ -427,11 +430,11 @@ private fun PersonHero(person: Person, onAddReminder: () -> Unit, onAddItem: () 
                 .padding(5.dp),
         ) { PersonAvatar(person, size = 96.dp) }
         Text(person.displayName, style = MaterialTheme.typography.headlineSmall, color = tone.content, textAlign = TextAlign.Center)
-        if (person.isArchived) Text("Archiviata", style = MaterialTheme.typography.labelLarge, color = tone.content)
+        if (person.isArchived) Text(tr("Archiviata"), style = MaterialTheme.typography.labelLarge, color = tone.content)
         person.notes?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = tone.content, textAlign = TextAlign.Center) }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), modifier = Modifier.padding(top = RicordellaDimensions.spaceS)) {
-            PushButton("Promemoria", onClick = onAddReminder, icon = Icons.Rounded.Add)
-            PushButton("Cosa", onClick = onAddItem, icon = Icons.Rounded.Add)
+            PushButton(tr("Promemoria"), onClick = onAddReminder, icon = Icons.Rounded.Add)
+            PushButton(tr("Cosa"), onClick = onAddItem, icon = Icons.Rounded.Add)
         }
     }
 }

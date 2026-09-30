@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -68,7 +70,7 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val tracker = rememberRevealTracker()
     val colors = MaterialTheme.ricordellaColors
 
-    TopLevelScaffold(title = "Cose", navigator = navigator, onAdd = onAdd) { padding ->
+    TopLevelScaffold(title = tr("Cose"), navigator = navigator, onAdd = onAdd) { padding ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 156.dp),
             modifier = Modifier.fillMaxSize().contentWidth(),
@@ -82,7 +84,7 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
-                SearchField(state.query, viewModel::onQueryChange, placeholder = "Cerca per nome, marca, modello, targa")
+                SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca per nome, marca, modello, targa"))
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "groups") {
                 IconChipRow {
@@ -108,17 +110,17 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "archived") {
                 IconChipRow {
-                    IconChoiceChip("Attive", Icons.Rounded.Inventory2, colors.mint, !state.showArchived, onClick = { viewModel.onShowArchived(false) })
-                    IconChoiceChip("Archiviate", Icons.Rounded.Archive, colors.lavender, state.showArchived, onClick = { viewModel.onShowArchived(true) })
+                    IconChoiceChip(tr("Attive"), Icons.Rounded.Inventory2, colors.mint, !state.showArchived, onClick = { viewModel.onShowArchived(false) })
+                    IconChoiceChip(tr("Archiviate"), Icons.Rounded.Archive, colors.lavender, state.showArchived, onClick = { viewModel.onShowArchived(true) })
                 }
             }
             if (!state.isLoading && state.isEmpty) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "empty") {
                     EmptyState(
                         icon = Icons.Rounded.Inventory2,
-                        title = "Nessuna cosa",
-                        message = "Aggiungi auto, elettrodomestici, dispositivi e documenti per ricordarne scadenze e manutenzioni.",
-                        actionLabel = if (state.showArchived) null else "Aggiungi cosa",
+                        title = tr("Nessuna cosa"),
+                        message = tr("Aggiungi auto, elettrodomestici, dispositivi e documenti per ricordarne scadenze e manutenzioni."),
+                        actionLabel = if (state.showArchived) null else tr("Aggiungi cosa"),
                         onAction = { navigator.newItem() },
                     )
                 }
@@ -173,13 +175,13 @@ private fun ItemTile(entry: ItemWithCategory, onClick: () -> Unit, modifier: Mod
             badge()
         }
         Text(item.name, style = MaterialTheme.typography.titleMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        val subtitle = listOfNotNull(entry.category?.name, item.brand, item.model).joinToString(" · ")
+        val subtitle = listOfNotNull(entry.category?.label, item.brand, item.model).joinToString(" · ")
         if (subtitle.isNotEmpty()) {
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = tone.content.copy(alpha = 0.8f), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         item.licensePlate?.let { Fact(Icons.Rounded.Pin, it) }
         item.odometerKm?.let { Fact(Icons.Rounded.Speed, DateTexts.kilometers(it)) }
-        item.warrantyEndDate?.let { Fact(Icons.Rounded.VerifiedUser, "Garanzia al " + DateTexts.date(it, dateFormat)) }
+        item.warrantyEndDate?.let { Fact(Icons.Rounded.VerifiedUser, tr("Garanzia al ") + DateTexts.date(it, dateFormat)) }
     }
 }
 

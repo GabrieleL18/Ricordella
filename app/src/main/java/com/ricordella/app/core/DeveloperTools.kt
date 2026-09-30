@@ -1,5 +1,7 @@
 package com.ricordella.app.core
 
+import com.ricordella.app.core.i18n.tr
+
 import android.content.Context
 import com.ricordella.app.core.notifications.ReminderNotifier
 import com.ricordella.app.core.widget.CalendarWidgetProvider
@@ -57,8 +59,8 @@ class DeveloperTools(
             val now = time.now()
             val reminder = Reminder(
                 id = "developer-test",
-                title = "Notifica di prova",
-                description = "Se leggi questo messaggio le notifiche di Remindella funzionano.",
+                title = tr("Notifica di prova"),
+                description = tr("Se leggi questo messaggio le notifiche di Remindella funzionano."),
                 type = type,
                 dueDate = time.today(),
                 dueTime = LocalTime.now().withSecond(0).withNano(0),
@@ -104,34 +106,34 @@ class DeveloperTools(
     suspend fun createDemoData() {
         val now = time.now()
         val today = time.today()
-        val anna = Person(name = "Anna", surname = "Esempio", notes = "Persona di esempio", createdAt = now, updatedAt = now)
+        val anna = Person(name = tr("Anna"), surname = tr("Esempio"), notes = tr("Persona di esempio"), createdAt = now, updatedAt = now)
         people.save(anna)
-        val car = Item(name = "Auto di esempio", categoryId = BuiltInCategories.idFor(ItemKind.CAR), licensePlate = "AB123CD", odometerKm = 54_000, createdAt = now, updatedAt = now)
+        val car = Item(name = tr("Auto di esempio"), categoryId = BuiltInCategories.idFor(ItemKind.CAR), licensePlate = "AB123CD", odometerKm = 54_000, createdAt = now, updatedAt = now)
         items.save(car, mapOf(anna.id to PersonItemRole.OWNER))
 
         fun draft(reminder: Reminder, rule: RecurrenceRule? = null, person: Boolean = false, item: Boolean = false) =
             ReminderDraft(reminder, rule, if (person) setOf(anna.id) else emptySet(), if (item) setOf(car.id) else emptySet())
 
         listOf(
-            draft(Reminder(title = "Compleanno di Anna", type = ReminderType.BIRTHDAY, dueDate = today.plusDays(3), createdAt = now, updatedAt = now),
+            draft(Reminder(title = tr("Compleanno di Anna"), type = ReminderType.BIRTHDAY, dueDate = today.plusDays(3), createdAt = now, updatedAt = now),
                 RecurrenceRule(frequency = RecurrenceFrequency.YEARLY, startDate = today.plusDays(3)), person = true),
-            draft(Reminder(title = "Visita dal dentista", type = ReminderType.MEDICAL_VISIT, dueDate = today.plusDays(1), dueTime = LocalTime.of(10, 30), createdAt = now, updatedAt = now)),
-            draft(Reminder(title = "Pagare la bolletta", type = ReminderType.PAYMENT, dueDate = today.minusDays(2), priority = Priority.URGENT, createdAt = now, updatedAt = now)),
-            draft(Reminder(title = "Revisione auto", type = ReminderType.MAINTENANCE, dueDate = today.plusDays(20), createdAt = now, updatedAt = now), item = true),
-            draft(Reminder(title = "Riunione", type = ReminderType.EVENT, dueDate = today, dueTime = LocalTime.of(15, 0), createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Visita dal dentista"), type = ReminderType.MEDICAL_VISIT, dueDate = today.plusDays(1), dueTime = LocalTime.of(10, 30), createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Pagare la bolletta"), type = ReminderType.PAYMENT, dueDate = today.minusDays(2), priority = Priority.URGENT, createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Revisione auto"), type = ReminderType.MAINTENANCE, dueDate = today.plusDays(20), createdAt = now, updatedAt = now), item = true),
+            draft(Reminder(title = tr("Riunione"), type = ReminderType.EVENT, dueDate = today, dueTime = LocalTime.of(15, 0), createdAt = now, updatedAt = now)),
             draft(
                 Reminder(
-                    title = "Vacanza al mare",
+                    title = tr("Vacanza al mare"),
                     type = ReminderType.VACATION,
                     dueDate = today.plusDays(10),
                     endDate = today.plusDays(17),
                     trip = TripInfo(
-                        destination = "Palermo",
+                        destination = tr("Palermo"),
                         legs = listOf(
-                            TripLeg(TravelMode.PLANE, "ITA Airways", "AZ1781", "Roma FCO", "Palermo PMO", today.plusDays(10), LocalTime.of(8, 40), "14A"),
-                            TripLeg(TravelMode.SHIP, "GNV", "La Suprema", "Palermo", "Napoli", today.plusDays(17), LocalTime.of(20, 0), "Cabina 204"),
+                            TripLeg(TravelMode.PLANE, tr("ITA Airways"), "AZ1781", tr("Roma FCO"), tr("Palermo PMO"), today.plusDays(10), LocalTime.of(8, 40), "14A"),
+                            TripLeg(TravelMode.SHIP, "GNV", tr("La Suprema"), tr("Palermo"), tr("Napoli"), today.plusDays(17), LocalTime.of(20, 0), tr("Cabina 204")),
                         ),
-                        stay = TripStay("Hotel Esempio", "Via Roma 1, Palermo", today.plusDays(10), today.plusDays(17), "XYZ123", "+39 091 000000"),
+                        stay = TripStay(tr("Hotel Esempio"), tr("Via Roma 1, Palermo"), today.plusDays(10), today.plusDays(17), "XYZ123", "+39 091 000000"),
                     ),
                     createdAt = now,
                     updatedAt = now,

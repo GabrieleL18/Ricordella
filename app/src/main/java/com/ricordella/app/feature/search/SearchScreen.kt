@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.search
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -83,7 +85,7 @@ fun SearchScreen(navigator: AppNavigator) {
     val settings = LocalAppSettings.current
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
-    DetailScaffold(title = "Cerca", onBack = navigator::back) { padding ->
+    DetailScaffold(title = tr("Cerca"), onBack = navigator::back) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).contentWidth(),
             contentPadding = PaddingValues(RicordellaDimensions.screenPadding),
@@ -93,36 +95,36 @@ fun SearchScreen(navigator: AppNavigator) {
                 SearchField(
                     value = state.query,
                     onValueChange = viewModel::onQueryChange,
-                    placeholder = "Persone, cose, promemoria, note…",
+                    placeholder = tr("Persone, cose, promemoria, note…"),
                     modifier = Modifier.focusRequester(focusRequester),
                 )
             }
             val results = state.results
             if (state.searched && results.isEmpty) {
                 item(key = "empty") {
-                    EmptyState(Icons.Rounded.SearchOff, "Nessun risultato", "Prova con un'altra parola.")
+                    EmptyState(Icons.Rounded.SearchOff, tr("Nessun risultato"), tr("Prova con un'altra parola."))
                 }
             }
             if (results.people.isNotEmpty()) {
-                item(key = "people") { SectionHeader("Persone") }
+                item(key = "people") { SectionHeader(tr("Persone")) }
                 items(results.people, key = { "p-" + it.id }) { person ->
                     PersonCard(person, onClick = { navigator.openPerson(person.id) })
                 }
             }
             if (results.items.isNotEmpty()) {
-                item(key = "items") { SectionHeader("Cose") }
+                item(key = "items") { SectionHeader(tr("Cose")) }
                 items(results.items, key = { "i-" + it.item.id }) { entry ->
                     ItemCard(entry, onClick = { navigator.openItem(entry.item.id) })
                 }
             }
             if (results.reminders.isNotEmpty()) {
-                item(key = "reminders") { SectionHeader("Promemoria ed eventi") }
+                item(key = "reminders") { SectionHeader(tr("Promemoria ed eventi")) }
                 items(results.reminders, key = { "r-" + it.reminder.id }) { entry ->
                     ReminderCard(entry, now = state.now, onClick = { navigator.openReminder(entry.reminder.id) })
                 }
             }
             if (results.maintenance.isNotEmpty()) {
-                item(key = "maintenance") { SectionHeader("Manutenzioni") }
+                item(key = "maintenance") { SectionHeader(tr("Manutenzioni")) }
                 items(results.maintenance, key = { "m-" + it.id }) { record ->
                     ListItem(
                         headlineContent = { Text(record.title) },

@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.settings
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.text.format.Formatter
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -49,12 +52,12 @@ fun VersionRow(developerMode: Boolean, onUnlock: () -> Unit) {
     val context = LocalContext.current
     var taps by remember { mutableIntStateOf(0) }
     ListItem(
-        headlineContent = { Text("Versione") },
+        headlineContent = { Text(tr("Versione")) },
         supportingContent = { Text("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})") },
         leadingContent = { Icon(Icons.Rounded.Code, contentDescription = null) },
         modifier = Modifier.clickable {
             if (developerMode) {
-                Toast.makeText(context, "Sei già uno sviluppatore", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, tr("Sei già uno sviluppatore"), Toast.LENGTH_SHORT).show()
                 return@clickable
             }
             taps++
@@ -63,9 +66,9 @@ fun VersionRow(developerMode: Boolean, onUnlock: () -> Unit) {
                 left <= 0 -> {
                     taps = 0
                     onUnlock()
-                    Toast.makeText(context, "Ora sei uno sviluppatore! 🧙", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, tr("Ora sei uno sviluppatore! 🧙"), Toast.LENGTH_SHORT).show()
                 }
-                left <= 3 -> Toast.makeText(context, if (left == 1) "Ancora 1 tocco" else "Ancora $left tocchi", Toast.LENGTH_SHORT).show()
+                left <= 3 -> Toast.makeText(context, if (left == 1) tr("Ancora 1 tocco") else trf("Ancora %1\$s tocchi", left), Toast.LENGTH_SHORT).show()
             }
         },
     )
@@ -87,51 +90,51 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         }
     }
 
-    SectionHeader("Sviluppatore", icon = Icons.Rounded.Code, tone = MaterialTheme.ricordellaColors.lavender)
-    DevRow(Icons.Rounded.NotificationsActive, "Invia notifica di prova", "Subito, per vedere l'aspetto della notifica.") {
+    SectionHeader(tr("Sviluppatore"), icon = Icons.Rounded.Code, tone = MaterialTheme.ricordellaColors.lavender)
+    DevRow(Icons.Rounded.NotificationsActive, tr("Invia notifica di prova"), tr("Subito, per vedere l'aspetto della notifica.")) {
         tools.sendTestNotification()
     }
-    DevRow(Icons.Rounded.NotificationAdd, "Notifica di prova tra 10 secondi", "Chiudi l'app per vederla arrivare in background.") {
+    DevRow(Icons.Rounded.NotificationAdd, tr("Notifica di prova tra 10 secondi"), tr("Chiudi l'app per vederla arrivare in background.")) {
         tools.sendTestNotification(ReminderType.BIRTHDAY, delaySeconds = 10)
-        done("Arriva tra 10 secondi")
+        done(tr("Arriva tra 10 secondi"))
     }
-    DevRow(Icons.Rounded.DataObject, "Crea dati di esempio", "Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno e un pagamento scaduto.") {
-        run("Dati di esempio creati") { tools.createDemoData() }
+    DevRow(Icons.Rounded.DataObject, tr("Crea dati di esempio"), tr("Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno e un pagamento scaduto.")) {
+        run(tr("Dati di esempio creati")) { tools.createDemoData() }
     }
-    DevRow(Icons.Rounded.CloudUpload, "Mostra l'invito al backup", "Fa comparire subito in Home la richiesta di aggiornare il backup.") {
-        run("Guarda la Home") { tools.forceBackupReminder() }
+    DevRow(Icons.Rounded.CloudUpload, tr("Mostra l'invito al backup"), tr("Fa comparire subito in Home la richiesta di aggiornare il backup.")) {
+        run(tr("Guarda la Home")) { tools.forceBackupReminder() }
     }
-    DevRow(Icons.Rounded.CleaningServices, "Proponi la pulizia annuale", "Alla prossima apertura della Home.") {
-        run("Guarda la Home") { tools.forceYearlyCleanup() }
+    DevRow(Icons.Rounded.CleaningServices, tr("Proponi la pulizia annuale"), tr("Alla prossima apertura della Home.")) {
+        run(tr("Guarda la Home")) { tools.forceYearlyCleanup() }
     }
-    DevRow(Icons.Rounded.Celebration, "Sposta le feste all'anno corrente", "Esegue ora il passaggio che avviene a gennaio.") {
-        run("Feste aggiornate") { tools.rollHolidays() }
+    DevRow(Icons.Rounded.Celebration, tr("Sposta le feste all'anno corrente"), tr("Esegue ora il passaggio che avviene a gennaio.")) {
+        run(tr("Feste aggiornate")) { tools.rollHolidays() }
     }
-    DevRow(Icons.Rounded.AccessAlarm, "Ricalcola le notifiche", "Riprogramma gli allarmi di tutti i promemoria.") {
-        run("Notifiche riprogrammate") { tools.rescheduleAlarms() }
+    DevRow(Icons.Rounded.AccessAlarm, tr("Ricalcola le notifiche"), tr("Riprogramma gli allarmi di tutti i promemoria.")) {
+        run(tr("Notifiche riprogrammate")) { tools.rescheduleAlarms() }
     }
-    DevRow(Icons.Rounded.Widgets, "Aggiorna il widget", "Ridisegna subito il widget del calendario.") {
+    DevRow(Icons.Rounded.Widgets, tr("Aggiorna il widget"), tr("Ridisegna subito il widget del calendario.")) {
         tools.refreshWidget()
-        done("Widget aggiornato")
+        done(tr("Widget aggiornato"))
     }
-    DevRow(Icons.Rounded.RestartAlt, "Rifai la configurazione iniziale", "Mostra di nuovo benvenuto, tutorial e import dal calendario.") {
-        run("Configurazione riavviata") { tools.restartOnboarding() }
+    DevRow(Icons.Rounded.RestartAlt, tr("Rifai la configurazione iniziale"), tr("Mostra di nuovo benvenuto, tutorial e import dal calendario.")) {
+        run(tr("Configurazione riavviata")) { tools.restartOnboarding() }
     }
     val current = info
     DevRow(
         Icons.Rounded.Storage,
-        "Spazio occupato",
-        if (current == null) "Calcolo..." else
-            "Database: ${Formatter.formatShortFileSize(context, current.databaseBytes)} (versione ${RicordellaDatabase.VERSION}) · " +
-                "Foto: ${current.mediaFiles} file, ${Formatter.formatShortFileSize(context, current.mediaBytes)} · " +
-                "Cache: ${Formatter.formatShortFileSize(context, current.cacheBytes)}",
+        tr("Spazio occupato"),
+        if (current == null) tr("Calcolo...") else
+            trf("Database: %1\$s (versione %2\$s) · ", Formatter.formatShortFileSize(context, current.databaseBytes), RicordellaDatabase.VERSION) +
+                trf("Foto: %1\$s file, %2\$s · ", current.mediaFiles, Formatter.formatShortFileSize(context, current.mediaBytes)) +
+                trf("Cache: %1\$s", Formatter.formatShortFileSize(context, current.cacheBytes)),
     ) { refresh++ }
-    DevRow(Icons.Rounded.DeleteSweep, "Svuota la cache", "Backup temporanei, suoni e file di lavoro (si ricreano da soli).") {
+    DevRow(Icons.Rounded.DeleteSweep, tr("Svuota la cache"), tr("Backup temporanei, suoni e file di lavoro (si ricreano da soli).")) {
         tools.clearCache()
         refresh++
-        done("Cache svuotata")
+        done(tr("Cache svuotata"))
     }
-    DevRow(Icons.Rounded.CodeOff, "Esci dalla modalità sviluppatore", "La sezione sparisce; 7 tocchi sulla versione per riaverla.") {
+    DevRow(Icons.Rounded.CodeOff, tr("Esci dalla modalità sviluppatore"), tr("La sezione sparisce; 7 tocchi sulla versione per riaverla.")) {
         update { it.copy(developerMode = false) }
     }
 }

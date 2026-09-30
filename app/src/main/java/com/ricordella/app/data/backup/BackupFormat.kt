@@ -1,5 +1,7 @@
 package com.ricordella.app.data.backup
 
+import com.ricordella.app.core.i18n.tr
+
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.Attachment
 import com.ricordella.app.domain.model.Category
@@ -65,14 +67,14 @@ data class BackupDatabaseContent(
         val categoryIds = categories.mapTo(HashSet()) { it.id }
         val allIds = listOf(people.map { it.id }, items.map { it.id }, reminders.map { it.id })
         return when {
-            allIds.any { it.size != it.toSet().size } -> "identificatori duplicati"
-            items.any { it.categoryId != null && it.categoryId !in categoryIds } -> "categoria mancante"
-            reminders.any { it.recurrenceRuleId != null && it.recurrenceRuleId !in ruleIds } -> "ricorrenza mancante"
-            completions.any { it.reminderId !in reminderIds } -> "storico senza promemoria"
-            maintenance.any { it.itemId !in itemIds } -> "manutenzione senza cosa"
-            reminderPeople.any { it.reminderId !in reminderIds || it.personId !in personIds } -> "collegamento promemoria-persona non valido"
-            reminderItems.any { it.reminderId !in reminderIds || it.itemId !in itemIds } -> "collegamento promemoria-cosa non valido"
-            personItems.any { it.personId !in personIds || it.itemId !in itemIds } -> "collegamento persona-cosa non valido"
+            allIds.any { it.size != it.toSet().size } -> tr("identificatori duplicati")
+            items.any { it.categoryId != null && it.categoryId !in categoryIds } -> tr("categoria mancante")
+            reminders.any { it.recurrenceRuleId != null && it.recurrenceRuleId !in ruleIds } -> tr("ricorrenza mancante")
+            completions.any { it.reminderId !in reminderIds } -> tr("storico senza promemoria")
+            maintenance.any { it.itemId !in itemIds } -> tr("manutenzione senza cosa")
+            reminderPeople.any { it.reminderId !in reminderIds || it.personId !in personIds } -> tr("collegamento promemoria-persona non valido")
+            reminderItems.any { it.reminderId !in reminderIds || it.itemId !in itemIds } -> tr("collegamento promemoria-cosa non valido")
+            personItems.any { it.personId !in personIds || it.itemId !in itemIds } -> tr("collegamento persona-cosa non valido")
             else -> null
         }
     }

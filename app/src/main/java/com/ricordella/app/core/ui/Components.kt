@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -215,7 +217,7 @@ fun SearchField(
         trailingIcon = {
             if (value.isNotEmpty()) {
                 IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Rounded.Clear, contentDescription = "Cancella ricerca")
+                    Icon(Icons.Rounded.Clear, contentDescription = tr("Cancella ricerca"))
                 }
             }
         },
@@ -270,7 +272,7 @@ fun ConfirmDialog(
                 Text(confirmLabel, color = if (destructive) MaterialTheme.colorScheme.error else Color.Unspecified)
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
     )
 }
 

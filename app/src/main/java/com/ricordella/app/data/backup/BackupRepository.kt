@@ -1,5 +1,7 @@
 package com.ricordella.app.data.backup
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.core.net.toUri
 import android.content.Context
 import android.content.Intent
@@ -62,7 +64,7 @@ class BackupRepository(
     suspend fun exportTo(destination: Uri) = withContext(Dispatchers.IO) {
         val output = runCatching { resolver.openOutputStream(destination, "wt") }.getOrNull()
             ?: resolver.openOutputStream(destination, "w")
-            ?: throw IOException("Destinazione non disponibile")
+            ?: throw IOException(tr("Destinazione non disponibile"))
         output.buffered().use { writeBackup(it) }
     }
 
@@ -111,7 +113,7 @@ class BackupRepository(
             deleteRecursively()
             mkdirs()
         }
-        val input = resolver.openInputStream(source) ?: throw IOException("File non disponibile")
+        val input = resolver.openInputStream(source) ?: throw IOException(tr("File non disponibile"))
         val result = input.use {
             codec.read(it) { path, content ->
                 File(staging, path.substringAfterLast('/')).outputStream().use { out -> content.copyTo(out) }

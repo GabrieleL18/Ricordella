@@ -1,5 +1,9 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.ui.label
+
+import com.ricordella.app.core.i18n.tr
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -136,7 +140,7 @@ class ItemEditViewModel(
             }
             form.copy(
                 category = category,
-                name = form.name.ifBlank { if (category.isBuiltIn) category.name else "" },
+                name = form.name.ifBlank { if (category.isBuiltIn) category.label else "" },
                 suggestions = suggestions,
             )
         }
@@ -172,7 +176,7 @@ class ItemEditViewModel(
                 })
                 _form.update { it.copy(isSaving = false, saved = true) }
             } catch (_: Exception) {
-                _form.update { it.copy(isSaving = false, errorMessage = "Non è stato possibile salvare. Riprova.") }
+                _form.update { it.copy(isSaving = false, errorMessage = tr("Non è stato possibile salvare. Riprova.")) }
             }
         }
     }

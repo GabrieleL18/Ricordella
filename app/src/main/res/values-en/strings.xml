@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_reminders">Reminders</string>
+    <string name="notification_channel_reminders_description">Notifications for reminders and deadlines</string>
+    <string name="widget_description">This month’s calendar with your reminders and quick-add buttons</string>
+    <string name="widget_label">Remindella Calendar</string>
+</resources>

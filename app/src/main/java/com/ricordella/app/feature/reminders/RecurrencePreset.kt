@@ -1,10 +1,12 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+
 import com.ricordella.app.domain.model.RecurrenceFrequency
 import com.ricordella.app.domain.model.RecurrenceRule
 
 /** Scelte di ricorrenza proposte nel modulo, più l'intervallo personalizzato. */
-enum class RecurrencePreset(val label: String, val frequency: RecurrenceFrequency?, val interval: Int) {
+enum class RecurrencePreset(private val italianLabel: String, val frequency: RecurrenceFrequency?, val interval: Int) {
     NONE("Nessuna", null, 1),
     DAILY("Ogni giorno", RecurrenceFrequency.DAILY, 1),
     WEEKLY("Ogni settimana", RecurrenceFrequency.WEEKLY, 1),
@@ -14,6 +16,8 @@ enum class RecurrencePreset(val label: String, val frequency: RecurrenceFrequenc
     SEMIANNUAL("Ogni 6 mesi", RecurrenceFrequency.MONTHLY, 6),
     YEARLY("Ogni anno", RecurrenceFrequency.YEARLY, 1),
     CUSTOM("Personalizzata", null, 1);
+
+    val label: String get() = tr(italianLabel)
 
     companion object {
         fun from(rule: RecurrenceRule?): RecurrencePreset {
@@ -26,8 +30,8 @@ enum class RecurrencePreset(val label: String, val frequency: RecurrenceFrequenc
 
 val RecurrenceFrequency.unitLabel: String
     get() = when (this) {
-        RecurrenceFrequency.DAILY -> "giorni"
-        RecurrenceFrequency.WEEKLY -> "settimane"
-        RecurrenceFrequency.MONTHLY -> "mesi"
-        RecurrenceFrequency.YEARLY -> "anni"
+        RecurrenceFrequency.DAILY -> tr("giorni")
+        RecurrenceFrequency.WEEKLY -> tr("settimane")
+        RecurrenceFrequency.MONTHLY -> tr("mesi")
+        RecurrenceFrequency.YEARLY -> tr("anni")
     }

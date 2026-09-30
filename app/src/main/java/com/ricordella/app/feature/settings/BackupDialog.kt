@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.settings
 
+import com.ricordella.app.core.i18n.tr
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -64,19 +66,19 @@ fun BackupDialog(
         listOfNotNull(
             BackupChoice(
                 Icons.Rounded.Save,
-                if (hasTarget) "Aggiorna il backup" else "Salva il backup",
-                if (hasTarget) "Sovrascrive il file precedente." else "Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto.",
+                if (hasTarget) tr("Aggiorna il backup") else tr("Salva il backup"),
+                if (hasTarget) tr("Sovrascrive il file precedente.") else tr("Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto."),
                 colors.mint,
             ) { onDismiss(); onOverwrite() },
-            if (hasTarget) BackupChoice(Icons.Rounded.AddCircleOutline, "Nuova versione", "Crea un nuovo file e tiene quello vecchio.", colors.cyan) { onDismiss(); onNewVersion() } else null,
-            BackupChoice(Icons.Rounded.Share, "Condividi", "Invialo con un'app (email, chat...).", colors.lavender) { onDismiss(); onShare() },
+            if (hasTarget) BackupChoice(Icons.Rounded.AddCircleOutline, tr("Nuova versione"), tr("Crea un nuovo file e tiene quello vecchio."), colors.cyan) { onDismiss(); onNewVersion() } else null,
+            BackupChoice(Icons.Rounded.Share, tr("Condividi"), tr("Invialo con un'app (email, chat...)."), colors.lavender) { onDismiss(); onShare() },
         )
     } else {
         listOf(
             BackupChoice(
                 Icons.Rounded.FolderOpen,
-                "Scegli il file",
-                "Il file .zip di Remindella. Prima di sostituire i dati ti mostro cosa contiene.",
+                tr("Scegli il file"),
+                tr("Il file .zip di Remindella. Prima di sostituire i dati ti mostro cosa contiene."),
                 colors.mint,
             ) { onDismiss(); onChooseFile() },
         )
@@ -85,8 +87,8 @@ fun BackupDialog(
         Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
             Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
                 Row(Modifier.fillMaxWidth().padding(start = RicordellaDimensions.spaceL, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (export) "Esporta backup" else "Importa backup", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
-                    IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, contentDescription = "Chiudi") }
+                    Text(if (export) tr("Esporta backup") else tr("Importa backup"), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+                    IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, contentDescription = tr("Chiudi")) }
                 }
                 BoxWithConstraints(Modifier.fillMaxSize()) {
                     val options: @Composable (Modifier) -> Unit = { modifier ->

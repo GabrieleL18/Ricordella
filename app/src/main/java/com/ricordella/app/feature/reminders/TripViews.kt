@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -57,10 +60,10 @@ import com.ricordella.app.domain.model.TripStay
 
 val TravelMode.label: String
     get() = when (this) {
-        TravelMode.PLANE -> "Aereo"
-        TravelMode.SHIP -> "Nave"
-        TravelMode.TRAIN -> "Treno"
-        TravelMode.CAR -> "Auto"
+        TravelMode.PLANE -> tr("Aereo")
+        TravelMode.SHIP -> tr("Nave")
+        TravelMode.TRAIN -> tr("Treno")
+        TravelMode.CAR -> tr("Auto")
     }
 
 val TravelMode.icon: ImageVector
@@ -73,18 +76,18 @@ val TravelMode.icon: ImageVector
 
 private val TravelMode.codeLabel: String
     get() = when (this) {
-        TravelMode.PLANE -> "Numero volo"
-        TravelMode.SHIP -> "Nave / traghetto"
-        TravelMode.TRAIN -> "Numero treno"
-        TravelMode.CAR -> "Targa / noleggio"
+        TravelMode.PLANE -> tr("Numero volo")
+        TravelMode.SHIP -> tr("Nave / traghetto")
+        TravelMode.TRAIN -> tr("Numero treno")
+        TravelMode.CAR -> tr("Targa / noleggio")
     }
 
 private val TravelMode.seatLabel: String
     get() = when (this) {
-        TravelMode.PLANE -> "Posto"
-        TravelMode.SHIP -> "Cabina / posto"
-        TravelMode.TRAIN -> "Carrozza e posto"
-        TravelMode.CAR -> "Note"
+        TravelMode.PLANE -> tr("Posto")
+        TravelMode.SHIP -> tr("Cabina / posto")
+        TravelMode.TRAIN -> tr("Carrozza e posto")
+        TravelMode.CAR -> tr("Note")
     }
 
 /* ---------- Modulo ---------- */
@@ -93,7 +96,7 @@ private val TravelMode.seatLabel: String
 @Composable
 fun TripFields(trip: TripInfo, onChange: (TripInfo) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
-    SectionHeader("Viaggio", icon = Icons.Rounded.Luggage, tone = colors.mint)
+    SectionHeader(tr("Viaggio"), icon = Icons.Rounded.Luggage, tone = colors.mint)
     Text_(
         value = trip.destination,
         label = "Luogo / destinazione",
@@ -123,16 +126,16 @@ fun TripFields(trip: TripInfo, onChange: (TripInfo) -> Unit) {
 private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRemove: () -> Unit) {
     FormCard(title = "${leg.mode.label} $number", icon = leg.mode.icon, tone = MaterialTheme.ricordellaColors.cyan, onRemove = onRemove) {
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            Text_(leg.carrier, "Compagnia", Modifier.weight(1f)) { onChange(leg.copy(carrier = it)) }
+            Text_(leg.carrier, tr("Compagnia"), Modifier.weight(1f)) { onChange(leg.copy(carrier = it)) }
             Text_(leg.code, leg.mode.codeLabel, Modifier.weight(1f), KeyboardCapitalization.Characters) { onChange(leg.copy(code = it)) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            Text_(leg.from, "Da", Modifier.weight(1f)) { onChange(leg.copy(from = it)) }
+            Text_(leg.from, tr("Da"), Modifier.weight(1f)) { onChange(leg.copy(from = it)) }
             Text_(leg.to, "A", Modifier.weight(1f)) { onChange(leg.copy(to = it)) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            DateField("Partenza", leg.date, { onChange(leg.copy(date = it)) }, Modifier.weight(1.6f), clearable = true)
-            TimeField("Ora", leg.time, { onChange(leg.copy(time = it)) }, Modifier.weight(1f))
+            DateField(tr("Partenza"), leg.date, { onChange(leg.copy(date = it)) }, Modifier.weight(1.6f), clearable = true)
+            TimeField(tr("Ora"), leg.time, { onChange(leg.copy(time = it)) }, Modifier.weight(1f))
         }
         Text_(leg.seat, leg.mode.seatLabel) { onChange(leg.copy(seat = it)) }
     }
@@ -140,16 +143,16 @@ private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRe
 
 @Composable
 private fun StayCard(stay: TripStay, onChange: (TripStay) -> Unit) {
-    FormCard(title = "Alloggio", icon = Icons.Rounded.Hotel, tone = MaterialTheme.ricordellaColors.lavender) {
-        Text_(stay.name, "Nome (hotel, casa, campeggio...)") { onChange(stay.copy(name = it)) }
-        Text_(stay.address, "Indirizzo") { onChange(stay.copy(address = it)) }
+    FormCard(title = tr("Alloggio"), icon = Icons.Rounded.Hotel, tone = MaterialTheme.ricordellaColors.lavender) {
+        Text_(stay.name, tr("Nome (hotel, casa, campeggio...)")) { onChange(stay.copy(name = it)) }
+        Text_(stay.address, tr("Indirizzo")) { onChange(stay.copy(address = it)) }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            DateField("Check-in", stay.checkIn, { onChange(stay.copy(checkIn = it)) }, Modifier.weight(1f), clearable = true)
-            DateField("Check-out", stay.checkOut, { onChange(stay.copy(checkOut = it)) }, Modifier.weight(1f), clearable = true)
+            DateField(tr("Check-in"), stay.checkIn, { onChange(stay.copy(checkIn = it)) }, Modifier.weight(1f), clearable = true)
+            DateField(tr("Check-out"), stay.checkOut, { onChange(stay.copy(checkOut = it)) }, Modifier.weight(1f), clearable = true)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-            Text_(stay.bookingCode, "Codice prenotazione", Modifier.weight(1f), KeyboardCapitalization.Characters) { onChange(stay.copy(bookingCode = it)) }
-            Text_(stay.phone, "Telefono", Modifier.weight(1f), keyboardType = KeyboardType.Phone) { onChange(stay.copy(phone = it)) }
+            Text_(stay.bookingCode, tr("Codice prenotazione"), Modifier.weight(1f), KeyboardCapitalization.Characters) { onChange(stay.copy(bookingCode = it)) }
+            Text_(stay.phone, tr("Telefono"), Modifier.weight(1f), keyboardType = KeyboardType.Phone) { onChange(stay.copy(phone = it)) }
         }
     }
 }
@@ -164,7 +167,7 @@ private fun FormCard(title: String, icon: ImageVector, tone: Tone, onRemove: (()
                 }
                 Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).padding(start = 10.dp))
                 if (onRemove != null) {
-                    IconButton(onClick = onRemove) { Icon(Icons.Rounded.Close, contentDescription = "Rimuovi $title") }
+                    IconButton(onClick = onRemove) { Icon(Icons.Rounded.Close, contentDescription = trf("Rimuovi %1\$s", title)) }
                 }
             }
             content()
@@ -200,7 +203,7 @@ fun TripSection(trip: TripInfo) {
     val context = LocalContext.current
     val format = LocalAppSettings.current.dateFormat
     val colors = MaterialTheme.ricordellaColors
-    SectionHeader("Viaggio", icon = Icons.Rounded.Luggage, tone = colors.mint)
+    SectionHeader(tr("Viaggio"), icon = Icons.Rounded.Luggage, tone = colors.mint)
     trip.destination?.let { destination ->
         Row(
             Modifier.fillMaxWidth().clickable { openMaps(context, destination) }.padding(vertical = 6.dp),
@@ -214,13 +217,13 @@ fun TripSection(trip: TripInfo) {
     trip.legs.forEach { leg ->
         FormCard(title = listOfNotNull(leg.from, leg.to).joinToString(" → ").ifEmpty { leg.mode.label }, icon = leg.mode.icon, tone = colors.cyan) {
             val whenText = listOfNotNull(leg.date?.let { DateTexts.date(it, format) }, leg.time?.let(DateTexts::time)).joinToString(" · ")
-            if (whenText.isNotEmpty()) InfoRow("Partenza", whenText)
+            if (whenText.isNotEmpty()) InfoRow(tr("Partenza"), whenText)
             listOfNotNull(leg.carrier, leg.code).joinToString(" ").takeIf { it.isNotBlank() }?.let { InfoRow(leg.mode.label, it) }
             leg.seat?.let { InfoRow(leg.mode.seatLabel, it) }
         }
     }
     trip.stay?.takeIf { !it.isEmpty }?.let { stay ->
-        FormCard(title = stay.name ?: "Alloggio", icon = Icons.Rounded.Hotel, tone = colors.lavender) {
+        FormCard(title = stay.name ?: tr("Alloggio"), icon = Icons.Rounded.Hotel, tone = colors.lavender) {
             stay.address?.let { address ->
                 Text(
                     address,
@@ -229,9 +232,9 @@ fun TripSection(trip: TripInfo) {
                     modifier = Modifier.clickable { openMaps(context, address) },
                 )
             }
-            stay.checkIn?.let { InfoRow("Check-in", DateTexts.date(it, format)) }
-            stay.checkOut?.let { InfoRow("Check-out", DateTexts.date(it, format)) }
-            stay.bookingCode?.let { InfoRow("Prenotazione", it) }
+            stay.checkIn?.let { InfoRow(tr("Check-in"), DateTexts.date(it, format)) }
+            stay.checkOut?.let { InfoRow(tr("Check-out"), DateTexts.date(it, format)) }
+            stay.bookingCode?.let { InfoRow(tr("Prenotazione"), it) }
             stay.phone?.let { phone ->
                 Text(
                     "📞 $phone",
