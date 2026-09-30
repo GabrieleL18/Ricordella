@@ -1,6 +1,7 @@
 package com.ricordella.app
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import com.ricordella.app.core.navigation.WidgetRequest
 import com.ricordella.app.core.widget.CalendarWidgetProvider
 import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.theme.RicordellaTheme
+import com.ricordella.app.feature.settings.OpenedBackupImport
 import com.ricordella.app.domain.model.AppSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -24,6 +26,9 @@ class MainActivity : ComponentActivity() {
 
     /** Azione richiesta dal widget del calendario (aggiungi promemoria, evento, cosa, persona). */
     private val widgetRequest = MutableStateFlow<WidgetRequest?>(null)
+
+    /** File di backup aperto con l'app (da file manager, Drive, email): si propone il ripristino. */
+    private val backupToOpen = MutableStateFlow<Uri?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -37,6 +42,7 @@ class MainActivity : ComponentActivity() {
             val settings = loaded ?: return@setContent
             val pendingReminder by reminderToOpen.collectAsStateWithLifecycle()
             val pendingWidget by widgetRequest.collectAsStateWithLifecycle()
+            val pendingBackup by backupToOpen.collectAsStateWithLifecycle()
             CompositionLocalProvider(LocalAppSettings provides settings) {
                 RicordellaTheme(themeMode = settings.themeMode) {
                     RicordellaApp(
@@ -45,6 +51,7 @@ class MainActivity : ComponentActivity() {
                         widgetRequest = pendingWidget,
                         onWidgetRequestHandled = { widgetRequest.value = null },
                     )
+                    pendingBackup?.let { OpenedBackupImport(it, onDone = { backupToOpen.value = null }) }
                 }
             }
         }
@@ -56,6 +63,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_VIEW) intent.data?.let { backupToOpen.value = it }
         intent?.getStringExtra(EXTRA_REMINDER_ID)?.let { reminderToOpen.value = it }
         intent?.getStringExtra(CalendarWidgetProvider.EXTRA_ACTION)?.let { action ->
             val epochDay = intent.getLongExtra(CalendarWidgetProvider.EXTRA_EPOCH_DAY, Long.MIN_VALUE)

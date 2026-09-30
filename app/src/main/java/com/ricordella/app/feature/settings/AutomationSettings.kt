@@ -67,7 +67,7 @@ fun AutomationSettings(settings: AppSettings, update: ((AppSettings) -> AppSetti
         if (includeBackup) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DropdownField(
-                    label = tr("Ricordami di aggiornare il backup"),
+                    label = tr("Ogni quanto aggiornare il backup"),
                     options = Housekeeping.BACKUP_INTERVALS,
                     selected = settings.backupIntervalDays,
                     optionLabel = Housekeeping::intervalLabel,

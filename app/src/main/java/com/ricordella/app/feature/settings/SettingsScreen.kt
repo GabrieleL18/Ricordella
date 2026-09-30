@@ -52,6 +52,7 @@ import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -98,6 +99,7 @@ import com.ricordella.app.domain.model.DateFormatStyle
 import com.ricordella.app.domain.model.ThemeMode
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -111,6 +113,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var confirmDelete by rememberSaveable { mutableStateOf(0) }
     var showPrivacy by rememberSaveable { mutableStateOf(false) }
     var pickAllDayTime by rememberSaveable { mutableStateOf(false) }
+    var pickBackupTime by rememberSaveable { mutableStateOf(false) }
     var showSectionsTutorial by rememberSaveable { mutableStateOf(false) }
     var showCalendarImport by rememberSaveable { mutableStateOf(false) }
 
@@ -255,6 +258,20 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onClick = { backupAction(BACKUP_IMPORT) },
             )
             SettingRow(
+                icon = Icons.Rounded.Schedule,
+                title = tr("Backup automatico"),
+                subtitle = settings.autoBackupTime?.let {
+                    trf("%1\$s alle %2\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.intervalLabel(settings.backupIntervalDays), DateTexts.time(it))
+                } ?: tr("Spento: tocca per scegliere l'orario."),
+                onClick = { pickBackupTime = true },
+                trailing = {
+                    Switch(
+                        checked = settings.autoBackupTime != null,
+                        onCheckedChange = { on -> if (on) pickBackupTime = true else viewModel.update { it.copy(autoBackupTime = null) } },
+                    )
+                },
+            )
+            SettingRow(
                 icon = Icons.Rounded.CalendarMonth,
                 title = tr("Importa da Google Calendar"),
                 subtitle = tr("Copia gli eventi di un account Google presente sul telefono."),
@@ -279,6 +296,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                 subtitle = tr("Come funzionano le sezioni dell'app."),
                 onClick = { showSectionsTutorial = true },
             )
+            SettingRow(
+                icon = Icons.Rounded.Lightbulb,
+                title = tr("Crediti"),
+                subtitle = tr("Da un'idea di GGL"),
+            )
             VersionRow(settings.developerMode, onUnlock = { justUnlocked = true; viewModel.update { it.copy(developerMode = true) } })
             SettingRow(
                 icon = Icons.Rounded.PrivacyTip,
@@ -294,24 +316,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
 
     state.restoreSummary?.let { summary ->
-        AlertDialog(
-            onDismissRequest = viewModel::cancelRestore,
-            title = { Text(tr("Ripristinare il backup?")) },
-            text = {
-                Text(
-                    trf("Backup del %1\$s\n\n", summary.createdAt.take(10)) +
-                        trf("• %1\$s persone\n• %2\$s cose\n• %3\$s promemoria\n", summary.people, summary.items, summary.reminders) +
-                        trf("• %1\$s manutenzioni\n• %2\$s file allegati\n\n", summary.maintenance, summary.files) +
-                        tr("Attenzione: tutti i dati attuali verranno sostituiti da quelli del backup."),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = viewModel::confirmRestore) {
-                    Text(tr("Ripristina sostituendo i dati"), color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = { TextButton(onClick = viewModel::cancelRestore) { Text(tr("Annulla")) } },
-        )
+        RestoreDialog(summary, onConfirm = viewModel::confirmRestore, onCancel = viewModel::cancelRestore)
     }
 
     when (confirmDelete) {
@@ -375,6 +380,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                 CalendarImportStep(importViewModel, onDone = { showCalendarImport = false }, doneLabel = tr("Chiudi"))
             }
         }
+    }
+
+    if (pickBackupTime) {
+        TimePickerDialogFor(
+            initial = settings.autoBackupTime ?: LocalTime.of(22, 0),
+            onDismiss = { pickBackupTime = false },
+            onConfirm = { time ->
+                pickBackupTime = false
+                viewModel.update { it.copy(autoBackupTime = time) }
+            },
+        )
     }
 
     if (pickAllDayTime) {

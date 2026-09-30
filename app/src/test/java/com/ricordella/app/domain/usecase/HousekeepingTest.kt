@@ -18,10 +18,10 @@ class HousekeepingTest {
     private val today = LocalDate.of(2026, 9, 30)
 
     @Test
-    fun backupIsDueAfterThreeMonths() {
+    fun backupIsDueEveryDayByDefault() {
         assertFalse(Housekeeping.isBackupDue(AppSettings(), today))
-        assertFalse(Housekeeping.isBackupDue(AppSettings(backupCheckEpochDay = today.minusDays(89).toEpochDay()), today))
-        assertTrue(Housekeeping.isBackupDue(AppSettings(backupCheckEpochDay = today.minusDays(90).toEpochDay()), today))
+        assertFalse(Housekeeping.isBackupDue(AppSettings(backupCheckEpochDay = today.toEpochDay()), today))
+        assertTrue(Housekeeping.isBackupDue(AppSettings(backupCheckEpochDay = today.minusDays(1).toEpochDay()), today))
     }
 
     @Test

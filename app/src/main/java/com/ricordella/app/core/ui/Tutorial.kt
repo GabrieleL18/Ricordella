@@ -654,7 +654,7 @@ val BackupTutorialPages: List<TutorialPage> get() = listOf(
     ) { LightBackupIllustration() },
     TutorialPage(
         tr("Te lo ricordo io"),
-        tr("Ogni 3 mesi (o ogni giorno, settimana, mese, anno: lo scegli nelle Impostazioni) ti chiedo di aggiornare il backup."),
+        tr("Ogni giorno (o ogni settimana, mese, 3 mesi, anno: lo scegli nelle Impostazioni) aggiorno il backup da sola."),
     ) { BackupReminderIllustration() },
     TutorialPage(
         tr("Importa"),

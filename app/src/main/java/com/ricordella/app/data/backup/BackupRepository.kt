@@ -68,6 +68,23 @@ class BackupRepository(
         output.buffered().use { writeBackup(it) }
     }
 
+    /**
+     * File per il backup automatico quando l'utente non ne ha scelto uno: Download/Remindella
+     * (resta anche se l'app viene disinstallata, nessun permesso). Su Android 9 va nella cartella dell'app.
+     */
+    fun createAutoTarget(): Uri? = runCatching {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.Downloads.DISPLAY_NAME, "remindella-backup.zip")
+                put(android.provider.MediaStore.Downloads.MIME_TYPE, "application/zip")
+                put(android.provider.MediaStore.Downloads.RELATIVE_PATH, "Download/Remindella")
+            }
+            resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+        } else {
+            Uri.fromFile(File(context.getExternalFilesDir(null), "remindella-backup.zip"))
+        }
+    }.getOrNull()
+
     /** Conserva l'accesso al file del backup anche dopo il riavvio, per poterlo sovrascrivere. */
     fun keepAccess(uri: Uri) {
         runCatching {

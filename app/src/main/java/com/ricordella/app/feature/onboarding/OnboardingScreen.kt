@@ -4,7 +4,9 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
 import android.Manifest
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import com.ricordella.app.feature.settings.OpenedBackupImport
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -37,11 +39,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -112,11 +119,16 @@ class CalendarImportViewModel(
         }
     }
 
-    /** Chiude la configurazione iniziale e fa partire il conteggio del backup trimestrale. */
     fun updateSettings(transform: (AppSettings) -> AppSettings) {
         viewModelScope.launch { settings.update(transform) }
     }
 
+    /** Il file scelto diventa quello che il backup automatico sovrascrive. */
+    fun saveBackupTo(uri: Uri) {
+        viewModelScope.launch { runCatching { housekeeping.exportToNewFile(uri) } }
+    }
+
+    /** Chiude la configurazione iniziale e fa partire il conteggio del backup. */
     fun finishOnboarding() {
         viewModelScope.launch {
             housekeeping.startBackupClockIfNeeded()
@@ -144,7 +156,7 @@ fun OnboardingScreen() {
             when (current) {
                 Stage.WELCOME -> Welcome(onNext = { stage = 1 })
                 Stage.TUTORIAL -> TutorialPager(SectionTutorialPages, onDone = { stage = 2 }, doneLabel = tr("Avanti"))
-                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onNext = { stage = 3 })
+                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onBackupFile = viewModel::saveBackupTo, onNext = { stage = 3 })
                 Stage.CALENDAR -> CalendarImportStep(viewModel, onDone = viewModel::finishOnboarding)
             }
         }
@@ -153,6 +165,8 @@ fun OnboardingScreen() {
 
 @Composable
 private fun Welcome(onNext: () -> Unit) {
+    var backup by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val pickBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { backup = it } }
     Column(
         Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().verticalScroll(rememberScrollState()).padding(RicordellaDimensions.spaceXl),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -170,8 +184,14 @@ private fun Welcome(onNext: () -> Unit) {
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
-        PushButton(tr("Iniziamo"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward)
+        PushButton(tr("Parti da zero"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward)
+        Spacer(Modifier.height(RicordellaDimensions.spaceS))
+        TextButton(onClick = { pickBackup.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }) {
+            Text(tr("Ho già un backup: ripristinalo"))
+        }
     }
+    // Se il ripristino va a buon fine le impostazioni del backup chiudono da sole la configurazione iniziale.
+    backup?.let { OpenedBackupImport(it, onDone = { backup = null }) }
 }
 
 /** Import facoltativo: permesso calendario → scelta account Google → import. */
@@ -251,7 +271,8 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
 
 /** Scelte sulle operazioni periodiche (feste, pulizia annuale, backup), modificabili poi nelle Impostazioni. */
 @Composable
-private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNext: () -> Unit) {
+private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onBackupFile: (Uri) -> Unit, onNext: () -> Unit) {
+    val chooseBackupFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let(onBackupFile) }
     Column(
         Modifier
             .fillMaxSize()
@@ -269,6 +290,20 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         AutomationSettings(LocalAppSettings.current, onUpdate, includeBackup = true)
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(tr("Dove salvo il backup"), style = MaterialTheme.typography.titleMedium)
+            Text(
+                if (LocalAppSettings.current.backupTargetUri != null) tr("Nel file che hai scelto: lo aggiorno da sola.")
+                else tr("In Download/Remindella sul telefono. Per non perderlo se cambi telefono, sceglilo su Drive."),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedButton(onClick = { chooseBackupFile.launch("remindella-backup.zip") }, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Rounded.FolderOpen, contentDescription = null)
+                Spacer(Modifier.width(RicordellaDimensions.spaceS))
+                Text(tr("Scegli dove salvarlo (es. Drive)"))
+            }
+        }
         PushButton(tr("Avanti"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward, modifier = Modifier.fillMaxWidth())
     }
 }

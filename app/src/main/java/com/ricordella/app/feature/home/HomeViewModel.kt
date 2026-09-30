@@ -38,7 +38,7 @@ data class HomeUiState(
     val hasOverdue: Boolean = false,
     /** È passato l'intervallo scelto dall'ultimo backup. */
     val backupDue: Boolean = false,
-    val backupIntervalDays: Int = 90,
+    val backupIntervalDays: Int = 1,
 ) {
     val isEmpty: Boolean get() = attention.isEmpty() && today.isEmpty() && upcoming.isEmpty()
 }
@@ -154,7 +154,7 @@ class HomeViewModel(
         settings.settings,
     ) { entries, now, appSettings ->
         buildState(entries, now).copy(
-            backupDue = Housekeeping.isBackupDue(appSettings, now.toLocalDate()),
+            backupDue = appSettings.autoBackupTime == null && Housekeeping.isBackupDue(appSettings, now.toLocalDate()),
             backupIntervalDays = appSettings.backupIntervalDays,
         )
     }

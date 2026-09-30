@@ -146,7 +146,7 @@ La prima volta scegli dove salvare il .zip (es. Drive). Le volte dopo lo sovrasc
 Leggero come una piuma ||| Light as a feather
 Il backup è compresso al massimo e le foto vengono ridotte: pesa il meno possibile, senza perdere i tuoi dati. ||| The backup is compressed to the max and photos are shrunk: it weighs as little as possible, without losing your data.
 Te lo ricordo io ||| I'll remind you
-Ogni 3 mesi (o ogni giorno, settimana, mese, anno: lo scegli nelle Impostazioni) ti chiedo di aggiornare il backup. ||| Every 3 months (or every day, week, month, year: you choose in Settings) I'll ask you to update the backup.
+Ogni giorno (o ogni settimana, mese, 3 mesi, anno: lo scegli nelle Impostazioni) aggiorno il backup da sola. ||| Every day (or every week, month, 3 months, year: you choose in Settings) I update the backup on my own.
 Importa ||| Import
 Su un nuovo telefono, "Importa backup" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto. ||| On a new phone, tap "Import backup" and choose the .zip file: I'll show you what's inside and, if you confirm, restore everything.
 Un mago felice e soddisfatto ||| A happy, satisfied wizard
@@ -567,7 +567,7 @@ Dati ||| Data
 Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione. ||| A maximally compressed .zip file: each time it overwrites the previous one, unless you ask for a new version.
 Ripristina un backup sostituendo i dati attuali. ||| Restore a backup, replacing the current data.
 Copia gli eventi di un account Google presente sul telefono. ||| Copies events from a Google account on this phone.
-Ricordami di aggiornare il backup ||| Remind me to update the backup
+Ogni quanto aggiornare il backup ||| How often to update the backup
 Elimina tutti i dati ||| Delete all data
 Cancella persone, cose, promemoria e storico da questo dispositivo. ||| Deletes people, things, reminders and history from this device.
 Rivedi il tutorial ||| See the tutorial again
@@ -689,3 +689,14 @@ Torna alla Home: %1$s feste da spostare, %2$s promemoria da pulire ||| Go back t
 Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno, un pagamento scaduto e, dell'anno scorso, due feste e una cena. ||| A person, a car, a holiday with flight and ferry, a visit, a birthday, an overdue payment and, from last year, two holidays and a dinner.
 Unità ||| Unit
 Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo, con i giorni impegnati colorati. Tocca un giorno per vederne gli impegni. ||| Add the Calendar widget to your phone's home screen: see this month and the next, with busy days coloured. Tap a day to see what's on.
+Backup automatico ||| Automatic backup
+Spento: tocca per scegliere l'orario. ||| Off: tap to choose the time.
+%1$s alle %2$s, da sola: nel file scelto o in Download/Remindella. ||| %1$s at %2$s, on its own: in the chosen file or in Download/Remindella.
+Crediti ||| Credits
+Da un'idea di GGL ||| From an idea by GGL
+Parti da zero ||| Start from scratch
+Ho già un backup: ripristinalo ||| I already have a backup: restore it
+Dove salvo il backup ||| Where I save the backup
+Nel file che hai scelto: lo aggiorno da sola. ||| In the file you chose: I keep it updated on my own.
+In Download/Remindella sul telefono. Per non perderlo se cambi telefono, sceglilo su Drive. ||| In Download/Remindella on the phone. To keep it if you change phone, choose Drive.
+Scegli dove salvarlo (es. Drive) ||| Choose where to save it (e.g. Drive)

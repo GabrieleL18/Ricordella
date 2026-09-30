@@ -49,10 +49,12 @@ data class AppSettings(
     val backupTutorialSeen: Boolean = false,
     /** Giorno (epochDay) da cui contare l'intervallo per chiedere un nuovo backup. */
     val backupCheckEpochDay: Long? = null,
-    /** Ogni quanti giorni proporre di aggiornare il backup (1, 7, 30, 90, 365). */
-    val backupIntervalDays: Int = 90,
+    /** Ogni quanti giorni aggiornare il backup (1, 7, 30, 90, 365): di default ogni giorno. */
+    val backupIntervalDays: Int = 1,
     /** File del backup scelto dall'utente: ogni esportazione lo sovrascrive. */
     val backupTargetUri: String? = null,
+    /** Orario del backup automatico (sul file scelto o in Download/Remindella); null = spento. */
+    val autoBackupTime: LocalTime? = LocalTime.of(22, 0),
     /** Spostamento annuale delle feste importate all'anno nuovo. */
     val holidayMode: AutoMode = AutoMode.ASK,
     /** Pulizia annuale dei promemoria vecchi e poco utili. */

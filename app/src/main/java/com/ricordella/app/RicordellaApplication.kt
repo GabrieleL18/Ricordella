@@ -23,5 +23,6 @@ class RicordellaApplication : Application() {
         // Gli allarmi vengono persi se l'app è stata forzata a chiudersi: all'avvio si ricostruiscono.
         container.applicationScope.launch { container.reminderScheduler.refresh() }
         container.potionReminders.watch(container.applicationScope)
+        container.autoBackup.watch(container.applicationScope)
     }
 }

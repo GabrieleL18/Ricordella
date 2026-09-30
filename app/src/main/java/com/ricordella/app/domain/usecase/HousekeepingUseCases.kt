@@ -16,7 +16,7 @@ import com.ricordella.app.domain.repository.SettingsRepository
 import java.time.LocalDate
 
 /**
- * Manutenzione periodica dei dati: promemoria del backup (ogni 3 mesi o come scelto),
+ * Manutenzione periodica dei dati: promemoria del backup (ogni giorno o come scelto),
  * una volta l'anno, la proposta di eliminare i promemoria vecchi e poco utili.
  */
 class Housekeeping(
@@ -58,7 +58,7 @@ class Housekeeping(
         settings.update { it.copy(backupCheckEpochDay = today) }
     }
 
-    /** Alla prima apertura fa partire il conteggio: il primo invito arriva dopo 3 mesi. */
+    /** Alla prima apertura fa partire il conteggio: il primo invito arriva dopo l'intervallo scelto. */
     suspend fun startBackupClockIfNeeded() {
         if (settings.current().backupCheckEpochDay != null) return
         val today = time.today().toEpochDay()

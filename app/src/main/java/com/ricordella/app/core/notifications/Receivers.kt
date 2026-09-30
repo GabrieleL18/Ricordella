@@ -64,6 +64,7 @@ class AlarmRestoreReceiver : BroadcastReceiver() {
         runAsync(context) {
             it.reminderScheduler.refresh()
             it.potionReminders.refresh()
+            it.autoBackup.refresh()
         }
     }
 
