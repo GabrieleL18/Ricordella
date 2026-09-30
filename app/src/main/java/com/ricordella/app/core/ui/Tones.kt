@@ -21,7 +21,7 @@ val ReminderType.tone: Tone
         when (this@tone) {
             ReminderType.TASK, ReminderType.RENEWAL, ReminderType.MEDICAL_VISIT -> cyan
             ReminderType.EVENT, ReminderType.OTHER, ReminderType.HOLIDAY -> lavender
-            ReminderType.BIRTHDAY, ReminderType.DEADLINE -> coral
+            ReminderType.BIRTHDAY, ReminderType.DEADLINE, ReminderType.ALARM -> coral
             ReminderType.MAINTENANCE -> pear
             ReminderType.WARRANTY, ReminderType.PAYMENT, ReminderType.VACATION -> mint
         }

@@ -99,6 +99,8 @@ def main():
     for i in range(fade):
         magic[-fade + i] *= 1 - i / fade
     write("notification_magic", magic)
+    # Sveglia: lo stesso incantesimo con una pausa, suonato in loop finché non la si ferma.
+    write("alarm_magic", magic + silence(0.8))
 
 
 if __name__ == "__main__":

@@ -80,6 +80,7 @@ fun TimeField(
     onValueChange: (LocalTime?) -> Unit,
     modifier: Modifier = Modifier,
     clearable: Boolean = true,
+    isError: Boolean = false,
 ) {
     var showPicker by rememberSaveable { mutableStateOf(false) }
     ClickableField(
@@ -89,6 +90,7 @@ fun TimeField(
         onClick = { showPicker = true },
         onClear = if (clearable && value != null) ({ onValueChange(null) }) else null,
         modifier = modifier,
+        isError = isError,
     )
     if (showPicker) {
         TimePickerDialogFor(

@@ -137,7 +137,7 @@ class ReminderNotifier(private val context: Context) {
     private fun look(type: ReminderType): Pair<String, NotifTone> = type.emoji to when (type) {
         ReminderType.TASK, ReminderType.MEDICAL_VISIT, ReminderType.RENEWAL -> NotifTone.CYAN
         ReminderType.EVENT, ReminderType.HOLIDAY, ReminderType.OTHER -> NotifTone.LAVENDER
-        ReminderType.DEADLINE, ReminderType.BIRTHDAY -> NotifTone.CORAL
+        ReminderType.DEADLINE, ReminderType.BIRTHDAY, ReminderType.ALARM -> NotifTone.CORAL
         ReminderType.MAINTENANCE -> NotifTone.PEAR
         ReminderType.WARRANTY, ReminderType.PAYMENT, ReminderType.VACATION -> NotifTone.MINT
     }

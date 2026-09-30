@@ -1,6 +1,12 @@
 package com.ricordella.app.feature.reminders
 
 import com.ricordella.app.core.i18n.tr
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import android.provider.Settings
+import android.os.Build
+import android.content.Intent
+import android.app.NotificationManager
 import com.ricordella.app.core.i18n.trf
 
 import androidx.compose.foundation.layout.Arrangement
@@ -91,6 +97,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
         title = when {
             !form.isNew -> tr("Modifica")
             form.type == ReminderType.EVENT -> tr("Nuovo evento")
+            form.type == ReminderType.ALARM -> tr("Nuova sveglia")
             else -> tr("Nuovo promemoria")
         },
         onBack = onBack,
@@ -154,14 +161,21 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             modifier = Modifier.weight(1.6f),
         )
         TimeField(
-            label = tr("Ora"),
+            label = if (form.isAlarm) tr("Ora *") else tr("Ora"),
             value = form.time,
             onValueChange = { value -> update { it.copy(time = value) } },
             modifier = Modifier.weight(1f),
+            isError = form.timeError,
         )
     }
+    if (form.timeError) {
+        Text(tr("La sveglia ha bisogno di un orario."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+    }
+    if (form.isAlarm) {
+        AlarmFields(form, update)
+    }
     // Eventi di più giorni: vacanze, viaggi, ricoveri... Nel calendario appaiono come una barra continua.
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    if (!form.isAlarm) Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(tr("Dura più giorni"), style = MaterialTheme.typography.bodyLarge)
             Text(tr("Es. una vacanza o un viaggio"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -182,7 +196,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     if (form.endDateError) {
         Text(tr("L'ultimo giorno deve venire dopo il primo."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
     }
-    if (form.time == null) {
+    if (form.time == null && !form.isAlarm) {
         Text(tr("Senza orario il promemoria vale per tutto il giorno."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     Text(tr("Tipo"), style = MaterialTheme.typography.labelLarge)
@@ -402,4 +416,35 @@ private fun AssistAddChip(label: String, onClick: () -> Unit) {
         label = { Text(label) },
         leadingIcon = { Icon(Icons.Rounded.Add, contentDescription = null) },
     )
+}
+
+/** Opzioni della sveglia: ripetizione quotidiana e controllo dei permessi che la fanno suonare. */
+@Composable
+private fun AlarmFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
+    val context = LocalContext.current
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(tr("Ripeti ogni giorno"), style = MaterialTheme.typography.bodyLarge)
+            Text(tr("Es. per le medicine"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(
+            checked = form.recurrencePreset == RecurrencePreset.DAILY,
+            onCheckedChange = { daily -> update { it.copy(recurrencePreset = if (daily) RecurrencePreset.DAILY else RecurrencePreset.NONE) } },
+        )
+    }
+    // Da Android 14 la schermata a tutto schermo può essere disattivata: si invita a riattivarla.
+    val canFullScreen = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+        context.getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
+    if (!canFullScreen) {
+        Text(
+            tr("Per mostrare la sveglia a tutto schermo serve un permesso."),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+        )
+        TextButton(onClick = {
+            runCatching {
+                context.startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, "package:${context.packageName}".toUri()))
+            }
+        }) { Text(tr("Concedi permesso")) }
+    }
 }

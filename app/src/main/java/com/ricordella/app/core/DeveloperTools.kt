@@ -3,6 +3,7 @@ package com.ricordella.app.core
 import com.ricordella.app.core.i18n.tr
 
 import android.content.Context
+import com.ricordella.app.core.alarm.AlarmRingService
 import com.ricordella.app.core.notifications.ReminderNotifier
 import com.ricordella.app.core.widget.CalendarWidgetProvider
 import com.ricordella.app.data.local.database.BuiltInCategories
@@ -71,6 +72,14 @@ class DeveloperTools(
                 updatedAt = now,
             )
             notifier.show(ReminderWithLinks(reminder, emptyList(), emptyList(), null), time.today())
+        }
+    }
+
+    /** Fa suonare una sveglia finta (nessun promemoria reale da completare) dopo [delaySeconds]. */
+    fun ringTestAlarm(delaySeconds: Long = 10) {
+        scope.launch {
+            delay(delaySeconds * 1000)
+            AlarmRingService.start(context, "developer-alarm", tr("Sveglia di prova"))
         }
     }
 

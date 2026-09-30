@@ -4,7 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ReminderType {
-    TASK, EVENT, VACATION, MEDICAL_VISIT, HOLIDAY, DEADLINE, BIRTHDAY, WARRANTY, MAINTENANCE, PAYMENT, RENEWAL, OTHER;
+    TASK, EVENT, VACATION, MEDICAL_VISIT, HOLIDAY, DEADLINE, BIRTHDAY, WARRANTY, MAINTENANCE, PAYMENT, RENEWAL, OTHER,
+
+    /** Sveglia a tutto schermo: orario obbligatorio, suona finché non la si ferma. */
+    ALARM;
 
     /** Le feste non si "fanno": non si completano e non diventano mai scadute. */
     val isCompletable: Boolean get() = this != HOLIDAY

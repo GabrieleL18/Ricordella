@@ -7,6 +7,7 @@ import android.text.format.Formatter
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.AccessAlarm
 import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.CleaningServices
@@ -118,6 +119,10 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
     DevRow(Icons.Rounded.NotificationAdd, tr("Notifica di prova tra 10 secondi"), tr("Chiudi l'app per vederla arrivare in background.")) {
         tools.sendTestNotification(ReminderType.BIRTHDAY, delaySeconds = 10)
         toast(context, tr("Arriva tra 10 secondi"))
+    }
+    DevRow(Icons.Rounded.Alarm, tr("Sveglia di prova tra 10 secondi"), tr("Blocca lo schermo per vederla comparire a tutto schermo.")) {
+        tools.ringTestAlarm()
+        toast(context, tr("Suona tra 10 secondi"))
     }
     DevRow(
         Icons.Rounded.DataObject,

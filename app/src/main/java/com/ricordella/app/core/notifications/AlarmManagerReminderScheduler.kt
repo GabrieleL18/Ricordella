@@ -5,7 +5,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.ricordella.app.core.alarm.AlarmRingService
 import com.ricordella.app.core.widget.CalendarWidgetProvider
+import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.ReminderAlarmPlanner
 import com.ricordella.app.domain.date.TimeSource
@@ -46,7 +48,12 @@ class AlarmManagerReminderScheduler(
 
         if (plan.dueNow.isNotEmpty()) {
             val today = time.today()
-            plan.dueNow.forEach { id -> reminders.getReminder(id)?.let { notifier.show(it, today) } }
+            plan.dueNow.forEach { id ->
+                val entry = reminders.getReminder(id) ?: return@forEach
+                // Le sveglie suonano a tutto schermo; se Android non lo consente, notifica normale.
+                val rang = entry.reminder.type == ReminderType.ALARM && AlarmRingService.start(context, id, entry.reminder.title)
+                if (!rang) notifier.show(entry, today)
+            }
             reminders.markNotified(plan.dueNow, now)
         }
 

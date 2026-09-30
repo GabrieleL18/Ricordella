@@ -73,7 +73,7 @@ fun HappyWizard(modifier: Modifier = Modifier, size: Dp = 140.dp) {
     }
 }
 
-private fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Float, twinkle: Float) {
+internal fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Float, twinkle: Float) {
     val w = size.width
     val h = size.height
     val cx = w * 0.46f

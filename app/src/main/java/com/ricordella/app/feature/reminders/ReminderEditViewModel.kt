@@ -69,6 +69,9 @@ data class ReminderForm(
 ) {
     val titleError: Boolean get() = showErrors && title.isBlank()
     val dateError: Boolean get() = showErrors && date == null
+    val isAlarm: Boolean get() = type == ReminderType.ALARM
+    /** La sveglia deve avere giorno e orario. */
+    val timeError: Boolean get() = showErrors && isAlarm && time == null
     val endDateError: Boolean get() = showErrors && multiDay && (endDate == null || date == null || !endDate.isAfter(date))
     val isRecurring: Boolean get() = recurrencePreset != RecurrencePreset.NONE
 }
@@ -166,7 +169,8 @@ class ReminderEditViewModel(
         form.copy(
             type = type,
             recurrencePreset = preset,
-            multiDay = form.multiDay || vacation,
+            // Una sveglia suona in un momento preciso: niente eventi di più giorni.
+            multiDay = type != ReminderType.ALARM && (form.multiDay || vacation),
             endDate = if (vacation) form.endDate ?: form.date?.plusDays(7) else form.endDate,
         )
     }
@@ -176,7 +180,9 @@ class ReminderEditViewModel(
     fun save() {
         val form = _form.value
         val date = form.date
-        if (form.title.isBlank() || date == null || (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))) {
+        val invalid = form.title.isBlank() || date == null || (form.isAlarm && form.time == null) ||
+            (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))
+        if (invalid || date == null) {
             _form.update { it.copy(showErrors = true) }
             return
         }
@@ -207,8 +213,9 @@ class ReminderEditViewModel(
             category = form.category.trim().ifEmpty { null },
             dueOdometerKm = form.dueOdometerKm.toIntOrNull(),
             odometerIntervalKm = form.odometerIntervalKm.toIntOrNull(),
-            notificationsEnabled = form.notificationsEnabled,
-            notifyOffsetMinutes = form.notifyOffsetMinutes,
+            // La sveglia suona sempre, esattamente all'orario.
+            notificationsEnabled = form.isAlarm || form.notificationsEnabled,
+            notifyOffsetMinutes = if (form.isAlarm) 0 else form.notifyOffsetMinutes,
         )
         return ReminderDraft(reminder, buildRule(form, date), form.personIds, form.itemIds)
     }

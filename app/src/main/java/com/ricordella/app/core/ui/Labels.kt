@@ -4,6 +4,7 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Badge
@@ -67,6 +68,7 @@ val ReminderType.label: String
         ReminderType.PAYMENT -> tr("Pagamento")
         ReminderType.RENEWAL -> tr("Rinnovo")
         ReminderType.OTHER -> tr("Altro")
+        ReminderType.ALARM -> tr("Allarme")
     }
 
 val ReminderType.icon: ImageVector
@@ -83,6 +85,7 @@ val ReminderType.icon: ImageVector
         ReminderType.PAYMENT -> Icons.Rounded.Payments
         ReminderType.RENEWAL -> Icons.Rounded.Autorenew
         ReminderType.OTHER -> Icons.Rounded.Notifications
+        ReminderType.ALARM -> Icons.Rounded.Alarm
     }
 
 /** Emoji del tipo: per widget e notifiche, dove le icone di Compose non si possono usare. */
@@ -100,6 +103,7 @@ val ReminderType.emoji: String
         ReminderType.PAYMENT -> "💳"
         ReminderType.RENEWAL -> "🔁"
         ReminderType.OTHER -> "🔔"
+        ReminderType.ALARM -> "⏰"
     }
 
 val Priority.label: String
