@@ -65,6 +65,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".core.notifications.PotionReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".core.notifications.AlarmRestoreReceiver"
             android:exported="true">
             <intent-filter>

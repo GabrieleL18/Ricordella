@@ -99,6 +99,7 @@ import com.ricordella.app.feature.search.SearchScreen
 import com.ricordella.app.feature.viewer.DocumentViewerScreen
 import androidx.navigation.toRoute
 import com.ricordella.app.feature.settings.SettingsScreen
+import com.ricordella.app.feature.potions.PotionsScreen
 import kotlin.reflect.KClass
 
 private enum class TopLevelDestination(
@@ -161,6 +162,7 @@ fun RicordellaApp(
             CalendarWidgetProvider.ACTION_ITEM -> navigator.newItem()
             CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
             CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
+            com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
         }
         onWidgetRequestHandled()
     }
@@ -215,6 +217,7 @@ fun RicordellaApp(
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
             composable<SearchRoute> { SearchScreen(navigator) }
             composable<SettingsRoute> { SettingsScreen(onBack = navigator::back) }
+            composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
             composable<ReminderDetailRoute> { ReminderDetailScreen(navigator) }
             composable<ReminderEditRoute> { ReminderEditScreen(onBack = navigator::back) }
             composable<ItemDetailRoute> { ItemDetailScreen(navigator) }

@@ -47,9 +47,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -161,7 +164,7 @@ private fun AlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean, onSto
     val ink = if (alarm.night) Color.White else DayInk
     Box(Modifier.fillMaxSize()) {
         if (alarm.night) {
-            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF1B1036), Color(0xFF2E1A5C), Color(0xFF111319)))))
+            NightSky()
         } else {
             DaySky()
         }
@@ -244,6 +247,58 @@ private fun DaySky() {
     }
 }
 
+/** Cielo di notte: blu profondo, luna calante che respira, stelle che brillano a turno e una stella cadente. */
+@Composable
+private fun NightSky() {
+    val colors = MaterialTheme.ricordellaColors
+    val reduced = rememberReducedMotion()
+    val t = if (reduced) 0.5f else rememberInfiniteTransition(label = "nightSky").animateFloat(0f, 1f, infiniteRepeatable(tween(6_000, easing = LinearEasing)), label = "nightT").value
+    Canvas(Modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val top = Color(0xFF0B0A2A)
+        drawRect(Brush.verticalGradient(listOf(top, Color(0xFF231456), Color(0xFF3A1F6E), Color(0xFF16122E))))
+        // Luna calante con alone che respira: la falce è un cerchio meno un cerchio spostato, così l'alone resta visibile.
+        val moon = Offset(w * 0.85f, h * 0.1f)
+        val r = w * 0.07f
+        val glow = 0.22f + 0.08f * sin(t * 2 * PI).toFloat()
+        drawCircle(Brush.radialGradient(listOf(colors.bolt.copy(alpha = glow), Color.Transparent), moon, r * 2.2f), radius = r * 2.2f, center = moon)
+        val crescent = Path().apply {
+            op(
+                Path().apply { addOval(Rect(moon, r)) },
+                Path().apply { addOval(Rect(Offset(moon.x - r * 0.45f, moon.y - r * 0.15f), r * 0.85f)) },
+                PathOperation.Difference,
+            )
+        }
+        drawPath(crescent, colors.bolt)
+        // Stelle fisse che brillano ognuna con il suo ritmo; le più grandi a quattro punte.
+        val random = java.util.Random(11)
+        repeat(70) {
+            val star = Offset(random.nextFloat() * w, random.nextFloat() * h * 0.85f)
+            val phase = random.nextFloat()
+            val big = random.nextFloat() < 0.18f
+            val glow = 0.35f + 0.65f * (0.5f + 0.5f * sin(((t + phase) * 2 * PI)).toFloat())
+            if (big) {
+                drawFourPointStar(star, w * (0.012f + random.nextFloat() * 0.01f), Color.White.copy(alpha = glow), rotation = t * 90f)
+            } else {
+                drawCircle(Color.White.copy(alpha = glow * 0.8f), radius = w * (0.002f + random.nextFloat() * 0.003f), center = star)
+            }
+        }
+        // Stella cadente: attraversa il cielo nella prima parte di ogni giro.
+        val fall = (t / 0.25f).coerceIn(0f, 1f)
+        if (!reduced && fall in 0.01f..0.99f) {
+            val head = Offset(w * (0.1f + 0.5f * fall), h * (0.05f + 0.15f * fall))
+            val tail = Offset(head.x - w * 0.14f, head.y - h * 0.042f)
+            drawLine(
+                Brush.linearGradient(listOf(Color.Transparent, Color.White.copy(alpha = 0.9f * sin(fall * PI).toFloat())), tail, head),
+                tail, head, strokeWidth = w * 0.006f, cap = StrokeCap.Round,
+            )
+        }
+        // Colline scure all'orizzonte, come l'erba della scena di giorno ma addormentata.
+        drawOval(Color(0xFF1A1440), topLeft = Offset(-w * 0.3f, h * 0.84f), size = Size(w * 1.6f, h * 0.4f))
+    }
+}
+
 /** La notte cala sulla schermata: cielo blu scuro, luna calante, stelle che si accendono e un "a dopo". */
 @Composable
 private fun Nightfall(progress: Float, snoozeMinutes: Int) {
@@ -268,7 +323,7 @@ private fun Nightfall(progress: Float, snoozeMinutes: Int) {
             }
         }
         Text(
-            trf("Buonanotte… ti risveglio tra %1\$s minuti", snoozeMinutes),
+            trf("Va bene… ci vediamo tra %1\$s minuti", snoozeMinutes),
             style = MaterialTheme.typography.titleLarge,
             color = Color.White.copy(alpha = ((progress - 0.5f) * 2f).coerceIn(0f, 1f)),
             textAlign = TextAlign.Center,

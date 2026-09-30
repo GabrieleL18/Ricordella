@@ -61,7 +61,10 @@ class NotificationActionReceiver : BroadcastReceiver() {
 class AlarmRestoreReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action !in HANDLED_ACTIONS) return
-        runAsync(context) { it.reminderScheduler.refresh() }
+        runAsync(context) {
+            it.reminderScheduler.refresh()
+            it.potionReminders.refresh()
+        }
     }
 
     private companion object {

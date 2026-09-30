@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object PeopleRoute
 @Serializable data object SettingsRoute
 @Serializable data object SearchRoute
+@Serializable data object PotionsRoute
 
 @Serializable data class ReminderDetailRoute(val id: String)
 
@@ -35,5 +36,5 @@ data class ReminderEditRoute(
 /** Visualizzatore interno di foto, PDF e documenti Word. */
 @Serializable data class ViewerRoute(val uri: String, val mimeType: String? = null, val name: String)
 
-/** Richiesta arrivata dal widget del calendario: cosa aggiungere ed eventuale giorno toccato. */
+/** Richiesta arrivata dal widget del calendario (cosa aggiungere, eventuale giorno) o da una notifica delle pozioni. */
 data class WidgetRequest(val action: String, val date: java.time.LocalDate?)

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -87,6 +88,10 @@ fun TopLevelScaffold(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
+                    // Le pozioni (acqua da bere) vivono a parte: si aprono da qui, in ogni sezione.
+                    IconButton(onClick = navigator::openPotions) {
+                        Icon(Icons.Rounded.WaterDrop, contentDescription = tr("Pozioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
+                    }
                     IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }
                     IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = tr("Impostazioni")) }
                 },

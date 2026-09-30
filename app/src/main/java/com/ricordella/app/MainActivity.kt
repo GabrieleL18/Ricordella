@@ -61,9 +61,13 @@ class MainActivity : ComponentActivity() {
             val epochDay = intent.getLongExtra(CalendarWidgetProvider.EXTRA_EPOCH_DAY, Long.MIN_VALUE)
             widgetRequest.value = WidgetRequest(action, epochDay.takeIf { it != Long.MIN_VALUE }?.let(LocalDate::ofEpochDay))
         }
+        // Tocco sulla notifica delle pozioni: si apre la loro schermata.
+        if (intent?.getBooleanExtra(EXTRA_OPEN_POTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_POTIONS, null)
     }
 
     companion object {
         const val EXTRA_REMINDER_ID = "com.ricordella.app.extra.OPEN_REMINDER_ID"
+        const val EXTRA_OPEN_POTIONS = "com.ricordella.app.extra.OPEN_POTIONS"
+        const val ACTION_OPEN_POTIONS = "potions"
     }
 }

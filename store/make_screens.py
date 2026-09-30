@@ -1,6 +1,6 @@
 """Impagina le schermate per il Play Store: titolo in alto, telefono con la schermata, cielo magico.
 
-Metti le schermate del telefono in store/screenshots/1.png ... 5.png (anche .jpg) e lancia:
+Metti le schermate del telefono in store/screenshots/ con i nomi elencati in SCREENS (anche .jpg) e lancia:
 
     python store/make_screens.py
 
@@ -20,13 +20,18 @@ BROWSERS = [
     Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
 ]
 
-# Titolo, sottotitolo e colori (cielo alto, cielo basso, accento) di ogni immagine.
+# Titolo, sottotitolo, colori (cielo alto, cielo basso, accento) e schermate di ogni immagine.
+# Le schermate sono i nomi dei file in store/screenshots/ (senza estensione): due nomi = due telefoni affiancati.
+# Si ottengono dalla modalità demo (Impostazioni > Sviluppatore > Modalità demo per gli screenshot).
 SCREENS = [
-    ("La tua giornata,<br>sotto controllo", "Il saluto giusto, l'ora e tutto quello che c'è da fare oggi", "#3B1F73", "#2E7FBF", "#F2D43D"),
-    ("Tutto il mese<br>a portata di dito", "Sfoglia giorni e mesi con uno swipe, feste comprese", "#1F4E8C", "#5FC3C9", "#F2D43D"),
-    ("Ogni promemoria<br>al suo posto", "Oggi, in arrivo o scaduti: li trovi in un tocco", "#2A1450", "#7A3FB8", "#FF9E7A"),
-    ("Auto, casa<br>e documenti", "Bollo, assicurazione e manutenzioni: ti avviso io", "#6B2E1F", "#E0873A", "#F2D43D"),
-    ("La tua cerchia<br>magica", "Ogni persona ha il suo maghetto e i suoi promemoria", "#0F5F73", "#58C9A8", "#F2D43D"),
+    ("La tua giornata,<br>sotto controllo", "Il saluto giusto, l'ora e tutto quello che c'è da fare oggi", "#3B1F73", "#2E7FBF", "#F2D43D", ["home"]),
+    ("Tutto il mese<br>a portata di dito", "Sfoglia giorni e mesi con uno swipe, viaggi e feste compresi", "#1F4E8C", "#5FC3C9", "#F2D43D", ["calendar"]),
+    ("Ogni promemoria<br>al suo posto", "Oggi, in arrivo o scaduti: li trovi in un tocco", "#2A1450", "#7A3FB8", "#FF9E7A", ["reminders"]),
+    ("Il viaggio,<br>tutto in un posto", "Voli, hotel e prenotazioni. E un tocco per arrivarci", "#0F5F73", "#3FA9E0", "#F2D43D", ["trip"]),
+    ("Auto, casa<br>e documenti", "Bollo, tagliando e garanzie: ti avviso io", "#6B2E1F", "#E0873A", "#F2D43D", ["items", "car"]),
+    ("La tua cerchia<br>magica", "Ogni persona ha il suo maghetto e i suoi promemoria", "#0F5F73", "#58C9A8", "#F2D43D", ["people", "person"]),
+    ("Bevi, e il mago<br>si riempie", "L'acqua di oggi in pozioni. Se esageri, gli si gonfia la pancia", "#0B3D6B", "#3FA9E0", "#F2D43D", ["potions", "potions-full"]),
+    ("Sveglie<br>incantate", "Di giorno o di notte, il maghetto ti sveglia col sorriso", "#1A1446", "#E0873A", "#F2D43D", ["alarm-day", "alarm-night"]),
 ]
 
 # Parte alta delle schermate da tagliare (la barra di stato di Android), in proporzione alla larghezza.
@@ -48,6 +53,10 @@ p {{ font-size: 40px; margin: 28px 80px 0; opacity: .9; line-height: 1.3; }}
 .phone {{ position: absolute; left: 50%; top: 640px; width: 700px; height: 1480px; transform: translateX(-50%) rotate(-2deg);
          background: #111319; border-radius: 76px; padding: 22px; box-sizing: border-box;
          box-shadow: 0 40px 90px rgba(0,0,0,.45), 0 0 0 6px rgba(255,255,255,.12); }}
+.phone.duo {{ width: 520px; height: 1100px; top: 700px; border-radius: 60px; padding: 16px; }}
+.phone.duo .screen {{ border-radius: 46px; }}
+.phone.left {{ left: 300px; transform: translateX(-50%) rotate(-5deg); }}
+.phone.right {{ left: 770px; top: 780px; transform: translateX(-50%) rotate(4deg); }}
 .screen {{ width: 100%; height: 100%; border-radius: 56px; overflow: hidden; background: #111319; }}
 .screen img {{ width: 100%; height: auto; display: block; margin-top: -{crop}%; }}
 .missing {{ height: 100%; display: flex; align-items: center; justify-content: center; color: #7A7766; font-size: 44px; border: 6px dashed #D6D0BA; border-radius: 56px; box-sizing: border-box; }}
@@ -59,7 +68,7 @@ p {{ font-size: 40px; margin: 28px 80px 0; opacity: .9; line-height: 1.3; }}
 <div class="brand">Remindella</div>
 <h1>{title}</h1>
 <p>{subtitle}</p>
-<div class="phone"><div class="screen">{screen}</div></div>
+{phones}
 </body></html>"""
 
 
@@ -138,27 +147,78 @@ def potion():
             '<circle cx="40" cy="72" r="4" fill="white" opacity=".7"/><circle cx="58" cy="78" r="3" fill="white" opacity=".7"/>')
 
 
-def prop(svg, left, top, size, rotate=0):
-    return (f'<div class="prop" style="left:{left}px;top:{top}px;width:{size}px;height:{size}px;transform:rotate({rotate}deg)">'
+SKIN, BEAR, BEAR_DARK, BEAR_LIGHT, INK = "#FFD9B8", "#8B5A3C", "#6B4129", "#D9A57A", "#2B1B12"
+
+
+def wizard():
+    """Il maghetto della sveglia: tunica lavanda, cappello azzurro, barba bianca e bacchetta che fa scintille."""
+    return (f'<ellipse cx="48" cy="93" rx="28" ry="4" fill="black" opacity=".25"/>'
+            f'<path d="M22 92 L48 40 L74 92 Z" fill="{LAVENDER}"/>'
+            f'<rect x="20" y="88" width="56" height="6" rx="2" fill="{BOLT}"/>'
+            f'<line x1="58" y1="60" x2="78" y2="50" stroke="{LAVENDER}" stroke-width="7" stroke-linecap="round"/>'
+            f'<line x1="80" y1="49" x2="93" y2="33" stroke="{WOOD}" stroke-width="3" stroke-linecap="round"/>'
+            f'<circle cx="79" cy="49" r="4" fill="{SKIN}"/>'
+            f'<path d="{star_path(95, 29, 7)}" fill="{BOLT}"/>'
+            f'<path d="{star_path(86, 20, 3)}" fill="white"/><path d="{star_path(99, 42, 2.5)}" fill="{CORAL}"/>'
+            f'<circle cx="48" cy="37" r="10" fill="{SKIN}"/>'
+            '<circle cx="41" cy="41" r="2" fill="#FF9EAE"/><circle cx="55" cy="41" r="2" fill="#FF9EAE"/>'
+            f'<path d="M42 36 q2.5 -2.5 5 0 M49 36 q2.5 -2.5 5 0" stroke="{INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
+            '<path d="M38 42 Q48 64 58 42 Q54 47 48 46 Q42 47 38 42 Z" fill="white"/>'
+            '<circle cx="40" cy="45" r="4" fill="white"/><circle cx="56" cy="45" r="4" fill="white"/><circle cx="48" cy="52" r="6" fill="#ECE8F4"/>'
+            f'<path d="M36 28 L60 28 L56 2 Q48 18 36 28 Z" fill="{CYAN}"/>'
+            f'<rect x="32" y="26" width="32" height="4" rx="2" fill="#6A56D8"/>'
+            f'<path d="{star_path(50, 20, 4)}" fill="{BOLT}"/>')
+
+
+def sleeping_bear():
+    """L'orso che dorme della sveglia di giorno, sdraiato con la testa a sinistra e le zeta che salgono."""
+    return (f'<ellipse cx="55" cy="90" rx="42" ry="4" fill="black" opacity=".25"/>'
+            f'<ellipse cx="60" cy="74" rx="34" ry="16" fill="{BEAR}"/>'
+            f'<circle cx="88" cy="81" r="8" fill="{BEAR_DARK}"/>'
+            f'<circle cx="17" cy="59" r="5" fill="{BEAR}"/><circle cx="17" cy="59" r="2.5" fill="{BEAR_LIGHT}"/>'
+            f'<circle cx="35" cy="58" r="5" fill="{BEAR}"/><circle cx="35" cy="58" r="2.5" fill="{BEAR_LIGHT}"/>'
+            f'<circle cx="26" cy="72" r="15" fill="{BEAR}"/>'
+            f'<path d="M17 69 q3 3 6 0 M29 69 q3 3 6 0" stroke="{INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>'
+            f'<ellipse cx="26" cy="79" rx="8" ry="6" fill="{BEAR_LIGHT}"/><ellipse cx="26" cy="76.5" rx="3" ry="2" fill="{INK}"/>'
+            f'<ellipse cx="12" cy="86" rx="7" ry="4.5" fill="{BEAR_LIGHT}"/>'
+            '<g font-family="Fredoka, sans-serif" font-weight="600" fill="white">'
+            '<text x="42" y="50" font-size="9" opacity=".6">z</text><text x="50" y="38" font-size="12" opacity=".8">z</text>'
+            '<text x="60" y="24" font-size="16">z</text></g>')
+
+
+def prop(svg, left, top, size, rotate=0, flip=False):
+    scale = " scaleX(-1)" if flip else ""
+    return (f'<div class="prop" style="left:{left}px;top:{top}px;width:{size}px;height:{size}px;transform:rotate({rotate}deg){scale}">'
             f'<svg viewBox="0 0 100 100">{svg}</svg></div>')
 
 
 # Per ogni immagine una combinazione diversa, negli spazi liberi e in parte dietro il telefono.
 PROPS = {
-    1: [prop(hat(), 830, 440, 210, 14), prop(crystal_ball(), -40, 1540, 280, -8), prop(wand(), -20, 820, 190, -10)],
+    1: [prop(hat(), 830, 440, 210, 14), prop(wizard(), -70, 1500, 320, -4), prop(wand(), -20, 820, 190, -10)],
     2: [prop(moon(), 70, 470, 150, -12), prop(spell_book(), 850, 1560, 250, 10), prop(wand(), 890, 800, 180, 80)],
-    3: [prop(hat(LAVENDER), 830, 450, 200, 12), prop(potion(), -30, 1500, 250, -12), prop(wand(), -20, 800, 190, -10)],
-    4: [prop(crystal_ball(), 850, 1520, 270, 8), prop(moon(), 880, 430, 150, 10), prop(hat(CORAL), -40, 1180, 220, -16)],
+    3: [prop(hat(LAVENDER), 830, 450, 200, 12), prop(sleeping_bear(), 40, 390, 330, 0), prop(wand(), -20, 800, 190, -10)],
+    4: [prop(wizard(), 800, 1460, 320, 4, flip=True), prop(moon(), 880, 430, 150, 10), prop(hat(CORAL), -40, 1180, 220, -16)],
     5: [prop(spell_book(), 810, 430, 230, -10), prop(crystal_ball(), -40, 1540, 280, -8), prop(potion(), 880, 1180, 200, 12)],
+    6: [prop(hat(MINT), 840, 440, 200, 12), prop(sleeping_bear(), 250, 420, 300, 0)],
+    7: [prop(potion(), 850, 420, 190, 12), prop(wand(), -30, 1640, 200, -10)],
+    8: [prop(moon(), 860, 420, 170, 10), prop(wand(), -30, 1640, 200, -10)],
 }
 
 
-def screenshot(n):
+def screenshot(name):
     for ext in ("png", "jpg", "jpeg", "webp"):
-        path = ROOT / "screenshots" / f"{n}.{ext}"
+        path = ROOT / "screenshots" / f"{name}.{ext}"
         if path.exists():
             return f'<img src="{path.as_uri()}">'
-    return f'<div class="missing">Schermata {n}</div>'
+    return f'<div class="missing">{name}</div>'
+
+
+def phones(names):
+    if len(names) == 1:
+        return f'<div class="phone"><div class="screen">{screenshot(names[0])}</div></div>'
+    return "\n".join(
+        f'<div class="phone duo {side}"><div class="screen">{screenshot(name)}</div></div>' for side, name in zip(("left", "right"), names)
+    )
 
 
 def main():
@@ -166,13 +226,13 @@ def main():
     if browser is None:
         raise SystemExit("Serve Microsoft Edge o Google Chrome per creare le immagini.")
     OUT.mkdir(exist_ok=True)
-    for n, (title, subtitle, top, bottom, accent) in enumerate(SCREENS, start=1):
+    for n, (title, subtitle, top, bottom, accent, names) in enumerate(SCREENS, start=1):
         # La prima riga del titolo resta bianca, la seconda prende il colore d'accento.
         first, _, second = title.partition("<br>")
         html = PAGE.format(
             fonts=FONTS.as_uri(), crop=f"{STATUS_BAR * 100:.1f}", top=top, bottom=bottom, accent=accent, stars=stars(n),
             props="\n".join(PROPS.get(n, [])),
-            title=f"{first}<br><span>{second}</span>", subtitle=subtitle, screen=screenshot(n),
+            title=f"{first}<br><span>{second}</span>", subtitle=subtitle, phones=phones(names),
         )
         page = OUT / f"_{n}.html"
         page.write_text(html, encoding="utf-8")

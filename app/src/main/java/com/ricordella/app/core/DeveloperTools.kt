@@ -55,6 +55,7 @@ class DeveloperTools(
     private val people: PersonRepository,
     private val items: ItemRepository,
     private val time: TimeSource,
+    private val databaseFileName: String,
 ) {
     /** Mostra una notifica finta (non legata a un promemoria reale), subito o dopo [delaySeconds]. */
     fun sendTestNotification(type: ReminderType = ReminderType.EVENT, delaySeconds: Long = 0) {
@@ -113,7 +114,7 @@ class DeveloperTools(
     suspend fun info(): DeveloperInfo = withContext(Dispatchers.IO) {
         val media = File(context.filesDir, "media").listFiles().orEmpty()
         DeveloperInfo(
-            databaseBytes = context.getDatabasePath("ricordella.db").length(),
+            databaseBytes = context.getDatabasePath(databaseFileName).length(),
             mediaBytes = media.sumOf { it.length() },
             mediaFiles = media.size,
             cacheBytes = context.cacheDir.walkTopDown().filter { it.isFile }.sumOf { it.length() },

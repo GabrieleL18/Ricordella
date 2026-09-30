@@ -81,8 +81,8 @@ abstract class RicordellaDatabase : RoomDatabase() {
             },
         )
 
-        fun create(context: Context): RicordellaDatabase =
-            Room.databaseBuilder(context, RicordellaDatabase::class.java, FILE_NAME)
+        fun create(context: Context, fileName: String = FILE_NAME): RicordellaDatabase =
+            Room.databaseBuilder(context, RicordellaDatabase::class.java, fileName)
                 .addMigrations(*MIGRATIONS)
                 .addCallback(SeedCategoriesCallback)
                 .build()

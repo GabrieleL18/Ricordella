@@ -111,9 +111,12 @@ internal fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Fl
     }
 
     // Testa che annuisce, con barba e cappello.
-    val head = Offset(cx, h * 0.4f + nod * h * 0.012f)
-    rotate(nod * 4f, Offset(cx, h * 0.5f)) {
-        val faceR = w * 0.12f
+    drawWizardHead(colors, Offset(cx, h * 0.4f + nod * h * 0.012f), w * 0.12f, Offset(cx, h * 0.5f), nod, twinkle, love)
+}
+
+/** Testa del mago (viso, barba, occhi, sorriso, cappello) centrata in [head], che ruota attorno a [pivot] quando annuisce. */
+internal fun DrawScope.drawWizardHead(colors: RicordellaColors, head: Offset, faceR: Float, pivot: Offset, nod: Float, twinkle: Float, love: Float = 0f) {
+    rotate(nod * 4f, pivot) {
         drawCircle(Skin, radius = faceR, center = head)
         // Barba a nuvola.
         val beardTop = head.y + faceR * 0.35f

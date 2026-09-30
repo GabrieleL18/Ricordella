@@ -248,7 +248,9 @@ class AlarmRingService : Service() {
 
         /** Sveglia finta tra [delaySeconds], con la scena scelta: passa da un allarme esatto come quelle vere. */
         fun scheduleTest(context: Context, settings: AppSettings, scene: Int, delaySeconds: Long = 10) {
-            val intent = ringIntent(context, "developer-alarm", tr("Sveglia di prova"), settings, scene).setClass(context, TestReceiver::class.java)
+            // In modalità demo un titolo credibile, per gli screenshot.
+            val title = if (com.ricordella.app.core.DemoMode.isOn(context)) tr("Sveglia per il volo") else tr("Sveglia di prova")
+            val intent = ringIntent(context, "developer-alarm", title, settings, scene).setClass(context, TestReceiver::class.java)
             val pending = PendingIntent.getBroadcast(context, 7_002, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             val manager = context.getSystemService(AlarmManager::class.java)
             val at = System.currentTimeMillis() + delaySeconds * 1000

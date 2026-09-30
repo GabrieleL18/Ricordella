@@ -16,6 +16,8 @@ enum class UiSound(@RawRes internal val res: Int) {
     DING(R.raw.ui_ding),
     /** Torna indietro: nota che scende. */
     BACK(R.raw.ui_back),
+    /** Pozione bevuta: bollicine e un "tin" di vetro (lo stesso della notifica). */
+    POTION(R.raw.potion),
 }
 
 /** Riproduce i suoni con SoundPool sul volume multimediale (quello dei tasti laterali). */

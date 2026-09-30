@@ -34,6 +34,7 @@ import kotlinx.coroutines.SupervisorJob
 import java.time.Clock
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+private val Context.demoSettingsDataStore by preferencesDataStore(name = "settings-demo")
 
 /**
  * Composizione delle dipendenze dell'app (dependency injection manuale).
@@ -50,14 +51,18 @@ class AppContainer(context: Context) {
     val recurrenceCalculator = RecurrenceCalculator()
     private val alarmPlanner = ReminderAlarmPlanner()
 
-    private val database = RicordellaDatabase.create(appContext)
+    /** Modalità demo (screenshot): database e impostazioni separati, i dati veri restano intatti. */
+    val isDemo = DemoMode.isOn(appContext)
+    val databaseFileName = if (isDemo) "ricordella-demo.db" else "ricordella.db"
+
+    private val database = RicordellaDatabase.create(appContext, databaseFileName)
 
     val reminderRepository = RoomReminderRepository(database.reminderDao())
     val personRepository = RoomPersonRepository(database.personDao())
     val itemRepository = RoomItemRepository(database.itemDao(), database.personDao())
     val maintenanceRepository = RoomMaintenanceRepository(database.maintenanceDao())
     val attachmentRepository = RoomAttachmentRepository(database.attachmentDao())
-    val settingsRepository = DataStoreSettingsRepository(appContext.settingsDataStore)
+    val settingsRepository = DataStoreSettingsRepository(if (isDemo) appContext.demoSettingsDataStore else appContext.settingsDataStore)
 
     val notifier = ReminderNotifier(appContext)
     val reminderScheduler = AlarmManagerReminderScheduler(
@@ -85,7 +90,8 @@ class AppContainer(context: Context) {
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
     val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
     val developerTools = DeveloperTools(
-        appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time,
+        appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time, databaseFileName,
     )
+    val potionReminders = com.ricordella.app.core.notifications.PotionReminders(appContext, settingsRepository, time)
     val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time)
 }

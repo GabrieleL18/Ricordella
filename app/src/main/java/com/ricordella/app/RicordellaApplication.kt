@@ -2,7 +2,9 @@ package com.ricordella.app
 
 import android.app.Application
 import com.ricordella.app.core.AppContainer
+import com.ricordella.app.core.seedDemoDataIfEmpty
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class RicordellaApplication : Application() {
 
@@ -14,8 +16,12 @@ class RicordellaApplication : Application() {
         com.ricordella.app.core.i18n.Lang.init(this)
         container = AppContainer(this)
         container.notifier.createChannel()
+        container.potionReminders.createChannel()
         com.ricordella.app.core.ui.UiSoundPlayer.init(this)
+        // In demo i dati vanno pronti prima della prima schermata, altrimenti partirebbe la configurazione iniziale.
+        if (container.isDemo) runBlocking { container.seedDemoDataIfEmpty() }
         // Gli allarmi vengono persi se l'app è stata forzata a chiudersi: all'avvio si ricostruiscono.
         container.applicationScope.launch { container.reminderScheduler.refresh() }
+        container.potionReminders.watch(container.applicationScope)
     }
 }

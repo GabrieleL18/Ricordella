@@ -74,6 +74,16 @@ def sparkle(seconds, count, seed):
     return out
 
 
+def bubbles(count, seed, spacing=0.07):
+    """Bollicine di pozione: "blub" brevi che salgono di tono, a ritmo un po' irregolare."""
+    rnd = random.Random(seed)
+    out = silence(count * spacing + 0.2)
+    for k in range(count):
+        f0 = rnd.uniform(260, 420) * (1 + k * 0.08)
+        mix(out, [v * rnd.uniform(0.5, 0.9) for v in glide(f0, f0 * 2.2, rnd.uniform(0.05, 0.09), decay=6)], k * spacing + rnd.uniform(0, 0.02))
+    return out
+
+
 def write(name, samples, peak=0.85):
     top = max(abs(v) for v in samples) or 1.0
     frames = b"".join(struct.pack("<h", int(v / top * peak * 32767)) for v in samples)
@@ -99,6 +109,12 @@ def main():
     for i in range(fade):
         magic[-fade + i] *= 1 - i / fade
     write("notification_magic", magic)
+    # Pozione: bollicine che salgono, un "tin" di vetro e qualche brillantino (notifiche e sorsi).
+    potion = bubbles(9, seed=5)
+    mix(potion, [v * 0.6 for v in bell(1760, 0.7, decay=6)], 0.62)
+    mix(potion, [v * 0.35 for v in bell(2637, 0.6, decay=7)], 0.7)
+    mix(potion, sparkle(0.6, 10, seed=9), 0.62)
+    write("potion", potion)
     # Sveglia: lo stesso incantesimo con una pausa, suonato in loop finché non la si ferma.
     write("alarm_magic", magic + silence(0.8))
 

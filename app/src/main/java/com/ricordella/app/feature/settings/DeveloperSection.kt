@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.DataObject
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.NotificationAdd
 import androidx.compose.material.icons.rounded.NotificationsActive
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.Widgets
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import com.ricordella.app.BuildConfig
 import com.ricordella.app.core.DeveloperInfo
+import com.ricordella.app.core.DemoMode
 import com.ricordella.app.core.DeveloperTools
 import com.ricordella.app.core.ui.SectionHeader
 import com.ricordella.app.core.ui.theme.ricordellaColors
@@ -129,6 +131,15 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         tools.ringTestAlarm(night = true)
         toast(context, tr("Suona tra 10 secondi"))
     }
+    val demo = remember { DemoMode.isOn(context) }
+    DevRow(
+        Icons.Rounded.PhotoCamera,
+        if (demo) tr("Esci dalla modalità demo") else tr("Modalità demo per gli screenshot"),
+        if (demo) tr("Torni ai tuoi dati veri, che non sono stati toccati.")
+        else tr("Una famiglia finta con promemoria, cose, viaggio e compleanni. I tuoi dati restano da parte e tornano uscendo."),
+        confirm = if (demo) tr("L'app si riavvia con i tuoi dati veri.")
+        else tr("L'app si riavvia con dati finti e notifiche spente. Per uscire torna qui: le modifiche fatte in demo restano solo in demo."),
+    ) { DemoMode.switch(context, !demo) }
     DevRow(
         Icons.Rounded.DataObject,
         tr("Crea dati di esempio"),
