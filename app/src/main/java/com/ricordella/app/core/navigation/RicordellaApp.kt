@@ -287,7 +287,6 @@ private val QuickAddOptions get() = listOf(
 @Composable
 private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
-    val tones = listOf(colors.cyan, colors.lavender, colors.mint, colors.cyan, colors.pear, colors.coral)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -308,7 +307,13 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                         val index = row * 2 + column
                         QuickAddTile(
                             option = option,
-                            tone = tones[index],
+                            tone = when (option.kind) {
+                                QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
+                                QuickAddKind.EVENT -> colors.lavender
+                                QuickAddKind.ALARM, QuickAddKind.PERSON -> colors.coral
+                                QuickAddKind.VACATION -> colors.mint
+                                QuickAddKind.ITEM -> colors.pear
+                            },
                             index = index,
                             onClick = { onSelected(option.kind) },
                             modifier = Modifier.weight(1f),
