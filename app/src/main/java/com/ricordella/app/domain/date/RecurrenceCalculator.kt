@@ -3,6 +3,7 @@ package com.ricordella.app.domain.date
 import com.ricordella.app.domain.model.RecurrenceFrequency
 import com.ricordella.app.domain.model.RecurrenceRule
 import com.ricordella.app.domain.model.Reminder
+import com.ricordella.app.domain.model.extraDays
 import com.ricordella.app.domain.model.ReminderStatus
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -35,6 +36,18 @@ class RecurrenceCalculator {
         if (rule == null || reminder.status != ReminderStatus.ACTIVE) return listOfNotNull(current)
         val projected = occurrencesBetween(rule, maxOf(from, reminder.dueDate.plusDays(1)), to)
         return listOfNotNull(current) + projected
+    }
+
+    /**
+     * Ogni giorno di [from]-[to] coperto dal promemoria, con l'inizio dell'occorrenza a cui
+     * appartiene: per gli eventi di più giorni (es. vacanza) restituisce tutti i giorni.
+     */
+    fun daysCoveredInRange(reminder: Reminder, rule: RecurrenceRule?, from: LocalDate, to: LocalDate): List<Pair<LocalDate, LocalDate>> {
+        val extra = reminder.extraDays
+        if (extra == 0L) return occurrencesInRange(reminder, rule, from, to).map { it to it }
+        return occurrencesInRange(reminder, rule, from.minusDays(extra), to).flatMap { start ->
+            (0..extra).map { start.plusDays(it) }.filter { !it.isBefore(from) && !it.isAfter(to) }.map { it to start }
+        }
     }
 
     /** Sequenza ordinata delle occorrenze a partire da [from] (incluso), limitata da endDate. */

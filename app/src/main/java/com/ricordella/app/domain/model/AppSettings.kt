@@ -35,6 +35,8 @@ data class AppSettings(
     val backupIntervalDays: Int = 90,
     /** File del backup scelto dall'utente: ogni esportazione lo sovrascrive. */
     val backupTargetUri: String? = null,
+    /** Sezione Sviluppatore sbloccata (7 tocchi sulla versione). */
+    val developerMode: Boolean = false,
     /** Ultimo anno in cui è stata proposta la pulizia dei promemoria vecchi. */
     val lastCleanupYear: Int? = null,
 )

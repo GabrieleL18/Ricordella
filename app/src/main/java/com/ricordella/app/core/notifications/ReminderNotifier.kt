@@ -18,7 +18,11 @@ import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.domain.date.RelativeDateDescriber
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.displayName
+import android.widget.RemoteViews
+import com.ricordella.app.domain.model.ReminderType
+import com.ricordella.app.core.ui.emoji
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /** Crea il canale e mostra/rimuove le notifiche dei promemoria. */
 class ReminderNotifier(private val context: Context) {
@@ -48,7 +52,11 @@ class ReminderNotifier(private val context: Context) {
             .setSmallIcon(R.drawable.ic_stat_reminder)
             .setContentTitle(reminder.title)
             .setContentText(contentText(entry, today))
-            .setStyle(NotificationCompat.BigTextStyle().bigText(bigText(entry, today)))
+            // Aspetto personalizzato: badge del tipo, conto alla rovescia e firma di Ricordella.
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(customView(entry, today, R.layout.notification_reminder))
+            .setCustomBigContentView(customView(entry, today, R.layout.notification_reminder_big))
+            .setColor(0xFFC9A400.toInt())
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
@@ -81,6 +89,45 @@ class ReminderNotifier(private val context: Context) {
         }
         val subject = entry.items.firstOrNull()?.name ?: entry.people.firstOrNull()?.displayName
         return listOfNotNull(whenText, subject).joinToString(" · ")
+    }
+
+    private fun customView(entry: ReminderWithLinks, today: LocalDate, layout: Int): RemoteViews {
+        val reminder = entry.reminder
+        val (emoji, tone) = look(reminder.type)
+        val days = ChronoUnit.DAYS.between(today, reminder.dueDate)
+        return RemoteViews(context.packageName, layout).apply {
+            setTextViewText(R.id.notif_badge, emoji)
+            setInt(R.id.notif_badge, "setBackgroundResource", tone.badge)
+            setTextViewText(R.id.notif_title, reminder.title)
+            setTextViewText(R.id.notif_subtitle, contentText(entry, today))
+            setTextViewText(R.id.notif_countdown, when {
+                days == 0L -> "Oggi"
+                days == 1L -> "Domani"
+                days > 1 -> "tra $days gg"
+                else -> "${-days} gg fa"
+            })
+            setInt(R.id.notif_countdown, "setBackgroundResource", if (days < 0) NotifTone.CORAL.pill else tone.pill)
+            if (layout == R.layout.notification_reminder_big) {
+                setTextViewText(R.id.notif_description, bigText(entry, today))
+            }
+        }
+    }
+
+    private enum class NotifTone(val badge: Int, val pill: Int) {
+        CYAN(R.drawable.notif_badge_cyan, R.drawable.notif_pill_cyan),
+        LAVENDER(R.drawable.notif_badge_lavender, R.drawable.notif_pill_lavender),
+        CORAL(R.drawable.notif_badge_coral, R.drawable.notif_pill_coral),
+        PEAR(R.drawable.notif_badge_pear, R.drawable.notif_pill_pear),
+        MINT(R.drawable.notif_badge_mint, R.drawable.notif_pill_mint),
+    }
+
+    /** Emoji e colore per tipo: gli stessi colori dell'app. */
+    private fun look(type: ReminderType): Pair<String, NotifTone> = type.emoji to when (type) {
+        ReminderType.TASK, ReminderType.MEDICAL_VISIT, ReminderType.RENEWAL -> NotifTone.CYAN
+        ReminderType.EVENT, ReminderType.HOLIDAY, ReminderType.OTHER -> NotifTone.LAVENDER
+        ReminderType.DEADLINE, ReminderType.BIRTHDAY -> NotifTone.CORAL
+        ReminderType.MAINTENANCE -> NotifTone.PEAR
+        ReminderType.WARRANTY, ReminderType.PAYMENT, ReminderType.VACATION -> NotifTone.MINT
     }
 
     private fun bigText(entry: ReminderWithLinks, today: LocalDate): String =

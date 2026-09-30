@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ricordella.app.domain.model.Attachment
+import com.ricordella.app.data.media.MediaStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,7 +39,8 @@ data class PickedFile(val uri: String, val displayName: String, val mimeType: St
 
 /**
  * Restituisce una funzione che apre il selettore file di sistema (Storage Access Framework).
- * Il permesso di lettura viene reso persistente: il file non viene copiato.
+ * Le immagini vengono salvate come copia compressa (leggerissima); gli altri file non vengono
+ * copiati: si rende persistente il permesso di lettura e si conserva solo il riferimento.
  */
 @Composable
 fun rememberFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
@@ -47,7 +49,11 @@ fun rememberFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
-                val picked = withContext(Dispatchers.IO) { describe(context, uri) }
+                val picked = withContext(Dispatchers.IO) {
+                    val described = describe(context, uri)
+                    val compact = if (described.mimeType?.startsWith("image/") == true) MediaStorage.storeCompressedImage(context, uri) else null
+                    if (compact != null) described.copy(uri = compact, mimeType = "image/webp") else described
+                }
                 onPicked(picked)
             }
         }
@@ -55,14 +61,21 @@ fun rememberFilePicker(onPicked: (PickedFile) -> Unit): () -> Unit {
     return { launcher.launch(arrayOf("*/*")) }
 }
 
-/** Selettore di foto di sistema (Photo Picker): non richiede permessi di archiviazione. */
+/**
+ * Selettore di foto di sistema (Photo Picker): non richiede permessi di archiviazione.
+ * La foto viene salvata come copia ridotta in WebP, così occupa pochissimo spazio.
+ */
 @Composable
 fun rememberPhotoPicker(onPicked: (String) -> Unit): () -> Unit {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
-            persistReadPermission(context, uri)
-            onPicked(uri.toString())
+            scope.launch {
+                val stored = withContext(Dispatchers.IO) { MediaStorage.storeCompressedImage(context, uri) }
+                if (stored == null) persistReadPermission(context, uri)
+                onPicked(stored ?: uri.toString())
+            }
         }
     }
     return {
@@ -112,7 +125,7 @@ fun AttachmentsSection(
     attachments: List<Attachment>,
     onAdd: (PickedFile) -> Unit,
     onRemove: (Attachment) -> Unit,
-    onOpenFailed: () -> Unit,
+    onOpen: (Attachment) -> Unit,
 ) {
     val context = LocalContext.current
     val pickFile = rememberFilePicker(onAdd)
@@ -129,7 +142,7 @@ fun AttachmentsSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { if (!openFile(context, attachment.uri, attachment.mimeType)) onOpenFailed() }
+                .clickable { onOpen(attachment) }
                 .padding(vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -153,7 +166,7 @@ fun shareBackup(context: Context, uri: Uri) {
     val send = Intent(Intent.ACTION_SEND)
         .setType("application/zip")
         .putExtra(Intent.EXTRA_STREAM, uri)
-        .putExtra(Intent.EXTRA_SUBJECT, "Backup di Ricordella")
+        .putExtra(Intent.EXTRA_SUBJECT, "Backup di Remindella")
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     context.startActivity(Intent.createChooser(send, "Salva o condividi il backup").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
 }

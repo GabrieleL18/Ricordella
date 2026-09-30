@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.os.Build
 import androidx.core.content.FileProvider
+import com.ricordella.app.data.media.MediaStorage
 import com.ricordella.app.BuildConfig
 import com.ricordella.app.data.local.dao.BackupDao
 import com.ricordella.app.data.local.database.BuiltInCategories
@@ -52,7 +53,7 @@ class BackupRepository(
             deleteRecursively()
             mkdirs()
         }
-        val file = File(dir, "ricordella-backup.zip")
+        val file = File(dir, "remindella-backup.zip")
         file.outputStream().buffered().use { writeBackup(it) }
         FileProvider.getUriForFile(context, fileProviderAuthority(), file)
     }
@@ -99,28 +100,9 @@ class BackupRepository(
     /** Copia il file in [target], ricompresso se è un'immagine; restituisce il file e se è diventato WebP. */
     private fun compact(uri: String, target: File): Pair<File, Boolean>? {
         val original = resolver.openInputStream(uri.toUri())?.use { it.readBytes() } ?: return null
-        val webp = runCatching { compressImage(original) }.getOrNull()?.takeIf { it.size < original.size }
+        val webp = MediaStorage.compress(original, MAX_IMAGE_SIDE, IMAGE_QUALITY)?.takeIf { it.size < original.size }
         target.writeBytes(webp ?: original)
         return target to (webp != null)
-    }
-
-    /** ImageDecoder applica anche l'orientamento EXIF, che la ricompressione altrimenti perderebbe. */
-    private fun compressImage(bytes: ByteArray): ByteArray {
-        val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(bytes))) { decoder, info, _ ->
-            val side = maxOf(info.size.width, info.size.height)
-            if (side > MAX_IMAGE_SIDE) {
-                val scale = MAX_IMAGE_SIDE.toFloat() / side
-                decoder.setTargetSize((info.size.width * scale).toInt().coerceAtLeast(1), (info.size.height * scale).toInt().coerceAtLeast(1))
-            }
-            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-        }
-        @Suppress("DEPRECATION")
-        val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSY else Bitmap.CompressFormat.WEBP
-        return ByteArrayOutputStream().use { out ->
-            bitmap.compress(format, IMAGE_QUALITY, out)
-            bitmap.recycle()
-            out.toByteArray()
-        }
     }
 
     /** Legge e valida il backup; i file allegati vengono estratti in un'area temporanea. */

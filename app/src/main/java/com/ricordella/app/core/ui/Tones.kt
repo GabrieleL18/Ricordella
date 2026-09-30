@@ -23,7 +23,7 @@ val ReminderType.tone: Tone
             ReminderType.EVENT, ReminderType.OTHER, ReminderType.HOLIDAY -> lavender
             ReminderType.BIRTHDAY, ReminderType.DEADLINE -> coral
             ReminderType.MAINTENANCE -> pear
-            ReminderType.WARRANTY, ReminderType.PAYMENT -> mint
+            ReminderType.WARRANTY, ReminderType.PAYMENT, ReminderType.VACATION -> mint
         }
     }
 

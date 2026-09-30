@@ -122,6 +122,7 @@ class CalendarImporter(
             CalendarContract.Instances.RRULE,
             CalendarContract.Instances.EVENT_LOCATION,
             CalendarContract.Instances.CALENDAR_ID,
+            CalendarContract.Instances.END,
         )
         val selection = "${CalendarContract.Instances.CALENDAR_ID} IN (${calendars.keys.joinToString()}) AND " +
             "${CalendarContract.Instances.STATUS} != ${CalendarContract.Instances.STATUS_CANCELED}"
@@ -144,6 +145,10 @@ class CalendarImporter(
                 // Gli eventi "tutto il giorno" sono salvati a mezzanotte UTC.
                 val dateTime = if (allDay) LocalDateTime.ofInstant(begin, ZoneOffset.UTC) else LocalDateTime.ofInstant(begin, time.zone)
                 val location = cursor.getString(6)?.takeIf { it.isNotBlank() }
+                // Eventi di più giorni: la fine "tutto il giorno" è esclusa (mezzanotte del giorno dopo).
+                val endInstant = Instant.ofEpochMilli(cursor.getLong(8))
+                val lastDay = if (allDay) LocalDateTime.ofInstant(endInstant, ZoneOffset.UTC).toLocalDate().minusDays(1)
+                else LocalDateTime.ofInstant(endInstant, time.zone).toLocalDate()
                 val type = when {
                     calendar.isHoliday -> ReminderType.HOLIDAY
                     calendar.isBirthdays -> ReminderType.BIRTHDAY
@@ -155,6 +160,7 @@ class CalendarImporter(
                     type = type,
                     dueDate = dateTime.toLocalDate(),
                     dueTime = if (allDay) null else dateTime.toLocalTime(),
+                    endDate = lastDay.takeIf { it.isAfter(dateTime.toLocalDate()) },
                     category = CATEGORY,
                     // Le feste si vedono nel calendario ma non disturbano con notifiche.
                     notificationsEnabled = type != ReminderType.HOLIDAY,
@@ -201,6 +207,7 @@ class CalendarImporter(
 
         private val typeKeywords = listOf(
             ReminderType.BIRTHDAY to listOf("compleanno", "birthday", "buon compleanno"),
+            ReminderType.VACATION to listOf("vacanza", "vacanze", "ferie", "viaggio", "vacation", "holiday trip"),
             ReminderType.MEDICAL_VISIT to listOf("visita", "medico", "dott.", "dottor", "dentista", "analisi", "oculista", "esami del sangue"),
             ReminderType.PAYMENT to listOf("pagamento", "pagare", "bolletta", "rata", "bonifico", "f24"),
             ReminderType.RENEWAL to listOf("rinnovo", "rinnovare", "abbonamento"),

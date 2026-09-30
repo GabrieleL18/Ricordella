@@ -32,5 +32,8 @@ data class ReminderEditRoute(
 @Serializable data class PersonDetailRoute(val id: String)
 @Serializable data class PersonEditRoute(val id: String? = null)
 
+/** Visualizzatore interno di foto, PDF e documenti Word. */
+@Serializable data class ViewerRoute(val uri: String, val mimeType: String? = null, val name: String)
+
 /** Richiesta arrivata dal widget del calendario: cosa aggiungere ed eventuale giorno toccato. */
 data class WidgetRequest(val action: String, val date: java.time.LocalDate?)

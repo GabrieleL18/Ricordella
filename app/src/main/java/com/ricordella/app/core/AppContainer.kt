@@ -84,5 +84,8 @@ class AppContainer(context: Context) {
     val restoreBackup = RestoreBackupUseCase(backupRepository, reminderScheduler)
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
     val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
+    val developerTools = DeveloperTools(
+        appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time,
+    )
     val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time)
 }

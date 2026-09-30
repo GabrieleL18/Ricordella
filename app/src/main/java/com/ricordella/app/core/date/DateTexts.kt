@@ -9,17 +9,20 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import com.ricordella.app.core.i18n.Lang
 
-/** Formattazione di date e orari per l'interfaccia, in italiano. */
+/** Formattazione di date e orari per l'interfaccia, nella lingua dell'app (italiano o inglese). */
 object DateTexts {
 
-    private val locale: Locale = Locale.ITALIAN
-    private val numeric = DateTimeFormatter.ofPattern("dd/MM/yyyy", locale)
-    private val extendedWithYear = DateTimeFormatter.ofPattern("d MMMM yyyy", locale)
-    private val extendedNoYear = DateTimeFormatter.ofPattern("d MMMM", locale)
-    private val dayHeader = DateTimeFormatter.ofPattern("EEEE d MMMM", locale)
-    private val fullDate = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", locale)
-    private val time = DateTimeFormatter.ofPattern("HH:mm", locale)
+    private val locale: Locale get() = Lang.locale
+    private val formatters = java.util.concurrent.ConcurrentHashMap<Pair<String, Locale>, DateTimeFormatter>()
+    private fun pattern(value: String): DateTimeFormatter = formatters.getOrPut(value to locale) { DateTimeFormatter.ofPattern(value, locale) }
+    private val numeric get() = pattern(if (Lang.english) "MM/dd/yyyy" else "dd/MM/yyyy")
+    private val extendedWithYear get() = pattern(if (Lang.english) "MMMM d, yyyy" else "d MMMM yyyy")
+    private val extendedNoYear get() = pattern(if (Lang.english) "MMMM d" else "d MMMM")
+    private val dayHeader get() = pattern(if (Lang.english) "EEEE, MMMM d" else "EEEE d MMMM")
+    private val fullDate get() = pattern(if (Lang.english) "EEEE, MMMM d, yyyy" else "EEEE d MMMM yyyy")
+    private val time get() = pattern("HH:mm")
 
     fun date(date: LocalDate, style: DateFormatStyle, today: LocalDate? = null): String = when (style) {
         DateFormatStyle.NUMERIC -> numeric.format(date)
@@ -61,12 +64,6 @@ object DateTexts {
     fun weekdayShort(day: DayOfWeek): String = day.getDisplayName(TextStyle.NARROW_STANDALONE, locale).uppercase(locale)
 
     fun weekdayFull(day: DayOfWeek): String = day.getDisplayName(TextStyle.FULL, locale).replaceFirstChar { it.uppercase() }
-
-    fun greeting(time: LocalTime): String = when (time.hour) {
-        in 5..12 -> "Buongiorno"
-        in 13..17 -> "Buon pomeriggio"
-        else -> "Buonasera"
-    }
 
     fun money(cents: Long): String = "€ " + String.format(locale, "%,.2f", cents / 100.0)
 

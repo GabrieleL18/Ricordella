@@ -124,7 +124,7 @@ class HomeViewModel(
         val today = now.toLocalDate()
         val sorted = entries.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder })
         val (attention, others) = sorted.partition { ReminderTimeline.needsAttention(it, now) }
-        val todayItems = others.filter { it.reminder.dueDate == today }
+        val todayItems = others.filter { ReminderTimeline.isOngoing(it.reminder, today) }
         val upcoming = others.filter { it.reminder.dueDate.isAfter(today) }
         return HomeUiState(
             isLoading = false,

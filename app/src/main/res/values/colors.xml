@@ -11,6 +11,7 @@
     <color name="widget_tone_lavender">#FFEBDDFF</color>
     <color name="widget_tone_pear">#FFFBEEA6</color>
     <color name="widget_tone_coral">#FFFFDAD9</color>
-    <color name="widget_busy">#FFF3EDFF</color>
+    <color name="widget_busy">#FFE4D6FF</color>
     <color name="widget_weekend">#FFC4303F</color>
+    <color name="widget_busy_text">#FF4A2A7A</color>
 </resources>

@@ -138,7 +138,7 @@ fun CrystalBallMascot(
         modifier = modifier
             .size(size)
             .semantics {
-                contentDescription = if (overdue) "Ricordella: c'è qualcosa di scaduto" else "Ricordella, la palla di vetro"
+                contentDescription = if (overdue) "Remindella: c'è qualcosa di scaduto" else "Remindella, la palla di vetro"
             }
             .then(
                 if (interactive) {

@@ -80,6 +80,8 @@ import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.ReminderWithLinks
+import com.ricordella.app.domain.model.ReminderOccurrence
+import com.ricordella.app.feature.calendar.DayTimeline
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
@@ -93,7 +95,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
     LaunchedEffect(backupEvent) {
         when (backupEvent) {
-            BackupEvent.ChooseFile -> chooseFile.launch("ricordella-backup.zip")
+            BackupEvent.ChooseFile -> chooseFile.launch("remindella-backup.zip")
             BackupEvent.Updated -> Toast.makeText(context, "Backup aggiornato", Toast.LENGTH_SHORT).show()
             BackupEvent.Failed -> Toast.makeText(context, "Backup non riuscito, riprova", Toast.LENGTH_SHORT).show()
             null -> return@LaunchedEffect
@@ -108,7 +110,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         mascot.celebrate()
     }
 
-    TopLevelScaffold(title = "Ricordella", navigator = navigator, onAdd = onAdd) { padding ->
+    TopLevelScaffold(title = "Remindella", navigator = navigator, onAdd = onAdd, brandTitle = true) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
@@ -156,18 +158,20 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 )
             }
 
-            if (state.today.isNotEmpty()) {
+            if (!state.isLoading) {
                 item(key = "today-header") {
-                    SectionHeader("Oggi", icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
+                    SectionHeader("La tua giornata", icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
                 }
-                itemsIndexed(state.today, key = { _, it -> "today-" + it.reminder.id }) { index, entry ->
-                    ReminderCard(
-                        entry = entry,
+                item(key = "today-timeline") {
+                    val today = state.now.toLocalDate()
+                    DayTimeline(
+                        date = today,
+                        occurrences = state.today.map { ReminderOccurrence(it, today, it.reminder.dueDate) },
                         now = state.now,
-                        onClick = { navigator.openReminder(entry.reminder.id) },
-                        onToggleComplete = { complete(entry) },
-                        dateMode = ReminderDateMode.TIME_ONLY,
-                        modifier = Modifier.animateItem().reveal(tracker, "today-" + entry.reminder.id, index + 2),
+                        onOpen = { navigator.openReminder(it.reminder.id) },
+                        onAdd = { navigator.newReminder(date = today) },
+                        onToggle = { complete(it.entry) },
+                        modifier = Modifier.animateItem().reveal(tracker, "today-timeline", 2),
                     )
                 }
             }
@@ -209,7 +213,7 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text("${DateTexts.greeting(state.now.toLocalTime())} 👋", style = MaterialTheme.typography.headlineLarge)
+                Text("Oggi ci penso io", style = MaterialTheme.typography.headlineMedium)
                 val count = state.attention.size
                 val subtitle = when {
                     state.isLoading -> " "

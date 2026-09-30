@@ -143,7 +143,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
         ) {
             ItemHeader(entry)
             InfoSection(entry, onUpdateOdometer = { showOdometer = true })
-            WarrantySection(entry, state.now.toLocalDate())
+            WarrantySection(entry, state.now.toLocalDate(), onOpenDocument = { navigator.openViewer(it, null, "Documento di garanzia") })
 
             if (state.deadlines.isNotEmpty()) {
                 SectionHeader("Scadenze")
@@ -201,7 +201,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 attachments = state.attachments,
                 onAdd = viewModel::onAddAttachment,
                 onRemove = viewModel::onRemoveAttachment,
-                onOpenFailed = { viewModel.showMessage("Nessuna app disponibile per aprire il file.") },
+                onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             entry.item.notes?.let {
                 SectionHeader("Note")
@@ -301,7 +301,7 @@ private fun InfoSection(entry: ItemWithCategory, onUpdateOdometer: () -> Unit) {
 }
 
 @Composable
-private fun WarrantySection(entry: ItemWithCategory, today: LocalDate) {
+private fun WarrantySection(entry: ItemWithCategory, today: LocalDate, onOpenDocument: (String) -> Unit) {
     val item = entry.item
     val status = item.warrantyStatus(today) ?: return
     val end = item.warrantyEndDate ?: return
@@ -326,7 +326,7 @@ private fun WarrantySection(entry: ItemWithCategory, today: LocalDate) {
             InfoRow("Scadenza", DateTexts.date(end, settings.dateFormat))
             item.warrantySeller?.let { InfoRow("Venditore", it) }
             item.warrantyDocumentUri?.let { uri ->
-                TextButton(onClick = { openFile(context, uri, null) }) { Text("Apri documento di garanzia") }
+                TextButton(onClick = { onOpenDocument(uri) }) { Text("Apri documento di garanzia") }
             }
         }
     }

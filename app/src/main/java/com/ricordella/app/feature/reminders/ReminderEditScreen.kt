@@ -1,6 +1,7 @@
 package com.ricordella.app.feature.reminders
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -103,6 +104,9 @@ fun ReminderEditScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
             BasicFields(form, viewModel::update, viewModel::onTypeChange)
+            if (form.type == ReminderType.VACATION) {
+                TripFields(form.trip, onChange = { trip -> viewModel.update { it.copy(trip = trip) } })
+            }
             TextButton(onClick = { viewModel.update { it.copy(showAdvanced = !it.showAdvanced) } }) {
                 Icon(if (form.showAdvanced) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
                 Text(if (form.showAdvanced) "Nascondi opzioni" else "Altre opzioni", modifier = Modifier.padding(start = 8.dp))
@@ -148,6 +152,28 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             onValueChange = { value -> update { it.copy(time = value) } },
             modifier = Modifier.weight(1f),
         )
+    }
+    // Eventi di più giorni: vacanze, viaggi, ricoveri... Nel calendario appaiono come una barra continua.
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text("Dura più giorni", style = MaterialTheme.typography.bodyLarge)
+            Text("Es. una vacanza o un viaggio", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = form.multiDay, onCheckedChange = { value ->
+            update { it.copy(multiDay = value, endDate = if (value) it.endDate ?: it.date?.plusDays(1) else it.endDate) }
+        })
+    }
+    AnimatedVisibility(form.multiDay) {
+        DateField(
+            label = "Fino al *",
+            value = form.endDate,
+            onValueChange = { value -> update { it.copy(endDate = value) } },
+            isError = form.endDateError,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+    if (form.endDateError) {
+        Text("L'ultimo giorno deve venire dopo il primo.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
     }
     if (form.time == null) {
         Text("Senza orario il promemoria vale per tutto il giorno.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

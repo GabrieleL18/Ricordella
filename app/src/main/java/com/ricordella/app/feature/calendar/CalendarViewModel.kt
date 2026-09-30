@@ -68,8 +68,8 @@ class CalendarViewModel(
             reminders.observeForRange(from, to).map { entries ->
                 entries
                     .flatMap { entry ->
-                        recurrence.occurrencesInRange(entry.reminder, entry.recurrenceRule, from, to)
-                            .map { ReminderOccurrence(entry, it) }
+                        recurrence.daysCoveredInRange(entry.reminder, entry.recurrenceRule, from, to)
+                            .map { (day, start) -> ReminderOccurrence(entry, day, start) }
                     }
                     .groupBy { it.date }
                     .mapValues { (_, list) -> list.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder }) }

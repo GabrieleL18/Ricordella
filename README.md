@@ -1,8 +1,8 @@
-# Ricordella
+# Remindella
 
 > *Pensaci tu, al resto pensa lei.*
 
-Ricordella è un'app Android nativa per ricordare tutto ciò che ha una data, una scadenza, una ricorrenza,
+Remindella (nome interno del progetto: Ricordella) è un'app Android nativa per ricordare tutto ciò che ha una data, una scadenza, una ricorrenza,
 una persona o una "cosa" associata: appuntamenti, compleanni, garanzie, manutenzioni, assicurazioni,
 revisioni, pagamenti, rinnovi.
 
@@ -32,7 +32,7 @@ Tono **giocoso ma ordinato**: carta crema, un giallo-saetta per le azioni princi
 corallo solo per i momenti che contano (scaduti, compleanni), menta per il "fatto!". Ogni colore ha un significato
 ed è sempre accompagnato da un'icona o da un testo. Font: Plus Jakarta Sans (OFL), incorporato nell'app.
 
-- **Ricordella, la mascotte**: una palla di vetro con una saetta dentro (è anche l'icona dell'app). Ondeggia piano
+- **Remindella, la mascotte**: una palla di vetro con una saetta dentro (è anche l'icona dell'app). Ondeggia piano
   in Home e la saetta si accende quando la tocchi o completi qualcosa.
 - **Completare è una piccola festa**: tocca il cerchio o trascina la card verso destra → spunta con molla,
   scoppio di stelle e vibrazione.
@@ -105,6 +105,11 @@ Scelte principali:
   predefinite). Ogni esportazione sovrascrive il file scelto, salvo "Nuova versione"; si può anche condividere.
   L'invito ad aggiornarlo arriva ogni giorno/settimana/mese/3 mesi/anno, a scelta. Ogni anno viene proposta la pulizia dei promemoria vecchi non importanti o senza
   persone/cose collegate.
+
+- **Eventi di più giorni** (es. vacanze): nel calendario una barra continua attraversa i giorni.
+- **Visualizzatore interno** per foto (zoom), PDF (PdfRenderer) e documenti Word .docx (testo, titoli,
+  elenchi). Foto e immagini allegate sono salvate come copie WebP ridotte; i documenti restano riferimenti.
+- **Font**: Plus Jakarta Sans per l'interfaccia, Fredoka per il nome "Remindella" (entrambi OFL).
 
 ## Compilare ed eseguire
 

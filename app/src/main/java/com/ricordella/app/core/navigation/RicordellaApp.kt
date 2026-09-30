@@ -42,6 +42,8 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Event
+import androidx.compose.material.icons.rounded.BeachAccess
+import androidx.compose.material.icons.rounded.MedicalServices
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Notifications
@@ -91,6 +93,8 @@ import com.ricordella.app.feature.reminders.ReminderDetailScreen
 import com.ricordella.app.feature.reminders.ReminderEditScreen
 import com.ricordella.app.feature.reminders.ReminderListScreen
 import com.ricordella.app.feature.search.SearchScreen
+import com.ricordella.app.feature.viewer.DocumentViewerScreen
+import androidx.navigation.toRoute
 import com.ricordella.app.feature.settings.SettingsScreen
 import kotlin.reflect.KClass
 
@@ -108,7 +112,7 @@ private enum class TopLevelDestination(
     PEOPLE(PeopleRoute, PeopleRoute::class, "Persone", Icons.Outlined.People, Icons.Rounded.People),
 }
 
-private enum class QuickAddKind { REMINDER, EVENT, ITEM, PERSON }
+private enum class QuickAddKind { REMINDER, EVENT, VACATION, MEDICAL_VISIT, ITEM, PERSON }
 
 /**
  * Shell dell'app: navigazione adattiva (barra in basso su schermi compatti,
@@ -212,6 +216,7 @@ fun RicordellaApp(
             composable<ItemEditRoute> { ItemEditScreen(onBack = navigator::back) }
             composable<PersonDetailRoute> { PersonDetailScreen(navigator) }
             composable<PersonEditRoute> { PersonEditScreen(navigator) }
+            composable<ViewerRoute> { entry -> DocumentViewerScreen(entry.toRoute(), onBack = navigator::back) }
         }
     }
     }
@@ -224,6 +229,8 @@ fun RicordellaApp(
                 when (kind) {
                     QuickAddKind.REMINDER -> navigator.newReminder(date = quickAddDate)
                     QuickAddKind.EVENT -> navigator.newReminder(type = ReminderType.EVENT, date = quickAddDate)
+                    QuickAddKind.VACATION -> navigator.newReminder(type = ReminderType.VACATION, date = quickAddDate)
+                    QuickAddKind.MEDICAL_VISIT -> navigator.newReminder(type = ReminderType.MEDICAL_VISIT, date = quickAddDate)
                     QuickAddKind.ITEM -> navigator.newItem()
                     QuickAddKind.PERSON -> navigator.newPerson()
                 }
@@ -263,6 +270,8 @@ private data class QuickAddOption(val kind: QuickAddKind, val icon: ImageVector,
 private val QuickAddOptions = listOf(
     QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, "Promemoria", "Da fare o da non dimenticare"),
     QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, "Evento", "Appuntamento o ricorrenza"),
+    QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, "Vacanza", "Voli, navi e alloggio"),
+    QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, "Visita medica", "Medico, esami, dentista"),
     QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, "Cosa", "Auto, casa, dispositivi, documenti"),
     QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, "Persona", "A chi collegare promemoria e cose"),
 )
@@ -271,7 +280,7 @@ private val QuickAddOptions = listOf(
 @Composable
 private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
-    val tones = listOf(colors.cyan, colors.lavender, colors.pear, colors.coral)
+    val tones = listOf(colors.cyan, colors.lavender, colors.mint, colors.cyan, colors.pear, colors.coral)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),

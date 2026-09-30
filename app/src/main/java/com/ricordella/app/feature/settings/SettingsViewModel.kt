@@ -93,9 +93,9 @@ class SettingsViewModel(
                 pendingRestore = pending
                 local.update { it.copy(restoreSummary = result.contents.summary) }
             }
-            BackupReadResult.NotABackup -> showMessage("Il file scelto non è un backup di Ricordella.")
+            BackupReadResult.NotABackup -> showMessage("Il file scelto non è un backup di Remindella.")
             is BackupReadResult.IncompatibleVersion ->
-                showMessage("Questo backup è stato creato con una versione più recente di Ricordella. Aggiorna l'app e riprova.")
+                showMessage("Questo backup è stato creato con una versione più recente di Remindella. Aggiorna l'app e riprova.")
             is BackupReadResult.Corrupted -> showMessage("Il backup è danneggiato (${result.reason}). Nessun dato è stato modificato.")
         }
     }

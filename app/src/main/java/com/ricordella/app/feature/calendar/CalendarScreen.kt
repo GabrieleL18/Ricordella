@@ -49,6 +49,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.ricordella.app.core.ui.tone
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -260,6 +264,8 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
             },
             label = "month",
         ) { month ->
+            val lanes = remember(state.occurrences) { spanLanes(state.occurrences) }
+            val laneCount = (lanes.values.maxOrNull()?.plus(1) ?: 0).coerceAtMost(MAX_LANES)
             Column {
                 monthGrid(month, state.firstDayOfWeek).chunked(7).forEach { week ->
                     Row(Modifier.fillMaxWidth()) {
@@ -267,6 +273,9 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
                             DayCell(
                                 date = day,
                                 occurrences = state.occurrences[day].orEmpty(),
+                                lanes = lanes,
+                                laneCount = laneCount,
+                                firstDayOfWeek = state.firstDayOfWeek,
                                 inMonth = day.month == month.month,
                                 isToday = day == today,
                                 isSelected = day == state.selectedDate,
@@ -286,6 +295,9 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
 private fun DayCell(
     date: LocalDate,
     occurrences: List<ReminderOccurrence>,
+    lanes: Map<String, Int>,
+    laneCount: Int,
+    firstDayOfWeek: java.time.DayOfWeek,
     inMonth: Boolean,
     isToday: Boolean,
     isSelected: Boolean,
@@ -304,17 +316,20 @@ private fun DayCell(
         tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseOut),
         label = "dayScale",
     )
-    val hasDeadline = occurrences.any { it.reminder.type.isDeadlineLike }
-    val hasEvent = occurrences.any { it.reminder.type == ReminderType.EVENT || it.reminder.type == ReminderType.BIRTHDAY }
-    val hasTask = occurrences.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY }
+    val single = occurrences.filterNot { it.isMultiDay }
+    val hasDeadline = single.any { it.reminder.type.isDeadlineLike }
+    val hasEvent = single.any { it.reminder.type == ReminderType.EVENT || it.reminder.type == ReminderType.BIRTHDAY }
+    val hasTask = single.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY }
     val description = buildString {
         append(DateTexts.fullDate(date))
         if (occurrences.isNotEmpty()) append(", ${occurrences.size} promemoria")
         if (hasDeadline) append(", con scadenze")
     }
+    Column(modifier) {
     Column(
-        modifier = modifier
-            .height(54.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
             .padding(2.dp)
             .graphicsLayer {
                 scaleX = scale
@@ -345,6 +360,80 @@ private fun DayCell(
             if (hasTask) Marker(MarkerShape.DOT)
             if (hasEvent) Marker(MarkerShape.RING)
             if (hasDeadline) Marker(MarkerShape.SQUARE)
+        }
+    }
+    SpanBars(date, occurrences.filter { it.isMultiDay }, lanes, laneCount, firstDayOfWeek)
+    }
+}
+
+private const val MAX_LANES = 3
+
+private fun spanKey(occurrence: ReminderOccurrence) = occurrence.reminder.id + "@" + occurrence.start
+
+/**
+ * Assegna a ogni evento di più giorni una "corsia" fissa, così la sua barra resta alla
+ * stessa altezza per tutti i giorni e si vede la continuità.
+ */
+private fun spanLanes(occurrences: Map<LocalDate, List<ReminderOccurrence>>): Map<String, Int> {
+    val spans = occurrences.values.flatten().filter { it.isMultiDay }.distinctBy(::spanKey)
+        .sortedWith(compareBy<ReminderOccurrence> { it.start }.thenByDescending { it.end })
+    val laneEnds = mutableListOf<LocalDate>()
+    return spans.associate { span ->
+        val lane = laneEnds.indexOfFirst { it.isBefore(span.start) }.takeIf { it >= 0 } ?: laneEnds.size.also { laneEnds += span.end }
+        laneEnds[lane] = span.end
+        spanKey(span) to lane
+    }
+}
+
+/** Barre degli eventi lunghi: arrotondate a inizio/fine evento e a inizio/fine settimana, col titolo all'inizio. */
+@Composable
+private fun SpanBars(
+    date: LocalDate,
+    spans: List<ReminderOccurrence>,
+    lanes: Map<String, Int>,
+    laneCount: Int,
+    firstDayOfWeek: java.time.DayOfWeek,
+) {
+    if (laneCount == 0) return
+    val byLane = spans.associateBy { lanes[spanKey(it)] ?: MAX_LANES }
+    val rowStart = date.dayOfWeek == firstDayOfWeek
+    val rowEnd = date.dayOfWeek == firstDayOfWeek.minus(1)
+    Column(Modifier.fillMaxWidth().padding(bottom = 2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        repeat(laneCount) { lane ->
+            val span = byLane[lane]
+            if (span == null) {
+                Box(Modifier.height(12.dp))
+            } else {
+                val first = date == span.start
+                val last = date == span.end
+                val tone = span.reminder.type.tone
+                val shape = RoundedCornerShape(
+                    topStart = if (first || rowStart) 6.dp else 0.dp,
+                    bottomStart = if (first || rowStart) 6.dp else 0.dp,
+                    topEnd = if (last || rowEnd) 6.dp else 0.dp,
+                    bottomEnd = if (last || rowEnd) 6.dp else 0.dp,
+                )
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = if (first) 3.dp else 0.dp, end = if (last) 3.dp else 0.dp)
+                        .height(12.dp)
+                        .background(tone.solid, shape),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    if (first || rowStart) {
+                        Text(
+                            span.reminder.title,
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp, lineHeight = 9.sp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Clip,
+                            modifier = Modifier.padding(start = 3.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }

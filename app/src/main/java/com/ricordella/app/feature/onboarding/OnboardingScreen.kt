@@ -55,7 +55,9 @@ import com.ricordella.app.core.ui.SectionTutorialPages
 import com.ricordella.app.core.ui.TutorialPager
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
+import com.ricordella.app.core.ui.theme.BrandTitleStyle
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
+import androidx.compose.ui.unit.sp
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.data.calendar.CalendarImporter
 import com.ricordella.app.domain.repository.SettingsRepository
@@ -147,7 +149,8 @@ private fun Welcome(onNext: () -> Unit) {
     ) {
         CrystalBallMascot(size = 160.dp)
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
-        Text("Ciao, sono Ricordella", style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
+        Text("Ciao, sono", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+        Text("Remindella", style = BrandTitleStyle.copy(fontSize = 44.sp, color = MaterialTheme.ricordellaColors.boltEdge), textAlign = TextAlign.Center)
         Spacer(Modifier.height(RicordellaDimensions.spaceS))
         Text(
             "Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?",
@@ -162,7 +165,7 @@ private fun Welcome(onNext: () -> Unit) {
 
 /** Import facoltativo: permesso calendario → scelta account Google → import. */
 @Composable
-fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = "Inizia a usare Ricordella") {
+fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = "Inizia a usare Remindella") {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission(), viewModel::onPermission)
     val tone = MaterialTheme.ricordellaColors.lavender

@@ -17,6 +17,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 /*
@@ -144,6 +145,10 @@ data class Reminder(
     val dueDate: LocalDate,
     /** Null = promemoria per tutto il giorno. */
     val dueTime: LocalTime? = null,
+    /** Ultimo giorno per gli eventi che durano più giorni (es. una vacanza); null = un giorno solo. */
+    val endDate: LocalDate? = null,
+    /** Dettagli di viaggio, solo per le vacanze. */
+    val trip: TripInfo? = null,
     val status: ReminderStatus = ReminderStatus.ACTIVE,
     val priority: Priority = Priority.NORMAL,
     val category: String? = null,
@@ -164,6 +169,11 @@ data class Reminder(
 )
 
 val Reminder.isAllDay: Boolean get() = dueTime == null
+
+/** Giorni in più oltre al primo per gli eventi di più giorni (0 = un giorno solo). */
+val Reminder.extraDays: Long get() = endDate?.let { ChronoUnit.DAYS.between(dueDate, it).coerceAtLeast(0) } ?: 0L
+
+val Reminder.isMultiDay: Boolean get() = extraDays > 0
 
 @Serializable
 @Entity(

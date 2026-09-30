@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Badge
+import androidx.compose.material.icons.rounded.BeachAccess
 import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.Cake
 import androidx.compose.material.icons.rounded.Category
@@ -53,6 +54,7 @@ val ReminderType.label: String
     get() = when (this) {
         ReminderType.TASK -> "Attività"
         ReminderType.EVENT -> "Evento"
+        ReminderType.VACATION -> "Vacanza"
         ReminderType.MEDICAL_VISIT -> "Visita medica"
         ReminderType.HOLIDAY -> "Festa"
         ReminderType.DEADLINE -> "Scadenza"
@@ -68,6 +70,7 @@ val ReminderType.icon: ImageVector
     get() = when (this) {
         ReminderType.TASK -> Icons.Rounded.TaskAlt
         ReminderType.EVENT -> Icons.Rounded.Event
+        ReminderType.VACATION -> Icons.Rounded.BeachAccess
         ReminderType.MEDICAL_VISIT -> Icons.Rounded.MedicalServices
         ReminderType.HOLIDAY -> Icons.Rounded.Celebration
         ReminderType.DEADLINE -> Icons.Rounded.HourglassBottom
@@ -77,6 +80,23 @@ val ReminderType.icon: ImageVector
         ReminderType.PAYMENT -> Icons.Rounded.Payments
         ReminderType.RENEWAL -> Icons.Rounded.Autorenew
         ReminderType.OTHER -> Icons.Rounded.Notifications
+    }
+
+/** Emoji del tipo: per widget e notifiche, dove le icone di Compose non si possono usare. */
+val ReminderType.emoji: String
+    get() = when (this) {
+        ReminderType.TASK -> "✅"
+        ReminderType.EVENT -> "📅"
+        ReminderType.VACATION -> "🏖️"
+        ReminderType.MEDICAL_VISIT -> "🩺"
+        ReminderType.HOLIDAY -> "🎉"
+        ReminderType.DEADLINE -> "⏳"
+        ReminderType.BIRTHDAY -> "🎂"
+        ReminderType.WARRANTY -> "🛡️"
+        ReminderType.MAINTENANCE -> "🔧"
+        ReminderType.PAYMENT -> "💳"
+        ReminderType.RENEWAL -> "🔁"
+        ReminderType.OTHER -> "🔔"
     }
 
 val Priority.label: String
@@ -151,7 +171,7 @@ val OdometerStatus.label: String
         OdometerStatus.OVERDUE -> "Superata"
     }
 
-private val dayMonth = DateTimeFormatter.ofPattern("d MMMM", Locale.ITALIAN)
+private val dayMonth get() = DateTimeFormatter.ofPattern(if (com.ricordella.app.core.i18n.Lang.english) "MMMM d" else "d MMMM", com.ricordella.app.core.i18n.Lang.locale)
 
 /** Es. "Ogni 6 mesi", "Ogni 2 settimane (lun, gio)", "Ogni anno il 18 novembre". */
 fun RecurrenceRule.describe(): String {

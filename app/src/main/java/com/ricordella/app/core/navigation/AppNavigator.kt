@@ -45,4 +45,6 @@ class AppNavigator(private val navController: NavController) {
     fun openPerson(id: String) = navController.navigate(PersonDetailRoute(id))
     fun newPerson() = navController.navigate(PersonEditRoute())
     fun editPerson(id: String) = navController.navigate(PersonEditRoute(id = id))
+
+    fun openViewer(uri: String, mimeType: String?, name: String) = navController.navigate(ViewerRoute(uri, mimeType, name))
 }

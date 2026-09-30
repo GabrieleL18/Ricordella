@@ -2,6 +2,8 @@
 <paths>
     <!-- File ripristinati da un backup (allegati e foto). -->
     <files-path name="restored" path="restored/" />
+    <!-- Foto e immagini allegate, salvate compresse in WebP. -->
+    <files-path name="media" path="media/" />
     <!-- Ultimo backup esportato, condiviso con l'app scelta dall'utente. -->
     <cache-path name="exports" path="exports/" />
 </paths>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Giorno con promemoria: fondo lavanda tenue e puntino in basso. -->
+<!-- Giorno con qualcosa in programma: fondo lavanda, bordo e puntino ben visibili. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@color/widget_busy" />
+            <stroke android:width="1.5dp" android:color="@color/widget_dot" />
             <corners android:radius="10dp" />
         </shape>
     </item>
-    <item android:gravity="bottom|center_horizontal" android:width="5dp" android:height="5dp" android:bottom="3dp">
+    <item android:gravity="bottom|center_horizontal" android:width="6dp" android:height="6dp" android:bottom="3dp">
         <shape android:shape="oval">
             <solid android:color="@color/widget_dot" />
         </shape>

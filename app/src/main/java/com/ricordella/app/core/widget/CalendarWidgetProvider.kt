@@ -16,6 +16,9 @@ import com.ricordella.app.RicordellaApplication
 import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.domain.date.ReminderTimeline
 import com.ricordella.app.domain.model.ReminderStatus
+import com.ricordella.app.domain.model.ReminderWithLinks
+import com.ricordella.app.domain.model.isMultiDay
+import com.ricordella.app.core.ui.emoji
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -35,6 +38,14 @@ class CalendarWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_SHOW_NEXT, ACTION_SHOW_PREVIOUS -> flip(context, forward = intent.action == ACTION_SHOW_NEXT)
+            ACTION_SELECT_DAY -> {
+                // Tocco su un giorno: mostra (o richiude) l'anteprima dei suoi impegni.
+                val day = intent.getLongExtra(EXTRA_EPOCH_DAY, Long.MIN_VALUE)
+                val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                val current = prefs.getLong(KEY_SELECTED, Long.MIN_VALUE)
+                prefs.edit().putLong(KEY_SELECTED, if (current == day) Long.MIN_VALUE else day).apply()
+                requestUpdate(context)
+            }
             else -> super.onReceive(context, intent)
         }
     }
@@ -64,13 +75,15 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 val rangeEnd = gridStart(months.last(), firstDay).plusDays(41)
 
                 val busy = mutableMapOf<LocalDate, Boolean>() // data → true se c'è qualcosa di scaduto
+                val byDay = mutableMapOf<LocalDate, MutableList<ReminderWithLinks>>()
                 var next: Pair<String, LocalDate>? = null
                 container.reminderRepository.observeForRange(rangeStart, rangeEnd).first().forEach { entry ->
                     val reminder = entry.reminder
                     if (reminder.status == ReminderStatus.CANCELLED) return@forEach
-                    container.recurrenceCalculator.occurrencesInRange(reminder, entry.recurrenceRule, rangeStart, rangeEnd).forEach { date ->
-                        val overdue = date == reminder.dueDate && ReminderTimeline.isOverdue(reminder, now)
+                    container.recurrenceCalculator.daysCoveredInRange(reminder, entry.recurrenceRule, rangeStart, rangeEnd).forEach { (date, start) ->
+                        val overdue = start == reminder.dueDate && ReminderTimeline.isOverdue(reminder, now)
                         busy[date] = (busy[date] ?: false) || overdue
+                        byDay.getOrPut(date) { mutableListOf() } += entry
                         val upcoming = reminder.status == ReminderStatus.ACTIVE && !date.isBefore(today)
                         if (upcoming && (next == null || date.isBefore(next!!.second))) next = reminder.title to date
                     }
@@ -87,6 +100,10 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 val page = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PAGE, 0)
                 views.setDisplayedChild(R.id.widget_flipper, page.coerceIn(0, MONTHS - 1))
                 actions(context, views)
+                val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                val selected = prefs.getLong(KEY_SELECTED, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }?.let(LocalDate::ofEpochDay)
+                    ?.takeIf { !it.isBefore(rangeStart) && !it.isAfter(rangeEnd) }
+                preview(context, views, selected, selected?.let { byDay[it] }.orEmpty(), today)
                 manager.updateAppWidget(ids, views)
             } finally {
                 pending.finish()
@@ -140,9 +157,10 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                     cell.setInt(R.id.widget_day, "setBackgroundResource", background)
                     when {
                         date == today -> cell.setTextColor(R.id.widget_day, 0xFF1F1A00.toInt())
+                        date in busy -> cell.setTextColor(R.id.widget_day, context.getColor(R.color.widget_busy_text))
                         date.dayOfWeek == DayOfWeek.SUNDAY -> cell.setTextColor(R.id.widget_day, context.getColor(R.color.widget_weekend))
                     }
-                    cell.setOnClickPendingIntent(R.id.widget_day, open(context, REQUEST_DAY + (date.toEpochDay() % 1000).toInt(), ACTION_REMINDER, date))
+                    cell.setOnClickPendingIntent(R.id.widget_day, selectDay(context, date))
                 } else {
                     cell.setTextViewText(R.id.widget_day, "")
                 }
@@ -166,6 +184,52 @@ class CalendarWidgetProvider : AppWidgetProvider() {
             views.setOnClickPendingIntent(action.id, open(context, REQUEST_ACTION + index, action.action, null))
         }
     }
+
+    /** Pannello con gli impegni del giorno toccato: tocco su una riga = apre il promemoria. */
+    private fun preview(context: Context, views: RemoteViews, day: LocalDate?, entries: List<ReminderWithLinks>, today: LocalDate) {
+        if (day == null) {
+            views.setViewVisibility(R.id.widget_preview, android.view.View.GONE)
+            return
+        }
+        views.setViewVisibility(R.id.widget_preview, android.view.View.VISIBLE)
+        views.setTextViewText(R.id.widget_preview_title, DateTexts.dayHeader(day, today).lowercase().replaceFirstChar { it.uppercase() })
+        views.setOnClickPendingIntent(R.id.widget_preview_add, open(context, REQUEST_PREVIEW_ADD, ACTION_REMINDER, day))
+        views.setOnClickPendingIntent(R.id.widget_preview_close, selectDay(context, day))
+        views.removeAllViews(R.id.widget_preview_list)
+        val sorted = entries.distinctBy { it.reminder.id }.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder })
+        if (sorted.isEmpty()) {
+            val row = RemoteViews(context.packageName, R.layout.widget_preview_row)
+            row.setTextViewText(R.id.widget_preview_row, "Niente in programma ✨")
+            views.addView(R.id.widget_preview_list, row)
+        }
+        sorted.take(PREVIEW_ROWS).forEachIndexed { index, entry ->
+            val reminder = entry.reminder
+            val row = RemoteViews(context.packageName, R.layout.widget_preview_row)
+            val time = if (reminder.isMultiDay) "più giorni" else reminder.dueTime?.let(DateTexts::time) ?: "tutto il giorno"
+            row.setTextViewText(R.id.widget_preview_row, "${reminder.type.emoji}  $time · ${reminder.title}")
+            val open = Intent(context, MainActivity::class.java)
+                .putExtra(MainActivity.EXTRA_REMINDER_ID, reminder.id)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            row.setOnClickPendingIntent(
+                R.id.widget_preview_row,
+                PendingIntent.getActivity(context, REQUEST_PREVIEW_ROW + index, open, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
+            )
+            views.addView(R.id.widget_preview_list, row)
+        }
+        if (sorted.size > PREVIEW_ROWS) {
+            val more = RemoteViews(context.packageName, R.layout.widget_preview_row)
+            more.setTextViewText(R.id.widget_preview_row, "+ altri ${sorted.size - PREVIEW_ROWS}: apri l'app")
+            more.setOnClickPendingIntent(R.id.widget_preview_row, open(context, REQUEST_OPEN, null, null))
+            views.addView(R.id.widget_preview_list, more)
+        }
+    }
+
+    private fun selectDay(context: Context, date: LocalDate): PendingIntent = PendingIntent.getBroadcast(
+        context,
+        REQUEST_DAY + (date.toEpochDay() % 1000).toInt(),
+        Intent(context, CalendarWidgetProvider::class.java).setAction(ACTION_SELECT_DAY).putExtra(EXTRA_EPOCH_DAY, date.toEpochDay()),
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+    )
 
     private class Action(val id: Int, val action: String, val label: String, val icon: Int, val background: Int)
 
@@ -197,6 +261,11 @@ class CalendarWidgetProvider : AppWidgetProvider() {
 
         private const val ACTION_SHOW_NEXT = "com.ricordella.app.widget.NEXT_MONTH"
         private const val ACTION_SHOW_PREVIOUS = "com.ricordella.app.widget.PREVIOUS_MONTH"
+        private const val ACTION_SELECT_DAY = "com.ricordella.app.widget.SELECT_DAY"
+        private const val KEY_SELECTED = "selected_day"
+        private const val PREVIEW_ROWS = 4
+        private const val REQUEST_PREVIEW_ADD = 20
+        private const val REQUEST_PREVIEW_ROW = 30
         private const val PREFS = "calendar_widget"
         private const val KEY_PAGE = "page"
         /** Mesi sfogliabili: il corrente e il successivo. */

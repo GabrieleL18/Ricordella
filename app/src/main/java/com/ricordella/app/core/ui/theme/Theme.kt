@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.ricordella.app.R
 import com.ricordella.app.domain.model.ThemeMode
 
@@ -183,6 +184,14 @@ private fun jakarta(weight: FontWeight) = Font(
     weight = weight,
     variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
 )
+
+/** Fredoka (OFL), arrotondato e flat: usato solo per il nome dell'app. */
+val BrandFont = FontFamily(
+    Font(R.font.fredoka, weight = FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
+)
+
+/** Il nome dell'app, in Fredoka semibold. */
+val BrandTitleStyle = TextStyle(fontFamily = BrandFont, fontWeight = FontWeight.SemiBold, fontSize = 30.sp, letterSpacing = 0.sp)
 
 /** Plus Jakarta Sans (OFL), incorporato nell'app: nessun download di font. */
 val JakartaSans = FontFamily(

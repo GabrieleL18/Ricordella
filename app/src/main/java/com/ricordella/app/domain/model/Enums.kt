@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ReminderType {
-    TASK, EVENT, MEDICAL_VISIT, HOLIDAY, DEADLINE, BIRTHDAY, WARRANTY, MAINTENANCE, PAYMENT, RENEWAL, OTHER;
+    TASK, EVENT, VACATION, MEDICAL_VISIT, HOLIDAY, DEADLINE, BIRTHDAY, WARRANTY, MAINTENANCE, PAYMENT, RENEWAL, OTHER;
 
     /** Le feste non si "fanno": non si completano e non diventano mai scadute. */
     val isCompletable: Boolean get() = this != HOLIDAY

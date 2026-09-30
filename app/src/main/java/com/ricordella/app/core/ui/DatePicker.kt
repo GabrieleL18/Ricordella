@@ -151,9 +151,9 @@ private fun Header(selected: LocalDate, today: LocalDate, onSelect: (LocalDate) 
             label = "headerDate",
         ) { date ->
             Column {
-                Text(date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ITALIAN).replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.titleMedium, color = tone.content)
+                Text(date.dayOfWeek.getDisplayName(TextStyle.FULL, com.ricordella.app.core.i18n.Lang.locale).replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.titleMedium, color = tone.content)
                 Text(
-                    "${date.dayOfMonth} ${date.month.getDisplayName(TextStyle.FULL, Locale.ITALIAN)}",
+                    "${date.dayOfMonth} ${date.month.getDisplayName(TextStyle.FULL, com.ricordella.app.core.i18n.Lang.locale)}",
                     style = MaterialTheme.typography.headlineMedium,
                     color = tone.content,
                 )
@@ -329,7 +329,7 @@ private fun MonthYearGrid(current: YearMonth, onPicked: (YearMonth) -> Unit) {
                 row.forEach { month ->
                     val active = year == current.year && month == current.month
                     Text(
-                        month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.ITALIAN).replaceFirstChar { it.uppercase() },
+                        month.getDisplayName(TextStyle.FULL_STANDALONE, com.ricordella.app.core.i18n.Lang.locale).replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.labelLarge,
                         textAlign = TextAlign.Center,
                         maxLines = 1,

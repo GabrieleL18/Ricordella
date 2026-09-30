@@ -53,14 +53,27 @@ abstract class RicordellaDatabase : RoomDatabase() {
     abstract fun backupDao(): BackupDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 3
         private const val FILE_NAME = "ricordella.db"
 
         /**
          * Migrazioni dello schema. Ogni nuova versione deve aggiungere qui la sua Migration:
          * non si usa mai fallbackToDestructiveMigration, i dati dell'utente non devono sparire.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf()
+        val MIGRATIONS: Array<Migration> = arrayOf(
+            // 1 → 2: eventi di più giorni.
+            object : Migration(1, 2) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE reminder ADD COLUMN endDate INTEGER")
+                }
+            },
+            // 2 → 3: dettagli di viaggio delle vacanze.
+            object : Migration(2, 3) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE reminder ADD COLUMN trip TEXT")
+                }
+            },
+        )
 
         fun create(context: Context): RicordellaDatabase =
             Room.databaseBuilder(context, RicordellaDatabase::class.java, FILE_NAME)

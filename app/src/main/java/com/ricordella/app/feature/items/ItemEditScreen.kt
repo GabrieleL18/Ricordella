@@ -507,7 +507,7 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
         }
     }
     Text(
-        "Ricordella ti avviserà 30 giorni prima della scadenza.",
+        "Remindella ti avviserà 30 giorni prima della scadenza.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )

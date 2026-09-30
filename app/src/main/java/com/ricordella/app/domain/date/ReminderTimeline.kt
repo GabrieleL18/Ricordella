@@ -6,6 +6,7 @@ import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.ReminderTimeStatus
 import com.ricordella.app.domain.model.ReminderWithLinks
+import com.ricordella.app.domain.model.isMultiDay
 import com.ricordella.app.domain.model.odometerStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -30,17 +31,23 @@ object ReminderTimeline {
         ReminderStatus.CANCELLED -> ReminderTimeStatus.CANCELLED
         ReminderStatus.ACTIVE -> when {
             isOverdue(reminder, now) -> ReminderTimeStatus.OVERDUE
-            reminder.dueDate == now.toLocalDate() -> ReminderTimeStatus.TODAY
+            isOngoing(reminder, now.toLocalDate()) -> ReminderTimeStatus.TODAY
             else -> ReminderTimeStatus.UPCOMING
         }
     }
 
     fun isOverdue(reminder: Reminder, now: LocalDateTime): Boolean {
         if (reminder.status != ReminderStatus.ACTIVE || !reminder.type.isCompletable) return false
+        // Un evento di più giorni è scaduto solo quando è finito l'ultimo giorno.
+        reminder.endDate?.let { if (reminder.isMultiDay) return it.isBefore(now.toLocalDate()) }
         val time = reminder.dueTime
         return if (time == null) reminder.dueDate.isBefore(now.toLocalDate())
         else reminder.dueDate.atTime(time).isBefore(now)
     }
+
+    /** Oggi cade dentro il promemoria (il suo giorno, o uno dei giorni di un evento lungo). */
+    fun isOngoing(reminder: Reminder, today: LocalDate): Boolean =
+        !today.isBefore(reminder.dueDate) && !today.isAfter(reminder.endDate?.takeIf { reminder.isMultiDay } ?: reminder.dueDate)
 
     fun horizon(reminder: Reminder, now: LocalDateTime): TimeHorizon {
         if (isOverdue(reminder, now)) return TimeHorizon.OVERDUE

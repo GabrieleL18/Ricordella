@@ -14,6 +14,7 @@ import com.ricordella.app.domain.model.RecurrenceRule
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderDraft
 import com.ricordella.app.domain.model.ReminderType
+import com.ricordella.app.domain.model.TripInfo
 import com.ricordella.app.domain.repository.ItemRepository
 import com.ricordella.app.domain.repository.PersonRepository
 import com.ricordella.app.domain.repository.ReminderRepository
@@ -37,6 +38,11 @@ data class ReminderForm(
     val title: String = "",
     val date: LocalDate? = null,
     val time: LocalTime? = null,
+    /** Ultimo giorno per gli eventi di più giorni (vacanze, viaggi...). */
+    val multiDay: Boolean = false,
+    /** Dettagli di viaggio, usati solo per le vacanze. */
+    val trip: TripInfo = TripInfo(),
+    val endDate: LocalDate? = null,
     val type: ReminderType = ReminderType.TASK,
     val description: String = "",
     val notes: String = "",
@@ -61,6 +67,7 @@ data class ReminderForm(
 ) {
     val titleError: Boolean get() = showErrors && title.isBlank()
     val dateError: Boolean get() = showErrors && date == null
+    val endDateError: Boolean get() = showErrors && multiDay && (endDate == null || date == null || !endDate.isAfter(date))
     val isRecurring: Boolean get() = recurrencePreset != RecurrencePreset.NONE
 }
 
@@ -101,6 +108,8 @@ class ReminderEditViewModel(
                 date = route.epochDay?.let(LocalDate::ofEpochDay) ?: time.today(),
                 type = route.type?.let { runCatching { ReminderType.valueOf(it) }.getOrNull() } ?: ReminderType.TASK,
                 recurrencePreset = if (route.type == ReminderType.BIRTHDAY.name) RecurrencePreset.YEARLY else RecurrencePreset.NONE,
+                multiDay = route.type == ReminderType.VACATION.name,
+                endDate = if (route.type == ReminderType.VACATION.name) (route.epochDay?.let(LocalDate::ofEpochDay) ?: time.today()).plusDays(7) else null,
                 personIds = setOfNotNull(route.personId),
                 itemIds = setOfNotNull(route.itemId),
                 notifyOffsetMinutes = settings.current().defaultNotifyOffsetMinutes,
@@ -117,6 +126,9 @@ class ReminderEditViewModel(
             isNew = false,
             title = reminder.title,
             date = reminder.dueDate,
+            multiDay = reminder.endDate != null,
+            trip = reminder.trip ?: TripInfo(),
+            endDate = reminder.endDate,
             time = reminder.dueTime,
             type = reminder.type,
             description = reminder.description.orEmpty(),
@@ -147,7 +159,14 @@ class ReminderEditViewModel(
             form.type == ReminderType.BIRTHDAY && type != ReminderType.BIRTHDAY && form.recurrencePreset == RecurrencePreset.YEARLY -> RecurrencePreset.NONE
             else -> form.recurrencePreset
         }
-        form.copy(type = type, recurrencePreset = preset)
+        // Una vacanza dura di solito più giorni: si propone una settimana.
+        val vacation = type == ReminderType.VACATION && !form.multiDay
+        form.copy(
+            type = type,
+            recurrencePreset = preset,
+            multiDay = form.multiDay || vacation,
+            endDate = if (vacation) form.endDate ?: form.date?.plusDays(7) else form.endDate,
+        )
     }
 
     fun onErrorShown() = _form.update { it.copy(errorMessage = null) }
@@ -155,7 +174,7 @@ class ReminderEditViewModel(
     fun save() {
         val form = _form.value
         val date = form.date
-        if (form.title.isBlank() || date == null) {
+        if (form.title.isBlank() || date == null || (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))) {
             _form.update { it.copy(showErrors = true) }
             return
         }
@@ -176,6 +195,8 @@ class ReminderEditViewModel(
         val reminder = base.copy(
             title = form.title.trim(),
             dueDate = date,
+            endDate = if (form.multiDay) form.endDate else null,
+            trip = form.trip.takeIf { form.type == ReminderType.VACATION && !it.isEmpty },
             dueTime = form.time,
             type = form.type,
             description = form.description.trim().ifEmpty { null },

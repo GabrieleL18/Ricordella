@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import com.ricordella.app.core.navigation.AppNavigator
+import com.ricordella.app.core.ui.theme.BrandTitleStyle
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 
 /** Limita la larghezza dei contenuti su tablet e schermi larghi, centrandoli. */
@@ -62,6 +63,8 @@ fun TopLevelScaffold(
     navigator: AppNavigator,
     onAdd: () -> Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    /** True per il titolo "Remindella" della Home, scritto col carattere magico. */
+    brandTitle: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -70,7 +73,12 @@ fun TopLevelScaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         topBar = {
             TopAppBar(
-                title = { Text(title, style = MaterialTheme.typography.headlineSmall) },
+                title = {
+                    Text(
+                        title,
+                        style = if (brandTitle) BrandTitleStyle.copy(color = MaterialTheme.ricordellaColors.boltEdge) else MaterialTheme.typography.headlineSmall,
+                    )
+                },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,

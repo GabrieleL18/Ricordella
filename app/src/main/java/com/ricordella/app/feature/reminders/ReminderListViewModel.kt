@@ -84,7 +84,7 @@ class ReminderListViewModel(
         val visible = if (range == null) list else list.filter { entry ->
             val reminder = entry.reminder
             if (reminder.dueDate in range) return@filter true
-            val first = recurrence.occurrencesInRange(reminder, entry.recurrenceRule, range.start, range.endInclusive).firstOrNull()
+            val first = recurrence.daysCoveredInRange(reminder, entry.recurrenceRule, range.start, range.endInclusive).firstOrNull()?.second
             first?.let { occurrenceDates[reminder.id] = it }
             first != null
         }

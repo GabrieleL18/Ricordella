@@ -66,6 +66,8 @@ import com.ricordella.app.domain.model.ItemWithCategory
 import com.ricordella.app.domain.model.OdometerStatus
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.ReminderStatus
+import com.ricordella.app.domain.model.extraDays
+import com.ricordella.app.domain.model.isMultiDay
 import com.ricordella.app.domain.model.ReminderTimeStatus
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.displayName
@@ -104,10 +106,12 @@ fun ReminderCard(
     var burst by remember { mutableIntStateOf(0) }
 
     // Le feste non hanno la spunta (né lo swipe per completare).
+    val sounds = rememberUiSounds()
     val toggle: (() -> Unit)? = onToggleComplete?.takeIf { reminder.type.isCompletable }?.let { callback ->
         {
             if (!isDone && !celebrating) {
                 celebrating = true
+                sounds(UiSound.DING)
                 burst++
                 haptics.performHapticFeedback(HapticFeedbackType.Confirm)
                 scope.launch {
@@ -198,7 +202,10 @@ private fun ReminderCardBody(
     val interaction = remember { MutableInteractionSource() }
     val tone = if (checked) colors.mint else reminder.type.tone
 
-    val dateText = when (dateMode) {
+    val lastDay = occurrenceDate.plusDays(reminder.extraDays)
+    val dateText = if (reminder.isMultiDay) {
+        "Dal ${DateTexts.date(occurrenceDate, settings.dateFormat, today)} al ${DateTexts.date(lastDay, settings.dateFormat, today)}"
+    } else when (dateMode) {
         ReminderDateMode.ABSOLUTE -> DateTexts.dateWithTime(occurrenceDate, reminder.dueTime, settings.dateFormat, today)
         ReminderDateMode.TIME_ONLY -> reminder.dueTime?.let(DateTexts::time) ?: "Tutto il giorno"
         ReminderDateMode.RELATIVE ->
@@ -253,7 +260,7 @@ private fun ReminderCardBody(
                 }
                 ReminderBadges(entry, overdue)
             }
-            if (reminder.status == ReminderStatus.ACTIVE && !checked) DaysLeft(occurrenceDate, today, overdue)
+            if (reminder.status == ReminderStatus.ACTIVE && !checked) DaysLeft(occurrenceDate, lastDay, today, overdue)
             if (toggle != null) {
                 CompleteToggle(checked = checked, burst = burst, onClick = toggle)
             } else {
@@ -265,9 +272,21 @@ private fun ReminderCardBody(
 
 /** Quanti giorni mancano: numero grande e unità sotto ("Oggi", "3 giorni", "2 gg fa"). */
 @Composable
-private fun DaysLeft(date: LocalDate, today: LocalDate, overdue: Boolean) {
-    val days = java.time.temporal.ChronoUnit.DAYS.between(today, date)
+private fun DaysLeft(date: LocalDate, lastDay: LocalDate, today: LocalDate, overdue: Boolean) {
     val colors = MaterialTheme.ricordellaColors
+    if (lastDay.isAfter(date) && !today.isBefore(date) && !today.isAfter(lastDay)) {
+        // Evento di più giorni in corso: "In corso · ancora N gg".
+        val left = java.time.temporal.ChronoUnit.DAYS.between(today, lastDay)
+        Column(
+            Modifier.widthIn(min = 52.dp).background(colors.mint.container, RoundedCornerShape(14.dp)).padding(horizontal = 8.dp, vertical = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("In corso", style = MaterialTheme.typography.labelMedium, color = colors.mint.content)
+            Text(if (left == 0L) "ultimo giorno" else "ancora $left gg", style = MaterialTheme.typography.labelSmall, color = colors.mint.content)
+        }
+        return
+    }
+    val days = java.time.temporal.ChronoUnit.DAYS.between(today, date)
     val tone = when {
         overdue || days < 0 -> colors.coral
         days == 0L -> colors.pear

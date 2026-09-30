@@ -164,7 +164,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 attachments = state.attachments,
                 onAdd = viewModel::onAddAttachment,
                 onRemove = viewModel::onRemoveAttachment,
-                onOpenFailed = { viewModel.showMessage("Nessuna app disponibile per aprire il file.") },
+                onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             if (state.completions.isNotEmpty()) {
                 SectionHeader("Storico")
@@ -254,7 +254,8 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
     val today = now.toLocalDate()
     Surface(color = MaterialTheme.colorScheme.surfaceContainerLow, shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(RicordellaDimensions.spaceL)) {
-            InfoRow("Data", DateTexts.date(reminder.dueDate, settings.dateFormat))
+            InfoRow(if (reminder.endDate != null) "Dal" else "Data", DateTexts.date(reminder.dueDate, settings.dateFormat))
+            reminder.endDate?.let { InfoRow("Al", DateTexts.date(it, settings.dateFormat)) }
             InfoRow("Ora", reminder.dueTime?.let(DateTexts::time) ?: "Tutto il giorno")
             InfoRow(
                 "Quando",
@@ -280,6 +281,7 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
             }
         }
     }
+    reminder.trip?.takeIf { !it.isEmpty }?.let { TripSection(it) }
     reminder.description?.let {
         SectionHeader("Descrizione")
         Text(it, style = MaterialTheme.typography.bodyLarge)

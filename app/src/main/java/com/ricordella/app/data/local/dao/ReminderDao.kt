@@ -54,6 +54,7 @@ abstract class ReminderDao {
         SELECT * FROM reminder
         WHERE isArchived = 0 AND status != 'CANCELLED' AND (
             (dueDate BETWEEN :from AND :to)
+            OR (endDate IS NOT NULL AND dueDate < :from AND endDate >= :from)
             OR (status = 'ACTIVE' AND recurrenceRuleId IS NOT NULL AND dueDate <= :to)
         )
         ORDER BY dueDate, dueTime

@@ -105,14 +105,13 @@ fun SettingsScreen(onBack: () -> Unit) {
     var pickAllDayTime by rememberSaveable { mutableStateOf(false) }
     var showSectionsTutorial by rememberSaveable { mutableStateOf(false) }
     var showCalendarImport by rememberSaveable { mutableStateOf(false) }
-    // Azione di backup in attesa che l'utente chiuda il tutorial mostrato la prima volta.
-    var backupTutorialFor by rememberSaveable { mutableStateOf<String?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(viewModel::readBackup)
     }
     val startImport = { importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
     var showExportChoices by rememberSaveable { mutableStateOf(false) }
+    var showImportChoices by rememberSaveable { mutableStateOf(false) }
     val newFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         uri?.let(viewModel::exportNewFile)
     }
@@ -123,9 +122,9 @@ fun SettingsScreen(onBack: () -> Unit) {
             newFileLauncher.launch(backupFileName(newVersion = false))
         }
     }
+    // Tutorial e scelte stanno nella stessa finestra.
     fun backupAction(action: String) {
-        if (!settings.backupTutorialSeen) backupTutorialFor = action
-        else if (action == BACKUP_EXPORT) showExportChoices = true else if (action == BACKUP_IMPORT) startImport()
+        if (action == BACKUP_EXPORT) showExportChoices = true else showImportChoices = true
     }
 
     LaunchedEffect(state.shareUri) {
@@ -187,7 +186,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             SettingRow(
                 icon = Icons.Rounded.Notifications,
                 title = "Notifiche abilitate",
-                subtitle = "Ricordella ti avvisa anche ad app chiusa.",
+                subtitle = "Remindella ti avvisa anche ad app chiusa.",
                 trailing = {
                     Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
                 },
@@ -237,12 +236,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onClick = { backupAction(BACKUP_IMPORT) },
             )
             SettingRow(
-                icon = Icons.AutoMirrored.Rounded.HelpOutline,
-                title = "Come funziona il backup",
-                subtitle = "Tutorial animato di esporta e importa.",
-                onClick = { backupTutorialFor = BACKUP_TUTORIAL_ONLY },
-            )
-            SettingRow(
                 icon = Icons.Rounded.CalendarMonth,
                 title = "Importa da Google Calendar",
                 subtitle = "Copia gli eventi di un account Google presente sul telefono.",
@@ -262,13 +255,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                 subtitle = "Come funzionano le sezioni dell'app.",
                 onClick = { showSectionsTutorial = true },
             )
-            SettingRow(icon = Icons.Rounded.Info, title = "Versione", subtitle = BuildConfig.VERSION_NAME)
+            VersionRow(settings.developerMode, onUnlock = { viewModel.update { it.copy(developerMode = true) } })
             SettingRow(
                 icon = Icons.Rounded.PrivacyTip,
                 title = "Privacy",
                 subtitle = "I tuoi dati restano sul dispositivo.",
                 onClick = { showPrivacy = true },
             )
+            if (settings.developerMode) {
+                val tools = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.developerTools
+                DeveloperSection(tools, viewModel::update)
+            }
         }
     }
 
@@ -319,7 +316,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             title = { Text("Privacy") },
             text = {
                 Text(
-                    "Ricordella funziona completamente offline e non richiede alcun account. " +
+                    "Remindella funziona completamente offline e non richiede alcun account. " +
                         "Tutti i dati restano sul tuo dispositivo: l'app non ha accesso a Internet, " +
                         "non usa servizi cloud né statistiche di utilizzo.\n\n" +
                         "I dati sono esclusi dal backup automatico di Android. " +
@@ -330,46 +327,15 @@ fun SettingsScreen(onBack: () -> Unit) {
         )
     }
 
-    backupTutorialFor?.let { action ->
-        TutorialDialog(BackupTutorialPages, onDismiss = {
-            backupTutorialFor = null
-            if (!settings.backupTutorialSeen) viewModel.update { it.copy(backupTutorialSeen = true) }
-            when (action) {
-                BACKUP_EXPORT -> showExportChoices = true
-                BACKUP_IMPORT -> startImport()
-            }
-        }, doneLabel = when (action) { BACKUP_EXPORT -> "Esporta"; BACKUP_IMPORT -> "Scegli il file"; else -> "Ho capito" })
-    }
-
-    if (showExportChoices) {
-        AlertDialog(
-            onDismissRequest = { showExportChoices = false },
-            title = { Text("Esporta backup") },
-            text = {
-                Column {
-                    SettingRow(
-                        icon = Icons.Rounded.Save,
-                        title = if (settings.backupTargetUri != null) "Aggiorna il backup" else "Salva il backup",
-                        subtitle = if (settings.backupTargetUri != null) "Sovrascrive il file precedente." else "Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto.",
-                        onClick = { showExportChoices = false; viewModel.exportOverwrite() },
-                    )
-                    if (settings.backupTargetUri != null) {
-                        SettingRow(
-                            icon = Icons.Rounded.AddCircleOutline,
-                            title = "Nuova versione",
-                            subtitle = "Crea un nuovo file e tiene quello vecchio.",
-                            onClick = { showExportChoices = false; startNewFile() },
-                        )
-                    }
-                    SettingRow(
-                        icon = Icons.Rounded.Share,
-                        title = "Condividi",
-                        subtitle = "Invialo con un'app (email, chat...).",
-                        onClick = { showExportChoices = false; viewModel.export() },
-                    )
-                }
-            },
-            confirmButton = { TextButton(onClick = { showExportChoices = false }) { Text("Annulla") } },
+    if (showExportChoices || showImportChoices) {
+        BackupDialog(
+            export = showExportChoices,
+            hasTarget = settings.backupTargetUri != null,
+            onDismiss = { showExportChoices = false; showImportChoices = false },
+            onOverwrite = viewModel::exportOverwrite,
+            onNewVersion = startNewFile,
+            onShare = viewModel::export,
+            onChooseFile = startImport,
         )
     }
 
@@ -401,12 +367,11 @@ fun SettingsScreen(onBack: () -> Unit) {
 
 /** Nome del file: fisso per il backup "principale", con data e ora per le nuove versioni. */
 private fun backupFileName(newVersion: Boolean): String =
-    if (newVersion) "ricordella-backup-${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))}.zip"
-    else "ricordella-backup.zip"
+    if (newVersion) "remindella-backup-${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))}.zip"
+    else "remindella-backup.zip"
 
 private const val BACKUP_EXPORT = "export"
 private const val BACKUP_IMPORT = "import"
-private const val BACKUP_TUTORIAL_ONLY = "tutorial"
 
 @Composable
 private fun <T> Segmented(options: List<T>, selected: T, label: (T) -> String, onSelected: (T) -> Unit) {

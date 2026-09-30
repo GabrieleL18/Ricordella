@@ -1,5 +1,27 @@
 package com.ricordella.app.feature.reminders
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.automirrored.rounded.Label
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Category
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Flag
+import androidx.compose.material.icons.rounded.Inventory2
+import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.SortByAlpha
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import com.ricordella.app.core.ui.PushButton
+import com.ricordella.app.domain.model.ReminderFilter
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -133,7 +155,6 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showFilters by rememberSaveable { mutableStateOf(false) }
-    var sortMenu by remember { mutableStateOf(false) }
 
     TopLevelScaffold(title = "Promemoria", navigator = navigator, onAdd = onAdd) { padding ->
         LazyColumn(
@@ -149,48 +170,15 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             item(key = "search") {
                 SearchField(value = state.query, onValueChange = viewModel::onQueryChange, placeholder = "Cerca promemoria, cose, persone")
             }
-            item(key = "filters") {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconChipRow(Modifier.weight(1f)) {
-                        ReminderListScope.entries.forEach { scope ->
-                            IconChoiceChip(scope.label, scope.icon, scope.tone(), state.filter.scope == scope, onClick = { viewModel.onScopeChange(scope) })
-                        }
-                    }
-                    IconButton(onClick = { showFilters = true }) {
-                        BadgedBox(badge = { if (state.filter.hasSecondaryFilters) Badge() }) {
-                            Icon(Icons.Rounded.FilterList, contentDescription = "Filtri")
-                        }
-                    }
-                    Box {
-                        IconButton(onClick = { sortMenu = true }) {
-                            Icon(Icons.AutoMirrored.Rounded.Sort, contentDescription = "Ordina")
-                        }
-                        DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
-                            ReminderSortOrder.entries.forEach { order ->
-                                DropdownMenuItem(
-                                    text = { Text(order.label) },
-                                    leadingIcon = { RadioButton(selected = state.filter.sortOrder == order, onClick = null) },
-                                    onClick = { sortMenu = false; viewModel.onSortChange(order) },
-                                )
-                            }
-                        }
+            item(key = "scope") {
+                IconChipRow {
+                    ReminderListScope.entries.forEach { scope ->
+                        IconChoiceChip(scope.label, scope.icon, scope.tone(), state.filter.scope == scope, onClick = { viewModel.onScopeChange(scope) })
                     }
                 }
             }
-            item(key = "period") { PeriodFilter(state.filter.period, viewModel) }
-            item(key = "types") {
-                // Filtro rapido per tipo: un tocco lo attiva, un secondo tocco lo toglie.
-                IconChipRow {
-                    ReminderType.entries.forEach { type ->
-                        IconChoiceChip(
-                            type.label,
-                            type.icon,
-                            type.tone,
-                            state.filter.type == type,
-                            onClick = { viewModel.onTypeFilter(if (state.filter.type == type) null else type) },
-                        )
-                    }
-                }
+            item(key = "active-filters") {
+                ActiveFilters(state, viewModel, onOpen = { showFilters = true })
             }
             if (!state.isLoading && state.reminders.isEmpty()) {
                 item(key = "empty") {
@@ -260,10 +248,81 @@ private fun PeriodFilter(period: ReminderPeriod, viewModel: ReminderListViewMode
     }
 }
 
+/** Numero di filtri attivi oltre allo stato (periodo, tipo, priorità, persona, cosa, categoria). */
+private val ReminderFilter.activeCount: Int
+    get() = listOfNotNull(personId, itemId, category, type, priority).size + if (period.kind != PeriodKind.ALL) 1 else 0
+
+/**
+ * Riga sotto lo stato: il pulsante "Filtri" (con il numero di quelli attivi) e ogni filtro
+ * attivo come pillola con la X per toglierlo. Così si vede sempre cosa si sta guardando.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ActiveFilters(state: ReminderListUiState, viewModel: ReminderListViewModel, onOpen: () -> Unit) {
+    val filter = state.filter
+    val colors = MaterialTheme.ricordellaColors
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), itemVerticalAlignment = Alignment.CenterVertically) {
+        FilledTonalButton(onClick = onOpen) {
+            Icon(Icons.Rounded.Tune, contentDescription = null, modifier = Modifier.size(18.dp))
+            Text(if (filter.activeCount == 0) "Filtri e ordine" else "Filtri · ${filter.activeCount}", modifier = Modifier.padding(start = 6.dp))
+        }
+        if (filter.period.kind != PeriodKind.ALL) {
+            val label = if (filter.period.kind == PeriodKind.YEAR) "Anno ${filter.period.anchor.year}" else DateTexts.monthTitle(YearMonth.from(filter.period.anchor))
+            RemovableFilter(label, Icons.Rounded.CalendarMonth, colors.lavender) { viewModel.onPeriodKind(PeriodKind.ALL) }
+        }
+        filter.type?.let { RemovableFilter(it.label, it.icon, it.tone) { viewModel.onTypeFilter(null) } }
+        filter.priority?.let { RemovableFilter(it.label, it.icon ?: Icons.Rounded.Flag, colors.coral) { viewModel.onPriorityFilter(null) } }
+        filter.personId?.let { id ->
+            RemovableFilter(state.people.firstOrNull { it.id == id }?.displayName ?: "Persona", Icons.Rounded.Person, colors.coral) { viewModel.onPersonFilter(null) }
+        }
+        filter.itemId?.let { id ->
+            RemovableFilter(state.items.firstOrNull { it.item.id == id }?.item?.name ?: "Cosa", Icons.Rounded.Inventory2, colors.pear) { viewModel.onItemFilter(null) }
+        }
+        filter.category?.let { RemovableFilter(it, Icons.AutoMirrored.Rounded.Label, colors.cyan) { viewModel.onCategoryFilter(null) } }
+        if (filter.sortOrder != ReminderSortOrder.DATE_ASC) {
+            Text("Ordine: ${filter.sortOrder.label.lowercase()}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (filter.activeCount > 1) {
+            TextButton(onClick = { viewModel.onClearSecondaryFilters(); viewModel.onPeriodKind(PeriodKind.ALL) }) { Text("Azzera tutto") }
+        }
+    }
+}
+
+@Composable
+private fun RemovableFilter(label: String, icon: ImageVector, tone: Tone, onRemove: () -> Unit) {
+    Row(
+        Modifier
+            .clip(CircleShape)
+            .background(tone.container)
+            .clickable(role = Role.Button, onClickLabel = "Togli filtro $label", onClick = onRemove)
+            .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = tone.content, modifier = Modifier.size(16.dp))
+        Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content, maxLines = 1)
+        Icon(Icons.Rounded.Close, contentDescription = null, tint = tone.content, modifier = Modifier.size(16.dp))
+    }
+}
+
+@Composable
+private fun SheetSection(title: String, icon: ImageVector, tone: Tone, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.size(28.dp).background(tone.container, CircleShape), contentAlignment = Alignment.Center) {
+                Icon(icon, contentDescription = null, tint = tone.content, modifier = Modifier.size(16.dp))
+            }
+            Text(title, style = MaterialTheme.typography.titleMedium)
+        }
+        content()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun FiltersSheet(state: ReminderListUiState, viewModel: ReminderListViewModel, onDismiss: () -> Unit) {
     val filter = state.filter
+    val colors = MaterialTheme.ricordellaColors
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
@@ -271,53 +330,83 @@ private fun FiltersSheet(state: ReminderListUiState, viewModel: ReminderListView
                 .verticalScroll(rememberScrollState())
                 .navigationBarsPadding()
                 .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceS),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Filtri", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                TextButton(onClick = viewModel::onClearSecondaryFilters, enabled = filter.hasSecondaryFilters) { Text("Azzera") }
+                Text("Filtri e ordine", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                TextButton(
+                    onClick = { viewModel.onClearSecondaryFilters(); viewModel.onPeriodKind(PeriodKind.ALL) },
+                    enabled = filter.activeCount > 0,
+                ) { Text("Azzera") }
             }
-            DropdownField(
-                label = "Persona",
-                options = listOf(null) + state.people.map { it.id },
-                selected = filter.personId,
-                optionLabel = { id -> state.people.firstOrNull { it.id == id }?.displayName ?: "Tutte" },
-                onSelected = viewModel::onPersonFilter,
-            )
-            DropdownField(
-                label = "Cosa",
-                options = listOf(null) + state.items.map { it.item.id },
-                selected = filter.itemId,
-                optionLabel = { id -> state.items.firstOrNull { it.item.id == id }?.item?.name ?: "Tutte" },
-                onSelected = viewModel::onItemFilter,
-            )
-            DropdownField(
-                label = "Categoria",
-                options = listOf<String?>(null) + state.categories,
-                selected = filter.category,
-                optionLabel = { it ?: "Tutte" },
-                onSelected = viewModel::onCategoryFilter,
-            )
-            Text("Tipo", style = MaterialTheme.typography.titleSmall)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ReminderType.entries.forEach { type ->
-                    IconChoiceChip(type.label, type.icon, type.tone, filter.type == type, onClick = { viewModel.onTypeFilter(if (filter.type == type) null else type) })
+            SheetSection("Periodo", Icons.Rounded.CalendarMonth, colors.lavender) { PeriodFilter(filter.period, viewModel) }
+            SheetSection("Tipo", Icons.Rounded.Category, colors.cyan) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ReminderType.entries.forEach { type ->
+                        IconChoiceChip(type.label, type.icon, type.tone, filter.type == type, onClick = { viewModel.onTypeFilter(if (filter.type == type) null else type) })
+                    }
                 }
             }
-            Text("Priorità", style = MaterialTheme.typography.titleSmall)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val colors = MaterialTheme.ricordellaColors
-                Priority.entries.forEach { priority ->
-                    IconChoiceChip(
-                        priority.label,
-                        priority.icon ?: Icons.Rounded.Remove,
-                        if (priority == Priority.URGENT) colors.coral else if (priority == Priority.IMPORTANT) colors.pear else colors.cyan,
-                        filter.priority == priority,
-                        onClick = { viewModel.onPriorityFilter(if (filter.priority == priority) null else priority) },
-                    )
+            SheetSection("Priorità", Icons.Rounded.Flag, colors.coral) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Priority.entries.forEach { priority ->
+                        IconChoiceChip(
+                            priority.label,
+                            priority.icon ?: Icons.Rounded.Remove,
+                            if (priority == Priority.URGENT) colors.coral else if (priority == Priority.IMPORTANT) colors.pear else colors.cyan,
+                            filter.priority == priority,
+                            onClick = { viewModel.onPriorityFilter(if (filter.priority == priority) null else priority) },
+                        )
+                    }
                 }
             }
-            TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.End)) { Text("Fatto") }
+            SheetSection("Collegati a", Icons.Rounded.Link, colors.pear) {
+                DropdownField(
+                    label = "Persona",
+                    options = listOf(null) + state.people.map { it.id },
+                    selected = filter.personId,
+                    optionLabel = { id -> state.people.firstOrNull { it.id == id }?.displayName ?: "Tutte" },
+                    onSelected = viewModel::onPersonFilter,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                DropdownField(
+                    label = "Cosa",
+                    options = listOf(null) + state.items.map { it.item.id },
+                    selected = filter.itemId,
+                    optionLabel = { id -> state.items.firstOrNull { it.item.id == id }?.item?.name ?: "Tutte" },
+                    onSelected = viewModel::onItemFilter,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                DropdownField(
+                    label = "Categoria",
+                    options = listOf<String?>(null) + state.categories,
+                    selected = filter.category,
+                    optionLabel = { it ?: "Tutte" },
+                    onSelected = viewModel::onCategoryFilter,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            SheetSection("Ordina per", Icons.AutoMirrored.Rounded.Sort, colors.mint) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ReminderSortOrder.entries.forEach { order ->
+                        IconChoiceChip(order.label, order.icon, colors.mint, filter.sortOrder == order, onClick = { viewModel.onSortChange(order) })
+                    }
+                }
+            }
+            PushButton(
+                text = if (state.reminders.size == 1) "Mostra 1 promemoria" else "Mostra ${state.reminders.size} promemoria",
+                onClick = onDismiss,
+                icon = Icons.Rounded.Check,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
+
+private val ReminderSortOrder.icon: ImageVector
+    get() = when (this) {
+        ReminderSortOrder.DATE_ASC -> Icons.Rounded.ArrowUpward
+        ReminderSortOrder.DATE_DESC -> Icons.Rounded.ArrowDownward
+        ReminderSortOrder.PRIORITY -> Icons.Rounded.Flag
+        ReminderSortOrder.TITLE -> Icons.Rounded.SortByAlpha
+    }

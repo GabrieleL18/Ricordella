@@ -64,10 +64,16 @@ data class SchedulingCandidate(
 data class ReminderOccurrence(
     val entry: ReminderWithLinks,
     val date: LocalDate,
+    /** Primo giorno dell'occorrenza: differisce da [date] nei giorni successivi di un evento lungo. */
+    val start: LocalDate = date,
 ) {
     val reminder: Reminder get() = entry.reminder
-    /** True se la data è calcolata dalla regola di ricorrenza e non è l'occorrenza corrente. */
-    val isProjected: Boolean get() = date != entry.reminder.dueDate
+    /** True se l'occorrenza non è quella corrente (proiettata dalla ricorrenza). */
+    val isProjected: Boolean get() = start != entry.reminder.dueDate
+    val end: LocalDate get() = start.plusDays(reminder.extraDays)
+    val isMultiDay: Boolean get() = reminder.isMultiDay
+    /** Es. 2 per il secondo giorno di una vacanza. */
+    val dayNumber: Long get() = java.time.temporal.ChronoUnit.DAYS.between(start, date) + 1
 }
 
 data class SearchResults(

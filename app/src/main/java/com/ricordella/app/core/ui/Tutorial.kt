@@ -667,3 +667,37 @@ val BackupTutorialPages: List<TutorialPage> = listOf(
         "Su un nuovo telefono, \"Importa backup\" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto.",
     ) { ImportIllustration() },
 )
+
+/**
+ * Tutorial compatto da incorporare in una schermata: pagine che scorrono da sole ogni
+ * pochi secondi (o col dito), illustrazione rimpicciolita e testo breve, con i pallini.
+ */
+@Composable
+fun MiniTutorial(pages: List<TutorialPage>, modifier: Modifier = Modifier) {
+    val pager = rememberPagerState { pages.size }
+    androidx.compose.runtime.LaunchedEffect(pager) {
+        while (true) {
+            kotlinx.coroutines.delay(4500)
+            if (!pager.isScrollInProgress) pager.animateScrollToPage((pager.currentPage + 1) % pages.size)
+        }
+    }
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        HorizontalPager(pager, modifier = Modifier.fillMaxWidth()) { index ->
+            val page = pages[index]
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = RicordellaDimensions.spaceL)) {
+                Box(Modifier.size(170.dp).graphicsLayer { scaleX = 0.65f; scaleY = 0.65f }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.requiredSize(260.dp), contentAlignment = Alignment.Center) { page.illustration() }
+                }
+                Text(page.title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+                Text(
+                    page.body,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    minLines = 3,
+                )
+            }
+        }
+        PageDots(pages.size, pager.currentPage, Modifier.padding(top = RicordellaDimensions.spaceS))
+    }
+}
