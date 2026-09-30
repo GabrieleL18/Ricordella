@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ricordella</string>
+    <string name="notification_channel_reminders">Promemoria</string>
+    <string name="notification_channel_reminders_description">Notifiche dei promemoria e delle scadenze</string>
+</resources>
