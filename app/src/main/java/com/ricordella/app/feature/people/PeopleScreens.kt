@@ -23,7 +23,8 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.People
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.Check
+import com.ricordella.app.core.ui.PushButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -108,7 +109,12 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 }
             }
             items(state.people, key = { it.id }) { person ->
-                PersonCard(person, onClick = { navigator.openPerson(person.id) }, subtitle = person.notes?.lineSequence()?.firstOrNull())
+                PersonCard(
+                    person,
+                    onClick = { navigator.openPerson(person.id) },
+                    subtitle = person.notes?.lineSequence()?.firstOrNull(),
+                    modifier = Modifier.animateItem(),
+                )
             }
         }
     }
@@ -188,7 +194,7 @@ fun PersonEditScreen(navigator: AppNavigator) {
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Button(onClick = viewModel::save, modifier = Modifier.fillMaxWidth()) { Text("Salva") }
+            PushButton(text = "Salva", onClick = viewModel::save, icon = Icons.Rounded.Check, modifier = Modifier.fillMaxWidth())
         }
     }
 }

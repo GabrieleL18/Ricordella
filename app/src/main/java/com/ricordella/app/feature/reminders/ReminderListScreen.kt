@@ -127,6 +127,7 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             if (!state.isLoading && state.reminders.isEmpty()) {
                 item(key = "empty") {
                     EmptyState(
+                        modifier = Modifier.animateItem(),
                         icon = Icons.Rounded.NotificationsNone,
                         title = "Nessun promemoria",
                         message = if (state.query.isNotBlank() || state.filter.hasSecondaryFilters) "Nessun risultato con questi filtri."
@@ -142,6 +143,7 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     now = state.now,
                     onClick = { navigator.openReminder(entry.reminder.id) },
                     onToggleComplete = { viewModel.onToggleComplete(entry) },
+                    modifier = Modifier.animateItem(),
                 )
             }
         }

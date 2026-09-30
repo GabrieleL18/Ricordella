@@ -16,7 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.FilterChipDefaults
+import com.ricordella.app.core.ui.PushButton
+import com.ricordella.app.core.ui.icon
+import com.ricordella.app.core.ui.tone
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -105,11 +110,13 @@ fun ReminderEditScreen(onBack: () -> Unit) {
             if (form.showAdvanced) {
                 AdvancedFields(form, viewModel)
             }
-            Button(
+            PushButton(
+                text = "Salva",
                 onClick = viewModel::save,
-                enabled = !form.isSaving,
+                icon = Icons.Rounded.Check,
+                loading = form.isSaving,
                 modifier = Modifier.fillMaxWidth().padding(vertical = RicordellaDimensions.spaceL),
-            ) { Text("Salva") }
+            )
         }
     }
 }
@@ -148,7 +155,18 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     Text("Tipo", style = MaterialTheme.typography.labelLarge)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         ReminderType.entries.forEach { type ->
-            FilterChip(selected = form.type == type, onClick = { update { it.copy(type = type) } }, label = { Text(type.label) })
+            val tone = type.tone
+            FilterChip(
+                selected = form.type == type,
+                onClick = { update { it.copy(type = type) } },
+                label = { Text(type.label) },
+                leadingIcon = { Icon(type.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = tone.container,
+                    selectedLabelColor = tone.content,
+                    selectedLeadingIconColor = tone.content,
+                ),
+            )
         }
     }
 }

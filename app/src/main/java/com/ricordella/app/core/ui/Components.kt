@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
+import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.Priority
 
@@ -53,18 +55,32 @@ import com.ricordella.app.domain.model.Priority
 fun SectionHeader(
     title: String,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    tone: Tone? = null,
     action: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = RicordellaDimensions.spaceL, bottom = RicordellaDimensions.spaceXs),
+            .padding(top = RicordellaDimensions.spaceXl, bottom = RicordellaDimensions.spaceXs),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
     ) {
+        if (icon != null) {
+            val colors = tone ?: MaterialTheme.ricordellaColors.cyan
+            Box(
+                Modifier
+                    .size(28.dp)
+                    .background(colors.container, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(icon, contentDescription = null, tint = colors.content, modifier = Modifier.size(16.dp))
+            }
+        }
         Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .weight(1f)
                 .semantics { heading() },
@@ -73,6 +89,7 @@ fun SectionHeader(
     }
 }
 
+/** Stato vuoto: la mascotte, un messaggio utile e, se serve, l'azione per iniziare. */
 @Composable
 fun EmptyState(
     icon: ImageVector,
@@ -89,26 +106,32 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
     ) {
-        Box(
-            modifier = Modifier
-                .size(72.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(24.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(36.dp))
+        Box(contentAlignment = Alignment.BottomEnd) {
+            CrystalBallMascot(size = 104.dp)
+            val tone = MaterialTheme.ricordellaColors.lavender
+            Box(
+                Modifier
+                    .size(36.dp)
+                    .background(tone.container, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(icon, contentDescription = null, tint = tone.content, modifier = Modifier.size(20.dp))
+            }
         }
-        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+        Text(title, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
         Text(
             message,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         if (actionLabel != null && onAction != null) {
-            Button(onClick = onAction, modifier = Modifier.padding(top = RicordellaDimensions.spaceS)) {
-                Icon(Icons.Rounded.Add, contentDescription = null)
-                Text(actionLabel, modifier = Modifier.padding(start = RicordellaDimensions.spaceS))
-            }
+            PushButton(
+                text = actionLabel,
+                onClick = onAction,
+                icon = Icons.Rounded.Add,
+                modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
+            )
         }
     }
 }
@@ -124,10 +147,10 @@ fun IconBadge(
     Box(
         modifier = modifier
             .size(RicordellaDimensions.iconBadge)
-            .background(containerColor, RoundedCornerShape(12.dp)),
+            .background(containerColor, RoundedCornerShape(14.dp)),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(24.dp))
     }
 }
 
@@ -140,9 +163,9 @@ fun StatusBadge(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
 ) {
-    Surface(color = containerColor, contentColor = contentColor, shape = RoundedCornerShape(8.dp), modifier = modifier) {
+    Surface(color = containerColor, contentColor = contentColor, shape = CircleShape, modifier = modifier) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
@@ -155,11 +178,11 @@ fun StatusBadge(
 @Composable
 fun PriorityIndicator(priority: Priority, modifier: Modifier = Modifier) {
     val icon = priority.icon ?: return
-    val colors = when (priority) {
-        Priority.URGENT -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-        else -> MaterialTheme.ricordellaColors.warningContainer to MaterialTheme.ricordellaColors.onWarningContainer
+    val tone = when (priority) {
+        Priority.URGENT -> MaterialTheme.ricordellaColors.coral
+        else -> MaterialTheme.ricordellaColors.pear
     }
-    StatusBadge(text = priority.label, containerColor = colors.first, contentColor = colors.second, icon = icon, modifier = modifier)
+    StatusBadge(text = priority.label, containerColor = tone.container, contentColor = tone.content, icon = icon, modifier = modifier)
 }
 
 @Composable
@@ -183,7 +206,12 @@ fun SearchField(
             }
         },
         singleLine = true,
-        shape = RoundedCornerShape(28.dp),
+        shape = CircleShape,
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+        ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
     )
 }

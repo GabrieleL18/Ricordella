@@ -71,6 +71,7 @@ import com.ricordella.app.core.ui.UriImage
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.icon
+import com.ricordella.app.core.ui.tone
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.openFile
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
@@ -256,7 +257,7 @@ private fun ItemHeader(entry: ItemWithCategory) {
         )
     }
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-        IconBadge(entry.category?.kind.icon)
+        IconBadge(entry.category?.kind.icon, containerColor = entry.group.tone.container, contentColor = entry.group.tone.content)
         Column {
             Text(item.name, style = MaterialTheme.typography.headlineSmall)
             Text(

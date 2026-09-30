@@ -26,6 +26,8 @@ import com.ricordella.app.core.ui.EmptyState
 import com.ricordella.app.core.ui.FilterChipRow
 import com.ricordella.app.core.ui.ItemCard
 import com.ricordella.app.core.ui.SearchField
+import com.ricordella.app.core.ui.SectionHeader
+import com.ricordella.app.core.ui.tone
 import com.ricordella.app.core.ui.TopLevelScaffold
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
@@ -84,21 +86,15 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
             state.groups.forEach { (group, entries) ->
                 item(span = { GridItemSpan(maxLineSpan) }, key = "header-$group") {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = RicordellaDimensions.spaceL, bottom = RicordellaDimensions.spaceXs),
-                    ) {
-                        Icon(group.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                        Text(
-                            "${group.label} (${entries.size})",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(start = 8.dp),
-                        )
-                    }
+                    SectionHeader(
+                        title = "${group.label} · ${entries.size}",
+                        icon = group.icon,
+                        tone = group.tone,
+                        modifier = Modifier.animateItem(),
+                    )
                 }
                 items(entries, key = { it.item.id }) { entry ->
-                    ItemCard(entry, onClick = { navigator.openItem(entry.item.id) })
+                    ItemCard(entry, onClick = { navigator.openItem(entry.item.id) }, modifier = Modifier.animateItem())
                 }
             }
         }

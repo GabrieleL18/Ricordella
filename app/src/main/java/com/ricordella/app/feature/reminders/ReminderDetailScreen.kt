@@ -19,7 +19,24 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Snooze
 import androidx.compose.material.icons.automirrored.rounded.Undo
-import androidx.compose.material3.Button
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.ricordella.app.core.ui.PushButton
+import com.ricordella.app.core.ui.StarBurst
+import com.ricordella.app.core.ui.rememberReducedMotion
+import com.ricordella.app.core.ui.tone
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -180,11 +197,34 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
 private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
     val reminder = entry.reminder
     val status = ReminderTimeline.timeStatus(reminder, now)
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-        IconBadge(reminder.type.icon)
+    val tone = reminder.type.tone
+    val reduced = rememberReducedMotion()
+    val pop = remember { Animatable(if (reduced) 1f else 0.4f) }
+    LaunchedEffect(Unit) { pop.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessMediumLow)) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.extraLarge)
+            .padding(RicordellaDimensions.spaceL),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL),
+    ) {
+        Box(
+            Modifier
+                .size(64.dp)
+                .graphicsLayer {
+                    scaleX = pop.value
+                    scaleY = pop.value
+                    rotationZ = (1f - pop.value) * -20f
+                }
+                .background(tone.solid, RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(reminder.type.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(34.dp))
+        }
         Column(Modifier.weight(1f)) {
-            Text(reminder.title, style = MaterialTheme.typography.headlineSmall)
-            Text(reminder.type.label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(reminder.title, style = MaterialTheme.typography.headlineSmall, color = tone.content)
+            Text(reminder.type.label, style = MaterialTheme.typography.titleSmall, color = tone.content)
         }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -273,6 +313,10 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
     var snoozeMenu by remember { mutableStateOf(false) }
     var pickDate by rememberSaveable { mutableStateOf(false) }
     var pickedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var burst by remember { mutableIntStateOf(0) }
+    val extra = MaterialTheme.ricordellaColors
+    val haptics = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
 
     Surface(tonalElevation = 3.dp) {
         Row(
@@ -281,6 +325,7 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
                 .navigationBarsPadding()
                 .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceM),
             horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isActive) {
                 Box(Modifier.weight(1f)) {
@@ -295,9 +340,25 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
                         DropdownMenuItem(text = { Text("Scegli data e ora…") }, onClick = { snoozeMenu = false; pickDate = true })
                     }
                 }
-                Button(onClick = viewModel::onComplete, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Rounded.Check, contentDescription = null)
-                    Text("Completa", modifier = Modifier.padding(start = 8.dp))
+                Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    StarBurst(
+                        trigger = burst,
+                        colors = listOf(extra.bolt, extra.coral.solid, extra.mint.solid),
+                        modifier = Modifier.requiredSize(160.dp),
+                    )
+                    PushButton(
+                        text = "Completa",
+                        icon = Icons.Rounded.Check,
+                        onClick = {
+                            burst++
+                            haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                            scope.launch {
+                                delay(380)
+                                viewModel.onComplete()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             } else {
                 OutlinedButton(onClick = viewModel::onReopen, modifier = Modifier.weight(1f)) {

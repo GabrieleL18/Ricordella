@@ -1,5 +1,20 @@
 package com.ricordella.app.feature.calendar
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import com.ricordella.app.core.ui.RicordellaMotion
+import com.ricordella.app.core.ui.theme.ricordellaColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -136,7 +151,7 @@ fun CalendarScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     days.forEach { (date, occurrences) ->
                         item(key = "agenda-$date") { SectionHeader(DateTexts.dayHeader(date, today)) }
                         items(occurrences, key = { "agenda-$date-${it.reminder.id}" }) { occurrence ->
-                            OccurrenceCard(occurrence, state, navigator, viewModel)
+                            OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem())
                         }
                     }
                 }
@@ -165,12 +180,18 @@ private fun LazyListScope.dayItems(
         }
     }
     items(occurrences, key = { "day-$date-${it.reminder.id}" }) { occurrence ->
-        OccurrenceCard(occurrence, state, navigator, viewModel)
+        OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem())
     }
 }
 
 @Composable
-private fun OccurrenceCard(occurrence: ReminderOccurrence, state: CalendarUiState, navigator: AppNavigator, viewModel: CalendarViewModel) {
+private fun OccurrenceCard(
+    occurrence: ReminderOccurrence,
+    state: CalendarUiState,
+    navigator: AppNavigator,
+    viewModel: CalendarViewModel,
+    modifier: Modifier = Modifier,
+) {
     ReminderCard(
         entry = occurrence.entry,
         now = state.now,
@@ -179,6 +200,7 @@ private fun OccurrenceCard(occurrence: ReminderOccurrence, state: CalendarUiStat
         else ({ viewModel.onComplete(occurrence.reminder.id) }),
         dateMode = ReminderDateMode.TIME_ONLY,
         occurrenceDate = occurrence.date,
+        modifier = modifier,
     )
 }
 
@@ -212,18 +234,46 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
                 )
             }
         }
-        state.gridDays.chunked(7).forEach { week ->
-            Row(Modifier.fillMaxWidth()) {
-                week.forEach { day ->
-                    DayCell(
-                        date = day,
-                        occurrences = state.occurrences[day].orEmpty(),
-                        inMonth = day.month == state.month.month,
-                        isToday = day == today,
-                        isSelected = day == state.selectedDate,
-                        onClick = { viewModel.onSelectDate(day) },
-                        modifier = Modifier.weight(1f),
-                    )
+        // Il mese scorre nella direzione in cui si va; si può anche trascinare a destra/sinistra.
+        val swipeThreshold = with(LocalDensity.current) { 64.dp.toPx() }
+        AnimatedContent(
+            targetState = state.month,
+            transitionSpec = {
+                val forward = targetState > initialState
+                (slideInHorizontally(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { if (forward) it / 3 else -it / 3 } +
+                    fadeIn(tween(RicordellaMotion.SHORT))) togetherWith
+                    (slideOutHorizontally(tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseIn)) { if (forward) -it / 3 else it / 3 } +
+                        fadeOut(tween(RicordellaMotion.MICRO)))
+            },
+            modifier = Modifier.pointerInput(Unit) {
+                var total = 0f
+                detectHorizontalDragGestures(
+                    onDragStart = { total = 0f },
+                    onDragEnd = {
+                        when {
+                            total > swipeThreshold -> viewModel.onShiftMonth(-1)
+                            total < -swipeThreshold -> viewModel.onShiftMonth(1)
+                        }
+                    },
+                ) { _, delta -> total += delta }
+            },
+            label = "month",
+        ) { month ->
+            Column {
+                monthGrid(month, state.firstDayOfWeek).chunked(7).forEach { week ->
+                    Row(Modifier.fillMaxWidth()) {
+                        week.forEach { day ->
+                            DayCell(
+                                date = day,
+                                occurrences = state.occurrences[day].orEmpty(),
+                                inMonth = day.month == month.month,
+                                isToday = day == today,
+                                isSelected = day == state.selectedDate,
+                                onClick = { viewModel.onSelectDate(day) },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -242,6 +292,17 @@ private fun DayCell(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    val extra = MaterialTheme.ricordellaColors
+    val background by animateColorAsState(
+        if (isSelected) extra.bolt else Color.Transparent,
+        tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseOut),
+        label = "daySelected",
+    )
+    val scale by animateFloatAsState(
+        if (isSelected) 1f else 0.92f,
+        tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseOut),
+        label = "dayScale",
+    )
     val hasDeadline = occurrences.any { it.reminder.type.isDeadlineLike }
     val hasEvent = occurrences.any { it.reminder.type == ReminderType.EVENT || it.reminder.type == ReminderType.BIRTHDAY }
     val hasTask = occurrences.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY }
@@ -252,11 +313,15 @@ private fun DayCell(
     }
     Column(
         modifier = modifier
-            .height(52.dp)
+            .height(54.dp)
             .padding(2.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) colors.primaryContainer else Color.Transparent)
-            .then(if (isToday && !isSelected) Modifier.border(1.5.dp, colors.primary, RoundedCornerShape(12.dp)) else Modifier)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(16.dp))
+            .background(background)
+            .then(if (isToday && !isSelected) Modifier.border(2.dp, colors.primary, RoundedCornerShape(16.dp)) else Modifier)
             .semantics {
                 contentDescription = description
                 selected = isSelected
@@ -268,9 +333,9 @@ private fun DayCell(
         Text(
             date.dayOfMonth.toString(),
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isToday) FontWeight.Bold else null,
+            fontWeight = if (isToday || isSelected) FontWeight.ExtraBold else FontWeight.Medium,
             color = when {
-                isSelected -> colors.onPrimaryContainer
+                isSelected -> extra.onBolt
                 inMonth -> colors.onSurface
                 else -> colors.outline
             },
@@ -287,12 +352,12 @@ private enum class MarkerShape { DOT, RING, SQUARE }
 
 @Composable
 private fun Marker(shape: MarkerShape) {
-    val colors = MaterialTheme.colorScheme
+    val colors = MaterialTheme.ricordellaColors
     val modifier = Modifier.size(6.dp)
     when (shape) {
-        MarkerShape.DOT -> Box(modifier.background(colors.primary, CircleShape))
-        MarkerShape.RING -> Box(modifier.border(1.5.dp, colors.secondary, CircleShape))
-        MarkerShape.SQUARE -> Box(modifier.background(colors.tertiary, RoundedCornerShape(1.dp)))
+        MarkerShape.DOT -> Box(modifier.background(colors.cyan.solid, CircleShape))
+        MarkerShape.RING -> Box(modifier.border(1.5.dp, colors.lavender.solid, CircleShape))
+        MarkerShape.SQUARE -> Box(modifier.background(colors.coral.solid, RoundedCornerShape(1.dp)))
     }
 }
 

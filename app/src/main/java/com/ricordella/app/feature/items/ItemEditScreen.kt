@@ -20,7 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.AttachFile
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.Check
+import com.ricordella.app.core.ui.PushButton
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -113,9 +114,13 @@ fun ItemEditScreen(onBack: () -> Unit) {
                 minLines = 2,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Button(onClick = viewModel::save, enabled = !form.isSaving, modifier = Modifier.fillMaxWidth().padding(vertical = RicordellaDimensions.spaceL)) {
-                Text("Salva")
-            }
+            PushButton(
+                text = "Salva",
+                onClick = viewModel::save,
+                icon = Icons.Rounded.Check,
+                loading = form.isSaving,
+                modifier = Modifier.fillMaxWidth().padding(vertical = RicordellaDimensions.spaceL),
+            )
         }
     }
 }

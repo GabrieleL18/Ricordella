@@ -1,5 +1,34 @@
 package com.ricordella.app.core.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.navigation.NavDestination
+import com.ricordella.app.core.ui.LocalQuickAddOpen
+import com.ricordella.app.core.ui.RicordellaMotion
+import com.ricordella.app.core.ui.pressScale
+import com.ricordella.app.core.ui.rememberReducedMotion
+import com.ricordella.app.core.ui.theme.Tone
+import com.ricordella.app.core.ui.theme.ricordellaColors
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,8 +47,6 @@ import androidx.compose.material.icons.rounded.People
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -102,21 +129,48 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
     }
 
     val adaptiveType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfoV2())
+    CompositionLocalProvider(LocalQuickAddOpen provides showQuickAdd) {
     NavigationSuiteScaffold(
         layoutType = if (currentTopLevel != null) adaptiveType else NavigationSuiteType.None,
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            navigationRailContainerColor = MaterialTheme.colorScheme.background,
+        ),
         navigationSuiteItems = {
             TopLevelDestination.entries.forEach { top ->
                 val selected = top == currentTopLevel
                 item(
                     selected = selected,
                     onClick = { navigator.openTopLevel(top.route) },
-                    icon = { Icon(if (selected) top.selectedIcon else top.icon, contentDescription = null) },
-                    label = { Text(top.label) },
+                    icon = { NavIcon(top, selected) },
+                    label = { Text(top.label, maxLines = 1) },
                 )
             }
         },
     ) {
-        NavHost(navController = navController, startDestination = HomeRoute) {
+        NavHost(
+            navController = navController,
+            startDestination = HomeRoute,
+            enterTransition = {
+                if (initialState.destination.isTopLevel() && targetState.destination.isTopLevel()) fadeThroughIn()
+                else slideIntoContainer(SlideDirection.Start, tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { it / 4 } +
+                    fadeIn(tween(RicordellaMotion.SHORT))
+            },
+            exitTransition = {
+                if (initialState.destination.isTopLevel() && targetState.destination.isTopLevel()) fadeOut(tween(90))
+                else slideOutOfContainer(SlideDirection.Start, tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { it / 10 } +
+                    fadeOut(tween(RicordellaMotion.SHORT))
+            },
+            popEnterTransition = {
+                if (initialState.destination.isTopLevel() && targetState.destination.isTopLevel()) fadeThroughIn()
+                else slideIntoContainer(SlideDirection.End, tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)) { it / 10 } +
+                    fadeIn(tween(RicordellaMotion.SHORT))
+            },
+            popExitTransition = {
+                slideOutOfContainer(SlideDirection.End, tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseIn)) { it / 4 } +
+                    fadeOut(tween(RicordellaMotion.SHORT))
+            },
+        ) {
             composable<HomeRoute> { HomeScreen(navigator, openQuickAdd) }
             composable<CalendarRoute> { CalendarScreen(navigator, openQuickAdd) }
             composable<RemindersRoute> { ReminderListScreen(navigator, openQuickAdd) }
@@ -131,6 +185,7 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
             composable<PersonDetailRoute> { PersonDetailScreen(navigator) }
             composable<PersonEditRoute> { PersonEditScreen(navigator) }
         }
+    }
     }
 
     if (showQuickAdd) {
@@ -149,31 +204,112 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
     }
 }
 
+private val topLevelRouteClasses = TopLevelDestination.entries.map { it.routeClass }
+
+private fun NavDestination.isTopLevel(): Boolean = topLevelRouteClasses.any { hasRoute(it) }
+
+/** Passaggio tra sezioni principali: dissolvenza con un accenno di zoom. */
+private fun fadeThroughIn(): EnterTransition =
+    fadeIn(tween(RicordellaMotion.SHORT, delayMillis = 60)) +
+        scaleIn(tween(RicordellaMotion.SHORT, delayMillis = 60, easing = RicordellaMotion.EaseOut), initialScale = 0.97f)
+
+@Composable
+private fun NavIcon(top: TopLevelDestination, selected: Boolean) {
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.12f else 1f,
+        animationSpec = tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseOut),
+        label = "navIcon",
+    )
+    Icon(
+        if (selected) top.selectedIcon else top.icon,
+        contentDescription = null,
+        modifier = Modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        },
+    )
+}
+
+private data class QuickAddOption(val kind: QuickAddKind, val icon: ImageVector, val title: String, val subtitle: String)
+
+private val QuickAddOptions = listOf(
+    QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, "Promemoria", "Da fare o da non dimenticare"),
+    QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, "Evento", "Appuntamento o ricorrenza"),
+    QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, "Cosa", "Auto, casa, dispositivi, documenti"),
+    QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, "Persona", "A chi collegare promemoria e cose"),
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-        Column(Modifier.navigationBarsPadding().padding(bottom = 16.dp)) {
-            Text(
-                "Cosa vuoi aggiungere?",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-            )
-            QuickAddRow(Icons.Rounded.NotificationsActive, "Promemoria", "Qualcosa da fare o da non dimenticare") { onSelected(QuickAddKind.REMINDER) }
-            QuickAddRow(Icons.Rounded.Event, "Evento", "Un appuntamento o una ricorrenza") { onSelected(QuickAddKind.EVENT) }
-            QuickAddRow(Icons.Rounded.Inventory2, "Cosa", "Auto, elettrodomestico, dispositivo, documento") { onSelected(QuickAddKind.ITEM) }
-            QuickAddRow(Icons.Rounded.PersonAdd, "Persona", "Qualcuno a cui collegare promemoria e cose") { onSelected(QuickAddKind.PERSON) }
+    val colors = MaterialTheme.ricordellaColors
+    val tones = listOf(colors.cyan, colors.lavender, colors.pear, colors.coral)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.background,
+    ) {
+        Column(
+            Modifier
+                .navigationBarsPadding()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text("Cosa vuoi aggiungere?", style = MaterialTheme.typography.headlineSmall)
+            QuickAddOptions.chunked(2).forEachIndexed { row, pair ->
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    pair.forEachIndexed { column, option ->
+                        val index = row * 2 + column
+                        QuickAddTile(
+                            option = option,
+                            tone = tones[index],
+                            index = index,
+                            onClick = { onSelected(option.kind) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+/** Riquadro colorato del foglio "Aggiungi": entra in cascata e si comprime al tocco. */
 @Composable
-private fun QuickAddRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
-        supportingContent = { Text(subtitle) },
-        leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 8.dp),
-    )
+private fun QuickAddTile(option: QuickAddOption, tone: Tone, index: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val reduced = rememberReducedMotion()
+    val appear = remember { Animatable(if (reduced) 1f else 0f) }
+    LaunchedEffect(Unit) {
+        delay(index * 50L)
+        appear.animateTo(1f, tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut))
+    }
+    val interaction = remember { MutableInteractionSource() }
+    Column(
+        modifier = modifier
+            .graphicsLayer {
+                alpha = appear.value
+                val scale = 0.85f + 0.15f * appear.value
+                scaleX = scale
+                scaleY = scale
+                translationY = (1f - appear.value) * 24.dp.toPx()
+            }
+            .pressScale(interaction, pressedScale = 0.95f)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Box(
+            Modifier
+                .size(48.dp)
+                .background(tone.solid, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(option.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(26.dp))
+        }
+        Text(option.title, style = MaterialTheme.typography.titleLarge, color = tone.content)
+        Text(option.subtitle, style = MaterialTheme.typography.bodySmall, color = tone.content, minLines = 2)
+    }
 }

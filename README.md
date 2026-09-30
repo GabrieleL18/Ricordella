@@ -26,6 +26,22 @@ La specifica completa è in [`Ricordella_specifica_tecnica_android.md`](Ricordel
 | **Backup** | Esportazione/importazione `.zip` via Storage Access Framework, con manifest versionato, firma SHA-256, controllo di integrità, anteprima e ripristino transazionale |
 | **Impostazioni** | Tema chiaro/scuro/sistema, primo giorno della settimana, formato data, notifiche, anticipo predefinito, orario dei promemoria "tutto il giorno", privacy |
 
+## Design
+
+Tono **giocoso ma ordinato**: carta crema, un giallo-saetta per le azioni principali, azzurro vetro per selezioni e link,
+corallo solo per i momenti che contano (scaduti, compleanni), menta per il "fatto!". Ogni colore ha un significato
+ed è sempre accompagnato da un'icona o da un testo. Font: Plus Jakarta Sans (OFL), incorporato nell'app.
+
+- **Ricordella, la mascotte**: una palla di vetro con una saetta dentro (è anche l'icona dell'app). Ondeggia piano
+  in Home e la saetta si accende quando la tocchi o completi qualcosa.
+- **Completare è una piccola festa**: tocca il cerchio o trascina la card verso destra → spunta con molla,
+  scoppio di stelle e vibrazione.
+- **Pulsanti "push"** gialli che si abbassano davvero quando li premi; card che si comprimono al tocco.
+- **Movimento con un senso**: comparsa a cascata in Home, liste che animano inserimenti e rimozioni,
+  mese del calendario che scorre (anche con uno swipe), contatori che scorrono, schermate di dettaglio che entrano
+  di lato, "+" che ruota quando apri il foglio "Aggiungi" a riquadri colorati.
+- Se in Android le animazioni sono disattivate, quelle decorative vengono saltate.
+
 ## Stack
 
 Kotlin · Jetpack Compose + Material 3 · Navigation Compose (route type-safe) · layout adattivo
