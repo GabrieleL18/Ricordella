@@ -60,12 +60,12 @@ p {{ font-size: 40px; margin: 28px 80px 0; opacity: .9; line-height: 1.3; }}
 .screen {{ width: 100%; height: 100%; border-radius: 56px; overflow: hidden; background: #111319; }}
 .screen img {{ width: 100%; height: auto; display: block; margin-top: -{crop}%; }}
 .missing {{ height: 100%; display: flex; align-items: center; justify-content: center; color: #7A7766; font-size: 44px; border: 6px dashed #D6D0BA; border-radius: 56px; box-sizing: border-box; }}
-.brand {{ position: absolute; right: 70px; top: 60px; font-family: Fredoka, sans-serif; font-size: 40px;
-          background: linear-gradient(90deg, #FFC400, #FF7A00); -webkit-background-clip: text; color: transparent; }}
+.brand {{ position: absolute; right: 60px; top: 44px; }}
+{title_css}
 </style></head><body>
 {stars}
 {props}
-<div class="brand">Remindella</div>
+<div class="brand">{brand}</div>
 <h1>{title}</h1>
 <p>{subtitle}</p>
 {phones}
@@ -100,6 +100,34 @@ def star_path(cx, cy, r):
             f"L{cx} {cy + r} L{cx - i} {cy + i} L{cx - r} {cy} L{cx - i} {cy - i} Z")
 
 
+# Il nome dell'app come nella grafica in primo piano (anche in make_logo.py).
+TITLE_CSS = """.title { font-family: Fredoka, sans-serif; font-weight: 700; line-height: 1.1; white-space: nowrap; filter: drop-shadow(0 .07em 0 #1E0E40) drop-shadow(0 0 .22em rgba(255,196,0,.45)); }
+.letter { display: inline-block; position: relative; }
+.letter .edge { position: absolute; left: 0; top: 0; color: #3B1F73; -webkit-text-stroke: 0.14em #3B1F73; }
+.letter .fill { position: relative; background: linear-gradient(#FFF6B0, #FFD23D 45%, #FF8A00); -webkit-background-clip: text; background-clip: text; color: transparent; }
+"""
+
+
+def brand_title(size):
+    """ "Remindella" a lettere che ballano, dorate col bordo viola, con una stella al posto del puntino della i e una scia magica sotto."""
+    letters = []
+    for n, ch in enumerate("Remindella"):
+        lift = (-1) ** n * size * 0.05
+        tilt = (-1) ** (n + 1) * 5
+        star = ""
+        if ch == "i":
+            ch = "ı"  # i senza puntino: il puntino lo fa la stella.
+            star = (f'<svg viewBox="0 0 20 20" style="position:absolute;left:50%;top:{size * 0.12}px;width:{size * 0.3}px;transform:translateX(-50%) rotate(15deg);'
+                    f'overflow:visible;filter:drop-shadow(0 0 {size * 0.08}px #FFE066)"><path d="{star_path(10, 10, 10)}" fill="white"/></svg>')
+        letters.append(f'<span class="letter" style="transform:translateY({lift}px) rotate({tilt}deg)"><span class="edge">{ch}</span><span class="fill">{ch}</span>{star}</span>')
+    trail = (f'<svg viewBox="0 0 400 40" style="display:block;width:{size * 5.4}px;margin-top:{-size * 0.05}px;overflow:visible">'
+             '<path d="M6 22 Q120 44 250 24 T392 10" stroke="url(#trail)" stroke-width="5" fill="none" stroke-linecap="round"/>'
+             '<defs><linearGradient id="trail"><stop offset="0" stop-color="#FFE066" stop-opacity="0"/><stop offset="1" stop-color="#FFE066"/></linearGradient></defs>'
+             f'<path d="{star_path(392, 10, 13)}" fill="{BOLT}"/><path d="{star_path(300, 36, 5)}" fill="white" opacity=".8"/>'
+             f'<path d="{star_path(200, 8, 4)}" fill="white" opacity=".6"/></svg>')
+    return f'<div class="title" style="font-size:{size}px">{"".join(letters)}</div>{trail}'
+
+
 def hat(color=CYAN):
     return (f'<path d="M14 80 Q38 46 70 6 Q56 46 86 80 Z" fill="{color}"/>'
             f'<path d="M70 6 Q60 30 64 50" stroke="white" stroke-opacity=".25" stroke-width="4" fill="none" stroke-linecap="round"/>'
@@ -116,11 +144,12 @@ def wand():
             f'<path d="{star_path(56, 10, 5)}" fill="{CYAN}"/>')
 
 
-def crystal_ball():
+def crystal_ball(stand=True):
+    """Palla di vetro con la saetta; senza [stand] fluttua da sola."""
     return ('<defs><radialGradient id="glass" cx="38%" cy="32%" r="70%">'
             '<stop offset="0" stop-color="#CFF2FF"/><stop offset=".55" stop-color="#6CC8F0"/><stop offset="1" stop-color="#2E8FD0"/></radialGradient></defs>'
-            f'<path d="M22 96 L30 74 H70 L78 96 Z" fill="{LAVENDER}"/>'
-            '<circle cx="50" cy="44" r="36" fill="url(#glass)"/>'
+            + (f'<path d="M22 96 L30 74 H70 L78 96 Z" fill="{LAVENDER}"/>' if stand else '')
+            + '<circle cx="50" cy="44" r="36" fill="url(#glass)"/>'
             '<path d="M32 30 A22 22 0 0 1 48 18" stroke="white" stroke-width="5" fill="none" stroke-linecap="round" opacity=".85"/>'
             f'<path d="M54 26 L40 48 H50 L44 64 L60 40 H50 Z" fill="{BOLT}"/>')
 
@@ -150,24 +179,51 @@ def potion():
 SKIN, BEAR, BEAR_DARK, BEAR_LIGHT, INK = "#FFD9B8", "#8B5A3C", "#6B4129", "#D9A57A", "#2B1B12"
 
 
-def wizard():
-    """Il maghetto della sveglia: tunica lavanda, cappello azzurro, barba bianca e bacchetta che fa scintille."""
-    return (f'<ellipse cx="48" cy="93" rx="28" ry="4" fill="black" opacity=".25"/>'
-            f'<path d="M22 92 L48 40 L74 92 Z" fill="{LAVENDER}"/>'
-            f'<rect x="20" y="88" width="56" height="6" rx="2" fill="{BOLT}"/>'
-            f'<line x1="58" y1="60" x2="78" y2="50" stroke="{LAVENDER}" stroke-width="7" stroke-linecap="round"/>'
-            f'<line x1="80" y1="49" x2="93" y2="33" stroke="{WOOD}" stroke-width="3" stroke-linecap="round"/>'
-            f'<circle cx="79" cy="49" r="4" fill="{SKIN}"/>'
-            f'<path d="{star_path(95, 29, 7)}" fill="{BOLT}"/>'
-            f'<path d="{star_path(86, 20, 3)}" fill="white"/><path d="{star_path(99, 42, 2.5)}" fill="{CORAL}"/>'
-            f'<circle cx="48" cy="37" r="10" fill="{SKIN}"/>'
-            '<circle cx="41" cy="41" r="2" fill="#FF9EAE"/><circle cx="55" cy="41" r="2" fill="#FF9EAE"/>'
-            f'<path d="M42 36 q2.5 -2.5 5 0 M49 36 q2.5 -2.5 5 0" stroke="{INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>'
-            '<path d="M38 42 Q48 64 58 42 Q54 47 48 46 Q42 47 38 42 Z" fill="white"/>'
-            '<circle cx="40" cy="45" r="4" fill="white"/><circle cx="56" cy="45" r="4" fill="white"/><circle cx="48" cy="52" r="6" fill="#ECE8F4"/>'
-            f'<path d="M36 28 L60 28 L56 2 Q48 18 36 28 Z" fill="{CYAN}"/>'
-            f'<rect x="32" y="26" width="32" height="4" rx="2" fill="#6A56D8"/>'
-            f'<path d="{star_path(50, 20, 4)}" fill="{BOLT}"/>')
+def wizard(amazed=False, arm=True):
+    """Il maghetto dell'app, ricalcato da drawWizard in Wizard.kt (riquadro 100x100, colori del tema scuro).
+
+    [arm]: False toglie braccio e bacchetta (per i primi piani).
+    [amazed]: occhi spalancati che guardano a destra, sopracciglia alzate, bocca a "o" e braccio alzato per lo stupore.
+    """
+    lav, cyan, stand, ink, beard, shade = "#B98CF0", "#5BC0F5", "#7E62E6", "#2B2140", "#FFFFFF", "#E6E4EF"
+    skin = "#FFD7B5"
+    puffs = [(37.6, 45.4, beard), (46, 48.4, beard), (54.4, 45.4, beard), (41.8, 51.4, shade), (50.2, 51.4, shade), (46, 55.6, shade)]
+
+    def eye(x):
+        return f'M{x - 2.255:.3f} 38.623 A2.4 1.92 0 0 1 {x + 2.255:.3f} 38.623'
+    return (
+        '<ellipse cx="46" cy="93.5" rx="26" ry="3.5" fill="black" opacity=".25"/>'
+        f'<path d="M34 50 L58 50 L72 93 L20 93 Z" fill="{lav}"/>'
+        f'<rect x="20" y="88" width="52" height="5" fill="{BOLT}"/>'
+        # Braccio con la bacchetta, inclinato come nell'app.
+        + (f'<g transform="rotate({-70 if amazed else -35} 56 58)">'
+        f'<line x1="56" y1="58" x2="76" y2="58" stroke="{lav}" stroke-width="7" stroke-linecap="round"/>'
+        f'<line x1="78" y1="58" x2="98" y2="56" stroke="{WOOD}" stroke-width="2.5" stroke-linecap="round"/>'
+        f'<circle cx="78" cy="58" r="4" fill="{skin}"/>'
+        f'<path d="{star_path(98, 56, 6.5)}" fill="{BOLT}"/>'
+        f'<path d="{star_path(101, 51.3, 2.3)}" fill="{BOLT}"/><path d="{star_path(105, 47.9, 1.6)}" fill="{CYAN}"/>'
+        f'<path d="{star_path(103.5, 60, 1.4)}" fill="{CORAL}"/>'
+        '</g>' if arm else '')
+        # Testa: viso, barba a nuvola, occhi chiusi felici, guance, sorriso.
+        + f'<circle cx="46" cy="40" r="12" fill="{skin}"/>'
+        + "".join(f'<circle cx="{x}" cy="{y}" r="6.6" fill="{c}"/>' for x, y, c in puffs)
+        + (
+            # Stupito: occhi tondi che guardano la palla, sopracciglia alte e bocca a "o".
+            '<ellipse cx="40.96" cy="38" rx="2.6" ry="3" fill="white"/><ellipse cx="51.04" cy="38" rx="2.6" ry="3" fill="white"/>'
+            f'<circle cx="42" cy="38.4" r="1.5" fill="{ink}"/><circle cx="52.1" cy="38.4" r="1.5" fill="{ink}"/>'
+            f'<path d="M38.4 33.6 Q41 32 43.4 33.4 M48.6 33.4 Q51 32 53.6 33.6" stroke="{ink}" stroke-width="1.1" fill="none" stroke-linecap="round"/>'
+            '<circle cx="38.2" cy="43" r="1.92" fill="#FF9E9E" opacity=".7"/><circle cx="53.8" cy="43" r="1.92" fill="#FF9E9E" opacity=".7"/>'
+            f'<ellipse cx="46.5" cy="45.6" rx="1.7" ry="2.3" fill="{ink}"/>'
+            if amazed else
+            f'<path d="{eye(40.96)} {eye(51.04)}" stroke="{ink}" stroke-width="1.44" fill="none" stroke-linecap="round"/>'
+            '<circle cx="38.56" cy="42.64" r="1.92" fill="#FF9E9E" opacity=".7"/><circle cx="53.44" cy="42.64" r="1.92" fill="#FF9E9E" opacity=".7"/>'
+            f'<path d="M49.157 43.821 A3.36 2.4 0 0 1 42.843 43.821" stroke="{ink}" stroke-width="1.2" fill="none" stroke-linecap="round"/>'
+        )
+        # Cappello a punta un po' storto, falda viola e stella.
+        + f'<path d="M33.4 31.6 Q43.6 17.2 56.8 2.8 Q50.8 19.6 58.6 31.6 Z" fill="{cyan}"/>'
+        f'<rect x="29.8" y="30.16" width="32.4" height="3.6" rx="1.8" fill="{stand}"/>'
+        f'<path d="{star_path(46.6, 22, 3.7)}" fill="{BOLT}"/>'
+    )
 
 
 def sleeping_bear():
@@ -184,6 +240,24 @@ def sleeping_bear():
             '<g font-family="Fredoka, sans-serif" font-weight="600" fill="white">'
             '<text x="42" y="50" font-size="9" opacity=".6">z</text><text x="50" y="38" font-size="12" opacity=".8">z</text>'
             '<text x="60" y="24" font-size="16">z</text></g>')
+
+
+def amazed_bear():
+    """L'orso sveglio, seduto, con le zampe sulle guance e gli occhi spalancati verso sinistra."""
+    return (f'<ellipse cx="50" cy="95" rx="30" ry="4" fill="black" opacity=".25"/>'
+            f'<ellipse cx="50" cy="72" rx="28" ry="24" fill="{BEAR}"/>'
+            f'<ellipse cx="50" cy="76" rx="17" ry="16" fill="{BEAR_LIGHT}"/>'
+            f'<ellipse cx="34" cy="92" rx="10" ry="5.5" fill="{BEAR_DARK}"/><ellipse cx="66" cy="92" rx="10" ry="5.5" fill="{BEAR_DARK}"/>'
+            f'<circle cx="34" cy="22" r="7" fill="{BEAR}"/><circle cx="34" cy="22" r="3.5" fill="{BEAR_LIGHT}"/>'
+            f'<circle cx="66" cy="22" r="7" fill="{BEAR}"/><circle cx="66" cy="22" r="3.5" fill="{BEAR_LIGHT}"/>'
+            f'<circle cx="50" cy="38" r="20" fill="{BEAR}"/>'
+            '<circle cx="42" cy="34" r="5" fill="white"/><circle cx="58" cy="34" r="5" fill="white"/>'
+            f'<circle cx="40" cy="34.6" r="2.5" fill="{INK}"/><circle cx="56" cy="34.6" r="2.5" fill="{INK}"/>'
+            f'<path d="M37 26 Q41.5 23 46 25.5 M54 25.5 Q58.5 23 63 26" stroke="{INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>'
+            f'<ellipse cx="50" cy="47" rx="9" ry="7.5" fill="{BEAR_LIGHT}"/><ellipse cx="50" cy="42.5" rx="3" ry="2" fill="{INK}"/>'
+            f'<ellipse cx="50" cy="49.5" rx="2.6" ry="3.2" fill="{INK}"/>'
+            f'<circle cx="31" cy="47" r="6.5" fill="{BEAR}"/><circle cx="69" cy="47" r="6.5" fill="{BEAR}"/>'
+            f'<circle cx="31" cy="48" r="3" fill="{BEAR_LIGHT}"/><circle cx="69" cy="48" r="3" fill="{BEAR_LIGHT}"/>')
 
 
 def prop(svg, left, top, size, rotate=0, flip=False):
@@ -221,41 +295,45 @@ def phones(names):
     )
 
 
-def main():
+def render(html, target, width, height):
+    """Disegna [html] con Edge/Chrome senza finestra e ne salva la schermata in [target]."""
     browser = next((b for b in BROWSERS if b.exists()), None)
     if browser is None:
         raise SystemExit("Serve Microsoft Edge o Google Chrome per creare le immagini.")
-    OUT.mkdir(exist_ok=True)
+    target.parent.mkdir(exist_ok=True)
+    page = target.with_name(f"_{target.stem}.html")
+    page.write_text(html, encoding="utf-8")
+    target.unlink(missing_ok=True)
+    # Profilo separato per ogni immagine: se il browser è già aperto, senza questo passerebbe
+    # il comando alla finestra esistente e non salverebbe nulla.
+    profile = tempfile.mkdtemp(prefix="remindella-store-")
+    subprocess.run(
+        [str(browser), "--headless=new", "--disable-gpu", f"--user-data-dir={profile}", "--hide-scrollbars", "--allow-file-access-from-files",
+         "--force-device-scale-factor=1", f"--window-size={width},{height}", f"--screenshot={target}", page.as_uri()],
+        check=True, capture_output=True,
+    )
+    # Il browser risponde subito e salva la schermata poco dopo: si aspetta il file.
+    for _ in range(120):
+        if target.exists() and target.stat().st_size > 0:
+            break
+        time.sleep(0.25)
+    else:
+        raise SystemExit(f"Il browser non ha creato {target.name}")
+    time.sleep(0.5)
+    page.unlink()
+    print("creata", target.name)
+
+
+def main():
     for n, (title, subtitle, top, bottom, accent, names) in enumerate(SCREENS, start=1):
         # La prima riga del titolo resta bianca, la seconda prende il colore d'accento.
         first, _, second = title.partition("<br>")
         html = PAGE.format(
-            fonts=FONTS.as_uri(), crop=f"{STATUS_BAR * 100:.1f}", top=top, bottom=bottom, accent=accent, stars=stars(n),
+            fonts=FONTS.as_uri(), title_css=TITLE_CSS, brand=brand_title(46), crop=f"{STATUS_BAR * 100:.1f}", top=top, bottom=bottom, accent=accent, stars=stars(n),
             props="\n".join(PROPS.get(n, [])),
             title=f"{first}<br><span>{second}</span>", subtitle=subtitle, phones=phones(names),
         )
-        page = OUT / f"_{n}.html"
-        page.write_text(html, encoding="utf-8")
-        target = OUT / f"remindella-{n}.png"
-        target.unlink(missing_ok=True)
-        # Profilo separato per ogni immagine: se il browser è già aperto, senza questo passerebbe
-        # il comando alla finestra esistente e non salverebbe nulla.
-        profile = tempfile.mkdtemp(prefix="remindella-store-")
-        subprocess.run(
-            [str(browser), "--headless=new", "--disable-gpu", f"--user-data-dir={profile}", "--hide-scrollbars", "--allow-file-access-from-files",
-             "--force-device-scale-factor=1", "--window-size=1080,1920", f"--screenshot={target}", page.as_uri()],
-            check=True, capture_output=True,
-        )
-        # Il browser risponde subito e salva la schermata poco dopo: si aspetta il file.
-        for _ in range(120):
-            if target.exists() and target.stat().st_size > 0:
-                break
-            time.sleep(0.25)
-        else:
-            raise SystemExit(f"Il browser non ha creato {target.name}")
-        time.sleep(0.5)
-        page.unlink()
-        print("creata", target.relative_to(ROOT.parent))
+        render(html, OUT / f"remindella-{n}.png", 1080, 1920)
 
 
 if __name__ == "__main__":

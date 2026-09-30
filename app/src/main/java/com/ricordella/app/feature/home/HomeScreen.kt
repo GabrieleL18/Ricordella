@@ -71,7 +71,6 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.navigation.AppNavigator
-import com.ricordella.app.core.ui.CrystalBallMascot
 import com.ricordella.app.core.ui.EmptyState
 import com.ricordella.app.core.ui.HappyWizard
 import com.ricordella.app.core.ui.MascotState
@@ -266,7 +265,7 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                 }
                 Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            CrystalBallMascot(size = 92.dp, state = mascot, overdue = state.hasOverdue)
+            HappyWizard(size = 92.dp, waving = true, magic = mascot.sparks)
         }
         if (!state.isLoading && !state.isEmpty) {
             Row(

@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.wizardProp
 import com.ricordella.app.core.ui.CompletionHistory
 import com.ricordella.app.core.ui.birthdayAgeLabel
 import com.ricordella.app.domain.model.ageOn
@@ -225,6 +227,7 @@ private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
                 color = tone.content,
             )
         }
+        HappyWizard(size = 88.dp, holding = reminder.type.wizardProp)
     }
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         when (status) {

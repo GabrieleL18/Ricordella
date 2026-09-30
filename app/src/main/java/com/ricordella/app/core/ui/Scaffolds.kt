@@ -46,7 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import com.ricordella.app.core.navigation.AppNavigator
-import com.ricordella.app.core.ui.theme.BrandTitleStyle
+import androidx.compose.ui.unit.sp
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 
 /** Limita la larghezza dei contenuti su tablet e schermi larghi, centrandoli. */
@@ -77,10 +77,8 @@ fun TopLevelScaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        title,
-                        style = if (brandTitle) BrandTitleStyle else MaterialTheme.typography.headlineSmall,
-                    )
+                    if (brandTitle) MagicTitle(fontSize = 28.sp)
+                    else Text(title, style = MaterialTheme.typography.headlineSmall)
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(

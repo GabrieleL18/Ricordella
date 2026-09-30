@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.wizardSceneFor
 import com.ricordella.app.core.ui.HistoryItem
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
@@ -265,7 +267,7 @@ private fun ItemHeader(entry: ItemWithCategory) {
     }
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
         IconBadge(entry.category?.kind.icon, containerColor = entry.group.tone.container, contentColor = entry.group.tone.content)
-        Column {
+        Column(Modifier.weight(1f)) {
             Text(item.name, style = MaterialTheme.typography.headlineSmall)
             Text(
                 listOfNotNull(entry.category?.label, if (item.isArchived) tr("Archiviata") else null).joinToString(" · "),
@@ -273,6 +275,7 @@ private fun ItemHeader(entry: ItemWithCategory) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        HappyWizard(size = 88.dp, scene = wizardSceneFor(entry.group))
     }
 }
 

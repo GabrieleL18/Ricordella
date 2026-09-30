@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.navigation.AppNavigator
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.WizardScene
 import com.ricordella.app.core.ui.EmptyState
 import com.ricordella.app.core.ui.IconChipRow
 import com.ricordella.app.core.ui.IconChoiceChip
@@ -122,6 +124,7 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         message = tr("Aggiungi auto, elettrodomestici, dispositivi e documenti per ricordarne scadenze e manutenzioni."),
                         actionLabel = if (state.showArchived) null else tr("Aggiungi cosa"),
                         onAction = { navigator.newItem() },
+                        illustration = { HappyWizard(size = 140.dp, scene = WizardScene.SEARCHING) },
                     )
                 }
             }

@@ -52,6 +52,7 @@ import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Upload
@@ -308,6 +309,17 @@ fun SettingsScreen(onBack: () -> Unit) {
                 subtitle = tr("I tuoi dati restano sul dispositivo."),
                 onClick = { showPrivacy = true },
             )
+            val context = LocalContext.current
+            SettingRow(
+                icon = Icons.Rounded.Email,
+                title = tr("Assistenza"),
+                subtitle = SUPPORT_EMAIL,
+                onClick = {
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_SENDTO, "mailto:$SUPPORT_EMAIL?subject=Remindella".toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    }
+                },
+            )
             if (settings.developerMode) {
                 val tools = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.developerTools
                 DeveloperSection(tools, viewModel::update, justUnlocked)
@@ -410,6 +422,7 @@ private fun backupFileName(newVersion: Boolean): String =
     if (newVersion) "remindella-backup-${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))}.zip"
     else "remindella-backup.zip"
 
+private const val SUPPORT_EMAIL = "lannilab.support@gmail.com"
 private const val BACKUP_EXPORT = "export"
 private const val BACKUP_IMPORT = "import"
 

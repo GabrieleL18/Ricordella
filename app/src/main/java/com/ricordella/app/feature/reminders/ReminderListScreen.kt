@@ -23,6 +23,8 @@ import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.WizardScene
 import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.domain.model.ReminderFilter
 import androidx.compose.animation.AnimatedContent
@@ -193,6 +195,7 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         else tr("Non c'è nulla da ricordare qui."),
                         actionLabel = tr("Aggiungi"),
                         onAction = onAdd,
+                        illustration = { HappyWizard(size = 140.dp, scene = WizardScene.WAITING_BELL) },
                     )
                 }
             }

@@ -65,7 +65,7 @@ import com.ricordella.app.core.ui.SectionTutorialPages
 import com.ricordella.app.core.ui.TutorialPager
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
-import com.ricordella.app.core.ui.theme.BrandTitleStyle
+import com.ricordella.app.core.ui.MagicTitle
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import androidx.compose.ui.unit.sp
 import com.ricordella.app.core.ui.theme.ricordellaColors
@@ -175,7 +175,7 @@ private fun Welcome(onNext: () -> Unit) {
         CrystalBallMascot(size = 160.dp)
         Spacer(Modifier.height(RicordellaDimensions.spaceXl))
         Text(tr("Ciao, sono"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-        Text(tr("Remindella"), style = BrandTitleStyle.copy(fontSize = 44.sp), textAlign = TextAlign.Center)
+        MagicTitle(fontSize = 44.sp)
         Spacer(Modifier.height(RicordellaDimensions.spaceS))
         Text(
             tr("Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?"),
