@@ -144,7 +144,7 @@ private fun ReminderBadges(entry: ReminderWithLinks, timeStatus: ReminderTimeSta
 }
 
 @Composable
-fun PersonAvatar(person: Person, size: Dp = 48.dp, modifier: Modifier = Modifier) {
+fun PersonAvatar(person: Person, modifier: Modifier = Modifier, size: Dp = 48.dp) {
     val initials = person.displayName.split(" ").filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }
     val placeholder: @Composable () -> Unit = {
         Box(

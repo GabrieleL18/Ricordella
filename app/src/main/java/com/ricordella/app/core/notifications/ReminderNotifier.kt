@@ -1,5 +1,6 @@
 package com.ricordella.app.core.notifications
 
+import android.os.Build
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -37,8 +38,8 @@ class ReminderNotifier(private val context: Context) {
     }
 
     fun canPostNotifications(): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED || android.os.Build.VERSION.SDK_INT < 33
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
     fun show(entry: ReminderWithLinks, today: LocalDate) {
         if (!canPostNotifications()) return

@@ -2,6 +2,8 @@ package com.ricordella.app.domain.date
 
 import com.ricordella.app.domain.model.RecurrenceFrequency
 import com.ricordella.app.domain.model.RecurrenceRule
+import com.ricordella.app.domain.model.Reminder
+import com.ricordella.app.domain.model.ReminderStatus
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -23,6 +25,17 @@ class RecurrenceCalculator {
     /** Occorrenze comprese tra [from] e [to] inclusi. */
     fun occurrencesBetween(rule: RecurrenceRule, from: LocalDate, to: LocalDate): List<LocalDate> =
         occurrencesFrom(rule, from).takeWhile { !it.isAfter(to) }.toList()
+
+    /**
+     * Date in cui un promemoria compare nel periodo [from]-[to]: l'occorrenza corrente e,
+     * se è attivo e ricorrente, le occorrenze future calcolate dalla regola.
+     */
+    fun occurrencesInRange(reminder: Reminder, rule: RecurrenceRule?, from: LocalDate, to: LocalDate): List<LocalDate> {
+        val current = reminder.dueDate.takeIf { !it.isBefore(from) && !it.isAfter(to) }
+        if (rule == null || reminder.status != ReminderStatus.ACTIVE) return listOfNotNull(current)
+        val projected = occurrencesBetween(rule, maxOf(from, reminder.dueDate.plusDays(1)), to)
+        return listOfNotNull(current) + projected
+    }
 
     /** Sequenza ordinata delle occorrenze a partire da [from] (incluso), limitata da endDate. */
     fun occurrencesFrom(rule: RecurrenceRule, from: LocalDate): Sequence<LocalDate> {

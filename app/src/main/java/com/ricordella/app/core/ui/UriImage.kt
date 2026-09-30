@@ -1,5 +1,6 @@
 package com.ricordella.app.core.ui
 
+import androidx.core.net.toUri
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -30,7 +31,7 @@ fun UriImage(
 ) {
     val context = LocalContext.current
     val bitmap by produceState<Bitmap?>(initialValue = null, uri) {
-        value = withContext(Dispatchers.IO) { loadThumbnail(context, Uri.parse(uri), maxSizePx) }
+        value = withContext(Dispatchers.IO) { loadThumbnail(context, uri.toUri(), maxSizePx) }
     }
     val image = bitmap
     if (image == null) {

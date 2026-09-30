@@ -18,6 +18,7 @@ object DateTexts {
     private val extendedWithYear = DateTimeFormatter.ofPattern("d MMMM yyyy", locale)
     private val extendedNoYear = DateTimeFormatter.ofPattern("d MMMM", locale)
     private val dayHeader = DateTimeFormatter.ofPattern("EEEE d MMMM", locale)
+    private val fullDate = DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", locale)
     private val time = DateTimeFormatter.ofPattern("HH:mm", locale)
 
     fun date(date: LocalDate, style: DateFormatStyle, today: LocalDate? = null): String = when (style) {
@@ -50,6 +51,9 @@ object DateTexts {
         today.plusDays(1) -> "Domani · " + dayHeader.format(date)
         else -> dayHeader.format(date)
     }.uppercase(locale)
+
+    /** Es. "lunedì 29 settembre 2026", per descrizioni accessibili. */
+    fun fullDate(date: LocalDate): String = fullDate.format(date)
 
     fun monthTitle(month: YearMonth): String =
         month.month.getDisplayName(TextStyle.FULL_STANDALONE, locale).replaceFirstChar { it.uppercase() } + " " + month.year

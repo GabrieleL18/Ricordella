@@ -1,5 +1,6 @@
 package com.ricordella.app.data.backup
 
+import androidx.core.net.toUri
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
@@ -39,7 +40,7 @@ class BackupRepository(
         val database = backupDao.readAll()
         val settings = settingsRepository.current()
         val files = database.fileUris().map { uri ->
-            BackupArchiveCodec.FileSource(uri) { resolver.openInputStream(Uri.parse(uri)) }
+            BackupArchiveCodec.FileSource(uri) { resolver.openInputStream(uri.toUri()) }
         }
         val output = resolver.openOutputStream(destination, "wt") ?: throw IOException("Destinazione non disponibile")
         output.use {
