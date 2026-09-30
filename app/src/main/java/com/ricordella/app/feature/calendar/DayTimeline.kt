@@ -255,8 +255,6 @@ private fun TimelineCard(
                 reminder.title,
                 style = MaterialTheme.typography.titleMedium,
                 color = tone.content,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
                 textDecoration = if (done) TextDecoration.LineThrough else null,
             )
             Text(

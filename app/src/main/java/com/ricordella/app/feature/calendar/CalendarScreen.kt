@@ -59,6 +59,8 @@ import com.ricordella.app.core.ui.MonthYearGrid
 import java.time.temporal.ChronoUnit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.layout.layout
 import com.ricordella.app.core.ui.tone
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.style.TextOverflow
@@ -330,7 +332,7 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
             Column {
                 monthGrid(month, state.firstDayOfWeek).chunked(7).forEach { week ->
                     Row(Modifier.fillMaxWidth()) {
-                        week.forEach { day ->
+                        week.forEachIndexed { index, day ->
                             DayCell(
                                 date = day,
                                 occurrences = state.occurrences[day].orEmpty(),
@@ -341,7 +343,8 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
                                 isToday = day == today,
                                 isSelected = day == state.selectedDate,
                                 onClick = { viewModel.onSelectDate(day) },
-                                modifier = Modifier.weight(1f),
+                                // I giorni a sinistra stanno sopra: il titolo di una barra può scorrere sui giorni seguenti.
+                                modifier = Modifier.weight(1f).zIndex((7 - index).toFloat()),
                             )
                         }
                     }
@@ -483,14 +486,19 @@ private fun SpanBars(
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     if (first || rowStart) {
+                        // Il titolo occupa tutti i giorni della barra in questa settimana, non solo il primo.
+                        val leftInRow = 6 - (date.dayOfWeek.value - firstDayOfWeek.value + 7) % 7
+                        val days = minOf(leftInRow.toLong(), ChronoUnit.DAYS.between(date, span.end)).toInt() + 1
                         Text(
                             span.reminder.title,
                             style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp, lineHeight = 9.sp),
                             color = MaterialTheme.colorScheme.surfaceContainerLowest,
                             maxLines = 1,
-                            softWrap = false,
-                            overflow = TextOverflow.Clip,
-                            modifier = Modifier.padding(start = 3.dp),
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 3.dp).layout { measurable, constraints ->
+                                val text = measurable.measure(constraints.copy(minWidth = 0, maxWidth = constraints.maxWidth * days))
+                                layout(constraints.maxWidth, text.height) { text.place(0, 0) }
+                            },
                         )
                     }
                 }

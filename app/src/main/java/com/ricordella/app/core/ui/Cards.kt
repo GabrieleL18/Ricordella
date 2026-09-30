@@ -282,8 +282,6 @@ private fun ReminderCardBody(
                 Text(
                     reminder.title,
                     style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
                     textDecoration = if (checked) TextDecoration.LineThrough else null,
                     modifier = Modifier.graphicsLayer { alpha = titleAlpha },
                 )
