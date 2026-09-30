@@ -50,6 +50,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import com.ricordella.app.core.ui.MonthYearGrid
+import java.time.temporal.ChronoUnit
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.ricordella.app.core.ui.tone
@@ -213,10 +218,19 @@ private fun OccurrenceCard(
 }
 
 @Composable
-private fun PeriodHeader(title: String, onPrevious: () -> Unit, onNext: () -> Unit, onToday: () -> Unit) {
+private fun PeriodHeader(title: String, onPrevious: () -> Unit, onNext: () -> Unit, onToday: () -> Unit, onTitleClick: (() -> Unit)? = null) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onPrevious) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowLeft, contentDescription = tr("Precedente")) }
-        Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+        Text(
+            title,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .weight(1f)
+                .clip(CircleShape)
+                .then(if (onTitleClick != null) Modifier.clickable(role = Role.Button, onClickLabel = tr("Scegli mese e anno"), onClick = onTitleClick) else Modifier)
+                .padding(vertical = 8.dp),
+        )
         IconButton(onClick = onNext) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Successivo")) }
         TextButton(onClick = onToday) { Text(tr("Oggi")) }
     }
@@ -224,12 +238,26 @@ private fun PeriodHeader(title: String, onPrevious: () -> Unit, onNext: () -> Un
 
 @Composable
 private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, today: LocalDate) {
+    var pickingMonth by remember { mutableStateOf(false) }
+    if (pickingMonth) {
+        AlertDialog(
+            onDismissRequest = { pickingMonth = false },
+            confirmButton = { TextButton(onClick = { pickingMonth = false }) { Text(tr("Annulla")) } },
+            text = {
+                MonthYearGrid(state.month) {
+                    viewModel.onShiftMonth(ChronoUnit.MONTHS.between(state.month, it))
+                    pickingMonth = false
+                }
+            },
+        )
+    }
     Column {
         PeriodHeader(
             title = DateTexts.monthTitle(state.month),
             onPrevious = { viewModel.onShiftMonth(-1) },
             onNext = { viewModel.onShiftMonth(1) },
             onToday = { viewModel.onToday(today) },
+            onTitleClick = { pickingMonth = true },
         )
         Row(Modifier.fillMaxWidth()) {
             state.gridDays.take(7).forEach { day ->

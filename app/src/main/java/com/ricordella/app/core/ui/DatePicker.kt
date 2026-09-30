@@ -318,7 +318,7 @@ private fun DayButton(date: LocalDate, inMonth: Boolean, isSelected: Boolean, is
 
 /** Scelta rapida: anno con le frecce e i dodici mesi in griglia. */
 @Composable
-private fun MonthYearGrid(current: YearMonth, onPicked: (YearMonth) -> Unit) {
+internal fun MonthYearGrid(current: YearMonth, onPicked: (YearMonth) -> Unit) {
     var year by remember { mutableStateOf(current.year) }
     val colors = MaterialTheme.ricordellaColors
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

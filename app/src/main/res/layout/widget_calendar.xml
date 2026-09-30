@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget calendario: mese corrente e successivo (sfogliabili), giorni con impegni evidenziati, prossimo promemoria. -->
+<!-- Widget calendario: un mese sfogliabile, giorni con impegni evidenziati, prossimo promemoria. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"

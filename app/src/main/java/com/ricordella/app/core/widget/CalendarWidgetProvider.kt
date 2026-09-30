@@ -31,15 +31,25 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 
 /**
- * Widget "Calendario": mese corrente e successivo, sfogliabili con le frecce (con transizione
- * animata). I giorni con almeno un impegno hanno lo sfondo pieno (rosso se c'è qualcosa di
+ * Widget "Calendario": un mese, sfogliabile senza limiti con le frecce (tocco sul titolo = torna
+ * al mese corrente). I giorni con almeno un impegno hanno lo sfondo pieno (rosso se c'è qualcosa di
  * scaduto), oggi è giallo; in alto il prossimo promemoria. Toccando un giorno se ne vede l'anteprima.
  */
 class CalendarWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            ACTION_SHOW_NEXT, ACTION_SHOW_PREVIOUS -> flip(context, forward = intent.action == ACTION_SHOW_NEXT)
+            ACTION_SHOW_NEXT, ACTION_SHOW_PREVIOUS, ACTION_SHOW_TODAY -> {
+                // Spostamento in mesi rispetto al mese corrente; ridisegna tutto il widget.
+                val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                val offset = when (intent.action) {
+                    ACTION_SHOW_NEXT -> prefs.getInt(KEY_OFFSET, 0) + 1
+                    ACTION_SHOW_PREVIOUS -> prefs.getInt(KEY_OFFSET, 0) - 1
+                    else -> 0
+                }
+                prefs.edit().putInt(KEY_OFFSET, offset).apply()
+                requestUpdate(context)
+            }
             ACTION_SELECT_DAY -> {
                 // Tocco su un giorno: mostra (o richiude) l'anteprima dei suoi impegni.
                 val day = intent.getLongExtra(EXTRA_EPOCH_DAY, Long.MIN_VALUE)
@@ -52,18 +62,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    /** Cambia mese con l'animazione del ViewFlipper, senza ridisegnare tutto il widget. */
-    private fun flip(context: Context, forward: Boolean) {
-        val manager = AppWidgetManager.getInstance(context)
-        val ids = manager.getAppWidgetIds(ComponentName(context, CalendarWidgetProvider::class.java))
-        val views = RemoteViews(context.packageName, R.layout.widget_calendar)
-        if (forward) views.showNext(R.id.widget_flipper) else views.showPrevious(R.id.widget_flipper)
-        manager.partiallyUpdateAppWidget(ids, views)
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val page = (prefs.getInt(KEY_PAGE, 0) + if (forward) 1 else MONTHS - 1) % MONTHS
-        prefs.edit().putInt(KEY_PAGE, page).apply()
-    }
-
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         val container = (context.applicationContext as RicordellaApplication).container
         val pending = goAsync()
@@ -72,9 +70,10 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 val today = container.time.today()
                 val now = container.time.localNow()
                 val firstDay = container.settingsRepository.current().firstDayOfWeek
-                val months = List(MONTHS) { YearMonth.from(today).plusMonths(it.toLong()) }
-                val rangeStart = gridStart(months.first(), firstDay)
-                val rangeEnd = gridStart(months.last(), firstDay).plusDays(41)
+                val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                val month = YearMonth.from(today).plusMonths(prefs.getInt(KEY_OFFSET, 0).toLong())
+                val rangeStart = gridStart(month, firstDay)
+                val rangeEnd = rangeStart.plusDays(41)
 
                 val busy = mutableMapOf<LocalDate, Boolean>() // data → true se c'è qualcosa di scaduto
                 val byDay = mutableMapOf<LocalDate, MutableList<ReminderWithLinks>>()
@@ -98,10 +97,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.widget_prev, broadcast(context, ACTION_SHOW_PREVIOUS))
                 views.setOnClickPendingIntent(R.id.widget_next_month, broadcast(context, ACTION_SHOW_NEXT))
                 views.removeAllViews(R.id.widget_flipper)
-                months.forEach { views.addView(R.id.widget_flipper, monthPage(context, it, today, firstDay, busy)) }
-                val page = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PAGE, 0)
-                views.setDisplayedChild(R.id.widget_flipper, page.coerceIn(0, MONTHS - 1))
-                val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                views.addView(R.id.widget_flipper, monthPage(context, month, today, firstDay, busy))
                 val selected = prefs.getLong(KEY_SELECTED, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }?.let(LocalDate::ofEpochDay)
                     ?.takeIf { !it.isBefore(rangeStart) && !it.isAfter(rangeEnd) }
                 preview(context, views, selected, selected?.let { byDay[it] }.orEmpty(), today)
@@ -132,6 +128,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         val pkg = context.packageName
         val page = RemoteViews(pkg, R.layout.widget_month_page)
         page.setTextViewText(R.id.widget_month, DateTexts.monthTitle(month))
+        page.setOnClickPendingIntent(R.id.widget_month, broadcast(context, ACTION_SHOW_TODAY))
         repeat(7) { i ->
             val label = RemoteViews(pkg, R.layout.widget_weekday)
             label.setTextViewText(R.id.widget_weekday, DateTexts.weekdayShort(firstDay.plus(i.toLong())))
@@ -246,14 +243,14 @@ class CalendarWidgetProvider : AppWidgetProvider() {
 
         private const val ACTION_SHOW_NEXT = "com.ricordella.app.widget.NEXT_MONTH"
         private const val ACTION_SHOW_PREVIOUS = "com.ricordella.app.widget.PREVIOUS_MONTH"
+        private const val ACTION_SHOW_TODAY = "com.ricordella.app.widget.THIS_MONTH"
         private const val ACTION_SELECT_DAY = "com.ricordella.app.widget.SELECT_DAY"
         private const val KEY_SELECTED = "selected_day"
         private const val PREVIEW_ROWS = 4
         private const val REQUEST_PREVIEW_ROW = 30
         private const val PREFS = "calendar_widget"
-        private const val KEY_PAGE = "page"
-        /** Mesi sfogliabili: il corrente e il successivo. */
-        private const val MONTHS = 2
+        /** Mesi di distanza dal mese corrente mostrati dal widget. */
+        private const val KEY_OFFSET = "month_offset"
 
         private const val REQUEST_OPEN = 1
         private const val REQUEST_ACTION = 10
