@@ -72,7 +72,7 @@ fun DateField(
     }
 }
 
-/** Campo orario: al tocco apre il selettore orario Material. */
+/** Campo orario: al tocco apre il selettore orario Material, su [value] o, se vuoto, su [defaultTime]. */
 @Composable
 fun TimeField(
     label: String,
@@ -81,6 +81,7 @@ fun TimeField(
     modifier: Modifier = Modifier,
     clearable: Boolean = true,
     isError: Boolean = false,
+    defaultTime: LocalTime = LocalTime.of(9, 0),
 ) {
     var showPicker by rememberSaveable { mutableStateOf(false) }
     ClickableField(
@@ -94,7 +95,7 @@ fun TimeField(
     )
     if (showPicker) {
         TimePickerDialogFor(
-            initial = value ?: LocalTime.of(9, 0),
+            initial = value ?: defaultTime,
             onDismiss = { showPicker = false },
             onConfirm = { onValueChange(it); showPicker = false },
         )
@@ -138,6 +139,9 @@ private fun ClickableField(
         }
     }
 }
+
+/** Adesso, al minuto: l'orario proposto quando si imposta qualcosa per oggi. */
+fun currentMinute(): LocalTime = LocalTime.now().withSecond(0).withNano(0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.items
 
+import com.ricordella.app.core.ui.HistoryItem
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -171,7 +172,9 @@ fun ItemDetailScreen(navigator: AppNavigator) {
             if (state.maintenance.isEmpty()) {
                 Text(tr("Nessun intervento registrato."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            state.maintenance.forEach { record -> MaintenanceRow(record, onDelete = { viewModel.onDeleteMaintenance(record) }) }
+            state.maintenance.forEachIndexed { index, record ->
+                MaintenanceRow(record, isLast = index == state.maintenance.lastIndex, onDelete = { viewModel.onDeleteMaintenance(record) })
+            }
 
             SectionHeader(tr("Promemoria")) {
                 TextButton(onClick = { navigator.newReminder(itemId = entry.item.id, personId = state.owners.firstOrNull()?.person?.id) }) {
@@ -344,27 +347,20 @@ private data class WarrantyBadge(
 )
 
 @Composable
-private fun MaintenanceRow(record: MaintenanceRecord, onDelete: () -> Unit) {
-    val settings = LocalAppSettings.current
+private fun MaintenanceRow(record: MaintenanceRecord, isLast: Boolean, onDelete: () -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
     var confirm by remember { mutableStateOf(false) }
-    Surface(color = MaterialTheme.colorScheme.surfaceContainerLow, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(start = RicordellaDimensions.spaceL, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(record.title, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    listOfNotNull(
-                        DateTexts.date(record.date, settings.dateFormat),
-                        record.odometerKm?.let(DateTexts::kilometers),
-                        record.costCents?.let(DateTexts::money),
-                    ).joinToString(" · "),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                record.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-            }
+    HistoryItem(
+        date = record.date,
+        title = record.title,
+        tone = colors.pear,
+        isLast = isLast,
+        subtitle = listOfNotNull(record.odometerKm?.let(DateTexts::kilometers), record.description).joinToString(" · ").ifEmpty { null },
+        badge = record.costCents?.let { DateTexts.money(it) to colors.mint },
+        trailing = {
             IconButton(onClick = { confirm = true }) { Icon(Icons.Rounded.Delete, contentDescription = trf("Elimina intervento %1\$s", record.title)) }
-        }
-    }
+        },
+    )
     if (confirm) {
         ConfirmDialog(
             title = tr("Eliminare l'intervento?"),

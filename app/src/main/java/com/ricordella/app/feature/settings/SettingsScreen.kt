@@ -238,6 +238,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
 
+            TypeDefaultsSection(settings, viewModel::update)
+            AlarmSettingsSection(settings, viewModel::update)
+
             SectionHeader(tr("Dati"))
             SettingRow(
                 icon = Icons.Rounded.Upload,
@@ -266,6 +269,8 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             SectionHeader(tr("Operazioni periodiche"))
             AutomationSettings(settings, viewModel::update, includeBackup = true)
+
+            SupportCard(loved = settings.supportLoved, onLoved = { viewModel.update { it.copy(supportLoved = true) } })
 
             SectionHeader(tr("Informazioni"))
             SettingRow(
@@ -406,7 +411,7 @@ private fun <T> Segmented(options: List<T>, selected: T, label: (T) -> String, o
 }
 
 @Composable
-private fun SettingRow(
+internal fun SettingRow(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,

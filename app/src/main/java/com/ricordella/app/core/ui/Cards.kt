@@ -1,5 +1,6 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -253,6 +254,7 @@ private fun ReminderCardBody(
             if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(occurrenceDate, today)
             else DateTexts.relativeWithTime(occurrenceDate, reminder.dueTime, today)
     }
+    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel)).joinToString(" · ")
     val links = (entry.items.map { it.name } + entry.people.map { it.displayName }).joinToString(" · ")
     val titleAlpha by animateFloatAsState(if (checked) 0.55f else 1f, tween(RicordellaMotion.SHORT), label = "titleAlpha")
     val badgeContainer by animateColorAsState(tone.container, tween(RicordellaMotion.SHORT), label = "badgeContainer")
@@ -287,7 +289,7 @@ private fun ReminderCardBody(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        dateText,
+                        shownDate,
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (overdue) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = if (overdue) FontWeight.Bold else FontWeight.Medium,

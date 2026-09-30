@@ -75,11 +75,10 @@ class DeveloperTools(
         }
     }
 
-    /** Fa suonare una sveglia finta (nessun promemoria reale da completare) dopo [delaySeconds]. */
-    fun ringTestAlarm(delaySeconds: Long = 10) {
+    /** Fa suonare una sveglia finta (nessun promemoria reale da completare) tra 10 secondi, di giorno o di notte. */
+    fun ringTestAlarm(night: Boolean) {
         scope.launch {
-            delay(delaySeconds * 1000)
-            AlarmRingService.start(context, "developer-alarm", tr("Sveglia di prova"))
+            AlarmRingService.scheduleTest(context, settings.current(), if (night) AlarmRingService.SCENE_NIGHT else AlarmRingService.SCENE_DAY)
         }
     }
 

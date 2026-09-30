@@ -13,6 +13,19 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 @Serializable
 enum class DateFormatStyle { NUMERIC, EXTENDED }
 
+/** Suono della sveglia: l'incantesimo di Remindella o la suoneria sveglia del telefono. */
+@Serializable
+enum class AlarmSound { MAGIC, SYSTEM }
+
+/** Valori proposti quando si crea un promemoria di un certo tipo. */
+@Serializable
+data class TypeDefaults(
+    val notificationsEnabled: Boolean = true,
+    /** Null = tutto il giorno. */
+    val time: LocalTime? = null,
+    val notifyOffsetMinutes: Int = 0,
+)
+
 /** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
 @Serializable
 enum class AutoMode { AUTOMATIC, ASK, OFF }
@@ -47,4 +60,16 @@ data class AppSettings(
     val developerMode: Boolean = false,
     /** Ultimo anno in cui è stata proposta la pulizia dei promemoria vecchi. */
     val lastCleanupYear: Int? = null,
-)
+    /** Predefiniti per tipo; i tipi assenti usano notifiche accese, tutto il giorno e [defaultNotifyOffsetMinutes]. */
+    val typeDefaults: Map<ReminderType, TypeDefaults> = emptyMap(),
+    val alarmVibration: Boolean = true,
+    val alarmSnoozeMinutes: Int = 10,
+    /** La sveglia parte piano e alza il volume in mezzo minuto. */
+    val alarmCrescendo: Boolean = false,
+    val alarmSound: AlarmSound = AlarmSound.MAGIC,
+    /** Si è tornati nell'app dopo aver aperto PayPal: il maghetto del riquadro "supporto" resta innamorato. */
+    val supportLoved: Boolean = false,
+) {
+    fun defaultsFor(type: ReminderType): TypeDefaults =
+        typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)
+}

@@ -7,7 +7,8 @@ import android.text.format.Formatter
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.Bedtime
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.AccessAlarm
 import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.CleaningServices
@@ -120,8 +121,12 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         tools.sendTestNotification(ReminderType.BIRTHDAY, delaySeconds = 10)
         toast(context, tr("Arriva tra 10 secondi"))
     }
-    DevRow(Icons.Rounded.Alarm, tr("Sveglia di prova tra 10 secondi"), tr("Blocca lo schermo per vederla comparire a tutto schermo.")) {
-        tools.ringTestAlarm()
+    DevRow(Icons.Rounded.WbSunny, tr("Sveglia di giorno tra 10 secondi"), tr("Il maghetto e l'orso che dorme. Blocca lo schermo per vederla a tutto schermo.")) {
+        tools.ringTestAlarm(night = false)
+        toast(context, tr("Suona tra 10 secondi"))
+    }
+    DevRow(Icons.Rounded.Bedtime, tr("Sveglia di notte tra 10 secondi"), tr("Il maghetto sotto le stelle. Blocca lo schermo per vederla a tutto schermo.")) {
+        tools.ringTestAlarm(night = true)
         toast(context, tr("Suona tra 10 secondi"))
     }
     DevRow(

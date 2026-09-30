@@ -215,4 +215,7 @@ fun notifyOffsetLabel(minutes: Int): String = when (minutes) {
     else -> trf("%1\$s giorni prima", minutes / 1440)
 }
 
+/** "compie 35 anni" (o "compie 1 anno"). */
+fun birthdayAgeLabel(age: Int): String = if (age == 1) tr("compie 1 anno") else trf("compie %1\$s anni", age)
+
 val NotifyOffsetPresets = listOf(0, 10, 60, 1440, 2 * 1440, 10080, 30 * 1440)

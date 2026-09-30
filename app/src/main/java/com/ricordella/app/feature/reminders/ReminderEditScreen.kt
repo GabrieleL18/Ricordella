@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.reminders
 
+import java.time.LocalTime
+import java.time.LocalDate
+import com.ricordella.app.core.ui.currentMinute
 import com.ricordella.app.core.i18n.tr
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
@@ -68,6 +71,7 @@ import com.ricordella.app.core.ui.SectionHeader
 import com.ricordella.app.core.ui.TimeField
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
+import com.ricordella.app.core.ui.birthdayAgeLabel
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
@@ -166,6 +170,8 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             onValueChange = { value -> update { it.copy(time = value) } },
             modifier = Modifier.weight(1f),
             isError = form.timeError,
+            // Per oggi il selettore parte dall'ora attuale, per gli altri giorni dalle 9.
+            defaultTime = if (form.date == LocalDate.now()) currentMinute() else LocalTime.of(9, 0),
         )
     }
     if (form.timeError) {
@@ -173,6 +179,18 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     }
     if (form.isAlarm) {
         AlarmFields(form, update)
+    }
+    if (form.type == ReminderType.BIRTHDAY) {
+        val age = form.birthYear.toIntOrNull()?.let { year -> form.date?.year?.minus(year) }?.takeIf { it in 1..150 }
+        OutlinedTextField(
+            value = form.birthYear,
+            onValueChange = { value -> update { it.copy(birthYear = value.filter(Char::isDigit).take(4)) } },
+            label = { Text(tr("Anno di nascita")) },
+            supportingText = { Text(age?.let(::birthdayAgeLabel) ?: tr("Facoltativo: così vedi quanti anni compie.")) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
     // Eventi di più giorni: vacanze, viaggi, ricoveri... Nel calendario appaiono come una barra continua.
     if (!form.isAlarm) Row(verticalAlignment = Alignment.CenterVertically) {

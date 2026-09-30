@@ -1,5 +1,17 @@
 package com.ricordella.app.core.ui
 
+import com.ricordella.app.core.ui.theme.ricordellaColors
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.clip
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Column
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -133,21 +145,16 @@ fun AttachmentsSection(
     onRemove: (Attachment) -> Unit,
     onOpen: (Attachment) -> Unit,
 ) {
-    val context = LocalContext.current
     val pickFile = rememberFilePicker(onAdd)
-    SectionHeader(title) {
-        TextButton(onClick = pickFile) {
-            Icon(Icons.Rounded.AttachFile, contentDescription = null)
-            Text(tr("Allega"), modifier = Modifier.padding(start = 4.dp))
-        }
-    }
-    if (attachments.isEmpty()) {
-        Text(tr("Nessun documento allegato."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-    // Anteprime affiancate e scorrevoli: foto, prima pagina dei PDF, testo dei documenti Word.
+    SectionHeader(
+        if (attachments.isEmpty()) title else "$title · ${attachments.size}",
+        icon = Icons.Rounded.AttachFile,
+        tone = MaterialTheme.ricordellaColors.lavender,
+    )
+    // Anteprime affiancate e scorrevoli: foto, prima pagina dei PDF, testo dei documenti Word; in fondo il "+".
     Row(
-        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         attachments.forEach { attachment ->
             FileTile(
@@ -158,6 +165,35 @@ fun AttachmentsSection(
                 onRemove = { onRemove(attachment) },
             )
         }
+        AddFileTile(onClick = pickFile)
+    }
+}
+
+/** Tessera tratteggiata per allegare: stessa forma delle anteprime, così la fila resta ordinata. */
+@Composable
+private fun AddFileTile(onClick: () -> Unit) {
+    val tone = MaterialTheme.ricordellaColors.lavender
+    val shape = RoundedCornerShape(18.dp)
+    Column(Modifier.width(112.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(
+            Modifier
+                .size(112.dp, 140.dp)
+                .clip(shape)
+                .drawBehind {
+                    drawRoundRect(
+                        tone.solid,
+                        cornerRadius = CornerRadius(18.dp.toPx()),
+                        style = Stroke(width = 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 10f))),
+                    )
+                }
+                .clickable(role = Role.Button, onClick = onClick),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(Icons.Rounded.Add, contentDescription = null, tint = tone.solid, modifier = Modifier.size(36.dp))
+            Text(tr("Allega"), style = MaterialTheme.typography.labelLarge, color = tone.content)
+        }
+        Text(tr("Foto, PDF o documenti"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
     }
 }
 

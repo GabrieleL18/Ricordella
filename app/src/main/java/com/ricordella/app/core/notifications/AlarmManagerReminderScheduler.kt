@@ -51,7 +51,7 @@ class AlarmManagerReminderScheduler(
             plan.dueNow.forEach { id ->
                 val entry = reminders.getReminder(id) ?: return@forEach
                 // Le sveglie suonano a tutto schermo; se Android non lo consente, notifica normale.
-                val rang = entry.reminder.type == ReminderType.ALARM && AlarmRingService.start(context, id, entry.reminder.title)
+                val rang = entry.reminder.type == ReminderType.ALARM && AlarmRingService.start(context, id, entry.reminder.title, appSettings)
                 if (!rang) notifier.show(entry, today)
             }
             reminders.markNotified(plan.dueNow, now)

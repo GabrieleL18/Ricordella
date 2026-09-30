@@ -1,5 +1,6 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.ui.draw.shadow
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color as AndroidColor
@@ -114,6 +115,12 @@ fun FileTile(
     val kind = remember(uri) { documentKind(context, uri, mimeType, name) }
     val preview by produceState<Preview?>(null, uri) { value = withContext(Dispatchers.IO) { loadPreview(context, uri, kind) } }
     val colors = MaterialTheme.ricordellaColors
+    val tone = when (kind) {
+        DocKind.PDF -> colors.coral
+        DocKind.IMAGE -> colors.mint
+        DocKind.DOCX -> colors.cyan
+        DocKind.OTHER -> colors.lavender
+    }
     val interaction = remember { MutableInteractionSource() }
     Column(
         modifier
@@ -125,9 +132,9 @@ fun FileTile(
         Box(
             Modifier
                 .size(112.dp, 140.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp)),
+                .shadow(3.dp, RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(18.dp))
+                .background(tone.container),
             contentAlignment = Alignment.Center,
         ) {
             when (val shown = preview) {
@@ -143,8 +150,8 @@ fun FileTile(
                 else -> Icon(
                     if (kind == DocKind.PDF) Icons.Rounded.PictureAsPdf else Icons.Rounded.Description,
                     contentDescription = null,
-                    tint = colors.cyan.solid,
-                    modifier = Modifier.size(40.dp),
+                    tint = tone.solid,
+                    modifier = Modifier.size(44.dp),
                 )
             }
             // Etichetta del tipo in basso a sinistra.
@@ -155,7 +162,7 @@ fun FileTile(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(6.dp)
-                    .background(colors.cyan.solid, RoundedCornerShape(6.dp))
+                    .background(tone.solid, RoundedCornerShape(8.dp))
                     .padding(horizontal = 6.dp, vertical = 2.dp),
             )
             if (onRemove != null) {

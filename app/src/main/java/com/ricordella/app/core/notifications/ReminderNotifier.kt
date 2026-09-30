@@ -1,5 +1,7 @@
 package com.ricordella.app.core.notifications
 
+import com.ricordella.app.core.ui.birthdayAgeLabel
+import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -100,7 +102,7 @@ class ReminderNotifier(private val context: Context) {
             DateTexts.relativeWithTime(reminder.dueDate, reminder.dueTime, today)
         }
         val subject = entry.items.firstOrNull()?.name ?: entry.people.firstOrNull()?.displayName
-        return listOfNotNull(whenText, subject).joinToString(" · ")
+        return listOfNotNull(whenText, reminder.ageOn(reminder.dueDate)?.let(::birthdayAgeLabel), subject).joinToString(" · ")
     }
 
     private fun customView(entry: ReminderWithLinks, today: LocalDate, layout: Int): RemoteViews {

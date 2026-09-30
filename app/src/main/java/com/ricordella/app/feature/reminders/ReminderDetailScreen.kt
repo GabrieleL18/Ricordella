@@ -1,5 +1,8 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.core.ui.CompletionHistory
+import com.ricordella.app.core.ui.birthdayAgeLabel
+import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -169,18 +172,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 onRemove = viewModel::onRemoveAttachment,
                 onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
-            if (state.completions.isNotEmpty()) {
-                SectionHeader(tr("Storico"))
-                val dateFormat = LocalAppSettings.current.dateFormat
-                state.completions.forEach { completion ->
-                    val completedOn = LocalDateTime.ofInstant(completion.completedAt, ZoneId.systemDefault())
-                    Text(
-                        trf("Occorrenza del %1\$s — completata il ", DateTexts.date(completion.occurrenceDate, dateFormat)) +
-                            DateTexts.dateWithTime(completedOn.toLocalDate(), completedOn.toLocalTime(), dateFormat),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
+            if (state.completions.isNotEmpty()) CompletionHistory(state.completions)
         }
     }
 
@@ -227,7 +219,11 @@ private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
         }
         Column(Modifier.weight(1f)) {
             Text(reminder.title, style = MaterialTheme.typography.headlineSmall, color = tone.content)
-            Text(reminder.type.label, style = MaterialTheme.typography.titleSmall, color = tone.content)
+            Text(
+                listOfNotNull(reminder.type.label, reminder.ageOn(reminder.dueDate)?.let(::birthdayAgeLabel)).joinToString(" · "),
+                style = MaterialTheme.typography.titleSmall,
+                color = tone.content,
+            )
         }
     }
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {

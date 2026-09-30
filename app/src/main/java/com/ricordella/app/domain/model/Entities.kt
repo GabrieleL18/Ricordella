@@ -149,6 +149,8 @@ data class Reminder(
     val endDate: LocalDate? = null,
     /** Dettagli di viaggio, solo per le vacanze. */
     val trip: TripInfo? = null,
+    /** Anno di nascita, solo per i compleanni: serve a mostrare quanti anni compie. */
+    val birthYear: Int? = null,
     val status: ReminderStatus = ReminderStatus.ACTIVE,
     val priority: Priority = Priority.NORMAL,
     val category: String? = null,
@@ -169,6 +171,10 @@ data class Reminder(
 )
 
 val Reminder.isAllDay: Boolean get() = dueTime == null
+
+/** Anni compiuti in [date] per i compleanni con l'anno di nascita, altrimenti null. */
+fun Reminder.ageOn(date: LocalDate): Int? =
+    birthYear?.takeIf { type == ReminderType.BIRTHDAY }?.let { date.year - it }?.takeIf { it > 0 }
 
 /** Giorni in più oltre al primo per gli eventi di più giorni (0 = un giorno solo). */
 val Reminder.extraDays: Long get() = endDate?.let { ChronoUnit.DAYS.between(dueDate, it).coerceAtLeast(0) } ?: 0L

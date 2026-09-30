@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ricordella.app.core.navigation.ReminderEditRoute
 import com.ricordella.app.domain.date.TimeSource
+import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ItemWithCategory
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.Priority
@@ -44,6 +45,8 @@ data class ReminderForm(
     val multiDay: Boolean = false,
     /** Dettagli di viaggio, usati solo per le vacanze. */
     val trip: TripInfo = TripInfo(),
+    /** Anno di nascita (testo del campo), usato solo per i compleanni. */
+    val birthYear: String = "",
     val endDate: LocalDate? = null,
     val type: ReminderType = ReminderType.TASK,
     val description: String = "",
@@ -88,6 +91,8 @@ class ReminderEditViewModel(
 
     private val route = savedStateHandle.toRoute<ReminderEditRoute>()
     private var existing: Reminder? = null
+    /** Impostazioni lette all'apertura: servono i predefiniti per tipo quando si cambia tipo. */
+    private var appSettings = AppSettings()
     private var existingRuleId: String? = null
 
     private val _form = MutableStateFlow(ReminderForm())
@@ -106,18 +111,23 @@ class ReminderEditViewModel(
 
     private suspend fun load() {
         val entry = route.id?.let { reminders.getReminder(it) }
+        appSettings = settings.current()
         if (entry == null) {
+            val type = route.type?.let { runCatching { ReminderType.valueOf(it) }.getOrNull() } ?: ReminderType.TASK
+            val defaults = appSettings.defaultsFor(type)
             _form.value = ReminderForm(
                 isLoading = false,
                 isNew = true,
                 date = route.epochDay?.let(LocalDate::ofEpochDay) ?: time.today(),
-                type = route.type?.let { runCatching { ReminderType.valueOf(it) }.getOrNull() } ?: ReminderType.TASK,
+                type = type,
+                time = defaults.time,
+                notificationsEnabled = defaults.notificationsEnabled,
                 recurrencePreset = if (route.type == ReminderType.BIRTHDAY.name) RecurrencePreset.YEARLY else RecurrencePreset.NONE,
                 multiDay = route.type == ReminderType.VACATION.name,
                 endDate = if (route.type == ReminderType.VACATION.name) (route.epochDay?.let(LocalDate::ofEpochDay) ?: time.today()).plusDays(7) else null,
                 personIds = setOfNotNull(route.personId),
                 itemIds = setOfNotNull(route.itemId),
-                notifyOffsetMinutes = settings.current().defaultNotifyOffsetMinutes,
+                notifyOffsetMinutes = defaults.notifyOffsetMinutes,
                 showAdvanced = route.itemId != null || route.personId != null,
             )
             return
@@ -133,6 +143,7 @@ class ReminderEditViewModel(
             date = reminder.dueDate,
             multiDay = reminder.endDate != null,
             trip = reminder.trip ?: TripInfo(),
+            birthYear = reminder.birthYear?.toString().orEmpty(),
             endDate = reminder.endDate,
             time = reminder.dueTime,
             type = reminder.type,
@@ -166,7 +177,14 @@ class ReminderEditViewModel(
         }
         // Una vacanza dura di solito più giorni: si propone una settimana.
         val vacation = type == ReminderType.VACATION && !form.multiDay
+        // Nei nuovi promemoria i predefiniti del tipo sostituiscono quelli del tipo precedente,
+        // ma solo i campi che l'utente non ha già cambiato a mano.
+        val old = appSettings.defaultsFor(form.type)
+        val new = appSettings.defaultsFor(type)
         form.copy(
+            time = if (form.isNew && form.time == old.time) new.time else form.time,
+            notificationsEnabled = if (form.isNew && form.notificationsEnabled == old.notificationsEnabled) new.notificationsEnabled else form.notificationsEnabled,
+            notifyOffsetMinutes = if (form.isNew && form.notifyOffsetMinutes == old.notifyOffsetMinutes) new.notifyOffsetMinutes else form.notifyOffsetMinutes,
             type = type,
             recurrencePreset = preset,
             // Una sveglia suona in un momento preciso: niente eventi di più giorni.
@@ -205,6 +223,7 @@ class ReminderEditViewModel(
             dueDate = date,
             endDate = if (form.multiDay) form.endDate else null,
             trip = form.trip.takeIf { form.type == ReminderType.VACATION && !it.isEmpty },
+            birthYear = form.birthYear.toIntOrNull()?.takeIf { form.type == ReminderType.BIRTHDAY && it in 1900..date.year },
             dueTime = form.time,
             type = form.type,
             description = form.description.trim().ifEmpty { null },

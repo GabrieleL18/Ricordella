@@ -48,7 +48,7 @@ private val Wood = Color(0xFF8A5A3B)
  * e fa scintillare la bacchetta. Disegnato in Canvas, stile flat come la mascotte.
  */
 @Composable
-fun HappyWizard(modifier: Modifier = Modifier, size: Dp = 140.dp) {
+fun HappyWizard(modifier: Modifier = Modifier, size: Dp = 140.dp, love: Float = 0f) {
     val colors = MaterialTheme.ricordellaColors
     val reduced = rememberReducedMotion()
     val entrance = remember { Animatable(if (reduced) 1f else 0f) }
@@ -62,18 +62,19 @@ fun HappyWizard(modifier: Modifier = Modifier, size: Dp = 140.dp) {
     Canvas(
         modifier
             .size(size)
-            .semantics { contentDescription = tr("Un mago felice e soddisfatto") }
+            .semantics { contentDescription = if (love > 0.5f) tr("Un mago innamorato") else tr("Un mago felice e soddisfatto") }
             .graphicsLayer {
                 scaleX = entrance.value
                 scaleY = entrance.value
                 translationY = (1f - entrance.value) * 30f
             },
     ) {
-        drawWizard(colors, nod, wave, twinkle)
+        drawWizard(colors, nod, wave, twinkle, love)
     }
 }
 
-internal fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Float, twinkle: Float) {
+/** [love] da 0 a 1: gli occhi diventano cuori che pulsano e le guance si fanno più rosse. */
+internal fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Float, twinkle: Float, love: Float = 0f) {
     val w = size.width
     val h = size.height
     val cx = w * 0.46f
@@ -123,16 +124,22 @@ internal fun DrawScope.drawWizard(colors: RicordellaColors, nod: Float, wave: Fl
         val eyeY = head.y - faceR * 0.1f
         listOf(-1f, 1f).forEach { side ->
             val eye = Offset(head.x + side * faceR * 0.42f, eyeY)
-            drawArc(
-                Ink,
-                startAngle = 200f,
-                sweepAngle = 140f,
-                useCenter = false,
-                topLeft = Offset(eye.x - faceR * 0.2f, eye.y - faceR * 0.12f),
-                size = Size(faceR * 0.4f, faceR * 0.32f),
-                style = Stroke(width = faceR * 0.12f, cap = StrokeCap.Round),
-            )
-            drawCircle(Blush.copy(alpha = 0.7f), radius = faceR * 0.16f, center = Offset(head.x + side * faceR * 0.62f, eyeY + faceR * 0.32f))
+            if (love > 0f) {
+                // Innamorato: occhi a cuore che battono.
+                val beat = 1f + 0.12f * sin(twinkle * 4 * PI.toFloat())
+                drawHeart(eye, faceR * 0.34f * love * beat, colors.coral.solid)
+            } else {
+                drawArc(
+                    Ink,
+                    startAngle = 200f,
+                    sweepAngle = 140f,
+                    useCenter = false,
+                    topLeft = Offset(eye.x - faceR * 0.2f, eye.y - faceR * 0.12f),
+                    size = Size(faceR * 0.4f, faceR * 0.32f),
+                    style = Stroke(width = faceR * 0.12f, cap = StrokeCap.Round),
+                )
+            }
+            drawCircle(Blush.copy(alpha = 0.7f + 0.3f * love), radius = faceR * (0.16f + 0.06f * love), center = Offset(head.x + side * faceR * 0.62f, eyeY + faceR * 0.32f))
         }
         // Sorriso che spunta dalla barba.
         drawArc(
@@ -245,4 +252,16 @@ fun WizardAvatar(seed: String, size: Dp, modifier: Modifier = Modifier) {
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(faceR * 0.14f),
         )
     }
+}
+
+/** Cuore pieno centrato in [center], largo circa 2 × [size]. */
+fun DrawScope.drawHeart(center: Offset, size: Float, color: Color) {
+    if (size <= 0f) return
+    val path = Path().apply {
+        moveTo(center.x, center.y + size * 0.9f)
+        cubicTo(center.x - size * 1.6f, center.y - size * 0.1f, center.x - size * 0.8f, center.y - size * 1.3f, center.x, center.y - size * 0.45f)
+        cubicTo(center.x + size * 0.8f, center.y - size * 1.3f, center.x + size * 1.6f, center.y - size * 0.1f, center.x, center.y + size * 0.9f)
+        close()
+    }
+    drawPath(path, color)
 }

@@ -1,5 +1,23 @@
 package com.ricordella.app.feature.reminders
 
+import java.time.LocalTime
+import com.ricordella.app.core.ui.currentMinute
+import com.ricordella.app.core.ui.rememberReducedMotion
+import com.ricordella.app.core.ui.pressScale
+import com.ricordella.app.core.ui.RicordellaMotion
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.material.icons.rounded.Navigation
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.RepeatMode
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -7,22 +25,14 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.net.Uri
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material.icons.rounded.PictureAsPdf
 import androidx.compose.material.icons.rounded.QrCodeScanner
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.viewinterop.AndroidView
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -220,7 +230,13 @@ private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRe
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             DateField(tr("Partenza"), leg.date, { onChange(leg.copy(date = it)) }, Modifier.weight(1.6f), clearable = true)
-            TimeField(tr("Ora"), leg.time, { onChange(leg.copy(time = it)) }, Modifier.weight(1f))
+            TimeField(
+                tr("Ora"),
+                leg.time,
+                { onChange(leg.copy(time = it)) },
+                Modifier.weight(1f),
+                defaultTime = if (leg.date == LocalDate.now()) currentMinute() else LocalTime.of(9, 0),
+            )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             Text_(leg.seat, leg.mode.seatLabel, Modifier.weight(1f)) { onChange(leg.copy(seat = it)) }
@@ -303,12 +319,7 @@ fun TripSection(trip: TripInfo) {
         }
     }
     (trip.stay?.address ?: trip.destination)?.let { place ->
-        OnlineMap(place)
-        AssistChip(
-            onClick = { openDirections(context, place) },
-            label = { Text(tr("Portami lì")) },
-            leadingIcon = { Icon(Icons.Rounded.Directions, contentDescription = null, modifier = Modifier.size(18.dp)) },
-        )
+        TakeMeThere(place, name = trip.stay?.name?.takeIf { trip.stay.address != null }, onClick = { openDirections(context, place) })
     }
     trip.legs.forEach { leg ->
         FormCard(title = listOfNotNull(leg.from, leg.to).joinToString(" → ").ifEmpty { leg.mode.label }, icon = leg.mode.icon, tone = colors.cyan) {
@@ -345,33 +356,56 @@ fun TripSection(trip: TripInfo) {
     }
 }
 
-/** Anteprima Google Maps, solo se c'è internet. Toccandola si apre l'app Mappe. */
+/**
+ * "Portami lì": pulsante grande a sfumatura verde-azzurra con la freccia di navigazione che
+ * oscilla piano, il nome del posto e l'indirizzo. Apre Google Maps con il percorso già pronto.
+ */
 @Composable
-private fun OnlineMap(place: String) {
-    val context = LocalContext.current
-    val online = remember { isOnline(context) }
-    if (!online) return
-    Box(Modifier.fillMaxWidth().height(180.dp).clip(MaterialTheme.shapes.large)) {
-        key(place) {
-            AndroidView(
-                factory = {
-                    WebView(it).apply {
-                        settings.javaScriptEnabled = true
-                        webViewClient = WebViewClient()
-                        loadUrl("https://maps.google.com/maps?q=${Uri.encode(place)}&z=14&output=embed")
-                    }
-                },
-                modifier = Modifier.matchParentSize(),
+private fun TakeMeThere(place: String, name: String?, onClick: () -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
+    val interaction = remember { MutableInteractionSource() }
+    val nudge = if (rememberReducedMotion()) 0f else rememberInfiniteTransition(label = "nudge").animateFloat(
+        -1f,
+        1f,
+        infiniteRepeatable(tween(1100, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse),
+        label = "nudgeX",
+    ).value
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .pressScale(interaction)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(Brush.horizontalGradient(listOf(colors.mint.solid, colors.cyan.solid)))
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClickLabel = tr("Apri il percorso in Google Maps"), onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Box(Modifier.size(48.dp).background(Color.White.copy(alpha = 0.25f), CircleShape), contentAlignment = Alignment.Center) {
+            Icon(
+                Icons.Rounded.Navigation,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(28.dp).graphicsLayer { rotationZ = 45f + nudge * 8f },
             )
         }
-        // Velo trasparente: il tocco apre Mappe invece di trascinare la mappa dentro la pagina.
-        Box(Modifier.matchParentSize().clickable { openMaps(context, place) })
+        Column(Modifier.weight(1f)) {
+            Text(tr("Portami lì"), style = MaterialTheme.typography.titleLarge, color = Color.White)
+            Text(
+                listOfNotNull(name, place).joinToString(" · "),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.9f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Icon(
+            Icons.AutoMirrored.Rounded.ArrowForward,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.graphicsLayer { translationX = nudge * 4.dp.toPx() },
+        )
     }
-}
-
-private fun isOnline(context: Context): Boolean {
-    val manager = context.getSystemService(ConnectivityManager::class.java)
-    return manager.getNetworkCapabilities(manager.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
 }
 
 /** Apre Google Maps già con il percorso verso il luogo (o il browser se Maps non c'è). */

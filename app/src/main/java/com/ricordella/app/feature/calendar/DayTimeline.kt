@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.calendar
 
+import com.ricordella.app.core.ui.birthdayAgeLabel
+import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -261,6 +263,7 @@ private fun TimelineCard(
                 listOfNotNull(
                     if (occurrence.isMultiDay) trf("Giorno %1\$s di %2\$s", occurrence.dayNumber, reminder.extraDays + 1) else reminder.dueTime?.let(DateTexts::time),
                     reminder.type.label,
+                    reminder.ageOn(occurrence.date)?.let(::birthdayAgeLabel),
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.labelMedium,
                 color = tone.content.copy(alpha = 0.8f),
