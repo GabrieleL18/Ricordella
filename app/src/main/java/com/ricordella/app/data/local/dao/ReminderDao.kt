@@ -201,6 +201,46 @@ abstract class ReminderDao {
         insertCompletion(completion)
     }
 
+    /**
+     * Promemoria ed eventi con scadenza prima di [before] che possono essere eliminati:
+     * non importanti, oppure senza persone o cose (attive) collegate.
+     * I ricorrenti ancora attivi sono esclusi: continuano a proporre occorrenze future.
+     */
+    @Query(
+        """
+        SELECT r.id FROM reminder r
+        WHERE r.dueDate < :before
+            AND r.type != 'HOLIDAY'
+            AND NOT (r.status = 'ACTIVE' AND r.recurrenceRuleId IS NOT NULL)
+            AND (
+                r.priority = 'NORMAL' OR (
+                    NOT EXISTS (
+                        SELECT 1 FROM reminder_person rp JOIN person p ON p.id = rp.personId
+                        WHERE rp.reminderId = r.id AND p.isArchived = 0
+                    )
+                    AND NOT EXISTS (
+                        SELECT 1 FROM reminder_item ri JOIN item i ON i.id = ri.itemId
+                        WHERE ri.reminderId = r.id AND i.isArchived = 0
+                    )
+                )
+            )
+        """,
+    )
+    abstract suspend fun getCleanupCandidates(before: LocalDate): List<String>
+
+    /** Feste rimaste in un anno passato: vanno riportate all'anno corrente. */
+    @Query("SELECT * FROM reminder WHERE type = 'HOLIDAY' AND dueDate < :before")
+    abstract suspend fun getHolidaysBefore(before: LocalDate): List<Reminder>
+
+    /** Quanti promemoria hanno già questo titolo in questa data (per non importare doppioni). */
+    @Query("SELECT COUNT(*) FROM reminder WHERE title = :title AND dueDate = :date")
+    abstract suspend fun countSame(title: String, date: LocalDate): Int
+
+    @Transaction
+    open suspend fun deleteAllWithDependencies(ids: List<String>) {
+        ids.forEach { deleteWithDependencies(it) }
+    }
+
     @Transaction
     open suspend fun deleteWithDependencies(id: String) {
         val ruleId = getById(id)?.recurrenceRuleId

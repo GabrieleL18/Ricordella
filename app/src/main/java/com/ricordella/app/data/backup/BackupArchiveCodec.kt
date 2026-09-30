@@ -1,5 +1,6 @@
 package com.ricordella.app.data.backup
 
+import com.ricordella.app.data.local.database.BuiltInCategories
 import com.ricordella.app.domain.model.AppSettings
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -7,6 +8,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.MessageDigest
+import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipInputStream
@@ -26,9 +28,12 @@ import java.util.zip.ZipOutputStream
  */
 class BackupArchiveCodec {
 
+    // Per tenere il backup il più leggero possibile non si scrivono valori di default né null:
+    // in lettura i campi mancanti ricadono sui default dei modelli.
     private val json = Json {
         ignoreUnknownKeys = true
-        encodeDefaults = true
+        encodeDefaults = false
+        explicitNulls = false
         prettyPrint = false
     }
 
@@ -43,8 +48,11 @@ class BackupArchiveCodec {
         appVersion: String,
         createdAt: String,
     ) {
-        val databaseBytes = json.encodeToString(BackupDatabaseContent.serializer(), database).toByteArray()
+        // Le categorie predefinite sono già nell'app: non serve salvarle (si ricreano in lettura).
+        val compact = database.copy(categories = database.categories - BuiltInCategories.all.toSet())
+        val databaseBytes = json.encodeToString(BackupDatabaseContent.serializer(), compact).toByteArray()
         ZipOutputStream(output).use { zip ->
+            zip.setLevel(Deflater.BEST_COMPRESSION)
             zip.putBytes(DATABASE_PATH, databaseBytes)
             zip.putBytes(SETTINGS_PATH, json.encodeToString(AppSettings.serializer(), settings).toByteArray())
 
@@ -111,6 +119,7 @@ class BackupArchiveCodec {
             return BackupReadResult.Corrupted("i dati non corrispondono alla firma del backup")
         }
         val database = decode(databaseData, BackupDatabaseContent.serializer())
+            ?.let { it.copy(categories = it.categories + BuiltInCategories.all.filter { builtIn -> it.categories.none { c -> c.id == builtIn.id } }) }
             ?: return BackupReadResult.Corrupted("dati non leggibili")
         database.findIntegrityProblem()?.let { return BackupReadResult.Corrupted(it) }
         val settings = settingsBytes?.let { decode(it, AppSettings.serializer()) }

@@ -22,7 +22,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.navigation.NavDestination
+import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.LocalQuickAddOpen
+import com.ricordella.app.core.widget.CalendarWidgetProvider
+import com.ricordella.app.feature.onboarding.OnboardingScreen
 import com.ricordella.app.core.ui.RicordellaMotion
 import com.ricordella.app.core.ui.pressScale
 import com.ricordella.app.core.ui.rememberReducedMotion
@@ -56,6 +59,8 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -110,7 +115,16 @@ private enum class QuickAddKind { REMINDER, EVENT, ITEM, PERSON }
  * rail su schermi larghi), grafo di navigazione e pulsante "+" di creazione rapida.
  */
 @Composable
-fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
+fun RicordellaApp(
+    reminderToOpen: String?,
+    onReminderOpened: () -> Unit,
+    widgetRequest: WidgetRequest? = null,
+    onWidgetRequestHandled: () -> Unit = {},
+) {
+    if (!LocalAppSettings.current.onboardingDone) {
+        OnboardingScreen()
+        return
+    }
     val navController = rememberNavController()
     val navigator = remember(navController) { AppNavigator(navController) }
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -119,13 +133,27 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
         destination?.hierarchy?.any { it.hasRoute(top.routeClass) } == true
     }
     var showQuickAdd by rememberSaveable { mutableStateOf(false) }
-    val openQuickAdd = { showQuickAdd = true }
+    // Giorno a cui legare promemoria ed eventi creati dal "+" (quello selezionato nel Calendario).
+    var quickAddDate by rememberSaveable { mutableStateOf<java.time.LocalDate?>(null) }
+    val openQuickAdd = { quickAddDate = null; showQuickAdd = true }
+    val openQuickAddOn = { date: java.time.LocalDate -> quickAddDate = date; showQuickAdd = true }
 
     LaunchedEffect(reminderToOpen) {
         if (reminderToOpen != null) {
             navigator.openReminder(reminderToOpen)
             onReminderOpened()
         }
+    }
+
+    LaunchedEffect(widgetRequest) {
+        val request = widgetRequest ?: return@LaunchedEffect
+        when (request.action) {
+            CalendarWidgetProvider.ACTION_EVENT -> navigator.newReminder(type = ReminderType.EVENT, date = request.date)
+            CalendarWidgetProvider.ACTION_ITEM -> navigator.newItem()
+            CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
+            CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
+        }
+        onWidgetRequestHandled()
     }
 
     val adaptiveType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfoV2())
@@ -172,7 +200,7 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
             },
         ) {
             composable<HomeRoute> { HomeScreen(navigator, openQuickAdd) }
-            composable<CalendarRoute> { CalendarScreen(navigator, openQuickAdd) }
+            composable<CalendarRoute> { CalendarScreen(navigator, openQuickAddOn) }
             composable<RemindersRoute> { ReminderListScreen(navigator, openQuickAdd) }
             composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd) }
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
@@ -194,8 +222,8 @@ fun RicordellaApp(reminderToOpen: String?, onReminderOpened: () -> Unit) {
             onSelected = { kind ->
                 showQuickAdd = false
                 when (kind) {
-                    QuickAddKind.REMINDER -> navigator.newReminder()
-                    QuickAddKind.EVENT -> navigator.newReminder(type = ReminderType.EVENT)
+                    QuickAddKind.REMINDER -> navigator.newReminder(date = quickAddDate)
+                    QuickAddKind.EVENT -> navigator.newReminder(type = ReminderType.EVENT, date = quickAddDate)
                     QuickAddKind.ITEM -> navigator.newItem()
                     QuickAddKind.PERSON -> navigator.newPerson()
                 }
@@ -251,6 +279,7 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
     ) {
         Column(
             Modifier
+                .verticalScroll(rememberScrollState())
                 .navigationBarsPadding()
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 24.dp),

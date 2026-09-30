@@ -7,6 +7,7 @@ import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.Cake
 import androidx.compose.material.icons.rounded.Category
+import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.DirectionsCar
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.HourglassBottom
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Kitchen
+import androidx.compose.material.icons.rounded.MedicalServices
 import androidx.compose.material.icons.rounded.LocalLaundryService
 import androidx.compose.material.icons.rounded.Microwave
 import androidx.compose.material.icons.rounded.Notifications
@@ -51,6 +53,8 @@ val ReminderType.label: String
     get() = when (this) {
         ReminderType.TASK -> "Attività"
         ReminderType.EVENT -> "Evento"
+        ReminderType.MEDICAL_VISIT -> "Visita medica"
+        ReminderType.HOLIDAY -> "Festa"
         ReminderType.DEADLINE -> "Scadenza"
         ReminderType.BIRTHDAY -> "Compleanno"
         ReminderType.WARRANTY -> "Garanzia"
@@ -64,6 +68,8 @@ val ReminderType.icon: ImageVector
     get() = when (this) {
         ReminderType.TASK -> Icons.Rounded.TaskAlt
         ReminderType.EVENT -> Icons.Rounded.Event
+        ReminderType.MEDICAL_VISIT -> Icons.Rounded.MedicalServices
+        ReminderType.HOLIDAY -> Icons.Rounded.Celebration
         ReminderType.DEADLINE -> Icons.Rounded.HourglassBottom
         ReminderType.BIRTHDAY -> Icons.Rounded.Cake
         ReminderType.WARRANTY -> Icons.Rounded.VerifiedUser

@@ -89,6 +89,23 @@ Scelte principali:
 - **Migrazioni Room** esportate in `app/schemas`, senza `fallbackToDestructiveMigration`.
 - **Allegati e foto** salvati come riferimenti (URI con permesso persistente), senza duplicare i file.
 
+## Esperienza
+
+- **Configurazione iniziale**: benvenuto, tutorial animato delle sezioni e import facoltativo degli eventi
+  di un account Google dal calendario del telefono (`READ_CALENDAR`, nessun accesso a Internet).
+- **Mascotte**: palla di vetro flat con la saetta che gira; si riempie di fumo rosso se c'è qualcosa di
+  scaduto e torna limpida quando lo completi. Quando non c'è nulla in arrivo compare un mago soddisfatto.
+- **Cose guidate**: categoria → cosa → dettagli raggruppati in schede, con animazioni e suoni sintetizzati.
+- **Widget Calendario**: mese corrente con i giorni occupati e pulsanti per aggiungere promemoria, eventi,
+  cose e persone.
+- **Import da Google**: eventi, compleanni (sempre annuali), promemoria e feste. Il tipo è dedotto da titolo e
+  descrizione; le feste non si completano, restano solo in italiano se duplicate e ogni anno passano all'anno
+  nuovo (Pasqua e feste mobili ricalcolate).
+- **Backup**: .zip alla massima compressione (foto in WebP ridotte, niente valori di default né categorie
+  predefinite). Ogni esportazione sovrascrive il file scelto, salvo "Nuova versione"; si può anche condividere.
+  L'invito ad aggiornarlo arriva ogni giorno/settimana/mese/3 mesi/anno, a scelta. Ogni anno viene proposta la pulizia dei promemoria vecchi non importanti o senza
+  persone/cose collegate.
+
 ## Compilare ed eseguire
 
 Requisiti: Android Studio recente (o JDK 17+ e Android SDK 37).

@@ -82,14 +82,15 @@ private val CalendarMode.label: String
     }
 
 @Composable
-fun CalendarScreen(navigator: AppNavigator, onAdd: () -> Unit) {
+fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
     val viewModel = appViewModel { c, _ ->
         CalendarViewModel(c.reminderRepository, c.settingsRepository, c.recurrenceCalculator, c.completeReminder, c.time)
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val today = state.now.toLocalDate()
 
-    TopLevelScaffold(title = "Calendario", navigator = navigator, onAdd = onAdd) { padding ->
+    // Il "+" crea promemoria ed eventi nel giorno selezionato, non oggi.
+    TopLevelScaffold(title = "Calendario", navigator = navigator, onAdd = { onAddOn(state.selectedDate) }) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
@@ -126,16 +127,16 @@ fun CalendarScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                             onToday = { viewModel.onToday(today) },
                         )
                     }
-                    val (allDay, timed) = state.selectedOccurrences.partition { it.reminder.dueTime == null }
-                    if (allDay.isNotEmpty()) {
-                        item(key = "all-day") { SectionHeader("Tutto il giorno") }
-                        dayItems(allDay, state, navigator, viewModel, state.selectedDate, showEmpty = false)
+                    item(key = "timeline-${state.selectedDate}") {
+                        DayTimeline(
+                            date = state.selectedDate,
+                            occurrences = state.selectedOccurrences,
+                            now = state.now,
+                            onOpen = { navigator.openReminder(it.reminder.id) },
+                            onAdd = { navigator.newReminder(date = state.selectedDate) },
+                            modifier = Modifier.animateItem(),
+                        )
                     }
-                    if (timed.isNotEmpty()) {
-                        item(key = "timed") { SectionHeader("Con orario") }
-                        dayItems(timed, state, navigator, viewModel, state.selectedDate, showEmpty = false)
-                    }
-                    if (state.selectedOccurrences.isEmpty()) dayItems(emptyList(), state, navigator, viewModel, state.selectedDate)
                 }
                 CalendarMode.AGENDA -> {
                     val days = state.occurrences.toSortedMap()

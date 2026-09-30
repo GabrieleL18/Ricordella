@@ -102,7 +102,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
                 .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceS),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
-            BasicFields(form, viewModel::update)
+            BasicFields(form, viewModel::update, viewModel::onTypeChange)
             TextButton(onClick = { viewModel.update { it.copy(showAdvanced = !it.showAdvanced) } }) {
                 Icon(if (form.showAdvanced) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
                 Text(if (form.showAdvanced) "Nascondi opzioni" else "Altre opzioni", modifier = Modifier.padding(start = 8.dp))
@@ -123,7 +123,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
+private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit, onTypeChange: (ReminderType) -> Unit) {
     OutlinedTextField(
         value = form.title,
         onValueChange = { value -> update { it.copy(title = value) } },
@@ -140,7 +140,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             value = form.date,
             onValueChange = { value -> update { it.copy(date = value) } },
             isError = form.dateError,
-            modifier = Modifier.weight(1.2f),
+            modifier = Modifier.weight(1.6f),
         )
         TimeField(
             label = "Ora",
@@ -158,7 +158,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             val tone = type.tone
             FilterChip(
                 selected = form.type == type,
-                onClick = { update { it.copy(type = type) } },
+                onClick = { onTypeChange(type) },
                 label = { Text(type.label) },
                 leadingIcon = { Icon(type.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
                 colors = FilterChipDefaults.filterChipColors(

@@ -23,4 +23,18 @@ data class AppSettings(
     val defaultNotifyOffsetMinutes: Int = 0,
     /** Orario della notifica per i promemoria "tutto il giorno". */
     val allDayNotificationTime: LocalTime = LocalTime.of(9, 0),
+    /** Suoni brevi quando si sceglie una categoria o una cosa. */
+    val soundsEnabled: Boolean = true,
+    /** Configurazione iniziale (tutorial ed eventuale import dal calendario) completata. */
+    val onboardingDone: Boolean = false,
+    /** Il tutorial di esporta/importa è già stato mostrato. */
+    val backupTutorialSeen: Boolean = false,
+    /** Giorno (epochDay) da cui contare l'intervallo per chiedere un nuovo backup. */
+    val backupCheckEpochDay: Long? = null,
+    /** Ogni quanti giorni proporre di aggiornare il backup (1, 7, 30, 90, 365). */
+    val backupIntervalDays: Int = 90,
+    /** File del backup scelto dall'utente: ogni esportazione lo sovrascrive. */
+    val backupTargetUri: String? = null,
+    /** Ultimo anno in cui è stata proposta la pulizia dei promemoria vecchi. */
+    val lastCleanupYear: Int? = null,
 )

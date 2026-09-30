@@ -2,4 +2,6 @@
 <paths>
     <!-- File ripristinati da un backup (allegati e foto). -->
     <files-path name="restored" path="restored/" />
+    <!-- Ultimo backup esportato, condiviso con l'app scelta dall'utente. -->
+    <cache-path name="exports" path="exports/" />
 </paths>

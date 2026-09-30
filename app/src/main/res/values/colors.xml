@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="window_background">#FFFAF7EA</color>
+    <color name="widget_background">#FFFAF7EA</color>
+    <color name="widget_text">#FF15181D</color>
+    <color name="widget_text_muted">#FF545A63</color>
+    <color name="widget_action">#FFD3ECFB</color>
+    <color name="widget_on_action">#FF00344F</color>
+    <color name="widget_dot">#FF9B6BE6</color>
+    <color name="widget_tone_cyan">#FFD3ECFB</color>
+    <color name="widget_tone_lavender">#FFEBDDFF</color>
+    <color name="widget_tone_pear">#FFFBEEA6</color>
+    <color name="widget_tone_coral">#FFFFDAD9</color>
+    <color name="widget_busy">#FFF3EDFF</color>
+    <color name="widget_weekend">#FFC4303F</color>
 </resources>

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -102,7 +103,8 @@ fun ReminderCard(
     var celebrating by remember(reminder.id, reminder.dueDate, reminder.status) { mutableStateOf(false) }
     var burst by remember { mutableIntStateOf(0) }
 
-    val toggle: (() -> Unit)? = onToggleComplete?.let { callback ->
+    // Le feste non hanno la spunta (né lo swipe per completare).
+    val toggle: (() -> Unit)? = onToggleComplete?.takeIf { reminder.type.isCompletable }?.let { callback ->
         {
             if (!isDone && !celebrating) {
                 celebrating = true
@@ -251,12 +253,47 @@ private fun ReminderCardBody(
                 }
                 ReminderBadges(entry, overdue)
             }
+            if (reminder.status == ReminderStatus.ACTIVE && !checked) DaysLeft(occurrenceDate, today, overdue)
             if (toggle != null) {
                 CompleteToggle(checked = checked, burst = burst, onClick = toggle)
             } else {
                 Box(Modifier.size(RicordellaDimensions.spaceS))
             }
         }
+    }
+}
+
+/** Quanti giorni mancano: numero grande e unità sotto ("Oggi", "3 giorni", "2 gg fa"). */
+@Composable
+private fun DaysLeft(date: LocalDate, today: LocalDate, overdue: Boolean) {
+    val days = java.time.temporal.ChronoUnit.DAYS.between(today, date)
+    val colors = MaterialTheme.ricordellaColors
+    val tone = when {
+        overdue || days < 0 -> colors.coral
+        days == 0L -> colors.pear
+        days <= 7 -> colors.lavender
+        else -> colors.cyan
+    }
+    val (value, unit) = when {
+        days == 0L -> "Oggi" to ""
+        days == 1L -> "1" to "giorno"
+        days > 1 -> "$days" to "giorni"
+        days == -1L -> "1" to "giorno fa"
+        else -> "${-days}" to "giorni fa"
+    }
+    Column(
+        Modifier
+            .widthIn(min = 52.dp)
+            .background(tone.container, RoundedCornerShape(14.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = if (days == 0L) "Oggi" else if (days > 0) "Mancano $value $unit" else "$value $unit"
+            },
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (days > 0) Text("mancano", style = MaterialTheme.typography.labelSmall, color = tone.content)
+        Text(value, style = if (days == 0L) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleLarge, color = tone.content, maxLines = 1)
+        if (unit.isNotEmpty()) Text(unit, style = MaterialTheme.typography.labelSmall, color = tone.content, maxLines = 1)
     }
 }
 
@@ -329,22 +366,8 @@ private fun ReminderBadges(entry: ReminderWithLinks, overdue: Boolean) {
 
 @Composable
 fun PersonAvatar(person: Person, modifier: Modifier = Modifier, size: Dp = 48.dp) {
-    val initials = person.displayName.split(" ").filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }
-    val tone = toneFor(person.id)
-    val placeholder: @Composable () -> Unit = {
-        Box(
-            modifier = Modifier
-                .size(size)
-                .background(tone.container, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                initials.ifEmpty { "?" },
-                style = if (size > 56.dp) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleMedium,
-                color = tone.content,
-            )
-        }
-    }
+    // Senza foto: un maghetto animato, sempre lo stesso per la stessa persona.
+    val placeholder: @Composable () -> Unit = { WizardAvatar(seed = person.id, size = size) }
     Box(modifier = modifier.size(size).clip(CircleShape)) {
         val photo = person.photoUri
         if (photo != null) {

@@ -100,6 +100,7 @@ class ReminderEditViewModel(
                 isNew = true,
                 date = route.epochDay?.let(LocalDate::ofEpochDay) ?: time.today(),
                 type = route.type?.let { runCatching { ReminderType.valueOf(it) }.getOrNull() } ?: ReminderType.TASK,
+                recurrencePreset = if (route.type == ReminderType.BIRTHDAY.name) RecurrencePreset.YEARLY else RecurrencePreset.NONE,
                 personIds = setOfNotNull(route.personId),
                 itemIds = setOfNotNull(route.itemId),
                 notifyOffsetMinutes = settings.current().defaultNotifyOffsetMinutes,
@@ -138,6 +139,16 @@ class ReminderEditViewModel(
     }
 
     fun update(transform: (ReminderForm) -> ReminderForm) = _form.update(transform)
+
+    /** I compleanni si ripetono ogni anno di default; tornando a un altro tipo la ripetizione automatica si toglie. */
+    fun onTypeChange(type: ReminderType) = _form.update { form ->
+        val preset = when {
+            type == ReminderType.BIRTHDAY && form.recurrencePreset == RecurrencePreset.NONE -> RecurrencePreset.YEARLY
+            form.type == ReminderType.BIRTHDAY && type != ReminderType.BIRTHDAY && form.recurrencePreset == RecurrencePreset.YEARLY -> RecurrencePreset.NONE
+            else -> form.recurrencePreset
+        }
+        form.copy(type = type, recurrencePreset = preset)
+    }
 
     fun onErrorShown() = _form.update { it.copy(errorMessage = null) }
 

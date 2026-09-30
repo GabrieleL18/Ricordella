@@ -1,6 +1,18 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -98,6 +110,8 @@ fun EmptyState(
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
     onAction: (() -> Unit)? = null,
+    /** Sostituisce la mascotte con un'illustrazione dedicata. */
+    illustration: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -106,7 +120,7 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
     ) {
-        Box(contentAlignment = Alignment.BottomEnd) {
+        if (illustration != null) illustration() else Box(contentAlignment = Alignment.BottomEnd) {
             CrystalBallMascot(size = 104.dp)
             val tone = MaterialTheme.ricordellaColors.lavender
             Box(
@@ -309,4 +323,63 @@ fun InfoRow(label: String, value: String, modifier: Modifier = Modifier) {
         )
         Text(value, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(0.6f))
     }
+}
+
+/**
+ * Filtro a pillola con icona in un cerchio colorato (ed eventuale conteggio).
+ * Quando è scelto si riempie del colore del tono e fa un piccolo "salto".
+ */
+@Composable
+fun IconChoiceChip(
+    label: String,
+    icon: ImageVector,
+    tone: Tone,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    count: Int? = null,
+) {
+    val background by animateColorAsState(if (selected) tone.solid else MaterialTheme.colorScheme.surfaceContainerLowest, tween(RicordellaMotion.SHORT), label = "chipBg")
+    val content by animateColorAsState(if (selected) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.onSurface, tween(RicordellaMotion.SHORT), label = "chipFg")
+    val bounce = remember { Animatable(1f) }
+    LaunchedEffect(selected) {
+        if (selected) {
+            bounce.snapTo(0.9f)
+            bounce.animateTo(1f, spring(dampingRatio = 0.4f, stiffness = Spring.StiffnessMedium))
+        }
+    }
+    val interaction = remember { MutableInteractionSource() }
+    Row(
+        modifier
+            .graphicsLayer { scaleX = bounce.value; scaleY = bounce.value }
+            .pressScale(interaction, pressedScale = 0.94f)
+            .clip(CircleShape)
+            .background(background)
+            .border(1.dp, if (selected) Color.Transparent else MaterialTheme.colorScheme.outlineVariant, CircleShape)
+            .selectable(selected = selected, interactionSource = interaction, indication = null, role = Role.Tab, onClick = onClick)
+            .padding(start = 4.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            Modifier.size(28.dp).background(if (selected) MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.25f) else tone.container, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, contentDescription = null, tint = if (selected) content else tone.content, modifier = Modifier.size(16.dp))
+        }
+        Text(label, style = MaterialTheme.typography.labelLarge, color = content, maxLines = 1)
+        if (count != null) {
+            Text("$count", style = MaterialTheme.typography.labelMedium, color = content.copy(alpha = 0.7f))
+        }
+    }
+}
+
+/** Riga scorrevole di [IconChoiceChip]. */
+@Composable
+fun IconChipRow(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+        verticalAlignment = Alignment.CenterVertically,
+    ) { content() }
 }

@@ -31,7 +31,11 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import com.ricordella.app.domain.date.RecurrenceCalculator
+import com.ricordella.app.domain.model.PeriodKind
+import com.ricordella.app.domain.model.ReminderPeriod
 
 data class ReminderListUiState(
     val isLoading: Boolean = true,
@@ -42,6 +46,8 @@ data class ReminderListUiState(
     val people: List<Person> = emptyList(),
     val items: List<ItemWithCategory> = emptyList(),
     val categories: List<String> = emptyList(),
+    /** Per i ricorrenti mostrati in un periodo: la prima occorrenza che vi cade. */
+    val occurrenceDates: Map<String, LocalDate> = emptyMap(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -51,6 +57,7 @@ class ReminderListViewModel(
     items: ItemRepository,
     private val completeReminder: CompleteReminderUseCase,
     private val reopenReminder: ReopenReminderUseCase,
+    private val recurrence: RecurrenceCalculator,
     time: TimeSource,
 ) : ViewModel() {
 
@@ -72,11 +79,21 @@ class ReminderListViewModel(
     ) { p, i, c -> Triple(p, i, c) }
 
     val uiState: StateFlow<ReminderListUiState> = combine(results, lookups, query, filter, ticks) { list, lookup, text, options, now ->
+        val range = options.period.range
+        val occurrenceDates = mutableMapOf<String, LocalDate>()
+        val visible = if (range == null) list else list.filter { entry ->
+            val reminder = entry.reminder
+            if (reminder.dueDate in range) return@filter true
+            val first = recurrence.occurrencesInRange(reminder, entry.recurrenceRule, range.start, range.endInclusive).firstOrNull()
+            first?.let { occurrenceDates[reminder.id] = it }
+            first != null
+        }
         ReminderListUiState(
             isLoading = false,
             query = text,
             filter = options,
-            reminders = list,
+            occurrenceDates = occurrenceDates,
+            reminders = visible,
             now = now,
             people = lookup.first,
             items = lookup.second,
@@ -89,6 +106,8 @@ class ReminderListViewModel(
     }
 
     fun onScopeChange(scope: ReminderListScope) = filter.update { it.copy(scope = scope) }
+    fun onPeriodKind(kind: PeriodKind) = filter.update { it.copy(period = ReminderPeriod(kind)) }
+    fun onShiftPeriod(steps: Long) = filter.update { it.copy(period = it.period.shift(steps)) }
     fun onSortChange(order: ReminderSortOrder) = filter.update { it.copy(sortOrder = order) }
     fun onPersonFilter(id: String?) = filter.update { it.copy(personId = id) }
     fun onItemFilter(id: String?) = filter.update { it.copy(itemId = id) }

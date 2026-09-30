@@ -53,9 +53,13 @@ class ReminderNotifier(private val context: Context) {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(openIntent(reminder.id))
-            .addAction(0, "Completa", actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
-            .addAction(0, "Tra 10 min", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_10_MINUTES))
-            .addAction(0, "Domani", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_TOMORROW))
+            .apply {
+                if (reminder.type.isCompletable) {
+                    addAction(0, "Completa", actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
+                    addAction(0, "Tra 10 min", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_10_MINUTES))
+                    addAction(0, "Domani", actionIntent(reminder.id, NotificationActionReceiver.ACTION_SNOOZE_TOMORROW))
+                }
+            }
             .build()
         try {
             manager.notify(reminder.id, NOTIFICATION_ID, notification)

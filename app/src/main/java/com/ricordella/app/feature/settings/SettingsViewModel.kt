@@ -11,6 +11,7 @@ import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.repository.SettingsRepository
 import com.ricordella.app.domain.usecase.DeleteAllDataUseCase
+import com.ricordella.app.domain.usecase.Housekeeping
 import com.ricordella.app.domain.usecase.RestoreBackupUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +27,10 @@ data class SettingsUiState(
     /** Riepilogo del backup da confermare prima del ripristino. */
     val restoreSummary: BackupSummary? = null,
     val message: String? = null,
+    /** Backup appena creato, da passare al menu Condividi. */
+    val shareUri: Uri? = null,
+    /** Nessun file di backup scelto (o non più scrivibile): va chiesto dove salvarlo. */
+    val askNewFile: Boolean = false,
 )
 
 class SettingsViewModel(
@@ -34,6 +39,7 @@ class SettingsViewModel(
     private val restoreBackup: RestoreBackupUseCase,
     private val deleteAllData: DeleteAllDataUseCase,
     private val scheduler: ReminderScheduler,
+    private val housekeeping: Housekeeping,
 ) : ViewModel() {
 
     private val local = MutableStateFlow(SettingsUiState())
@@ -59,10 +65,26 @@ class SettingsViewModel(
         viewModelScope.launch { scheduler.refresh() }
     }
 
-    fun export(destination: Uri) = runBusy {
-        backupRepository.export(destination)
-        showMessage("Backup esportato.")
+    fun export() = runBusy {
+        val uri = housekeeping.exportBackup()
+        local.update { it.copy(shareUri = uri) }
     }
+
+    fun onShared() = local.update { it.copy(shareUri = null) }
+
+    /** Aggiorna il backup sovrascrivendo il file precedente; se manca, chiede dove salvarlo. */
+    fun exportOverwrite() = runBusy {
+        if (housekeeping.overwriteBackup()) showMessage("Backup aggiornato (file precedente sovrascritto).")
+        else local.update { it.copy(askNewFile = true) }
+    }
+
+    /** Primo backup o nuova versione: da ora in poi è questo il file che viene sovrascritto. */
+    fun exportNewFile(destination: Uri) = runBusy {
+        housekeeping.exportToNewFile(destination)
+        showMessage("Backup salvato.")
+    }
+
+    fun onAskedNewFile() = local.update { it.copy(askNewFile = false) }
 
     fun readBackup(source: Uri) = runBusy {
         val (result, pending) = backupRepository.read(source)

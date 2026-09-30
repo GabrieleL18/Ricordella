@@ -309,6 +309,7 @@ private fun Links(entry: ReminderWithLinks, navigator: AppNavigator) {
 
 @Composable
 private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewModel) {
+    if (!entry.reminder.type.isCompletable) return
     val isActive = entry.reminder.status == ReminderStatus.ACTIVE
     var snoozeMenu by remember { mutableStateOf(false) }
     var pickDate by rememberSaveable { mutableStateOf(false) }

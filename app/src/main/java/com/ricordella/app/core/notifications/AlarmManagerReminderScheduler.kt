@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.ricordella.app.core.widget.CalendarWidgetProvider
 import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.ReminderAlarmPlanner
 import com.ricordella.app.domain.date.TimeSource
@@ -33,6 +34,8 @@ class AlarmManagerReminderScheduler(
     private val mutex = Mutex()
 
     override suspend fun refresh() = mutex.withLock {
+        // Ogni modifica ai promemoria passa di qui: è il punto giusto per ridisegnare il widget.
+        CalendarWidgetProvider.requestUpdate(context)
         val appSettings = settings.current()
         if (!appSettings.notificationsEnabled) {
             alarmManager.cancel(alarmIntent())

@@ -19,6 +19,8 @@ data class ItemListUiState(
     val showArchived: Boolean = false,
     val groupFilter: ItemGroup? = null,
     val groups: Map<ItemGroup, List<ItemWithCategory>> = emptyMap(),
+    /** Quante cose ci sono per categoria, indipendentemente dal filtro scelto. */
+    val counts: Map<ItemGroup, Int> = emptyMap(),
 ) {
     val isEmpty: Boolean get() = groups.values.all { it.isEmpty() }
 }
@@ -48,6 +50,7 @@ class ItemListViewModel(items: ItemRepository) : ViewModel() {
             showArchived = archived,
             groupFilter = group,
             groups = ItemGroup.entries.associateWith { g -> filtered.filter { it.group == g } }.filterValues { it.isNotEmpty() },
+            counts = list.groupingBy { it.group }.eachCount(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ItemListUiState())
 

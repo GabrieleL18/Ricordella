@@ -14,6 +14,7 @@ import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.displayName
+import com.ricordella.app.domain.model.newId
 import com.ricordella.app.domain.repository.ItemRepository
 import com.ricordella.app.domain.repository.PersonRepository
 import com.ricordella.app.domain.repository.ReminderRepository
@@ -84,6 +85,9 @@ class PersonEditViewModel(
 ) : ViewModel() {
 
     private val personId = savedStateHandle.toRoute<PersonEditRoute>().id
+
+    /** Id definitivo della persona, noto già in creazione: l'anteprima mostra lo stesso maghetto che verrà salvato. */
+    val stableId: String = personId ?: savedStateHandle.get<String>("newPersonId") ?: newId().also { savedStateHandle["newPersonId"] = it }
     private var existing: Person? = null
     private val _form = MutableStateFlow(PersonForm())
     val form: StateFlow<PersonForm> = _form.asStateFlow()
@@ -119,7 +123,7 @@ class PersonEditViewModel(
         }
         viewModelScope.launch {
             val now = time.now()
-            val person = (existing ?: Person(name = "", createdAt = now, updatedAt = now)).copy(
+            val person = (existing ?: Person(id = stableId, name = "", createdAt = now, updatedAt = now)).copy(
                 name = form.name.trim(),
                 surname = form.surname.trim().ifEmpty { null },
                 notes = form.notes.trim().ifEmpty { null },

@@ -2,7 +2,11 @@ package com.ricordella.app.data.backup
 
 import androidx.core.net.toUri
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
 import androidx.core.content.FileProvider
 import com.ricordella.app.BuildConfig
 import com.ricordella.app.data.local.dao.BackupDao
@@ -10,8 +14,11 @@ import com.ricordella.app.data.local.database.BuiltInCategories
 import com.ricordella.app.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
@@ -36,15 +43,83 @@ class BackupRepository(
     private val resolver get() = context.contentResolver
     private val restoredDir get() = File(context.filesDir, RESTORED_DIR)
 
-    suspend fun export(destination: Uri) = withContext(Dispatchers.IO) {
-        val database = backupDao.readAll()
-        val settings = settingsRepository.current()
-        val files = database.fileUris().map { uri ->
-            BackupArchiveCodec.FileSource(uri) { resolver.openInputStream(uri.toUri()) }
+    /**
+     * Crea il backup in un file temporaneo condivisibile (come "Condividi file") e ne
+     * restituisce l'URI. Resta solo l'ultimo export: il precedente viene sovrascritto.
+     */
+    suspend fun exportForSharing(): Uri = withContext(Dispatchers.IO) {
+        val dir = File(context.cacheDir, EXPORT_DIR).apply {
+            deleteRecursively()
+            mkdirs()
         }
-        val output = resolver.openOutputStream(destination, "wt") ?: throw IOException("Destinazione non disponibile")
-        output.use {
-            codec.write(it, database, settings, files, BuildConfig.VERSION_NAME, Instant.now(clock).toString())
+        val file = File(dir, "ricordella-backup.zip")
+        file.outputStream().buffered().use { writeBackup(it) }
+        FileProvider.getUriForFile(context, fileProviderAuthority(), file)
+    }
+
+    /** Scrive il backup nel documento scelto dall'utente, sovrascrivendone il contenuto. */
+    suspend fun exportTo(destination: Uri) = withContext(Dispatchers.IO) {
+        val output = runCatching { resolver.openOutputStream(destination, "wt") }.getOrNull()
+            ?: resolver.openOutputStream(destination, "w")
+            ?: throw IOException("Destinazione non disponibile")
+        output.buffered().use { writeBackup(it) }
+    }
+
+    /** Conserva l'accesso al file del backup anche dopo il riavvio, per poterlo sovrascrivere. */
+    fun keepAccess(uri: Uri) {
+        runCatching {
+            resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
+    }
+
+    /**
+     * Per pesare il meno possibile: dati JSON senza valori di default, zip alla massima
+     * compressione e immagini ridotte e convertite in WebP (se così diventano più leggere).
+     */
+    private suspend fun writeBackup(output: OutputStream) {
+        val staging = File(context.cacheDir, "backup-staging").apply {
+            deleteRecursively()
+            mkdirs()
+        }
+        try {
+            val database = backupDao.readAll()
+            var index = 0
+            val compacted = database.fileUris().associateWith { uri -> runCatching { compact(uri, File(staging, "${index++}")) }.getOrNull() }
+            val webp = compacted.filterValues { it?.second == true }.keys
+            val content = database.copy(
+                attachments = database.attachments.map { if (it.uri in webp) it.copy(mimeType = "image/webp") else it },
+            )
+            val files = compacted.mapNotNull { (uri, result) -> result?.let { BackupArchiveCodec.FileSource(uri) { it.first.inputStream() } } }
+            codec.write(output, content, settingsRepository.current(), files, BuildConfig.VERSION_NAME, Instant.now(clock).toString())
+        } finally {
+            staging.deleteRecursively()
+        }
+    }
+
+    /** Copia il file in [target], ricompresso se è un'immagine; restituisce il file e se è diventato WebP. */
+    private fun compact(uri: String, target: File): Pair<File, Boolean>? {
+        val original = resolver.openInputStream(uri.toUri())?.use { it.readBytes() } ?: return null
+        val webp = runCatching { compressImage(original) }.getOrNull()?.takeIf { it.size < original.size }
+        target.writeBytes(webp ?: original)
+        return target to (webp != null)
+    }
+
+    /** ImageDecoder applica anche l'orientamento EXIF, che la ricompressione altrimenti perderebbe. */
+    private fun compressImage(bytes: ByteArray): ByteArray {
+        val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(bytes))) { decoder, info, _ ->
+            val side = maxOf(info.size.width, info.size.height)
+            if (side > MAX_IMAGE_SIDE) {
+                val scale = MAX_IMAGE_SIDE.toFloat() / side
+                decoder.setTargetSize((info.size.width * scale).toInt().coerceAtLeast(1), (info.size.height * scale).toInt().coerceAtLeast(1))
+            }
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        }
+        @Suppress("DEPRECATION")
+        val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Bitmap.CompressFormat.WEBP_LOSSY else Bitmap.CompressFormat.WEBP
+        return ByteArrayOutputStream().use { out ->
+            bitmap.compress(format, IMAGE_QUALITY, out)
+            bitmap.recycle()
+            out.toByteArray()
         }
     }
 
@@ -104,5 +179,8 @@ class BackupRepository(
 
     private companion object {
         const val RESTORED_DIR = "restored"
+        const val EXPORT_DIR = "exports"
+        const val MAX_IMAGE_SIDE = 1280
+        const val IMAGE_QUALITY = 70
     }
 }

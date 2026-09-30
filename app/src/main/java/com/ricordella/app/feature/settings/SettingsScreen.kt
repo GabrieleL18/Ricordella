@@ -20,6 +20,25 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AlarmOn
+import androidx.compose.material.icons.rounded.AddCircleOutline
+import androidx.compose.material.icons.rounded.Save
+import androidx.compose.material.icons.rounded.Share
+import com.ricordella.app.domain.usecase.Housekeeping
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import androidx.compose.material3.Surface
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.ricordella.app.core.ui.BackupTutorialPages
+import com.ricordella.app.core.ui.SectionTutorialPages
+import com.ricordella.app.core.ui.TutorialDialog
+import com.ricordella.app.core.ui.shareBackup
+import com.ricordella.app.feature.onboarding.CalendarImportStep
+import com.ricordella.app.feature.onboarding.CalendarImportViewModel
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
@@ -75,7 +94,7 @@ import java.time.LocalDate
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val viewModel = appViewModel { c, _ ->
-        SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler)
+        SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val settings = state.settings
@@ -84,12 +103,33 @@ fun SettingsScreen(onBack: () -> Unit) {
     var confirmDelete by rememberSaveable { mutableStateOf(0) }
     var showPrivacy by rememberSaveable { mutableStateOf(false) }
     var pickAllDayTime by rememberSaveable { mutableStateOf(false) }
+    var showSectionsTutorial by rememberSaveable { mutableStateOf(false) }
+    var showCalendarImport by rememberSaveable { mutableStateOf(false) }
+    // Azione di backup in attesa che l'utente chiuda il tutorial mostrato la prima volta.
+    var backupTutorialFor by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-        uri?.let(viewModel::export)
-    }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(viewModel::readBackup)
+    }
+    val startImport = { importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
+    var showExportChoices by rememberSaveable { mutableStateOf(false) }
+    val newFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+        uri?.let(viewModel::exportNewFile)
+    }
+    val startNewFile = { newFileLauncher.launch(backupFileName(newVersion = settings.backupTargetUri != null)) }
+    LaunchedEffect(state.askNewFile) {
+        if (state.askNewFile) {
+            viewModel.onAskedNewFile()
+            newFileLauncher.launch(backupFileName(newVersion = false))
+        }
+    }
+    fun backupAction(action: String) {
+        if (!settings.backupTutorialSeen) backupTutorialFor = action
+        else if (action == BACKUP_EXPORT) showExportChoices = true else if (action == BACKUP_IMPORT) startImport()
+    }
+
+    LaunchedEffect(state.shareUri) {
+        state.shareUri?.let { shareBackup(context, it); viewModel.onShared() }
     }
 
     LaunchedEffect(state.message) {
@@ -133,6 +173,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
             )
 
+            SectionHeader("Suoni")
+            SettingRow(
+                icon = Icons.Rounded.MusicNote,
+                title = "Suoni delle scelte",
+                subtitle = "Un piccolo suono quando scegli categorie e cose.",
+                trailing = {
+                    Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
+                },
+            )
+
             SectionHeader("Notifiche")
             SettingRow(
                 icon = Icons.Rounded.Notifications,
@@ -169,14 +219,34 @@ fun SettingsScreen(onBack: () -> Unit) {
             SettingRow(
                 icon = Icons.Rounded.Upload,
                 title = "Esporta backup",
-                subtitle = "Salva tutti i dati in un file .zip dove preferisci.",
-                onClick = { exportLauncher.launch("ricordella-backup-${LocalDate.now()}.zip") },
+                subtitle = "Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione.",
+                onClick = { backupAction(BACKUP_EXPORT) },
+            )
+            DropdownField(
+                label = "Ricordami di aggiornare il backup",
+                options = Housekeeping.BACKUP_INTERVALS,
+                selected = settings.backupIntervalDays,
+                optionLabel = Housekeeping::intervalLabel,
+                onSelected = { days -> viewModel.update { it.copy(backupIntervalDays = days) } },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
             SettingRow(
                 icon = Icons.Rounded.Download,
                 title = "Importa backup",
                 subtitle = "Ripristina un backup sostituendo i dati attuali.",
-                onClick = { importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) },
+                onClick = { backupAction(BACKUP_IMPORT) },
+            )
+            SettingRow(
+                icon = Icons.AutoMirrored.Rounded.HelpOutline,
+                title = "Come funziona il backup",
+                subtitle = "Tutorial animato di esporta e importa.",
+                onClick = { backupTutorialFor = BACKUP_TUTORIAL_ONLY },
+            )
+            SettingRow(
+                icon = Icons.Rounded.CalendarMonth,
+                title = "Importa da Google Calendar",
+                subtitle = "Copia gli eventi di un account Google presente sul telefono.",
+                onClick = { showCalendarImport = true },
             )
             SettingRow(
                 icon = Icons.Rounded.DeleteForever,
@@ -186,6 +256,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
 
             SectionHeader("Informazioni")
+            SettingRow(
+                icon = Icons.Rounded.School,
+                title = "Rivedi il tutorial",
+                subtitle = "Come funzionano le sezioni dell'app.",
+                onClick = { showSectionsTutorial = true },
+            )
             SettingRow(icon = Icons.Rounded.Info, title = "Versione", subtitle = BuildConfig.VERSION_NAME)
             SettingRow(
                 icon = Icons.Rounded.PrivacyTip,
@@ -254,6 +330,63 @@ fun SettingsScreen(onBack: () -> Unit) {
         )
     }
 
+    backupTutorialFor?.let { action ->
+        TutorialDialog(BackupTutorialPages, onDismiss = {
+            backupTutorialFor = null
+            if (!settings.backupTutorialSeen) viewModel.update { it.copy(backupTutorialSeen = true) }
+            when (action) {
+                BACKUP_EXPORT -> showExportChoices = true
+                BACKUP_IMPORT -> startImport()
+            }
+        }, doneLabel = when (action) { BACKUP_EXPORT -> "Esporta"; BACKUP_IMPORT -> "Scegli il file"; else -> "Ho capito" })
+    }
+
+    if (showExportChoices) {
+        AlertDialog(
+            onDismissRequest = { showExportChoices = false },
+            title = { Text("Esporta backup") },
+            text = {
+                Column {
+                    SettingRow(
+                        icon = Icons.Rounded.Save,
+                        title = if (settings.backupTargetUri != null) "Aggiorna il backup" else "Salva il backup",
+                        subtitle = if (settings.backupTargetUri != null) "Sovrascrive il file precedente." else "Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto.",
+                        onClick = { showExportChoices = false; viewModel.exportOverwrite() },
+                    )
+                    if (settings.backupTargetUri != null) {
+                        SettingRow(
+                            icon = Icons.Rounded.AddCircleOutline,
+                            title = "Nuova versione",
+                            subtitle = "Crea un nuovo file e tiene quello vecchio.",
+                            onClick = { showExportChoices = false; startNewFile() },
+                        )
+                    }
+                    SettingRow(
+                        icon = Icons.Rounded.Share,
+                        title = "Condividi",
+                        subtitle = "Invialo con un'app (email, chat...).",
+                        onClick = { showExportChoices = false; viewModel.export() },
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showExportChoices = false }) { Text("Annulla") } },
+        )
+    }
+
+    if (showSectionsTutorial) TutorialDialog(SectionTutorialPages, onDismiss = { showSectionsTutorial = false })
+
+    if (showCalendarImport) {
+        val importViewModel = appViewModel { c, _ -> CalendarImportViewModel(c.calendarImporter, c.settingsRepository, c.housekeeping) }
+        Dialog(
+            onDismissRequest = { showCalendarImport = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
+                CalendarImportStep(importViewModel, onDone = { showCalendarImport = false }, doneLabel = "Chiudi")
+            }
+        }
+    }
+
     if (pickAllDayTime) {
         TimePickerDialogFor(
             initial = settings.allDayNotificationTime,
@@ -265,6 +398,15 @@ fun SettingsScreen(onBack: () -> Unit) {
         )
     }
 }
+
+/** Nome del file: fisso per il backup "principale", con data e ora per le nuove versioni. */
+private fun backupFileName(newVersion: Boolean): String =
+    if (newVersion) "ricordella-backup-${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))}.zip"
+    else "ricordella-backup.zip"
+
+private const val BACKUP_EXPORT = "export"
+private const val BACKUP_IMPORT = "import"
+private const val BACKUP_TUTORIAL_ONLY = "tutorial"
 
 @Composable
 private fun <T> Segmented(options: List<T>, selected: T, label: (T) -> String, onSelected: (T) -> Unit) {

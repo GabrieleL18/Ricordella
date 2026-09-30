@@ -79,6 +79,15 @@ class RoomReminderRepository(private val dao: ReminderDao) : ReminderRepository 
             ReminderListScope.COMPLETED -> where += "reminder.status = 'COMPLETED'"
         }
 
+        // Periodo: le scadenze nel periodo, più i ricorrenti attivi che potrebbero avere
+        // un'occorrenza nel periodo (li rifinisce il ViewModel con il calcolo delle ricorrenze).
+        filter.period.range?.let { range ->
+            where += "(reminder.dueDate BETWEEN ? AND ? OR (reminder.status = 'ACTIVE' AND reminder.recurrenceRuleId IS NOT NULL AND reminder.dueDate <= ?))"
+            args += range.start.toEpochDay()
+            args += range.endInclusive.toEpochDay()
+            args += range.endInclusive.toEpochDay()
+        }
+
         if (filter.query.isNotBlank()) {
             val pattern = likePattern(filter.query)
             where += """(

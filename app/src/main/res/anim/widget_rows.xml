@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Le settimane compaiono a cascata quando il widget viene disegnato. -->
+<layoutAnimation xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animation="@anim/widget_row_in"
+    android:delay="15%" />

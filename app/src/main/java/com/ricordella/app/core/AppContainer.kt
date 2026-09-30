@@ -21,6 +21,8 @@ import com.ricordella.app.domain.usecase.DeleteAllDataUseCase
 import com.ricordella.app.domain.usecase.DeleteItemUseCase
 import com.ricordella.app.domain.usecase.DeleteReminderUseCase
 import com.ricordella.app.domain.usecase.GlobalSearchUseCase
+import com.ricordella.app.domain.usecase.Housekeeping
+import com.ricordella.app.data.calendar.CalendarImporter
 import com.ricordella.app.domain.usecase.ReopenReminderUseCase
 import com.ricordella.app.domain.usecase.RestoreBackupUseCase
 import com.ricordella.app.domain.usecase.SaveItemUseCase
@@ -81,4 +83,6 @@ class AppContainer(context: Context) {
     val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository)
     val restoreBackup = RestoreBackupUseCase(backupRepository, reminderScheduler)
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
+    val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
+    val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time)
 }

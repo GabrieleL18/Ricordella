@@ -36,7 +36,7 @@ object ReminderTimeline {
     }
 
     fun isOverdue(reminder: Reminder, now: LocalDateTime): Boolean {
-        if (reminder.status != ReminderStatus.ACTIVE) return false
+        if (reminder.status != ReminderStatus.ACTIVE || !reminder.type.isCompletable) return false
         val time = reminder.dueTime
         return if (time == null) reminder.dueDate.isBefore(now.toLocalDate())
         else reminder.dueDate.atTime(time).isBefore(now)

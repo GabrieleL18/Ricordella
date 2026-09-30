@@ -11,7 +11,7 @@ import kotlin.math.absoluteValue
 /*
  * Ogni accento ha un significato stabile, sempre accompagnato da un'icona o da un testo
  * (il colore non è mai l'unico segnale):
- * azzurro = attività e rinnovi · lavanda = eventi · corallo = compleanni e scadenze vere ·
+ * azzurro = attività, rinnovi e visite mediche · lavanda = eventi e feste · corallo = compleanni e scadenze vere ·
  * giallo = manutenzioni · menta = garanzie e pagamenti.
  */
 
@@ -19,8 +19,8 @@ val ReminderType.tone: Tone
     @Composable
     get() = with(MaterialTheme.ricordellaColors) {
         when (this@tone) {
-            ReminderType.TASK, ReminderType.RENEWAL -> cyan
-            ReminderType.EVENT, ReminderType.OTHER -> lavender
+            ReminderType.TASK, ReminderType.RENEWAL, ReminderType.MEDICAL_VISIT -> cyan
+            ReminderType.EVENT, ReminderType.OTHER, ReminderType.HOLIDAY -> lavender
             ReminderType.BIRTHDAY, ReminderType.DEADLINE -> coral
             ReminderType.MAINTENANCE -> pear
             ReminderType.WARRANTY, ReminderType.PAYMENT -> mint

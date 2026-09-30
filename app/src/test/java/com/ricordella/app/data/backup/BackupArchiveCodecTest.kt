@@ -18,6 +18,7 @@ import com.ricordella.app.domain.model.ThemeMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import com.ricordella.app.data.local.database.BuiltInCategories
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.DayOfWeek
@@ -85,7 +86,8 @@ class BackupArchiveCodecTest {
 
         assertTrue(result is BackupReadResult.Valid)
         val contents = (result as BackupReadResult.Valid).contents
-        assertEquals(database, contents.database)
+        // Le categorie predefinite non viaggiano nel backup e vengono ricreate tutte in lettura.
+        assertEquals(database.copy(categories = BuiltInCategories.all), contents.database.copy(categories = contents.database.categories.sortedBy { it.sortOrder }))
         assertEquals(ThemeMode.DARK, contents.settings?.themeMode)
         assertEquals(1, contents.manifest.files.size)
         assertEquals("content://photos/1", contents.manifest.files.single().originalUri)

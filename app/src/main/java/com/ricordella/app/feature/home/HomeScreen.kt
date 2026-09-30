@@ -3,6 +3,7 @@ package com.ricordella.app.feature.home
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -10,6 +11,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -32,12 +34,16 @@ import androidx.compose.material.icons.rounded.EventAvailable
 import androidx.compose.material.icons.automirrored.rounded.EventNote
 import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +62,7 @@ import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.navigation.AppNavigator
 import com.ricordella.app.core.ui.CrystalBallMascot
 import com.ricordella.app.core.ui.EmptyState
+import com.ricordella.app.core.ui.HappyWizard
 import com.ricordella.app.core.ui.MascotState
 import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.core.ui.ReminderCard
@@ -76,8 +83,23 @@ import com.ricordella.app.domain.model.ReminderWithLinks
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
-    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time) }
+    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val cleanupIds by viewModel.cleanupIds.collectAsStateWithLifecycle()
+    val backupEvent by viewModel.backupEvent.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val chooseFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+        uri?.let(viewModel::onNewBackupFile)
+    }
+    LaunchedEffect(backupEvent) {
+        when (backupEvent) {
+            BackupEvent.ChooseFile -> chooseFile.launch("ricordella-backup.zip")
+            BackupEvent.Updated -> Toast.makeText(context, "Backup aggiornato", Toast.LENGTH_SHORT).show()
+            BackupEvent.Failed -> Toast.makeText(context, "Backup non riuscito, riprova", Toast.LENGTH_SHORT).show()
+            null -> return@LaunchedEffect
+        }
+        viewModel.onBackupEventHandled()
+    }
     val mascot = rememberMascotState()
     val tracker = rememberRevealTracker()
     val colors = MaterialTheme.ricordellaColors
@@ -99,6 +121,9 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         ) {
             item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
             item(key = "permission") { NotificationPermissionCard() }
+            item(key = "backup") {
+                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = viewModel::onExportBackup, onLater = viewModel::onPostponeBackup)
+            }
 
             if (!state.isLoading && state.isEmpty) {
                 item(key = "empty") {
@@ -109,6 +134,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         actionLabel = "Aggiungi",
                         onAction = onAdd,
                         modifier = Modifier.animateItem(),
+                        illustration = { HappyWizard(size = 150.dp) },
                     )
                 }
             }
@@ -165,6 +191,10 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
         }
     }
+
+    if (cleanupIds.isNotEmpty()) {
+        CleanupDialog(cleanupIds.size, onConfirm = viewModel::onConfirmCleanup, onDismiss = viewModel::onDismissCleanup)
+    }
 }
 
 @Composable
@@ -190,7 +220,7 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                 }
                 Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            CrystalBallMascot(size = 92.dp, state = mascot)
+            CrystalBallMascot(size = 92.dp, state = mascot, overdue = state.hasOverdue)
         }
         if (!state.isLoading && !state.isEmpty) {
             Row(
@@ -234,6 +264,67 @@ private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, 
             Text(label, style = MaterialTheme.typography.labelLarge)
         }
     }
+}
+
+/** Scaduto l'intervallo scelto: invito ad aggiornare il backup, che sovrascrive il precedente. */
+@Composable
+private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> Unit, onLater: () -> Unit) {
+    val tone = MaterialTheme.ricordellaColors.mint
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)),
+        exit = fadeOut(tween(RicordellaMotion.SHORT)) + shrinkVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseInOut)),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = RicordellaDimensions.spaceS)
+                .background(tone.container, MaterialTheme.shapes.large)
+                .padding(RicordellaDimensions.spaceL),
+            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+                Icon(Icons.Rounded.CloudUpload, contentDescription = null, tint = tone.content)
+                Column(Modifier.weight(1f)) {
+                    Text("È ora di aggiornare il backup", style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    Text(
+                        when (intervalDays) {
+                            1 -> "Aggiorna il backup di oggi: sovrascrivo quello precedente."
+                            7 -> "È passata una settimana: aggiorno il backup sovrascrivendo il precedente."
+                            30 -> "È passato un mese: aggiorno il backup sovrascrivendo il precedente."
+                            365 -> "È passato un anno: aggiorno il backup sovrascrivendo il precedente."
+                            else -> "Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente."
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = tone.content,
+                    )
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+                PushButton("Aggiorna ora", onClick = onExport, modifier = Modifier.weight(1f))
+                TextButton(onClick = onLater) { Text("Più tardi") }
+            }
+        }
+    }
+}
+
+/** Una volta l'anno: proposta di eliminare i promemoria vecchi e poco utili. */
+@Composable
+private fun CleanupDialog(count: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Rounded.CleaningServices, contentDescription = null) },
+        title = { Text("Pulizia di inizio anno") },
+        text = {
+            Text(
+                "Ho trovato $count ${if (count == 1) "promemoria o evento" else "promemoria ed eventi"} degli anni precedenti " +
+                    "non importanti o senza persone e cose collegate. Vuoi eliminarli per fare spazio?\n\n" +
+                    "Quelli importanti e collegati a persone o cose restano.",
+            )
+        },
+        confirmButton = { TextButton(onClick = onConfirm) { Text("Elimina $count", color = MaterialTheme.colorScheme.error) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Tienili") } },
+    )
 }
 
 /** Invito a concedere il permesso di notifica (Android 13+), finché non è concesso. */

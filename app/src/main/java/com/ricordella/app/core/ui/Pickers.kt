@@ -14,8 +14,6 @@ import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,10 +36,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.ricordella.app.core.date.DateTexts
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneOffset
 
 /** Campo data: al tocco apre il selettore data Material. */
 @Composable
@@ -120,7 +115,9 @@ private fun ClickableField(
             leadingIcon = icon,
             isError = isError,
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
+            // Date lunghe ("28 settembre 2026") vanno a capo invece di essere tagliate.
+            maxLines = 2,
+            textStyle = if (text.length > 12) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
         )
         Box(
             Modifier
@@ -134,28 +131,6 @@ private fun ClickableField(
                 Icon(Icons.Rounded.Clear, contentDescription = "Rimuovi $label")
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerDialogFor(initial: LocalDate?, onDismiss: () -> Unit, onConfirm: (LocalDate) -> Unit) {
-    val state = rememberDatePickerState(
-        initialSelectedDateMillis = initial?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-    )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    state.selectedDateMillis?.let { onConfirm(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate()) }
-                },
-                enabled = state.selectedDateMillis != null,
-            ) { Text("OK") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } },
-    ) {
-        DatePicker(state = state)
     }
 }
 

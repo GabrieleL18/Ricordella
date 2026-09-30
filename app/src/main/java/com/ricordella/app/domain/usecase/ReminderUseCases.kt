@@ -61,7 +61,7 @@ class CompleteReminderUseCase(
     suspend operator fun invoke(reminderId: String) {
         val entry = reminders.getReminder(reminderId) ?: return
         val reminder = entry.reminder
-        if (reminder.status != ReminderStatus.ACTIVE) return
+        if (reminder.status != ReminderStatus.ACTIVE || !reminder.type.isCompletable) return
         val now = time.now()
         val today = time.today()
         val completion = ReminderCompletion(reminderId = reminder.id, occurrenceDate = reminder.dueDate, completedAt = now)

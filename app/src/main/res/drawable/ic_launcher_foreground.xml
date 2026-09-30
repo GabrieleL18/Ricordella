@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ricordella: una palla di vetro con una saetta dentro, su un piedistallo. -->
+<!-- Ricordella in stile flat: palla di vetro a tinta piena, saetta, piedistallo. Nessuna sfumatura. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
@@ -9,54 +8,36 @@
     <!-- Piedistallo. -->
     <path
         android:fillColor="#FF6A4BD8"
-        android:pathData="M42,67 L66,67 L71.5,77 Q72.5,79.5 70,79.5 L38,79.5 Q35.5,79.5 36.5,77 Z" />
+        android:pathData="M41.5,67 L66.5,67 L72,79.5 L36,79.5 Z" />
     <path
         android:fillColor="#FF8D73EE"
-        android:pathData="M40,65.5 h28 a2,2 0,0 1,2 2 v1 a2,2 0,0 1,-2 2 h-28 a2,2 0,0 1,-2 -2 v-1 a2,2 0,0 1,2 -2 z" />
-    <!-- Vetro. -->
-    <path android:pathData="M54,47m-21,0a21,21 0,1 1,42 0a21,21 0,1 1,-42 0">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="radial"
-                android:centerX="46"
-                android:centerY="38"
-                android:gradientRadius="33">
-                <item android:offset="0" android:color="#FFEAFAFF" />
-                <item android:offset="0.45" android:color="#FF7FD3F7" />
-                <item android:offset="1" android:color="#FF2A8FD1" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- Bagliore della saetta. -->
-    <path android:pathData="M54,47m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="radial"
-                android:centerX="54"
-                android:centerY="47"
-                android:gradientRadius="14">
-                <item android:offset="0" android:color="#CCFFF3A0" />
-                <item android:offset="1" android:color="#00FFF3A0" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <!-- Saetta. -->
+        android:pathData="M39.5,64.5 h29 a2,2 0,0 1,2 2 v1.5 a2,2 0,0 1,-2 2 h-29 a2,2 0,0 1,-2 -2 v-1.5 a2,2 0,0 1,2 -2 z" />
+    <!-- Vetro: disco pieno e mezzaluna chiara. -->
     <path
-        android:fillColor="#FFF2D43D"
-        android:strokeColor="#FFC9A400"
-        android:strokeWidth="1.2"
-        android:strokeLineJoin="round"
-        android:pathData="M57.4,34 L47,49.3 L53.4,49.3 L50.6,60.2 L61.6,43.7 L55.1,43.7 Z" />
-    <!-- Riflessi. -->
-    <group android:rotation="-35" android:pivotX="44" android:pivotY="36">
+        android:fillColor="#FF7FD3F7"
+        android:pathData="M54,47m-21,0a21,21 0,1 1,42 0a21,21 0,1 1,-42 0" />
+    <path
+        android:fillColor="#FF9EDDF9"
+        android:pathData="M51.5,44.5m-16,0a16,16 0,1 1,32 0a16,16 0,1 1,-32 0" />
+    <!-- Saetta: gruppo animabile (gira sul suo asse nello splash). -->
+    <group
+        android:name="bolt"
+        android:pivotX="54.3"
+        android:pivotY="47">
         <path
-            android:fillColor="#CCFFFFFF"
-            android:pathData="M39.5,36a4.6,2.2 0,1 0,9.2 0a4.6,2.2 0,1 0,-9.2 0z" />
+            android:fillColor="#FFF2D43D"
+            android:pathData="M57.4,34 L47,49.3 L53.4,49.3 L50.6,60.2 L61.6,43.7 L55.1,43.7 Z" />
     </group>
-    <path android:fillColor="#B3FFFFFF" android:pathData="M51.5,31.8m-1.2,0a1.2,1.2 0,1 1,2.4 0a1.2,1.2 0,1 1,-2.4 0" />
+    <!-- Riflesso flat e bordo. -->
     <path
         android:fillColor="#00000000"
-        android:strokeColor="#661B6FA8"
-        android:strokeWidth="1"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="2.4"
+        android:pathData="M39.5,42 A15,15 0 0,1 47,33.5" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF1B6FA8"
+        android:strokeWidth="1.4"
         android:pathData="M54,47m-21,0a21,21 0,1 1,42 0a21,21 0,1 1,-42 0" />
 </vector>

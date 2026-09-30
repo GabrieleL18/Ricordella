@@ -31,3 +31,6 @@ data class ReminderEditRoute(
 @Serializable data class ItemEditRoute(val id: String? = null, val personId: String? = null)
 @Serializable data class PersonDetailRoute(val id: String)
 @Serializable data class PersonEditRoute(val id: String? = null)
+
+/** Richiesta arrivata dal widget del calendario: cosa aggiungere ed eventuale giorno toccato. */
+data class WidgetRequest(val action: String, val date: java.time.LocalDate?)

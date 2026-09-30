@@ -1,5 +1,36 @@
 package com.ricordella.app.feature.people
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import com.ricordella.app.core.ui.RicordellaMotion
+import com.ricordella.app.core.ui.pressScale
+import com.ricordella.app.core.ui.rememberReducedMotion
+import com.ricordella.app.core.ui.rememberRevealTracker
+import com.ricordella.app.core.ui.reveal
+import com.ricordella.app.core.ui.toneFor
+import com.ricordella.app.core.ui.theme.ricordellaColors
+import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.sin
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,20 +103,26 @@ import java.time.Instant
 fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val viewModel = appViewModel { c, _ -> PersonListViewModel(c.personRepository) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val tracker = rememberRevealTracker()
 
     TopLevelScaffold(title = "Persone", navigator = navigator, onAdd = onAdd) { padding ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 280.dp),
+            columns = GridCells.Adaptive(minSize = 156.dp),
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
                 start = RicordellaDimensions.screenPadding,
                 end = RicordellaDimensions.screenPadding,
                 top = padding.calculateTopPadding(),
-                bottom = 96.dp,
+                bottom = 112.dp,
             ),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-            horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+            horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
+            if (!state.showArchived && state.query.isBlank() && state.people.isNotEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }, key = "circle") {
+                    CircleHeader(state.people, Modifier.reveal(tracker, "circle", 0))
+                }
+            }
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
                 SearchField(state.query, viewModel::onQueryChange, placeholder = "Cerca persone")
             }
@@ -108,15 +145,109 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     )
                 }
             }
-            items(state.people, key = { it.id }) { person ->
-                PersonCard(
+            itemsIndexed(state.people, key = { _, it -> it.id }) { index, person ->
+                PersonTile(
                     person,
                     onClick = { navigator.openPerson(person.id) },
-                    subtitle = person.notes?.lineSequence()?.firstOrNull(),
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier.animateItem().reveal(tracker, person.id, index + 1),
                 )
             }
         }
+    }
+}
+
+/** "La tua cerchia": avatar sovrapposti che arrivano uno dopo l'altro e ondeggiano piano. */
+@Composable
+private fun CircleHeader(people: List<Person>, modifier: Modifier = Modifier) {
+    val tone = MaterialTheme.ricordellaColors.coral
+    val reduced = rememberReducedMotion()
+    val wave = if (reduced) 0f else rememberInfiniteTransition(label = "circle").animateFloat(
+        0f,
+        1f,
+        infiniteRepeatable(tween(2600, easing = LinearEasing)),
+        label = "wave",
+    ).value
+    Row(
+        modifier
+            .fillMaxWidth()
+            .padding(top = RicordellaDimensions.spaceS)
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text("La tua cerchia", style = MaterialTheme.typography.titleLarge, color = tone.content)
+            Text(
+                if (people.size == 1) "1 persona" else "${people.size} persone",
+                style = MaterialTheme.typography.bodyMedium,
+                color = tone.content,
+            )
+        }
+        Box {
+            people.take(4).forEachIndexed { index, person ->
+                val appear = remember { Animatable(if (reduced) 1f else 0f) }
+                LaunchedEffect(Unit) {
+                    delay(120L + index * 90L)
+                    appear.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessMediumLow))
+                }
+                PersonAvatar(
+                    person,
+                    size = 44.dp,
+                    modifier = Modifier
+                        .padding(start = (index * 28).dp)
+                        .graphicsLayer {
+                            scaleX = appear.value
+                            scaleY = appear.value
+                            translationY = sin((wave + index * 0.2f) * 2 * PI).toFloat() * 3.dp.toPx()
+                        }
+                        .border(3.dp, tone.container, CircleShape),
+                )
+            }
+        }
+    }
+}
+
+/** Scheda persona colorata: avatar grande con anello, nome e nota; si comprime al tocco. */
+@Composable
+private fun PersonTile(person: Person, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val tone = toneFor(person.id)
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val tilt by animateFloatAsState(if (pressed) -6f else 0f, tween(RicordellaMotion.SHORT, easing = RicordellaMotion.Snappy), label = "tilt")
+    Column(
+        modifier
+            .pressScale(interaction, pressedScale = 0.95f)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
+            .padding(RicordellaDimensions.spaceL)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        Box(
+            Modifier
+                .graphicsLayer { rotationZ = tilt }
+                .border(3.dp, tone.solid, CircleShape)
+                .padding(4.dp),
+        ) {
+            PersonAvatar(person, size = 64.dp)
+        }
+        Text(
+            person.displayName,
+            style = MaterialTheme.typography.titleMedium,
+            color = tone.content,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            person.notes?.lineSequence()?.firstOrNull()?.takeIf { it.isNotBlank() } ?: " ",
+            style = MaterialTheme.typography.bodySmall,
+            color = tone.content.copy(alpha = 0.8f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -151,6 +282,7 @@ fun PersonEditScreen(navigator: AppNavigator) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL)) {
                 val preview = Person(
+                    id = viewModel.stableId,
                     name = form.name.ifBlank { "?" },
                     surname = form.surname,
                     photoUri = form.photoUri,
@@ -244,24 +376,11 @@ fun PersonDetailScreen(navigator: AppNavigator) {
                 .padding(RicordellaDimensions.screenPadding),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL)) {
-                PersonAvatar(person, size = 72.dp)
-                Column {
-                    Text(person.displayName, style = MaterialTheme.typography.headlineSmall)
-                    if (person.isArchived) Text("Archiviata", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            person.notes?.let { Text(it, style = MaterialTheme.typography.bodyLarge) }
-            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                OutlinedButton(onClick = { navigator.newReminder(personId = person.id) }) {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                    Text("Promemoria", modifier = Modifier.padding(start = 6.dp))
-                }
-                OutlinedButton(onClick = { navigator.newItem(personId = person.id) }) {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                    Text("Cosa", modifier = Modifier.padding(start = 6.dp))
-                }
-            }
+            PersonHero(
+                person,
+                onAddReminder = { navigator.newReminder(personId = person.id) },
+                onAddItem = { navigator.newItem(personId = person.id) },
+            )
 
             ReminderSection("Oggi", state.today, state, navigator, viewModel, ReminderDateMode.RELATIVE)
             ReminderSection("Prossimi eventi", state.events, state, navigator, viewModel, ReminderDateMode.ABSOLUTE)
@@ -283,6 +402,37 @@ fun PersonDetailScreen(navigator: AppNavigator) {
             onConfirm = viewModel::onDelete,
             onDismiss = { confirmDelete = false },
         )
+    }
+}
+
+/** Intestazione della scheda persona: fascia colorata, avatar che "atterra" e azioni rapide. */
+@Composable
+private fun PersonHero(person: Person, onAddReminder: () -> Unit, onAddItem: () -> Unit) {
+    val tone = toneFor(person.id)
+    val reduced = rememberReducedMotion()
+    val pop = remember { Animatable(if (reduced) 1f else 0.4f) }
+    LaunchedEffect(person.id) { pop.animateTo(1f, spring(dampingRatio = 0.45f, stiffness = Spring.StiffnessLow)) }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.extraLarge)
+            .padding(RicordellaDimensions.spaceXl),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        Box(
+            Modifier
+                .graphicsLayer { scaleX = pop.value; scaleY = pop.value; rotationZ = (1f - pop.value) * -20f }
+                .border(4.dp, tone.solid, CircleShape)
+                .padding(5.dp),
+        ) { PersonAvatar(person, size = 96.dp) }
+        Text(person.displayName, style = MaterialTheme.typography.headlineSmall, color = tone.content, textAlign = TextAlign.Center)
+        if (person.isArchived) Text("Archiviata", style = MaterialTheme.typography.labelLarge, color = tone.content)
+        person.notes?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = tone.content, textAlign = TextAlign.Center) }
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), modifier = Modifier.padding(top = RicordellaDimensions.spaceS)) {
+            PushButton("Promemoria", onClick = onAddReminder, icon = Icons.Rounded.Add)
+            PushButton("Cosa", onClick = onAddItem, icon = Icons.Rounded.Add)
+        }
     }
 }
 

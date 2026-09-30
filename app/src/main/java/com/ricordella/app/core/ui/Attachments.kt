@@ -147,3 +147,13 @@ fun AttachmentsSection(
     }
 }
 
+
+/** Apre il menu "Condividi" di Android per il file .zip del backup. */
+fun shareBackup(context: Context, uri: Uri) {
+    val send = Intent(Intent.ACTION_SEND)
+        .setType("application/zip")
+        .putExtra(Intent.EXTRA_STREAM, uri)
+        .putExtra(Intent.EXTRA_SUBJECT, "Backup di Ricordella")
+        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    context.startActivity(Intent.createChooser(send, "Salva o condividi il backup").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+}
