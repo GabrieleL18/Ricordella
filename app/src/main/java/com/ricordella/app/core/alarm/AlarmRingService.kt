@@ -94,6 +94,7 @@ class AlarmRingService : Service() {
     private fun finish(snooze: Boolean) {
         val alarm = _ringing.value
         silence()
+        endedBySnooze = snooze
         _ringing.value = null
         if (alarm != null) {
             val container = (application as RicordellaApplication).container
@@ -158,6 +159,11 @@ class AlarmRingService : Service() {
         private val _ringing = MutableStateFlow<Ringing?>(null)
         /** La sveglia che sta suonando, osservata dalla schermata a tutto schermo. */
         val ringing: StateFlow<Ringing?> = _ringing.asStateFlow()
+
+        /** Come è finita l'ultima sveglia: la schermata sceglie l'animazione (notte o stelle). */
+        @Volatile
+        var endedBySnooze: Boolean = false
+            private set
 
         /** Avvia la sveglia. False se Android non lo permette: si ripiega sulla notifica normale. */
         fun start(context: Context, reminderId: String, title: String): Boolean = runCatching {

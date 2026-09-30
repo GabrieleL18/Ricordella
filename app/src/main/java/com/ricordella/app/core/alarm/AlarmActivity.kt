@@ -107,10 +107,7 @@ class AlarmActivity : ComponentActivity() {
                     title = shown!!.title,
                     ringing = ringing != null,
                     onStop = { AlarmRingService.stop(this) },
-                    onSnooze = {
-                        AlarmRingService.snooze(this)
-                        finish()
-                    },
+                    onSnooze = { AlarmRingService.snooze(this) },
                     onDone = ::finish,
                 )
             }
@@ -122,13 +119,21 @@ class AlarmActivity : ComponentActivity() {
 private fun AlarmScreen(title: String, ringing: Boolean, onStop: () -> Unit, onSnooze: () -> Unit, onDone: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     val calm = remember { Animatable(0f) }
-    // Fermata (dallo swipe o dalla notifica): la sveglia si quieta, esplode di stelle e la schermata si chiude.
+    val thrown = remember { Animatable(0f) }
+    val night = remember { Animatable(0f) }
     LaunchedEffect(ringing) {
-        if (!ringing) {
+        if (ringing) return@LaunchedEffect
+        if (AlarmRingService.endedBySnooze) {
+            // Posticipata: il maghetto lancia via la sveglia e fa calare la notte.
+            thrown.animateTo(1f, tween(900, easing = RicordellaMotion.EaseIn))
+            night.animateTo(1f, tween(1400, easing = RicordellaMotion.EaseInOut))
+            delay(1_200)
+        } else {
+            // Fermata: la sveglia si quieta ed esplode di stelle.
             calm.animateTo(1f, tween(1400, easing = RicordellaMotion.EaseOut))
             delay(300)
-            onDone()
         }
+        onDone()
     }
     var now by remember { mutableStateOf(LocalDateTime.now()) }
     LaunchedEffect(Unit) {
@@ -137,6 +142,7 @@ private fun AlarmScreen(title: String, ringing: Boolean, onStop: () -> Unit, onS
             delay(1_000)
         }
     }
+    Box(Modifier.fillMaxSize()) {
     Column(
         Modifier
             .fillMaxSize()
@@ -160,18 +166,56 @@ private fun AlarmScreen(title: String, ringing: Boolean, onStop: () -> Unit, onS
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 20.dp),
         )
-        AlarmScene(calm = calm.value, modifier = Modifier.fillMaxWidth().weight(1f))
+        AlarmScene(calm = calm.value, thrown = thrown.value, modifier = Modifier.fillMaxWidth().weight(1f))
         OutlinedButton(onClick = onSnooze, enabled = ringing, modifier = Modifier.padding(bottom = 16.dp)) {
             Icon(Icons.Rounded.Snooze, contentDescription = null, tint = Color.White)
             Text(trf("Posticipa %1\$s min", AlarmRingService.SNOOZE_MINUTES), color = Color.White, modifier = Modifier.padding(start = 8.dp))
         }
         SwipeToStop(enabled = ringing, onStop = onStop)
     }
+    if (night.value > 0f) Nightfall(night.value)
+    }
 }
 
-/** Il maghetto incanta la sveglia che trema; [calm] da 0 a 1 la ferma con un'esplosione di stelle. */
+/** La notte cala sulla schermata: cielo blu scuro, luna calante, stelle che si accendono e un "a dopo". */
 @Composable
-private fun AlarmScene(calm: Float, modifier: Modifier = Modifier) {
+private fun Nightfall(progress: Float) {
+    val colors = MaterialTheme.ricordellaColors
+    val sky = Color(0xFF060A1F)
+    Box(Modifier.fillMaxSize()) {
+        Canvas(Modifier.fillMaxSize()) {
+            val w = size.width
+            val h = size.height
+            // Il buio scende dall'alto come un sipario.
+            drawRect(sky.copy(alpha = 0.97f), size = Size(w, h * minOf(1f, progress * 1.6f)))
+            val light = ((progress - 0.35f) / 0.65f).coerceIn(0f, 1f)
+            val moon = Offset(w * 0.72f, h * 0.22f)
+            val r = w * 0.11f
+            drawCircle(colors.bolt.copy(alpha = light), radius = r, center = moon)
+            drawCircle(sky, radius = r * 0.9f, center = Offset(moon.x + r * 0.45f, moon.y - r * 0.2f), alpha = light)
+            val random = java.util.Random(7)
+            repeat(34) { i ->
+                val star = Offset(random.nextFloat() * w, random.nextFloat() * h * 0.75f)
+                val appear = ((light - i / 60f) * 2f).coerceIn(0f, 1f)
+                drawFourPointStar(star, w * (0.006f + random.nextFloat() * 0.012f), Color.White.copy(alpha = appear))
+            }
+        }
+        Text(
+            trf("Buonanotte… ti risveglio tra %1\$s minuti", AlarmRingService.SNOOZE_MINUTES),
+            style = MaterialTheme.typography.titleLarge,
+            color = Color.White.copy(alpha = ((progress - 0.5f) * 2f).coerceIn(0f, 1f)),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.Center).padding(24.dp),
+        )
+    }
+}
+
+/**
+ * Il maghetto incanta la sveglia che trema; [calm] da 0 a 1 la ferma con un'esplosione di stelle,
+ * [thrown] da 0 a 1 la lancia fuori dallo schermo con un colpo di bacchetta.
+ */
+@Composable
+private fun AlarmScene(calm: Float, thrown: Float, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.ricordellaColors
     val reduced = rememberReducedMotion()
     val loop = rememberInfiniteTransition(label = "alarm")
@@ -186,19 +230,24 @@ private fun AlarmScene(calm: Float, modifier: Modifier = Modifier) {
         val top = (h - side) / 2
         // Maghetto a sinistra: finita la sveglia, smette di agitare la bacchetta e annuisce.
         inset(left = w * 0.02f, top = top, right = w - side - w * 0.02f, bottom = h - top - side) {
-            drawWizard(colors, nod = wave * calm, wave = wave * (1f - calm * 0.8f), twinkle = twinkle)
+            // Lancio: la bacchetta carica all'indietro e poi scatta in avanti.
+            val swing = if (thrown > 0f) (thrown * 3f - 1f).coerceIn(-1f, 1.6f) else wave * (1f - calm * 0.8f)
+            drawWizard(colors, nod = wave * calm, wave = swing, twinkle = twinkle)
         }
-        val clock = Offset(w * 0.74f, h * 0.5f)
+        // La sveglia lanciata vola in alto a destra, girando su se stessa, fino a sparire.
+        val clock = Offset(w * 0.74f + w * 0.8f * thrown, h * 0.5f - h * 1.5f * thrown + h * 0.4f * thrown * thrown)
         val radius = minOf(w * 0.18f, h * 0.26f)
         // Incantesimo: stelline che volano dalla bacchetta alla sveglia.
         val wand = Offset(side * 0.95f, top + side * 0.45f)
-        if (calm < 1f) repeat(5) { i ->
+        if (calm < 1f && thrown == 0f) repeat(5) { i ->
             val t = (twinkle + i / 5f) % 1f
             val x = wand.x + (clock.x - radius - wand.x) * t
             val y = wand.y + (clock.y - wand.y) * t - sin(t * PI.toFloat()) * h * 0.12f
             drawFourPointStar(Offset(x, y), radius * 0.12f * (1f - t * 0.5f), listOf(colors.bolt, colors.cyan.solid, colors.coral.solid)[i % 3].copy(alpha = 1f - calm), rotation = t * 180f)
         }
-        drawAlarmClock(colors, clock, radius, shake * (1f - calm), time)
+        rotate(thrown * 540f, clock) {
+            drawAlarmClock(colors, clock, radius * (1f - 0.4f * thrown), if (thrown > 0f) 0f else shake * (1f - calm), time)
+        }
         // Stop: anello di stelle che esplode dalla sveglia.
         if (calm > 0f && calm < 1f) repeat(10) { i ->
             val angle = (2 * PI * i / 10).toFloat()

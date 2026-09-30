@@ -89,6 +89,7 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Rinnovo" to "Renewal",
     "Altro" to "Other",
     "Allarme" to "Alarm",
+    "Buonanotte… ti risveglio tra %1\$s minuti" to "Good night… I'll wake you in %1\$s minutes",
     "Sveglia di prova" to "Test alarm",
     "Sveglia di prova tra 10 secondi" to "Test alarm in 10 seconds",
     "Blocca lo schermo per vederla comparire a tutto schermo." to "Lock the screen to see it appear full screen.",
