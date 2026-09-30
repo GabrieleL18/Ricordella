@@ -11,7 +11,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.ricordella.app"
+        applicationId = "com.remindella.app"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
