@@ -63,6 +63,8 @@ import androidx.core.net.toUri
 import com.ricordella.app.core.navigation.ViewerRoute
 import com.ricordella.app.core.ui.DetailScaffold
 import com.ricordella.app.core.ui.openFile
+import com.ricordella.app.core.ui.DocKind
+import com.ricordella.app.core.ui.documentKind
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.data.documents.DocParagraph
 import com.ricordella.app.data.documents.DocxReader
@@ -71,24 +73,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-private enum class DocKind { IMAGE, PDF, DOCX, OTHER }
-
-private fun kindOf(context: Context, route: ViewerRoute): DocKind {
-    val mime = route.mimeType ?: runCatching { context.contentResolver.getType(route.uri.toUri()) }.getOrNull()
-    val name = route.name.lowercase()
-    return when {
-        mime?.startsWith("image/") == true -> DocKind.IMAGE
-        mime == "application/pdf" || name.endsWith(".pdf") -> DocKind.PDF
-        mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || name.endsWith(".docx") -> DocKind.DOCX
-        else -> DocKind.OTHER
-    }
-}
-
 /** Visualizzatore interno: foto con zoom, PDF pagina per pagina, documenti Word come testo. */
 @Composable
 fun DocumentViewerScreen(route: ViewerRoute, onBack: () -> Unit) {
     val context = LocalContext.current
-    val kind = remember(route) { kindOf(context, route) }
+    val kind = remember(route) { documentKind(context, route.uri, route.mimeType, route.name) }
     DetailScaffold(
         title = route.name,
         onBack = onBack,

@@ -11,6 +11,7 @@ import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.Holidays
 import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.AppSettings
+import com.ricordella.app.domain.model.AutoMode
 import com.ricordella.app.domain.repository.SettingsRepository
 import java.time.LocalDate
 
@@ -74,8 +75,8 @@ class Housekeeping(
     }
 
     /**
-     * Promemoria degli anni precedenti da proporre per l'eliminazione, se la pulizia
-     * annuale è dovuta; lista vuota altrimenti. Il primo anno d'uso non propone nulla.
+     * Promemoria degli anni precedenti che la pulizia annuale eliminerebbe, se è il momento
+     * (primo avvio in un anno nuovo); lista vuota altrimenti. Il primo anno d'uso non propone nulla.
      */
     suspend fun cleanupCandidates(): List<String> {
         val year = time.today().year
@@ -88,9 +89,40 @@ class Housekeeping(
         return reminderDao.getCleanupCandidates(LocalDate.of(year, 1, 1))
     }
 
+    /** Quanti promemoria degli anni passati eliminerebbe la pulizia (senza guardare se è il momento). */
+    suspend fun countCleanupCandidates(): Int = reminderDao.getCleanupCandidates(LocalDate.of(time.today().year, 1, 1)).size
+
+    /** Quante feste sono rimaste negli anni passati e andrebbero spostate all'anno corrente. */
+    suspend fun holidaysToRoll(): Int = reminderDao.getHolidaysBefore(LocalDate.of(time.today().year, 1, 1)).size
+
     /**
-     * Ogni anno (alla prima apertura, di solito a gennaio) le feste dell'anno passato vengono
-     * riportate a quello corrente, Pasqua e feste mobili comprese. Un doppione viene eliminato.
+     * Operazioni annuali all'avvio: quelle in automatico vengono eseguite subito,
+     * quelle "chiedimi" restituite come proposta; "mai" non fa nulla.
+     */
+    suspend fun yearlyCheck(): YearlyCheck {
+        val current = settings.current()
+        var rolled = 0
+        var cleaned = 0
+        var holidays = 0
+        var cleanupIds = emptyList<String>()
+        val pastHolidays = holidaysToRoll()
+        when (current.holidayMode) {
+            AutoMode.AUTOMATIC -> if (pastHolidays > 0) { rollHolidays(); rolled = pastHolidays }
+            AutoMode.ASK -> holidays = pastHolidays
+            AutoMode.OFF -> Unit
+        }
+        val candidates = cleanupCandidates()
+        when (current.cleanupMode) {
+            AutoMode.AUTOMATIC -> if (candidates.isNotEmpty()) { cleanup(candidates); cleaned = candidates.size } else if (current.lastCleanupYear != null) dismissCleanup()
+            AutoMode.ASK -> cleanupIds = candidates
+            AutoMode.OFF -> dismissCleanup()
+        }
+        return YearlyCheck(holidays, cleanupIds, rolled, cleaned)
+    }
+
+    /**
+     * Riporta le feste dell'anno passato a quello corrente, Pasqua e feste mobili comprese.
+     * Un doppione (stessa festa già presente in quella data) viene eliminato.
      */
     suspend fun rollHolidays() {
         val year = time.today().year
@@ -116,6 +148,9 @@ class Housekeeping(
         val year = time.today().year
         settings.update { it.copy(lastCleanupYear = year) }
     }
+
+    /** Esito del controllo annuale: proposte da chiedere e operazioni già fatte in automatico. */
+    data class YearlyCheck(val holidaysToAsk: Int, val cleanupToAsk: List<String>, val holidaysRolled: Int, val remindersCleaned: Int)
 
     companion object {
         private const val POSTPONE_DAYS = 7L

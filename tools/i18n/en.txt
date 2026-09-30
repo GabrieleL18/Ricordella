@@ -637,3 +637,55 @@ Ogni 6 mesi ||| Every 6 months
 Personalizzata ||| Custom
 settimane ||| weeks
 Home ||| Home
+A gennaio elimina i promemoria degli anni passati non importanti o senza persone e cose. ||| In January, deletes past years' reminders that aren't important or have no people or things.
+A gennaio sposta all'anno nuovo le feste importate da Google (Pasqua ricalcolata). ||| In January, moves holidays imported from Google to the new year (Easter recalculated).
+Aggiungo ai tuoi dati alcuni promemoria, una persona e un'auto di esempio. Potrai eliminarli quando vuoi. ||| I'll add some sample reminders, a person and a car to your data. You can delete them anytime.
+Alcune cose le faccio una volta l'anno o ogni tanto. Scegli se farle da sola, chiedertelo prima o mai. Tocca ? per vedere cosa succede. Potrai cambiare idea nelle Impostazioni. ||| Some things I do once a year or every now and then. Choose whether I do them on my own, ask you first, or never. Tap ? to see what happens. You can change your mind in Settings.
+Anno nuovo, feste nuove ||| New year, new holidays
+Apri ||| Open
+Automatico ||| Automatic
+Cena dell'anno scorso ||| Last year's dinner
+Chiedimi ||| Ask me
+Ci sono %1$s feste importate rimaste nell'anno passato.  ||| There are %1$s imported holidays still in last year. 
+Come funziona ||| How it works
+Come preferisci? ||| How do you prefer it?
+Dagli anni prossimi fallo in automatico ||| From next year, do it automatically
+Data * ||| Date *
+Data acquisto ||| Purchase date
+Eliminati %1$s promemoria vecchi ||| Deleted %1$s old reminders
+Elimino definitivamente %1$s promemoria. L'operazione non si può annullare: se vuoi conservarli, esporta prima un backup. ||| I'll permanently delete %1$s reminders. This can't be undone: if you want to keep them, export a backup first.
+Fa comparire in Home le proposte di spostare le feste e di fare la pulizia annuale, con la loro animazione. ||| Shows in Home the proposals to move holidays and do the yearly clean-up, with their animation.
+Faccio come se fosse il primo avvio dell'anno: tornando alla Home ti verranno proposte le operazioni di inizio anno. ||| I'll act as if it were the first launch of the year: back in Home you'll be offered the new year operations.
+Faccio come se fosse scaduto l'intervallo del backup. ||| I'll act as if the backup interval had expired.
+Feste all'anno nuovo ||| Holidays to the new year
+Fino al (opzionale) ||| Until (optional)
+Fino al * ||| Until *
+Ho spostato %1$s feste al %2$s ||| I moved %1$s holidays to %2$s
+Ho trovato %1$s promemoria ed eventi degli anni passati non importanti o senza persone e cose collegate.  ||| I found %1$s reminders and events from past years that aren't important or have no linked people or things. 
+Inizio garanzia ||| Warranty start
+La sezione Sviluppatore sparirà. Per riaverla tocca 7 volte la versione. ||| The Developer section will disappear. Tap the version 7 times to get it back.
+Le sposto al %1$s: Natale e le feste fisse restano nello stesso giorno, Pasqua, Pasquetta e le altre feste mobili vengono ricalcolate. ||| I'll move them to %1$s: Christmas and fixed holidays keep the same day, Easter, Easter Monday and other movable feasts are recalculated.
+Lo faccio da sola e ti avviso con un messaggio. ||| I'll do it on my own and let you know with a message.
+Mai ||| Never
+Natale ||| Christmas
+Niente da proporre: non ci sono feste né promemoria degli anni passati. Crea prima i dati di esempio. ||| Nothing to propose: there are no holidays or reminders from past years. Create the sample data first.
+Non chiedermelo più ||| Don't ask again
+Operazioni periodiche ||| Periodic tasks
+Pasqua ||| Easter
+Posso eliminarli per fare ordine. Quelli importanti e collegati a persone o cose restano. ||| I can delete them to tidy up. Important ones and those linked to people or things stay.
+Procedi ||| Proceed
+Pulizia annuale ||| Yearly clean-up
+Pulizia annuale: eliminati %1$s promemoria vecchi ||| Yearly clean-up: deleted %1$s old reminders
+Riprogrammo le notifiche di tutti i promemoria. Quelle già passate non vengono ripetute. ||| I'll reschedule notifications for all reminders. Past ones won't be repeated.
+Scadenza garanzia * ||| Warranty end *
+Sei già uno sviluppatore: trovi la sezione qui sotto ||| You're already a developer: the section is below
+Si ripete ||| Repeats
+Simula l'inizio di un anno nuovo ||| Simulate the start of a new year
+Sposto %1$s feste al %2$s. Le date dell'anno passato non si potranno ripristinare. ||| I'll move %1$s holidays to %2$s. Last year's dates can't be restored.
+Svuoto la cache. Non tocca i tuoi dati, le foto né i backup salvati. ||| I'll clear the cache. It doesn't touch your data, photos or saved backups.
+Sì, procedi ||| Yes, proceed
+Ti mostro di nuovo la configurazione iniziale. I tuoi dati restano. ||| I'll show you the initial setup again. Your data stays.
+Torna alla Home: %1$s feste da spostare, %2$s promemoria da pulire ||| Go back to Home: %1$s holidays to move, %2$s reminders to clean up
+Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno, un pagamento scaduto e, dell'anno scorso, due feste e una cena. ||| A person, a car, a holiday with flight and ferry, a visit, a birthday, an overdue payment and, from last year, two holidays and a dinner.
+Unità ||| Unit
+Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo, con i giorni impegnati colorati. Tocca un giorno per vederne gli impegni. ||| Add the Calendar widget to your phone's home screen: see this month and the next, with busy days coloured. Tap a day to see what's on.

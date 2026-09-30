@@ -365,7 +365,7 @@ private fun FiltersSheet(state: ReminderListUiState, viewModel: ReminderListView
             }
             SheetSection(tr("Collegati a"), Icons.Rounded.Link, colors.pear) {
                 DropdownField(
-                    label = "Persona",
+                    label = tr("Persona"),
                     options = listOf(null) + state.people.map { it.id },
                     selected = filter.personId,
                     optionLabel = { id -> state.people.firstOrNull { it.id == id }?.displayName ?: tr("Tutte") },
@@ -373,7 +373,7 @@ private fun FiltersSheet(state: ReminderListUiState, viewModel: ReminderListView
                     modifier = Modifier.fillMaxWidth(),
                 )
                 DropdownField(
-                    label = "Cosa",
+                    label = tr("Cosa"),
                     options = listOf(null) + state.items.map { it.item.id },
                     selected = filter.itemId,
                     optionLabel = { id -> state.items.firstOrNull { it.item.id == id }?.item?.name ?: tr("Tutte") },
@@ -381,7 +381,7 @@ private fun FiltersSheet(state: ReminderListUiState, viewModel: ReminderListView
                     modifier = Modifier.fillMaxWidth(),
                 )
                 DropdownField(
-                    label = "Categoria",
+                    label = tr("Categoria"),
                     options = listOf<String?>(null) + state.categories,
                     selected = filter.category,
                     optionLabel = { it ?: tr("Tutte") },

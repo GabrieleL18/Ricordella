@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Oggi senza impegni: giallo con bordo. -->
+<!-- Oggi con impegni: giallo con bordo e puntino lavanda. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#FFF2D43D" />
             <stroke android:width="2dp" android:color="#FFC9A400" />
             <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <item android:gravity="bottom|center_horizontal" android:width="6dp" android:height="6dp" android:bottom="3dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/widget_dot" />
         </shape>
     </item>
 </layer-list>

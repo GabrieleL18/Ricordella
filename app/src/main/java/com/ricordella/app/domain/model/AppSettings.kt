@@ -13,6 +13,10 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 @Serializable
 enum class DateFormatStyle { NUMERIC, EXTENDED }
 
+/** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
+@Serializable
+enum class AutoMode { AUTOMATIC, ASK, OFF }
+
 @Serializable
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
@@ -35,6 +39,10 @@ data class AppSettings(
     val backupIntervalDays: Int = 90,
     /** File del backup scelto dall'utente: ogni esportazione lo sovrascrive. */
     val backupTargetUri: String? = null,
+    /** Spostamento annuale delle feste importate all'anno nuovo. */
+    val holidayMode: AutoMode = AutoMode.ASK,
+    /** Pulizia annuale dei promemoria vecchi e poco utili. */
+    val cleanupMode: AutoMode = AutoMode.ASK,
     /** Sezione Sviluppatore sbloccata (7 tocchi sulla versione). */
     val developerMode: Boolean = false,
     /** Ultimo anno in cui è stata proposta la pulizia dei promemoria vecchi. */

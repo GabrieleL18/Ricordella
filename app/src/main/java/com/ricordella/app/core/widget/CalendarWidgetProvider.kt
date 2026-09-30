@@ -32,9 +32,8 @@ import java.time.temporal.TemporalAdjusters
 
 /**
  * Widget "Calendario": mese corrente e successivo, sfogliabili con le frecce (con transizione
- * animata), giorni con promemoria evidenziati (in corallo se scaduti), oggi in giallo,
- * il prossimo promemoria con i giorni che mancano, e quattro pulsanti per aggiungere
- * promemoria, eventi, cose e persone. Toccando un giorno si crea un promemoria in quella data.
+ * animata). I giorni con almeno un impegno hanno lo sfondo pieno (rosso se c'è qualcosa di
+ * scaduto), oggi è giallo; in alto il prossimo promemoria. Toccando un giorno se ne vede l'anteprima.
  */
 class CalendarWidgetProvider : AppWidgetProvider() {
 
@@ -102,7 +101,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 months.forEach { views.addView(R.id.widget_flipper, monthPage(context, it, today, firstDay, busy)) }
                 val page = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PAGE, 0)
                 views.setDisplayedChild(R.id.widget_flipper, page.coerceIn(0, MONTHS - 1))
-                actions(context, views)
                 val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 val selected = prefs.getLong(KEY_SELECTED, Long.MIN_VALUE).takeIf { it != Long.MIN_VALUE }?.let(LocalDate::ofEpochDay)
                     ?.takeIf { !it.isBefore(rangeStart) && !it.isAfter(rangeEnd) }
@@ -152,6 +150,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                     if (date == today || date in busy) text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
                     cell.setTextViewText(R.id.widget_day, text)
                     val background = when {
+                        date == today && date in busy -> R.drawable.widget_day_today_busy
                         date == today -> R.drawable.widget_day_today
                         busy[date] == true -> R.drawable.widget_day_overdue
                         date in busy -> R.drawable.widget_day_busy
@@ -160,7 +159,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                     cell.setInt(R.id.widget_day, "setBackgroundResource", background)
                     when {
                         date == today -> cell.setTextColor(R.id.widget_day, 0xFF1F1A00.toInt())
-                        date in busy -> cell.setTextColor(R.id.widget_day, context.getColor(R.color.widget_busy_text))
+                        date in busy -> cell.setTextColor(R.id.widget_day, 0xFFFFFFFF.toInt())
                         date.dayOfWeek == DayOfWeek.SUNDAY -> cell.setTextColor(R.id.widget_day, context.getColor(R.color.widget_weekend))
                     }
                     cell.setOnClickPendingIntent(R.id.widget_day, selectDay(context, date))
@@ -174,20 +173,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         return page
     }
 
-    private fun actions(context: Context, views: RemoteViews) {
-        listOf(
-            Action(R.id.widget_add_reminder, ACTION_REMINDER, tr("Promemoria"), R.drawable.ic_widget_add_reminder, R.drawable.widget_action_cyan),
-            Action(R.id.widget_add_event, ACTION_EVENT, tr("Evento"), R.drawable.ic_widget_add_event, R.drawable.widget_action_lavender),
-            Action(R.id.widget_add_item, ACTION_ITEM, tr("Cosa"), R.drawable.ic_widget_add_item, R.drawable.widget_action_pear),
-            Action(R.id.widget_add_person, ACTION_PERSON, tr("Persona"), R.drawable.ic_widget_add_person, R.drawable.widget_action_coral),
-        ).forEachIndexed { index, action ->
-            views.setTextViewText(action.id, action.label)
-            views.setTextViewCompoundDrawables(action.id, 0, action.icon, 0, 0)
-            views.setInt(action.id, "setBackgroundResource", action.background)
-            views.setOnClickPendingIntent(action.id, open(context, REQUEST_ACTION + index, action.action, null))
-        }
-    }
-
     /** Pannello con gli impegni del giorno toccato: tocco su una riga = apre il promemoria. */
     private fun preview(context: Context, views: RemoteViews, day: LocalDate?, entries: List<ReminderWithLinks>, today: LocalDate) {
         if (day == null) {
@@ -196,7 +181,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         }
         views.setViewVisibility(R.id.widget_preview, android.view.View.VISIBLE)
         views.setTextViewText(R.id.widget_preview_title, DateTexts.dayHeader(day, today).lowercase().replaceFirstChar { it.uppercase() })
-        views.setOnClickPendingIntent(R.id.widget_preview_add, open(context, REQUEST_PREVIEW_ADD, ACTION_REMINDER, day))
         views.setOnClickPendingIntent(R.id.widget_preview_close, selectDay(context, day))
         views.removeAllViews(R.id.widget_preview_list)
         val sorted = entries.distinctBy { it.reminder.id }.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder })
@@ -234,8 +218,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
-    private class Action(val id: Int, val action: String, val label: String, val icon: Int, val background: Int)
-
     private fun gridStart(month: YearMonth, firstDay: DayOfWeek): LocalDate =
         month.atDay(1).with(TemporalAdjusters.previousOrSame(firstDay))
 
@@ -267,7 +249,6 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         private const val ACTION_SELECT_DAY = "com.ricordella.app.widget.SELECT_DAY"
         private const val KEY_SELECTED = "selected_day"
         private const val PREVIEW_ROWS = 4
-        private const val REQUEST_PREVIEW_ADD = 20
         private const val REQUEST_PREVIEW_ROW = 30
         private const val PREFS = "calendar_widget"
         private const val KEY_PAGE = "page"

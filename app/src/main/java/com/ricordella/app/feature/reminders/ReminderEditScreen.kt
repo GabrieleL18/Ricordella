@@ -147,14 +147,14 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     )
     Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         DateField(
-            label = "Data *",
+            label = tr("Data *"),
             value = form.date,
             onValueChange = { value -> update { it.copy(date = value) } },
             isError = form.dateError,
             modifier = Modifier.weight(1.6f),
         )
         TimeField(
-            label = "Ora",
+            label = tr("Ora"),
             value = form.time,
             onValueChange = { value -> update { it.copy(time = value) } },
             modifier = Modifier.weight(1f),
@@ -172,7 +172,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     }
     AnimatedVisibility(form.multiDay) {
         DateField(
-            label = "Fino al *",
+            label = tr("Fino al *"),
             value = form.endDate,
             onValueChange = { value -> update { it.copy(endDate = value) } },
             isError = form.endDateError,
@@ -225,7 +225,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
 
     SectionHeader(tr("Ricorrenza"))
     DropdownField(
-        label = "Si ripete",
+        label = tr("Si ripete"),
         options = RecurrencePreset.entries,
         selected = form.recurrencePreset,
         optionLabel = { it.label },
@@ -242,7 +242,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
                 modifier = Modifier.weight(0.4f),
             )
             DropdownField(
-                label = "Unità",
+                label = tr("Unità"),
                 options = RecurrenceFrequency.entries,
                 selected = form.customFrequency,
                 optionLabel = { it.unitLabel },
@@ -263,7 +263,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
             }
         }
         DateField(
-            label = "Fino al (opzionale)",
+            label = tr("Fino al (opzionale)"),
             value = form.recurrenceEnd,
             onValueChange = { value -> update { it.copy(recurrenceEnd = value) } },
             clearable = true,
@@ -350,7 +350,7 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
     if (form.notificationsEnabled) {
         val offsets = (NotifyOffsetPresets + form.notifyOffsetMinutes).distinct().sorted()
         DropdownField(
-            label = "Quando",
+            label = tr("Quando"),
             options = offsets,
             selected = form.notifyOffsetMinutes,
             optionLabel = ::notifyOffsetLabel,

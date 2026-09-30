@@ -12,6 +12,9 @@ import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -141,24 +144,19 @@ fun AttachmentsSection(
     if (attachments.isEmpty()) {
         Text(tr("Nessun documento allegato."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    attachments.forEach { attachment ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onOpen(attachment) }
-                .padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Rounded.Description, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            Text(
-                attachment.displayName,
-                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+    // Anteprime affiancate e scorrevoli: foto, prima pagina dei PDF, testo dei documenti Word.
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        attachments.forEach { attachment ->
+            FileTile(
+                uri = attachment.uri,
+                mimeType = attachment.mimeType,
+                name = attachment.displayName,
+                onOpen = { onOpen(attachment) },
+                onRemove = { onRemove(attachment) },
             )
-            IconButton(onClick = { onRemove(attachment) }) {
-                Icon(Icons.Rounded.Close, contentDescription = trf("Rimuovi %1\$s", attachment.displayName))
-            }
         }
     }
 }

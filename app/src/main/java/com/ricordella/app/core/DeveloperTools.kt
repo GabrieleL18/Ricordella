@@ -34,7 +34,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.time.LocalDate
 import java.time.LocalTime
+import com.ricordella.app.domain.date.Holidays
+import com.ricordella.app.domain.model.AutoMode
 
 /** Informazioni tecniche mostrate nella sezione Sviluppatore. */
 data class DeveloperInfo(val databaseBytes: Long, val mediaBytes: Long, val mediaFiles: Int, val cacheBytes: Long)
@@ -79,10 +82,21 @@ class DeveloperTools(
         settings.update { it.copy(backupCheckEpochDay = today - it.backupIntervalDays) }
     }
 
-    /** Fa proporre la pulizia annuale alla prossima apertura della Home. */
-    suspend fun forceYearlyCleanup() = settings.update { it.copy(lastCleanupYear = time.today().year - 1) }
-
-    suspend fun rollHolidays() = housekeeping.rollHolidays()
+    /**
+     * Fa comparire in Home le proposte di inizio anno (feste da spostare e pulizia), come al primo
+     * avvio in un anno nuovo. Le modalità "Mai" tornano a "Chiedimi". Restituisce quante feste e
+     * quanti promemoria sono coinvolti: se sono zero non c'è nulla da proporre.
+     */
+    suspend fun simulateNewYear(): Pair<Int, Int> {
+        settings.update {
+            it.copy(
+                lastCleanupYear = time.today().year - 1,
+                holidayMode = if (it.holidayMode == AutoMode.OFF) AutoMode.ASK else it.holidayMode,
+                cleanupMode = if (it.cleanupMode == AutoMode.OFF) AutoMode.ASK else it.cleanupMode,
+            )
+        }
+        return housekeeping.holidaysToRoll() to housekeeping.countCleanupCandidates()
+    }
 
     suspend fun rescheduleAlarms() = scheduler.refresh()
 
@@ -102,7 +116,10 @@ class DeveloperTools(
         context.cacheDir.listFiles()?.forEach { it.deleteRecursively() }
     }
 
-    /** Dati di esempio per provare tutte le schermate: persona, cosa, vacanza, visita, compleanno, scaduto. */
+    /**
+     * Dati di esempio per provare tutte le schermate: persona, cosa, vacanza, visita, compleanno, scaduto,
+     * più due feste e una cena dell'anno scorso per provare le operazioni di inizio anno.
+     */
     suspend fun createDemoData() {
         val now = time.now()
         val today = time.today()
@@ -140,6 +157,10 @@ class DeveloperTools(
                 ),
                 person = true,
             ),
+            // Anno scorso: feste da spostare (Pasqua cambia data) e un evento da pulire.
+            draft(Reminder(title = tr("Natale"), type = ReminderType.HOLIDAY, dueDate = LocalDate.of(today.year - 1, 12, 25), notificationsEnabled = false, createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Pasqua"), type = ReminderType.HOLIDAY, dueDate = Holidays.easter(today.year - 1), notificationsEnabled = false, createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Cena dell'anno scorso"), type = ReminderType.EVENT, dueDate = LocalDate.of(today.year - 1, 11, 20), createdAt = now, updatedAt = now)),
         ).forEach { saveReminder(it) }
     }
 }

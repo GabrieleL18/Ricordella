@@ -89,7 +89,7 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "groups") {
                 IconChipRow {
                     IconChoiceChip(
-                        label = "Tutte",
+                        label = tr("Tutte"),
                         icon = Icons.Rounded.Apps,
                         tone = colors.cyan,
                         selected = state.groupFilter == null,

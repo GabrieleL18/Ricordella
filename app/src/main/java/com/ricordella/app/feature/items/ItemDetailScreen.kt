@@ -64,6 +64,7 @@ import com.ricordella.app.core.ui.DateField
 import com.ricordella.app.core.ui.DetailScaffold
 import com.ricordella.app.core.ui.IconBadge
 import com.ricordella.app.core.ui.InfoRow
+import com.ricordella.app.core.ui.FileTile
 import com.ricordella.app.core.ui.LinkChip
 import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.ReminderCard
@@ -329,7 +330,7 @@ private fun WarrantySection(entry: ItemWithCategory, today: LocalDate, onOpenDoc
             InfoRow(tr("Scadenza"), DateTexts.date(end, settings.dateFormat))
             item.warrantySeller?.let { InfoRow(tr("Venditore"), it) }
             item.warrantyDocumentUri?.let { uri ->
-                TextButton(onClick = { onOpenDocument(uri) }) { Text(tr("Apri documento di garanzia")) }
+                FileTile(uri = uri, mimeType = null, name = tr("Documento di garanzia"), onOpen = { onOpenDocument(uri) }, modifier = Modifier.padding(top = 8.dp))
             }
         }
     }

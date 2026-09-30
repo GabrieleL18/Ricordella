@@ -117,6 +117,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
     val startImport = { importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
     var showExportChoices by rememberSaveable { mutableStateOf(false) }
+    var justUnlocked by remember { mutableStateOf(false) }
     var showImportChoices by rememberSaveable { mutableStateOf(false) }
     val newFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         uri?.let(viewModel::exportNewFile)
@@ -226,7 +227,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onClick = { pickAllDayTime = true },
             )
             DropdownField(
-                label = "Anticipo predefinito",
+                label = tr("Anticipo predefinito"),
                 options = NotifyOffsetPresets,
                 selected = settings.defaultNotifyOffsetMinutes,
                 optionLabel = ::notifyOffsetLabel,
@@ -240,14 +241,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                 title = tr("Esporta backup"),
                 subtitle = tr("Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione."),
                 onClick = { backupAction(BACKUP_EXPORT) },
-            )
-            DropdownField(
-                label = "Ricordami di aggiornare il backup",
-                options = Housekeeping.BACKUP_INTERVALS,
-                selected = settings.backupIntervalDays,
-                optionLabel = Housekeeping::intervalLabel,
-                onSelected = { days -> viewModel.update { it.copy(backupIntervalDays = days) } },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
             SettingRow(
                 icon = Icons.Rounded.Download,
@@ -268,6 +261,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 onClick = { confirmDelete = 1 },
             )
 
+            SectionHeader(tr("Operazioni periodiche"))
+            AutomationSettings(settings, viewModel::update, includeBackup = true)
+
             SectionHeader(tr("Informazioni"))
             SettingRow(
                 icon = Icons.Rounded.School,
@@ -275,7 +271,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 subtitle = tr("Come funzionano le sezioni dell'app."),
                 onClick = { showSectionsTutorial = true },
             )
-            VersionRow(settings.developerMode, onUnlock = { viewModel.update { it.copy(developerMode = true) } })
+            VersionRow(settings.developerMode, onUnlock = { justUnlocked = true; viewModel.update { it.copy(developerMode = true) } })
             SettingRow(
                 icon = Icons.Rounded.PrivacyTip,
                 title = tr("Privacy"),
@@ -284,7 +280,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
             if (settings.developerMode) {
                 val tools = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.developerTools
-                DeveloperSection(tools, viewModel::update)
+                DeveloperSection(tools, viewModel::update, justUnlocked)
             }
         }
     }

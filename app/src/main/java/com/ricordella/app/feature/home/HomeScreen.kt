@@ -1,5 +1,11 @@
 package com.ricordella.app.feature.home
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.ricordella.app.core.ui.LocalAppSettings
+import com.ricordella.app.core.ui.YearlyTask
+import com.ricordella.app.core.ui.YearlyTaskDialog
+import com.ricordella.app.core.ui.shareBackup
+import com.ricordella.app.feature.settings.BackupDialog
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -90,20 +96,26 @@ import com.ricordella.app.feature.calendar.DayTimeline
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val cleanupIds by viewModel.cleanupIds.collectAsStateWithLifecycle()
+    val yearly by viewModel.yearly.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
     val backupEvent by viewModel.backupEvent.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var showBackupChoices by rememberSaveable { mutableStateOf(false) }
     val chooseFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         uri?.let(viewModel::onNewBackupFile)
     }
     LaunchedEffect(backupEvent) {
-        when (backupEvent) {
+        when (val event = backupEvent) {
             BackupEvent.ChooseFile -> chooseFile.launch("remindella-backup.zip")
             BackupEvent.Updated -> Toast.makeText(context, tr("Backup aggiornato"), Toast.LENGTH_SHORT).show()
             BackupEvent.Failed -> Toast.makeText(context, tr("Backup non riuscito, riprova"), Toast.LENGTH_SHORT).show()
+            is BackupEvent.Share -> shareBackup(context, event.uri)
             null -> return@LaunchedEffect
         }
         viewModel.onBackupEventHandled()
+    }
+    LaunchedEffect(message) {
+        message?.let { Toast.makeText(context, it, Toast.LENGTH_LONG).show(); viewModel.onMessageShown() }
     }
     val mascot = rememberMascotState()
     val tracker = rememberRevealTracker()
@@ -127,7 +139,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
             item(key = "permission") { NotificationPermissionCard() }
             item(key = "backup") {
-                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = viewModel::onExportBackup, onLater = viewModel::onPostponeBackup)
+                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
             }
 
             if (!state.isLoading && state.isEmpty) {
@@ -199,8 +211,36 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         }
     }
 
-    if (cleanupIds.isNotEmpty()) {
-        CleanupDialog(cleanupIds.size, onConfirm = viewModel::onConfirmCleanup, onDismiss = viewModel::onDismissCleanup)
+    // Operazioni annuali: prima le feste, poi la pulizia. Una finestra alla volta.
+    val year = state.now.year
+    when {
+        yearly.holidays > 0 -> YearlyTaskDialog(
+            YearlyTask.HOLIDAYS, yearly.holidays, year,
+            onConfirm = { viewModel.onConfirmYearly(YearlyTask.HOLIDAYS, it) },
+            onLater = { viewModel.onLaterYearly(YearlyTask.HOLIDAYS) },
+            onNever = { viewModel.onNeverYearly(YearlyTask.HOLIDAYS) },
+        )
+        yearly.cleanupIds.isNotEmpty() -> YearlyTaskDialog(
+            YearlyTask.CLEANUP, yearly.cleanupIds.size, year,
+            onConfirm = { viewModel.onConfirmYearly(YearlyTask.CLEANUP, it) },
+            onLater = { viewModel.onLaterYearly(YearlyTask.CLEANUP) },
+            onNever = { viewModel.onNeverYearly(YearlyTask.CLEANUP) },
+        )
+    }
+
+    // L'invito al backup chiede sempre se salvare (sovrascrivere o nuova versione) o condividere.
+    if (showBackupChoices) {
+        BackupDialog(
+            export = true,
+            hasTarget = LocalAppSettings.current.backupTargetUri != null,
+            onDismiss = { showBackupChoices = false },
+            onOverwrite = viewModel::onExportBackup,
+            onNewVersion = {
+                chooseFile.launch("remindella-backup-" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm")) + ".zip")
+            },
+            onShare = viewModel::onShareBackup,
+            onChooseFile = {},
+        )
     }
 }
 
@@ -313,25 +353,6 @@ private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> U
             }
         }
     }
-}
-
-/** Una volta l'anno: proposta di eliminare i promemoria vecchi e poco utili. */
-@Composable
-private fun CleanupDialog(count: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Rounded.CleaningServices, contentDescription = null) },
-        title = { Text(tr("Pulizia di inizio anno")) },
-        text = {
-            Text(
-                (if (count == 1) tr("Ho trovato 1 promemoria o evento degli anni precedenti ") else trf("Ho trovato %1\$s promemoria ed eventi degli anni precedenti ", count)) +
-                    tr("non importanti o senza persone e cose collegate. Vuoi eliminarli per fare spazio?\n\n") +
-                    tr("Quelli importanti e collegati a persone o cose restano."),
-            )
-        },
-        confirmButton = { TextButton(onClick = onConfirm) { Text(trf("Elimina %1\$s", count), color = MaterialTheme.colorScheme.error) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Tienili")) } },
-    )
 }
 
 /** Invito a concedere il permesso di notifica (Android 13+), finché non è concesso. */

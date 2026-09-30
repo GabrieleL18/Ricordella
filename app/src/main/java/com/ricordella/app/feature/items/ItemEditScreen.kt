@@ -446,7 +446,7 @@ private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
         }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             DateField(
-                label = "Data acquisto",
+                label = tr("Data acquisto"),
                 value = form.purchaseDate,
                 onValueChange = { value -> update { it.copy(purchaseDate = value) } },
                 clearable = true,
@@ -478,7 +478,7 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
     }
     if (!form.hasWarranty) return
     DateField(
-        label = "Inizio garanzia",
+        label = tr("Inizio garanzia"),
         value = form.warrantyStart,
         onValueChange = { value -> update { it.copy(warrantyStart = value) } },
         modifier = Modifier.fillMaxWidth(),
@@ -493,7 +493,7 @@ private fun WarrantyFields(form: ItemForm, viewModel: ItemEditViewModel) {
         }
     }
     DateField(
-        label = "Scadenza garanzia *",
+        label = tr("Scadenza garanzia *"),
         value = form.warrantyEnd,
         onValueChange = { value -> update { it.copy(warrantyEnd = value) } },
         isError = form.warrantyError,

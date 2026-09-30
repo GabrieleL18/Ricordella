@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Giorno con promemoria scaduti e non completati: fondo corallo, bordo e puntino rossi. -->
+<!-- Giorno con impegni scaduti e non completati: sfondo rosso pieno. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/widget_tone_coral" />
-            <stroke android:width="1.5dp" android:color="#FFE53935" />
+            <solid android:color="#FFE53935" />
             <corners android:radius="10dp" />
         </shape>
     </item>
     <item android:gravity="bottom|center_horizontal" android:width="6dp" android:height="6dp" android:bottom="3dp">
         <shape android:shape="oval">
-            <solid android:color="#FFE53935" />
+            <solid android:color="#FFFFFFFF" />
         </shape>
     </item>
 </layer-list>

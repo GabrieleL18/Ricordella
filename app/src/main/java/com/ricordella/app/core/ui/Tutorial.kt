@@ -38,6 +38,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Celebration
+import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.CloudDone
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.FolderZip
@@ -454,7 +457,6 @@ fun AddIllustration() {
 fun WidgetIllustration() {
     val t = loopTime(3000)
     val c = MaterialTheme.ricordellaColors
-    val tap = t.phase(0.4f, 0.5f) * (1f - t.phase(0.5f, 0.6f))
     PhoneFrame {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(
@@ -479,16 +481,6 @@ fun WidgetIllustration() {
                                 contentAlignment = Alignment.BottomCenter,
                             ) { if ((w * 7 + d) % 5 == 2) Box(Modifier.size(3.dp).background(c.lavender.solid, CircleShape)) }
                         }
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                    listOf(c.cyan, c.lavender, c.pear, c.coral).forEachIndexed { i, tone ->
-                        Box(
-                            Modifier
-                                .graphicsLayer { val s = if (i == 0) 1f - 0.2f * tap else 1f; scaleX = s; scaleY = s }
-                                .size(22.dp, 14.dp)
-                                .background(tone.container, RoundedCornerShape(5.dp)),
-                        )
                     }
                 }
             }
@@ -530,7 +522,7 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
     ) { AddIllustration() },
     TutorialPage(
         tr("Il widget"),
-        tr("Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo e inserisci promemoria, eventi, cose e persone con un tocco."),
+        tr("Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo, con i giorni impegnati colorati. Tocca un giorno per vederne gli impegni."),
     ) { WidgetIllustration() },
 )
 
@@ -701,5 +693,67 @@ fun MiniTutorial(pages: List<TutorialPage>, modifier: Modifier = Modifier) {
             }
         }
         PageDots(pages.size, pager.currentPage, Modifier.padding(top = RicordellaDimensions.spaceS))
+    }
+}
+
+/* ---------- Illustrazioni delle operazioni annuali ---------- */
+
+/** Feste all'anno nuovo: il foglio del calendario gira da un anno al successivo, l'uovo di Pasqua cambia giorno. */
+@Composable
+fun HolidayRollIllustration(fromYear: Int = java.time.LocalDate.now().year - 1) {
+    val t = loopTime(3600)
+    val c = MaterialTheme.ricordellaColors
+    val flip = t.phase(0.2f, 0.5f)
+    val hop = t.phase(0.55f, 0.8f)
+    Box(Modifier.size(240.dp), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier
+                .size(150.dp)
+                .graphicsLayer { rotationY = if (flip < 0.5f) flip * 180f else (flip - 1f) * 180f; cameraDistance = 12f * density }
+                .background(if (flip < 0.5f) c.lavender.container else c.mint.container, RoundedCornerShape(24.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                "${if (flip < 0.5f) fromYear else fromYear + 1}",
+                style = MaterialTheme.typography.displaySmall,
+                color = if (flip < 0.5f) c.lavender.content else c.mint.content,
+            )
+        }
+        // Festa fissa che resta al suo posto e uovo di Pasqua che salta a un altro giorno.
+        RoundIcon(Icons.Rounded.Celebration, c.coral, size = 44.dp, modifier = Modifier.offset(x = (-78).dp, y = (-80).dp).graphicsLayer { rotationZ = sin(t * 12f) * 8f })
+        Box(
+            Modifier
+                .offset(x = (70 - 40 * hop).dp, y = (78 - sin(hop * PI).toFloat() * 50).dp)
+                .size(34.dp, 44.dp)
+                .background(c.pear.solid, RoundedCornerShape(50)),
+        )
+    }
+}
+
+/** Pulizia: le card vecchie scivolano nel cestino, quelle importanti restano. */
+@Composable
+fun CleanupIllustration() {
+    val t = loopTime(3600)
+    val c = MaterialTheme.ricordellaColors
+    Box(Modifier.size(240.dp), contentAlignment = Alignment.Center) {
+        Column(Modifier.offset(x = (-30).dp, y = (-30).dp).width(150.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(c.cyan, c.coral, c.lavender).forEachIndexed { i, tone ->
+                val keep = i == 1
+                val fall = if (keep) 0f else t.phase(0.2f + i * 0.15f, 0.5f + i * 0.15f)
+                MiniCard(
+                    tone,
+                    modifier = Modifier.graphicsLayer {
+                        translationX = fall * 60.dp.toPx()
+                        translationY = fall * (110 - i * 40).dp.toPx()
+                        scaleX = 1f - 0.6f * fall
+                        scaleY = scaleX
+                        alpha = 1f - fall
+                        rotationZ = fall * 25f
+                    },
+                )
+            }
+        }
+        RoundIcon(Icons.Rounded.Delete, c.coral, size = 56.dp, modifier = Modifier.offset(x = 70.dp, y = 80.dp))
+        RoundIcon(Icons.Rounded.CleaningServices, c.pear, size = 40.dp, modifier = Modifier.offset(x = (-80).dp, y = 85.dp).graphicsLayer { rotationZ = sin(t * 18f) * 20f })
     }
 }

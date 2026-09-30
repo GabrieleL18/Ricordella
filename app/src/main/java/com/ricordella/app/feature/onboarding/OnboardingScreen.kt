@@ -64,6 +64,9 @@ import androidx.compose.ui.unit.sp
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.data.calendar.CalendarImporter
 import com.ricordella.app.domain.repository.SettingsRepository
+import com.ricordella.app.domain.model.AppSettings
+import com.ricordella.app.core.ui.LocalAppSettings
+import com.ricordella.app.feature.settings.AutomationSettings
 import com.ricordella.app.domain.usecase.Housekeeping
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -110,6 +113,10 @@ class CalendarImportViewModel(
     }
 
     /** Chiude la configurazione iniziale e fa partire il conteggio del backup trimestrale. */
+    fun updateSettings(transform: (AppSettings) -> AppSettings) {
+        viewModelScope.launch { settings.update(transform) }
+    }
+
     fun finishOnboarding() {
         viewModelScope.launch {
             housekeeping.startBackupClockIfNeeded()
@@ -118,7 +125,7 @@ class CalendarImportViewModel(
     }
 }
 
-private enum class Stage { WELCOME, TUTORIAL, CALENDAR }
+private enum class Stage { WELCOME, TUTORIAL, PREFERENCES, CALENDAR }
 
 /** Configurazione iniziale: benvenuto, tutorial animato delle sezioni, import da Google Calendar. */
 @Composable
@@ -137,6 +144,7 @@ fun OnboardingScreen() {
             when (current) {
                 Stage.WELCOME -> Welcome(onNext = { stage = 1 })
                 Stage.TUTORIAL -> TutorialPager(SectionTutorialPages, onDone = { stage = 2 }, doneLabel = tr("Avanti"))
+                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onNext = { stage = 3 })
                 Stage.CALENDAR -> CalendarImportStep(viewModel, onDone = viewModel::finishOnboarding)
             }
         }
@@ -238,5 +246,29 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
             }
         }
         TextButton(onClick = onDone, enabled = !state.importing) { Text(tr("Salta per ora")) }
+    }
+}
+
+/** Scelte sulle operazioni periodiche (feste, pulizia annuale, backup), modificabili poi nelle Impostazioni. */
+@Composable
+private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNext: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .contentWidth()
+            .padding(RicordellaDimensions.spaceXl),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL),
+    ) {
+        Text(tr("Come preferisci?"), style = MaterialTheme.typography.headlineMedium)
+        Text(
+            tr("Alcune cose le faccio una volta l'anno o ogni tanto. Scegli se farle da sola, chiedertelo prima o mai. Tocca ? per vedere cosa succede. Potrai cambiare idea nelle Impostazioni."),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        AutomationSettings(LocalAppSettings.current, onUpdate, includeBackup = true)
+        PushButton(tr("Avanti"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward, modifier = Modifier.fillMaxWidth())
     }
 }

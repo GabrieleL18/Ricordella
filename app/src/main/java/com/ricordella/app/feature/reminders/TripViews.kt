@@ -99,7 +99,7 @@ fun TripFields(trip: TripInfo, onChange: (TripInfo) -> Unit) {
     SectionHeader(tr("Viaggio"), icon = Icons.Rounded.Luggage, tone = colors.mint)
     Text_(
         value = trip.destination,
-        label = "Luogo / destinazione",
+        label = tr("Luogo / destinazione"),
         onValue = { onChange(trip.copy(destination = it)) },
     )
     trip.legs.forEachIndexed { index, leg ->
