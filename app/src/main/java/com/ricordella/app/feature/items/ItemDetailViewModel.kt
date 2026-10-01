@@ -120,6 +120,8 @@ class ItemDetailViewModel(
         )
     }
 
+    fun onUpdateMaintenance(record: MaintenanceRecord) = launchAction(tr("Voce aggiornata")) { maintenance.save(record) }
+
     fun onDeleteMaintenance(record: MaintenanceRecord) = launchAction(tr("Intervento eliminato")) { maintenance.delete(record.id) }
 
     fun onCompleteReminder(id: String) = launchAction(null) { completeReminder(id) }

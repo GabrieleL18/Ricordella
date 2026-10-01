@@ -3,8 +3,15 @@ package com.ricordella.app.core.i18n
 import android.content.Context
 import java.util.Locale
 
-/** Lingua scelta nelle impostazioni: di default segue quella del sistema. */
-enum class AppLanguage { SYSTEM, ITALIAN, ENGLISH }
+/** Lingua scelta nelle impostazioni (con bandiera e nome nella lingua stessa): di default segue quella del sistema. */
+enum class AppLanguage(val code: String?, val flag: String, val nativeName: String) {
+    SYSTEM(null, "🌐", ""),
+    ITALIAN("it", "🇮🇹", "Italiano"),
+    ENGLISH("en", "🇬🇧", "English"),
+    GERMAN("de", "🇩🇪", "Deutsch"),
+    FRENCH("fr", "🇫🇷", "Français"),
+    SPANISH("es", "🇪🇸", "Español"),
+}
 
 /**
  * Lingua corrente dell'app. I testi sono scritti in italiano nel codice e tradotti al volo
@@ -14,23 +21,25 @@ enum class AppLanguage { SYSTEM, ITALIAN, ENGLISH }
 object Lang {
     private const val PREFS = "language"
     private const val KEY = "app_language"
+    private val supported = AppLanguage.entries.mapNotNull { it.code }
 
+    /** Codice della lingua in uso: "it", "en", "de", "fr" o "es". */
     @Volatile
-    var english: Boolean = false
+    var code: String = "it"
         private set
 
-    val locale: Locale get() = if (english) Locale.ENGLISH else Locale.ITALIAN
+    val english: Boolean get() = code == "en"
+    val italian: Boolean get() = code == "it"
+
+    val locale: Locale get() = Locale.forLanguageTag(code)
 
     fun current(context: Context): AppLanguage =
         runCatching { AppLanguage.valueOf(prefs(context).getString(KEY, null) ?: "") }.getOrDefault(AppLanguage.SYSTEM)
 
     /** Da chiamare all'avvio dell'app e dopo ogni cambio. */
     fun init(context: Context) {
-        english = when (current(context)) {
-            AppLanguage.SYSTEM -> systemLanguage() != "it"
-            AppLanguage.ITALIAN -> false
-            AppLanguage.ENGLISH -> true
-        }
+        // Lingua di sistema non tradotta: inglese, la più comprensibile.
+        code = current(context).code ?: systemLanguage().takeIf { it in supported } ?: "en"
     }
 
     fun set(context: Context, language: AppLanguage) {
@@ -45,12 +54,29 @@ object Lang {
 
     /** Solo per i test: forza la lingua senza Android. */
     internal fun forceEnglish(value: Boolean) {
-        english = value
+        code = if (value) "en" else "it"
+    }
+
+    /** Solo per i test: forza una lingua qualsiasi. */
+    internal fun force(languageCode: String) {
+        code = languageCode
     }
 }
 
-/** Traduce un testo italiano nella lingua corrente (resta in italiano se manca la traduzione). */
-fun tr(text: String): String = if (Lang.english) EnglishStrings[text] ?: text else text
+private fun strings(code: String): Map<String, String>? = when (code) {
+    "en" -> EnglishStrings
+    "de" -> GermanStrings
+    "fr" -> FrenchStrings
+    "es" -> SpanishStrings
+    else -> null
+}
+
+/** Traduce un testo italiano nella lingua corrente; se manca la traduzione usa l'inglese, poi l'italiano. */
+fun tr(text: String): String {
+    val code = Lang.code
+    if (code == "it") return text
+    return strings(code)?.get(text) ?: EnglishStrings[text] ?: text
+}
 
 /** Come [tr], per testi con segnaposto (%1$s, %2$s...). */
 fun trf(text: String, vararg args: Any?): String = String.format(Lang.locale, tr(text), *args)

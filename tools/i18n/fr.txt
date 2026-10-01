@@ -1,0 +1,1157 @@
+# Traduzioni francesi di Remindella: "testo italiano ||| traduzione", una per riga.
+# ⏎ = a capo. I segnaposto (%1$s, %2$s, %02d) vanno mantenuti. Genera i file Kotlin con:
+#   python tools/i18n/generate.py
+Nonna Rosa ||| Mamie Rosa
+Lavatrice ||| Lave-linge
+Caldaia ||| Chaudière
+Carta d'identità di Giulia ||| Carte d'identité de Giulia
+Passaporto di Marco ||| Passeport de Marco
+Contratto luce e gas ||| Contrat électricité et gaz
+Offerta a prezzo fisso, 24 mesi ||| Offre à prix fixe, 24 mois
+Tagliando ||| Révision
+Olio, filtri e controllo freni ||| Huile, filtres et contrôle des freins
+Pneumatici ||| Pneus
+Cambio gomme invernali ||| Pose des pneus hiver
+Controllo fumi ||| Contrôle des fumées
+Rifornimento ||| Plein
+Assicurazione ||| Assurance
+Bollo auto ||| Taxe auto
+Manutenzione annuale ||| Entretien annuel
+Compleanno di %1$s ||| Anniversaire de %1$s
+Portare Sofia in piscina ||| Emmener Sofia à la piscine
+Call con il commercialista ||| Appel avec le comptable
+Ritirare il pacco in tabaccheria ||| Retirer le colis
+Pagare la bolletta della luce ||| Payer la facture d'électricité
+Visita dal dentista ||| Rendez-vous chez le dentiste
+Studio dott.ssa Conti, portare la tessera sanitaria ||| Cabinet du Dr Conti, apporter la carte Vitale
+Cena da Luca ||| Dîner chez Luca
+Riunione con le maestre ||| Réunion avec les maîtresses
+Tagliando Panda ||| Révision Panda
+Controllo pressione nonna ||| Tension de mamie
+Assicurazione Vespa ||| Assurance Vespa
+Revisione caldaia ||| Entretien chaudière
+Rinnovo passaporto ||| Renouvellement du passeport
+Weekend in Sicilia ||| Week-end en Sicile
+Roma FCO ||| Rome FCO
+Via Butera 45, Palermo ||| Via Butera 45, Palerme
+Sveglia per il volo ||| Réveil pour le vol
+Natale ||| Noël
+Pasqua ||| Pâques
+Ognissanti ||| Toussaint
+Spesa settimanale ||| Courses de la semaine
+Pagare la mensa di Sofia ||| Payer la cantine de Sofia
+Notifica di prova ||| Notification de test
+Se leggi questo messaggio le notifiche di Remindella funzionano. ||| Si tu lis ce message, les notifications de Remindella fonctionnent.
+Cena dell'anno scorso ||| Dîner de l'an dernier
+Bere più acqua ||| Boire plus d'eau
+Leggere un libro al mese ||| Lire un livre par mois
+Fare una passeggiata ogni domenica ||| Se promener chaque dimanche
+Anna ||| Anna
+Esempio ||| Exemple
+Persona di esempio ||| Personne d'exemple
+Auto di esempio ||| Voiture d'exemple
+Compleanno di Anna ||| Anniversaire d'Anna
+Pagare la bolletta ||| Payer la facture
+Revisione auto ||| Contrôle technique
+Riunione ||| Réunion
+Vacanza al mare ||| Vacances à la mer
+Palermo ||| Palerme
+ITA Airways ||| ITA Airways
+Palermo PMO ||| Palerme PMO
+La Suprema ||| La Suprema
+Napoli ||| Naples
+Cabina 204 ||| Cabine 204
+Hotel Esempio ||| Hôtel Exemple
+Via Roma 1, Palermo ||| Via Roma 1, Palerme
+Posticipa %1$s min ||| Rappel dans %1$s min
+Ok… ci riprovo tra %1$s minuti ||| D'accord… je réessaie dans %1$s minutes
+Va bene… ci vediamo tra %1$s minuti ||| Très bien… à dans %1$s minutes
+Un maghetto incanta la sveglia con la bacchetta ||| Un petit magicien enchante le réveil avec sa baguette
+Un maghetto cerca di zittire la sveglia per non svegliare l'orso che dorme ||| Un petit magicien essaie de faire taire le réveil pour ne pas réveiller l'ours qui dort
+Ferma la sveglia ||| Arrêter le réveil
+Scorri per fermare ||| Glisse pour arrêter
+Sveglia ||| Réveil
+Ferma ||| Arrêter
+Sveglia di prova ||| Réveil de test
+Sveglie ||| Réveils
+Oggi ||| Aujourd'hui
+Domani ||| Demain
+Ieri ||| Hier
+%1$s alle %2$s ||| %1$s à %2$s
+Oggi ·  ||| Aujourd'hui ·
+Domani ·  ||| Demain ·
+%,d km ||| %,d km
+Promemoria ||| Rappels
+Da fare o da non dimenticare ||| À faire ou à ne pas oublier
+Evento ||| Événement
+Appuntamento o ricorrenza ||| Rendez-vous ou occasion
+Suona a tutto schermo, anche ogni giorno ||| Sonne en plein écran, même chaque jour
+Vacanza ||| Vacances
+Voli, navi e alloggio ||| Vols, ferries et logement
+Visita medica ||| Rendez-vous médical
+Medico, esami, dentista ||| Médecin, examens, dentiste
+Cosa ||| Objet
+Auto, casa, dispositivi, documenti ||| Voiture, maison, appareils, documents
+Persona ||| Personne
+A chi collegare promemoria e cose ||| À qui relier rappels et objets
+Cosa vuoi aggiungere? ||| Que veux-tu ajouter ?
+Pozioni ||| Potions
+Ti ricorda di bere un po' d'acqua. ||| Te rappelle de boire un peu d'eau.
+È l'ora di una pozione 🧪 ||| C'est l'heure d'une potion 🧪
+Ancora %1$s ml per l'obiettivo di oggi ||| Encore %1$s ml pour l'objectif du jour
+Bevuta! +%1$s ml ||| Bue ! +%1$s ml
+Completa ||| Fait
+Tra 10 min ||| Dans 10 min
+tra %1$s gg ||| dans %1$s j
+%1$s gg fa ||| il y a %1$s j
+Documento ||| Document
+Foto del %1$s ||| Photo du %1$s
+Nessuna app fotocamera disponibile ||| Aucune app appareil photo disponible
+Allega un documento ||| Joindre un document
+Scatta una foto adesso o scegli un file che hai già sul telefono. ||| Prends une photo maintenant ou choisis un fichier déjà sur ton téléphone.
+Scatta una foto ||| Prendre une photo
+Con la fotocamera, adesso ||| Avec l'appareil photo, maintenant
+Scegli un file ||| Choisir un fichier
+Foto, PDF o documenti già sul telefono ||| Photos, PDF ou documents déjà sur le téléphone
+Annulla ||| Annuler
+Allega ||| Joindre
+Foto, PDF o documenti ||| Photos, PDF ou documents
+Backup di Remindella ||| Sauvegarde Remindella
+Salva o condividi il backup ||| Enregistrer ou partager la sauvegarde
+Dal %1$s al %2$s ||| Du %1$s au %2$s
+Tutto il giorno ||| Toute la journée
+Ricorrente ||| Récurrent
+In corso ||| En cours
+ultimo giorno ||| dernier jour
+ancora %1$s gg ||| encore %1$s j
+giorno ||| jour
+giorni ||| jours
+giorno fa ||| jour écoulé
+giorni fa ||| jours écoulés
+Mancano %1$s %2$s ||| Dans %1$s %2$s
+mancano ||| dans
+Completato ||| Terminé
+Fatto ||| Fait
+Da fare ||| À faire
+Scaduto ||| En retard
+Cancella ricerca ||| Effacer la recherche
++1 settimana ||| +1 semaine
++1 mese ||| +1 mois
+oggi ||| aujourd'hui
+domani ||| demain
+ieri ||| hier
+tra %1$s giorni ||| dans %1$s jours
+%1$s giorni fa ||| il y a %1$s jours
+Scegli mese e anno ||| Choisir le mois et l'année
+Mese precedente ||| Mois précédent
+Mese successivo ||| Mois suivant
+Anno precedente ||| Année précédente
+Anno successivo ||| Année suivante
+Apri ||| Ouvrir
+Rimuovi ||| Retirer
+Storico · %1$s ||| Historique · %1$s
+il %1$s ||| le %1$s
+1 giorno in ritardo ||| 1 jour de retard
+%1$s giorni in ritardo ||| %1$s jours de retard
+1 giorno in anticipo ||| 1 jour d'avance
+%1$s giorni in anticipo ||| %1$s jours d'avance
+puntuale ||| à l'heure
+Attività ||| Tâche
+Festa ||| Fête
+Scadenza ||| Échéance
+Compleanno ||| Anniversaire
+Garanzia ||| Garantie
+Manutenzione ||| Entretien
+Pagamento ||| Paiement
+Rinnovo ||| Renouvellement
+Altro ||| Autre
+Allarme ||| Alarme
+Normale ||| Normale
+Importante ||| Importante
+Urgente ||| Urgente
+Veicoli ||| Véhicules
+Casa ||| Maison
+Elettronica ||| Électronique
+Documenti ||| Documents
+Generico ||| Général
+Proprietario ||| Propriétaire
+Utilizzatore ||| Utilisateur
+Lontana ||| Lointaine
+Vicina ||| Proche
+Superata ||| Dépassée
+Ogni giorno ||| Chaque jour
+Ogni %1$s giorni ||| Tous les %1$s jours
+Ogni settimana ||| Chaque semaine
+Ogni %1$s settimane ||| Toutes les %1$s semaines
+Ogni mese ||| Chaque mois
+Ogni %1$s mesi ||| Tous les %1$s mois
+Ogni anno ||| Chaque année
+Ogni %1$s anni ||| Tous les %1$s ans
+ il  |||  le
+ fino al  |||  jusqu'au
+ dall'ultima volta |||  depuis la dernière fois
+All'orario del promemoria ||| À l'heure du rappel
+%1$s minuti prima ||| %1$s minutes avant
+1 ora prima ||| 1 heure avant
+%1$s ore prima ||| %1$s heures avant
+1 giorno prima ||| 1 jour avant
+1 settimana prima ||| 1 semaine avant
+%1$s giorni prima ||| %1$s jours avant
+compie 1 anno ||| fête ses 1 an
+compie %1$s anni ||| fête ses %1$s ans
+Remindella: c'è qualcosa di scaduto ||| Remindella : quelque chose est en retard
+Remindella, la palla di vetro ||| Remindella, la boule de cristal
+non impostato ||| non défini
+Rimuovi %1$s ||| Retirer %1$s
+Scegli l'orario ||| Choisir l'heure
+Conferma ||| Confirmer
+Scansiona lo scontrino ||| Scanner le ticket de caisse
+Non sono riuscita a leggere il testo: prova con una foto più nitida e dritta. ||| Je n'ai pas pu lire le texte : essaie avec une photo plus nette et bien droite.
+Leggo data, prezzo e negozio e preparo la garanzia. Tutto sul telefono. ||| Je lis la date, le prix et le magasin et je prépare la garantie. Tout sur le téléphone.
+Cerca ||| Rechercher
+Impostazioni ||| Réglages
+Aggiungi ||| Ajouter
+Indietro ||| Retour
+Come vuoi darmelo? Leggo tutto sul telefono, senza Internet. ||| Comment veux-tu me le donner ? Je lis tout sur le téléphone, sans Internet.
+Fotocamera ||| Appareil photo
+Inquadra il documento adesso ||| Cadre le document maintenant
+Foto o PDF ||| Photo ou PDF
+Un file già sul telefono, anche un PDF ricevuto per email ||| Un fichier déjà sur le téléphone, même un PDF reçu par e-mail
+Ho capito ||| Compris
+Salta ||| Passer
+Avanti ||| Suivant
+Home: cosa ricordare oggi ||| Accueil : ce qu'il faut retenir aujourd'hui
+In alto trovi quello che richiede attenzione, poi le cose di oggi e quelle in arrivo.  ||| En haut, ce qui demande ton attention, puis ce qui est prévu aujourd'hui et à venir.
+Tocca il cerchio per completare: se qualcosa è scaduto la palla si riempie di fumo rosso. ||| Touche le cercle pour terminer : si quelque chose est en retard, la boule se remplit de fumée rouge.
+Calendario ||| Calendrier
+Il mese a colpo d'occhio: i giorni con un puntino hanno promemoria. Tocca un giorno per vederli, scorri per cambiare mese. In "Giorno" trovi la timeline ora per ora. ||| Le mois en un coup d'œil : chaque jour montre ses rappels. Touche un jour pour les voir, fais glisser pour changer de mois. Dans « Jour », la chronologie heure par heure.
+Tutti i promemoria, filtrabili per tipo e stato: attività, eventi, visite mediche, scadenze, compleanni. Ti avviso io con una notifica. ||| Tous les rappels, filtrables par type et statut : tâches, événements, rendez-vous médicaux, échéances, anniversaires. Je te préviens par une notification.
+Cose ||| Objets
+Auto, elettrodomestici, dispositivi, documenti. Scegli prima la categoria, poi la cosa: ti propongo io revisioni, tagliandi e garanzie. ||| Voitures, électroménager, appareils, documents. Choisis d'abord la catégorie, puis l'objet : je te propose contrôles, révisions et garanties.
+Persone ||| Personnes
+Collega promemoria e cose alle persone: nella loro scheda trovi compleanni, eventi e tutto ciò che le riguarda. ||| Relie rappels et objets aux personnes : leur fiche montre anniversaires, événements et tout ce qui les concerne.
+Pozioni: bevi abbastanza ||| Potions : bois assez
+La goccia in alto apre le Pozioni: scegli quanta acqua bere al giorno e ogni quanto ricordartelo.  ||| La goutte en haut ouvre les Potions : choisis combien d'eau boire par jour et à quelle fréquence te le rappeler.
+A ogni bicchiere tocca +: il mago si riempie e gli avvisi si fermano quando hai raggiunto l'obiettivo. ||| À chaque verre, touche + : le magicien se remplit et les rappels s'arrêtent quand tu atteins l'objectif.
+Buoni propositi ||| Bonnes résolutions
+A gennaio ti propongo di scrivere i buoni propositi dell'anno; spuntali quando li rispetti.  ||| En janvier, je te propose d'écrire tes bonnes résolutions de l'année ; coche-les quand tu les tiens.
+A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi anche nelle Impostazioni e nel widget. ||| Fin décembre, je te montre le bilan : combien tu en as tenu. Tu les trouves aussi dans les Réglages et dans le widget.
+Scansiona documenti ||| Scanner des documents
+Scontrini e carte d'imbarco hanno un solo pulsante "Scansiona": toccalo e scegli se inquadrare con la fotocamera o aprire una foto o un PDF già sul telefono.  ||| Tickets de caisse et cartes d'embarquement ont un seul bouton « Scanner » : touche-le et choisis l'appareil photo ou une photo ou un PDF déjà sur le téléphone.
+Leggo io data, prezzo, negozio e garanzia, oppure volo e posto. Tutto sul telefono, senza Internet. ||| Je lis date, prix, magasin et garantie, ou vol et siège. Tout sur le téléphone, sans Internet.
+Il pulsante + ||| Le bouton +
+Da qualunque sezione, il + giallo aggiunge al volo un promemoria, un evento, una cosa o una persona. ||| Depuis n'importe quelle section, le + jaune ajoute vite un rappel, un événement, un objet ou une personne.
+Il widget ||| Le widget
+Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi, domani e i giorni dopo se c'è spazio, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi. ||| Sur l'écran d'accueil du téléphone, tu peux ajouter les widgets de Remindella : Calendrier du mois, Ta journée (aujourd'hui, demain et les jours suivants s'il y a de la place, à cocher), Potions (+ et − pour l'eau) et Bonnes résolutions.
+Esporta: un solo file ||| Exporter : un seul fichier
+La prima volta scegli dove salvare il .zip (es. Drive). Le volte dopo lo sovrascrivo, a meno che tu non chieda una nuova versione. Puoi anche condividerlo. ||| La première fois, tu choisis où enregistrer le .zip (ex. Drive). Ensuite je l'écrase, sauf si tu demandes une nouvelle version. Tu peux aussi le partager.
+Leggero come una piuma ||| Léger comme une plume
+Il backup è compresso al massimo e le foto vengono ridotte: pesa il meno possibile, senza perdere i tuoi dati. ||| La sauvegarde est compressée au maximum et les photos réduites : elle pèse le moins possible, sans perdre tes données.
+Te lo ricordo io ||| Je m'en souviens pour toi
+Ogni giorno (o ogni settimana, mese, 3 mesi, anno: lo scegli nelle Impostazioni) aggiorno il backup da sola. ||| Chaque jour (ou chaque semaine, mois, 3 mois, année : tu choisis dans les Réglages) je mets à jour la sauvegarde toute seule.
+Importa ||| Importer
+Su un nuovo telefono, "Importa backup" e scegli il file .zip: ti mostro cosa contiene e, se confermi, ripristino tutto. ||| Sur un nouveau téléphone, touche « Importer une sauvegarde » et choisis le fichier .zip : je te montre son contenu et, si tu confirmes, je restaure tout.
+Un file in comune ||| Un fichier en commun
+Crea il file condiviso: scegli Google Drive come posizione. Dentro ci sono promemoria, persone, cose e spese. ||| Crée le fichier partagé : choisis Google Drive comme emplacement. Il contient rappels, personnes, objets et dépenses.
+Condividilo su Drive ||| Partage-le sur Drive
+Apri Google Drive, tocca ⋮ sul file › Condividi e aggiungi l'altra persona come Editor. Lei apre Remindella › Impostazioni › Condivisione › «Apri il file condiviso con me». ||| Ouvre Google Drive, touche ⋮ sur le fichier › Partager et ajoute l'autre personne comme Éditeur. Elle ouvre Remindella › Réglages › Partage › « Ouvrir le fichier partagé avec moi ».
+Sempre allineati ||| Toujours synchronisés
+In automatico si aggiorna da solo, in manuale quando tocchi «Sincronizza ora». Se avete modificato entrambi, anche offline, unisco le modifiche senza perderne nessuna. Foto e allegati restano sul telefono di chi li ha aggiunti. ||| En automatique, il se met à jour tout seul ; en manuel, quand tu touches « Synchroniser ». Si vous avez modifié tous les deux, même hors ligne, je fusionne les modifications sans en perdre aucune. Photos et pièces jointes restent sur le téléphone de qui les a ajoutées.
+dentista domani alle 9 ||| dentiste demain à 9h
+Dentista ||| Dentiste
+Domani · 09:00 ||| Demain · 09:00
+palestra ogni lunedì ||| sport chaque lundi
+Un mago che saluta ||| Un magicien qui salue
+Un mago al lavoro ||| Un magicien au travail
+Un mago che vola su una scopa ||| Un magicien qui vole sur un balai
+Un mago che guarda la TV ||| Un magicien qui regarde la télé
+Un mago che parla al telefono ||| Un magicien qui téléphone
+Un mago che legge un libro ||| Un magicien qui lit un livre
+Un mago che crea oggetti con la magia ||| Un magicien qui fait apparaître des objets
+Un mago che cerca con la lente ||| Un magicien qui cherche avec une loupe
+Un mago che aspetta che suoni la campanella ||| Un magicien qui attend que la cloche sonne
+Un mago innamorato ||| Un magicien amoureux
+Un mago felice e soddisfatto ||| Un magicien heureux et satisfait
+Anno nuovo, feste nuove ||| Nouvelle année, nouvelles fêtes
+Pulizia di inizio anno ||| Grand ménage de début d'année
+Ci sono %1$s feste importate rimaste nell'anno passato.  ||| %1$s fêtes importées sont restées sur l'année passée.
+Le sposto al %1$s: Natale e le feste fisse restano nello stesso giorno, Pasqua, Pasquetta e le altre feste mobili vengono ricalcolate. ||| Je les déplace en %1$s : Noël et les fêtes fixes gardent le même jour, Pâques, le lundi de Pâques et les autres fêtes mobiles sont recalculées.
+Ho trovato %1$s promemoria ed eventi più vecchi di un anno non importanti o senza persone e cose collegate.  ||| J'ai trouvé %1$s rappels et événements de plus d'un an, peu importants ou sans personnes ni objets liés.
+Posso eliminarli per fare ordine. Quelli importanti e collegati a persone o cose restano. ||| Je peux les supprimer pour faire de l'ordre. Les importants et ceux liés à des personnes ou des objets restent.
+Dagli anni prossimi fallo in automatico ||| Les années suivantes, fais-le automatiquement
+Procedi ||| Continuer
+Non chiedermelo più ||| Ne plus me demander
+Più tardi ||| Plus tard
+Sei sicuro? ||| Tu es sûr ?
+Sposto %1$s feste al %2$s. Le date dell'anno passato non si potranno ripristinare. ||| Je déplace %1$s fêtes en %2$s. Les dates de l'année passée ne pourront pas être restaurées.
+Elimino definitivamente %1$s promemoria. L'operazione non si può annullare: se vuoi conservarli, esporta prima un backup. ||| Je supprime définitivement %1$s rappels. C'est irréversible : si tu veux les garder, exporte d'abord une sauvegarde.
+Sì, procedi ||| Oui, continuer
+Niente in arrivo ✨ ||| Rien à venir ✨
+Prossimo: %1$s · %2$s ||| Prochain : %1$s · %2$s
+Niente in programma ✨ ||| Rien de prévu ✨
+più giorni ||| plusieurs jours
+tutto il giorno ||| toute la journée
++ altri %1$s: apri l'app ||| + %1$s autres : ouvre l'app
+%1$s ml ||| %1$s ml
+Obiettivo raggiunto! ||| Objectif atteint !
+su %1$s · ±%2$s ml ||| sur %1$s · ±%2$s ml
+Buoni propositi %1$s ||| Bonnes résolutions %1$s
+Tocca per scrivere i propositi di quest'anno ✨ ||| Touche pour écrire les résolutions de cette année ✨
+La tua giornata ||| Ta journée
+Niente in programma ||| Rien de prévu
+archivio danneggiato ||| archive endommagée
+lettura del file non riuscita ||| lecture du fichier impossible
+manifest non leggibile ||| manifeste illisible
+dati mancanti ||| données manquantes
+i dati non corrispondono alla firma del backup ||| les données ne correspondent pas à la signature de la sauvegarde
+dati non leggibili ||| données illisibles
+identificatori duplicati ||| identifiants en double
+categoria mancante ||| catégorie manquante
+ricorrenza mancante ||| récurrence manquante
+storico senza promemoria ||| historique sans rappel
+manutenzione senza cosa ||| entretien sans objet
+collegamento promemoria-persona non valido ||| lien rappel-personne non valide
+collegamento promemoria-cosa non valido ||| lien rappel-objet non valide
+collegamento persona-cosa non valido ||| lien personne-objet non valide
+Backup non valido ||| Sauvegarde non valide
+Destinazione non disponibile ||| Destination indisponible
+Il file di backup scritto non si rilegge ||| Le fichier de sauvegarde écrit ne se relit pas
+File non disponibile ||| Fichier indisponible
+L'altra persona ||| L'autre personne
+%1$s ha segnato come fatto «%2$s» di %3$s ||| %1$s a marqué « %2$s » de %3$s comme fait
+%1$s ha riaperto «%2$s» di %3$s ||| %1$s a rouvert « %2$s » de %3$s
+%1$s ha modificato «%2$s» di %3$s ||| %1$s a modifié « %2$s » de %3$s
+Novità dal file condiviso ||| Nouveautés du fichier partagé
+tra %1$s ||| dans %1$s
+%1$s fa ||| il y a %1$s
+Scade oggi ||| Expire aujourd'hui
+Scade domani ||| Expire demain
+Scade tra %1$s ||| Expire dans %1$s
+Scaduto ieri ||| Expiré hier
+Scaduto da %1$s ||| Expiré depuis %1$s
+anno ||| an
+anni ||| ans
+mese ||| mois
+mesi ||| mois
+Altra spesa ||| Autre dépense
+Intervento ||| Intervention
+Manutenzione e spese ||| Entretien et dépenses
+Catena ||| Chaîne
+Freni ||| Freins
+Batteria ||| Batterie
+Revisione ||| Contrôle technique
+Cambio olio ||| Vidange
+Carrozzeria ||| Carrosserie
+Bollo ||| Taxe
+Parcheggio ||| Parking
+Pedaggi ||| Péages
+Lavaggio ||| Lavage
+Accessori ||| Accessoires
+Segna tagliandi, rifornimenti, bollo e assicurazione: ti mostro quanto spendi, il consumo e il costo al km. ||| Note révisions, pleins, taxe et assurance : je te montre tes dépenses, la consommation et le coût au km.
+Pulizia filtro ||| Nettoyage du filtre
+Pulizia guarnizione ||| Nettoyage du joint
+Decalcificazione ||| Détartrage
+Riparazione ||| Réparation
+Sale e brillantante ||| Sel et liquide de rinçage
+Pulizia ||| Nettoyage
+Sbrinamento ||| Dégivrage
+Guarnizioni ||| Joints
+Guarnizione ||| Joint
+Pulizia filtri ||| Nettoyage des filtres
+Sanificazione ||| Assainissement
+Ricarica gas ||| Recharge de gaz
+Manutenzione caldaia ||| Entretien chaudière
+Supporto a parete ||| Support mural
+Controllo ||| Contrôle
+Ricambi ||| Pièces détachées
+Detersivi ||| Produits d'entretien
+Installazione ||| Installation
+Estensione garanzia ||| Extension de garantie
+Segna pulizie, interventi e ricambi: ti ricordo il prossimo e ti mostro quanto spendi. ||| Note nettoyages, interventions et pièces : je te rappelle le prochain et je te montre tes dépenses.
+Riparazioni e spese ||| Réparations et dépenses
+Schermo ||| Écran
+Upgrade ||| Mise à niveau
+Pulizia ventole ||| Nettoyage des ventilateurs
+Controller ||| Manette
+Custodia ||| Étui
+Abbonamento ||| Abonnement
+Software ||| Logiciel
+Segna riparazioni, accessori e abbonamenti: ti mostro quanto ti costa ogni anno. ||| Note réparations, accessoires et abonnements : je te montre ce que ça coûte chaque année.
+Rinnovi e spese ||| Renouvellements et dépenses
+Variazione ||| Modification
+Disdetta ||| Résiliation
+Pratica di assistenza ||| Dossier SAV
+Estensione ||| Extension
+Duplicato ||| Duplicata
+Foto tessera ||| Photos d'identité
+Marca da bollo ||| Timbre fiscal
+Diritti di segreteria ||| Frais de dossier
+Spedizione ||| Envoi
+Raccomandata ||| Recommandé
+Segna rinnovi, marche da bollo e diritti: ti ricordo la prossima scadenza. ||| Note renouvellements, timbres et frais : je te rappelle la prochaine échéance.
+Segna interventi e spese: ti mostro quanto spendi ogni anno. ||| Note interventions et dépenses : je te montre combien tu dépenses chaque année.
+Cambio gomme ||| Changement de pneus
+Pulizia frigorifero ||| Nettoyage du frigo
+Pulizia forno ||| Nettoyage du four
+Backup ||| Sauvegarde
+Rinnovo documento ||| Renouvellement du document
+Rinnovo contratto ||| Renouvellement du contrat
+Ogni ora ||| Toutes les heures
+Ogni %1$s ore ||| Toutes les %1$s heures
+Ogni 3 mesi ||| Tous les 3 mois
+Garanzia %1$s ||| Garantie %1$s
+Mese ||| Mois
+Giorno ||| Jour
+Agenda ||| Agenda
+Agenda libera ||| Agenda libre
+Nessun promemoria nei prossimi 90 giorni. ||| Aucun rappel dans les 90 prochains jours.
+Nessun promemoria ||| Aucun rappel
+Non c'è nulla da ricordare in questa giornata. ||| Rien à retenir ce jour-là.
+Precedente ||| Précédent
+Successivo ||| Suivant
+, %1$s promemoria ||| , %1$s rappels
+, con scadenze ||| , avec des échéances
+Eventi ||| Événements
+Scadenze ||| Échéances
+Giornata libera ✨ ||| Journée libre ✨
+Nessun impegno: è il momento giusto per aggiungerne uno. ||| Rien de prévu : c'est le bon moment pour ajouter quelque chose.
+Aggiungi un impegno ||| Ajouter un rendez-vous
+Giorno %1$s di %2$s ||| Jour %1$s sur %2$s
+Backup aggiornato ||| Sauvegarde mise à jour
+Backup non riuscito, riprova ||| Échec de la sauvegarde, réessaie
+Remindella ||| Remindella
+Niente all'orizzonte ||| Rien à l'horizon
+Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io. ||| Rien à retenir dans les prochains jours. Ajoute quelque chose et je m'en occupe.
+Da guardare ||| À surveiller
+Prossimamente ||| Prochainement
+Vedi tutto ||| Tout voir
+Tutto sotto controllo. Goditi la giornata. ||| Tout est sous contrôle. Profite de ta journée.
+Niente di urgente: solo le cose di oggi. ||| Rien d'urgent : juste ce qui est prévu aujourd'hui.
+C'è 1 cosa che richiede attenzione. ||| 1 chose demande ton attention.
+Ci sono %1$s cose che richiedono attenzione. ||| %1$s choses demandent ton attention.
+da guardare ||| à surveiller
+in arrivo ||| à venir
+Buongiorno ||| Bonjour
+Buon pomeriggio ||| Bon après-midi
+Buonasera ||| Bonsoir
+%1$s o più %2$s ||| %1$s ou plus %2$s
+Buoni propositi per il %1$s ||| Bonnes résolutions pour %1$s
+Com'è andato il %1$s? ||| Comment s'est passé %1$s ?
+Inizia l'anno con qualche proposito: a fine anno vediamo insieme quali hai rispettato. ||| Commence l'année avec quelques résolutions : à la fin de l'année, on verra ensemble lesquelles tu as tenues.
+Avevi %1$s buoni propositi: segna quelli che hai rispettato e guarda il recap. ||| Tu avais %1$s bonnes résolutions : coche celles que tu as tenues et regarde le bilan.
+Scrivili ||| Les écrire
+Vedi il recap ||| Voir le bilan
+Non quest'anno ||| Pas cette année
+È ora di aggiornare il backup ||| C'est l'heure de mettre à jour la sauvegarde
+Aggiorna il backup di oggi: sovrascrivo quello precedente. ||| Mets à jour la sauvegarde du jour : j'écrase la précédente.
+È passata una settimana: aggiorno il backup sovrascrivendo il precedente. ||| Une semaine est passée : je mets à jour la sauvegarde en écrasant la précédente.
+È passato un mese: aggiorno il backup sovrascrivendo il precedente. ||| Un mois est passé : je mets à jour la sauvegarde en écrasant la précédente.
+È passato un anno: aggiorno il backup sovrascrivendo il precedente. ||| Un an est passé : je mets à jour la sauvegarde en écrasant la précédente.
+Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente. ||| 3 mois sont passés : je mets à jour la sauvegarde en écrasant la précédente.
+Aggiorna ora ||| Mettre à jour
+Le notifiche sono spente ||| Les notifications sont désactivées
+Accendile e ti avviso io, anche con l'app chiusa. ||| Active-les et je te préviens, même avec l'app fermée.
+Accendi le notifiche ||| Activer les notifications
+Aggiunto: %1$s ||| Ajouté : %1$s
+Non è stato possibile salvare il promemoria. Riprova. ||| Impossible d'enregistrer le rappel. Réessaie.
+Ho spostato %1$s feste al %2$s ||| J'ai déplacé %1$s fêtes en %2$s
+Pulizia annuale: eliminati %1$s promemoria vecchi ||| Ménage annuel : %1$s anciens rappels supprimés
+Eliminati %1$s promemoria vecchi ||| %1$s anciens rappels supprimés
+Scrivi al volo: «dentista domani alle 9» ||| Saisie rapide : « dentiste demain à 9h »
+Come funziona ||| Comment ça marche
+fino al %1$s ||| jusqu'au %1$s
+dentista domani alle 9 e mezza ||| dentiste demain à 9h30
+palestra ogni lunedì e giovedì alle 18 ||| sport chaque lundi et jeudi à 18h
+vacanza dal 10 al 15 agosto ||| vacances du 10 au 15 août
+pagare affitto ogni mese il 5 urgente ||| payer le loyer chaque mois urgent
+chiamare Luca tra 2 ore ||| appeler Luca dans 2 heures
+sveglia alle 7 ||| réveil à 7h
+Scrivi come parli ||| Écris comme tu parles
+Scrivi una frase come la diresti: capisco quando, a che ora, se si ripete e quanto è importante. Quello che resta diventa il titolo, e mentre scrivi ti suggerisco le parole giuste. ||| Écris une phrase comme tu la dirais : je comprends quand, à quelle heure, si ça se répète et si c'est important. Le reste devient le titre, et pendant que tu écris je te suggère les bons mots.
+Quando e a che ora ||| Quand et à quelle heure
+oggi, domani, lunedì, sabato prossimo, 24/12, 31 gennaio, tra 3 giorni, nel weekend, fine mese · alle 9, alle 18:30, alle 9 e mezza, stasera, a pranzo, tra 2 ore ||| aujourd'hui, demain, après-demain, lundi, samedi prochain, 24/12, 31 janvier, dans 3 jours, semaine prochaine · à 9h, à 18h30, ce soir, dans 2 heures
+sabato prossimo ||| samedi prochain
+alle 18:30 ||| à 18h30
+stasera ||| ce soir
+Si ripete, dura, conta ||| Se répète, dure, compte
+ogni giorno, ogni lunedì e giovedì, giorni feriali, ogni 2 settimane, ogni mese il 5, ogni anno · dal 10 al 15 agosto, per 3 giorni · urgente o !!, importante o ! ||| chaque jour, chaque lundi et jeudi, toutes les 2 semaines, chaque mois, chaque année · du 10 au 15 août, pour 3 jours · urgent ou !!, important ou !
+ogni lunedì ||| chaque lundi
+dal 10 al 15 agosto ||| du 10 au 15 août
+urgente ||| urgent
+Capisco anche il tipo ||| Je comprends aussi le type
+«sveglia alle 7» diventa una sveglia, «compleanno di…» si ripete ogni anno, «dentista» è una visita medica, «pagare» o «bolletta» un pagamento. ||| « réveil à 7h » devient un réveil, « anniversaire de… » se répète chaque année, « dentiste » est un rendez-vous médical, « payer » ou « facture » un paiement.
+compleanno di Marco ||| anniversaire de Marco
+pagare la bolletta ||| payer la facture
+Oppure dillo ||| Ou dis-le
+Tocca il microfono e parla: la sfera ti ascolta e scrive per te. Il permesso del microfono te lo chiedo solo la prima volta. ||| Touche le micro et parle : la boule t'écoute et écrit pour toi. Je te demande l'autorisation du micro seulement la première fois.
+Prova tu ||| À toi
+Tocca un esempio: finisce nella barra e vedi subito cosa ho capito. ||| Touche un exemple : il arrive dans la barre et tu vois tout de suite ce que j'ai compris.
+Senza il microfono puoi sempre scrivere. Puoi attivarlo nelle impostazioni di Android. ||| Sans micro, tu peux toujours écrire. Tu peux l'activer dans les paramètres d'Android.
+Il riconoscimento vocale non è disponibile su questo telefono ||| La reconnaissance vocale n'est pas disponible sur ce téléphone
+Dillo a voce ||| Dis-le à voix haute
+Posso ascoltarti? ||| Je peux t'écouter ?
+Uso il microfono solo mentre la sfera è aperta, per capire cosa vuoi ricordare. La voce la trascrive il riconoscimento vocale del telefono: Remindella non registra né salva l'audio. ||| J'utilise le micro seulement tant que la boule est ouverte, pour comprendre ce que tu veux retenir. Ta voix est transcrite par la reconnaissance vocale du téléphone : Remindella n'enregistre ni ne garde l'audio.
+Non ora ||| Pas maintenant
+Consenti ||| Autoriser
+Non ho sentito niente. ||| Je n'ai rien entendu.
+Il riconoscimento vocale ha bisogno di internet su questo telefono. ||| Sur ce téléphone, la reconnaissance vocale a besoin d'Internet.
+Manca il permesso del microfono. ||| L'autorisation du micro manque.
+Non sono riuscita ad ascoltare. ||| Je n'ai pas pu écouter.
+Ti ascolto… ||| Je t'écoute…
+Ops! ||| Oups !
+Dimmi cosa ricordare, ad esempio «dentista domani alle 9» ||| Dis-moi quoi retenir, par exemple « dentiste demain à 9h »
+Riprova ||| Réessayer
+Rifornimenti ||| Pleins
+Altre spese ||| Autres dépenses
+Spese ||| Dépenses
+Per tipo ||| Par type
+Per cosa ||| Par objet
+Cosa eliminata ||| Objet supprimé
+Tutte le spese del %1$s ||| Toutes les dépenses de %1$s
+Spese %1$s ||| Dépenses %1$s
+Anno prima ||| Année précédente
+Media al mese ||| Moyenne mensuelle
+La spesa più alta ||| Plus grosse dépense
+Nessuna spesa registrata in quest'anno. ||| Aucune dépense enregistrée cette année.
+Mese per mese ||| Mois par mois
+Mostra solo le ultime ||| Voir seulement les dernières
+Mostra tutte (%1$s) ||| Tout voir (%1$s)
+Anno scorso: %1$s ||| L'an dernier : %1$s
+Consumo medio ||| Consommation moyenne
+%1$s km/l ||| %1$s km/l
+Costo al km ||| Coût au km
+Modifica ||| Modifier
+Elimina intervento %1$s ||| Supprimer l'intervention %1$s
+Eliminare la voce? ||| Supprimer l'entrée ?
+"%1$s" verrà rimosso dallo storico. ||| « %1$s » sera retiré de l'historique.
+Elimina ||| Supprimer
+Nuova voce ||| Nouvelle entrée
+Modifica voce ||| Modifier l'entrée
+Descrizione breve * ||| Description courte *
+Data ||| Date
+Costo € ||| Coût €
+Litri ||| Litres
+Con litri e km calcolo il consumo medio. ||| Avec les litres et les km, je calcule la consommation moyenne.
+Note ||| Notes
+Ricordami il prossimo ||| Me rappeler le prochain
+Tra mesi ||| Dans (mois)
+o tra km ||| ou dans (km)
+Salva ||| Enregistrer
+Altre azioni ||| Autres actions
+Ripristina dall'archivio ||| Sortir des archives
+Archivia ||| Archiver
+Documento di garanzia ||| Justificatif de garantie
+Nessun altro promemoria. ||| Aucun autre rappel.
+Eliminare questa cosa? ||| Supprimer cet objet ?
+Verranno eliminati anche lo storico delle manutenzioni e il promemoria della garanzia.  ||| L'historique d'entretien et le rappel de garantie seront aussi supprimés.
+Gli altri promemoria restano. Se vuoi solo nasconderla, usa "Archivia". ||| Les autres rappels restent. Si tu veux seulement le masquer, utilise « Archiver ».
+Foto di %1$s ||| Photo de %1$s
+Archiviata ||| Archivé
+Targa ||| Immatriculation
+Anno ||| Année
+Marca ||| Marque
+Modello ||| Modèle
+N. di serie ||| N° de série
+Acquistata ||| Acheté
+Prezzo ||| Prix
+Informazioni ||| Informations
+Non indicati ||| Non renseignés
+Aggiorna ||| Mettre à jour
+Attiva ||| Active
+Scaduta ||| Expirée
+Dal ||| Depuis
+Venditore ||| Vendeur
+Aggiorna chilometri ||| Mettre à jour le kilométrage
+Km attuali ||| Km actuels
+Chilometraggio aggiornato ||| Kilométrage mis à jour
+Intervento registrato ||| Intervention enregistrée
+Spesa registrata ||| Dépense enregistrée
+Voce aggiornata ||| Entrée mise à jour
+Intervento eliminato ||| Intervention supprimée
+Ripristinata ||| Restauré
+Operazione non riuscita. Riprova. ||| Opération échouée. Réessaie.
+Auto, moto, scooter ||| Voiture, moto, scooter
+Lavatrice, caldaia, TV ||| Lave-linge, chaudière, TV
+Smartphone, computer ||| Smartphone, ordinateur
+Documenti, contratti ||| Documents, contrats
+Attrezzi e oggetti ||| Outils et objets
+Nuova cosa ||| Nouvel objet
+Che tipo di cosa è? ||| Quel genre d'objet est-ce ?
+Scegli la categoria ||| Choisis la catégorie
+Quale %1$s? ||| Quel %1$s ?
+Scegli la cosa ||| Choisis l'objet
+Categoria ||| Catégorie
+Dettagli ||| Détails
+Cambia ||| Changer
+Com'è fatta ||| Comment il est
+Cosa vuoi ricordare? ||| Que veux-tu retenir ?
+Foto ||| Photo
+Aggiungi foto ||| Ajouter une photo
+Cambia foto ||| Changer la photo
+Rimuovi foto ||| Retirer la photo
+Nome * ||| Nom *
+Inserisci un nome ||| Saisis un nom
+Es. Fiat Panda, Lavatrice Samsung ||| Ex. Fiat Panda, lave-linge Samsung
+Chilometri attuali ||| Kilométrage actuel
+Numero di serie ||| Numéro de série
+Data acquisto ||| Date d'achat
+Prezzo € ||| Prix €
+Ha una garanzia ||| A une garantie
+Inizio garanzia ||| Début de garantie
+1 anno ||| 1 an
+%1$s anni ||| %1$s ans
+Scadenza garanzia * ||| Fin de garantie *
+Allega documento ||| Joindre un document
+Cambia documento ||| Changer de document
+Remindella ti avviserà 30 giorni prima della scadenza. ||| Remindella te préviendra 30 jours avant l'échéance.
+Persone associate ||| Personnes liées
+Non hai ancora aggiunto persone. ||| Tu n'as pas encore ajouté de personnes.
+Potrai modificare date e dettagli in qualsiasi momento. ||| Tu pourras modifier dates et détails à tout moment.
+ogni %1$s o un anno ||| tous les %1$s ou un an
+Una volta ||| Une fois
+Ho letto lo scontrino: controlla i dati ||| J'ai lu le ticket : vérifie les informations
+Non è stato possibile salvare. Riprova. ||| Impossible d'enregistrer. Réessaie.
+Cerca per nome, marca, modello, targa ||| Rechercher par nom, marque, modèle, immatriculation
+Tutte ||| Tous
+Attive ||| Actifs
+Archiviate ||| Archivés
+Nessuna cosa ||| Aucun objet
+Aggiungi auto, elettrodomestici, dispositivi e documenti per ricordarne scadenze e manutenzioni. ||| Ajoute voitures, électroménager, appareils et documents pour suivre leurs échéances et entretiens.
+Aggiungi cosa ||| Ajouter un objet
+Garanzia al  ||| Garantie jusqu'au
+Riepilogo delle spese ||| Récapitulatif des dépenses
+Termini d'uso ||| Conditions d'utilisation
+Remindella è un'app gratuita per organizzare promemoria, scadenze, eventi, cose e persone. Usandola accetti questi termini.  ||| Remindella est une app gratuite pour organiser rappels, échéances, événements, objets et personnes. En l'utilisant, tu acceptes ces conditions.
+Puoi usarla per scopi personali e familiari; non usarla per attività illecite né per conservare dati di altre persone senza averne il diritto. ||| Tu peux l'utiliser à des fins personnelles et familiales ; ne l'utilise pas pour des activités illicites ni pour conserver des données d'autres personnes sans en avoir le droit.
+Uno strumento di supporto ||| Un outil d'aide
+Remindella ti aiuta a ricordare, ma non può garantire che una notifica, una sveglia o un promemoria arrivi sempre e in tempo.  ||| Remindella t'aide à te souvenir, mais ne peut pas garantir qu'une notification, un réveil ou un rappel arrive toujours, et à temps.
+Android può ritardarli o bloccarli: risparmio energetico, Non disturbare, permessi revocati, telefono spento o scarico, ora del telefono sbagliata, aggiornamenti.  ||| Android peut les retarder ou les bloquer : économie d'énergie, Ne pas déranger, autorisations retirées, téléphone éteint ou déchargé, mauvaise heure, mises à jour.
+Per le scadenze importanti (pagamenti, documenti, visite, farmaci) non affidarti soltanto all'app. ||| Pour les échéances importantes (paiements, documents, rendez-vous, médicaments), ne te fie pas uniquement à l'app.
+Le informazioni le controlli tu ||| C'est toi qui vérifies les informations
+Sei responsabile di ciò che inserisci: date, orari, importi e ricorrenze, anche quando arrivano dal calendario o sono letti da scontrini e carte d'imbarco.  ||| Tu es responsable de ce que tu saisis : dates, heures, montants et récurrences, même quand ils viennent du calendrier ou sont lus sur des tickets et des cartes d'embarquement.
+Il riconoscimento automatico può sbagliare e le date calcolate dall'app (ricorrenze, feste, chilometri) vanno verificate con le fonti ufficiali. ||| La reconnaissance automatique peut se tromper et les dates calculées par l'app (récurrences, fêtes, kilométrage) doivent être vérifiées auprès des sources officielles.
+I dati vivono solo sul telefono ||| Les données restent sur le téléphone
+Non ci sono account né copie sul cloud, e i dati sono esclusi dal backup automatico di Android.  ||| Il n'y a ni compte ni copie dans le cloud, et les données sont exclues de la sauvegarde automatique d'Android.
+Se disinstalli l'app, ne cancelli i dati, ripristini, perdi o rompi il telefono, i dati vanno persi per sempre, a meno che tu non abbia esportato un backup. ||| Si tu désinstalles l'app, effaces ses données, réinitialises, perds ou casses le téléphone, les données sont perdues pour toujours, sauf si tu as exporté une sauvegarde.
+Esportare e importare i dati ||| Exporter et importer les données
+Impostazioni › Dati e backup › Esporta backup crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.⏎⏎ ||| Réglages › Données et sauvegarde › Exporter une sauvegarde crée un fichier .zip avec rappels, objets, personnes, photos et réglages : tu peux l'écraser, en enregistrer une nouvelle version ou le partager. La sauvegarde automatique le met à jour toute seule à l'heure choisie.⏎⏎
+Per ripristinare: Impostazioni › Dati e backup › Importa backup e scegli il file. I dati presenti vengono sostituiti.  ||| Pour restaurer : Réglages › Données et sauvegarde › Importer une sauvegarde et choisis le fichier. Les données actuelles sont remplacées.
+Tieni il file in un posto sicuro (Drive, un computer): non è cifrato e chi lo ha può leggerne il contenuto.  ||| Garde le fichier en lieu sûr (Drive, un ordinateur) : il n'est pas chiffré et qui l'a peut le lire.
+Di ogni backup l'app tiene anche una copia di riserva sul telefono, per quando il file principale si rovina; anche la copia sparisce se disinstalli l'app. ||| Pour chaque sauvegarde, l'app garde aussi une copie de secours sur le téléphone, au cas où le fichier principal serait abîmé ; la copie disparaît aussi si tu désinstalles l'app.
+Condivisione con un'altra persona ||| Partage avec une autre personne
+Con la Condivisione due telefoni leggono e scrivono lo stesso file (es. su Google Drive). Chi ha il file può leggere e modificare promemoria, persone, cose e spese che contiene: condividilo solo con chi vuoi.  ||| Avec le Partage, deux téléphones lisent et écrivent le même fichier (ex. sur Google Drive). Qui a le fichier peut lire et modifier les rappels, personnes, objets et dépenses qu'il contient : ne le partage qu'avec qui tu veux.
+In automatico il file si aggiorna da solo, anche in background; in manuale solo quando lo chiedi. Se entrambi modificate gli stessi dati, l'app unisce le modifiche e, se lo stesso campo è cambiato da tutti e due, tiene la più recente.  ||| En automatique, le fichier se met à jour tout seul, même en arrière-plan ; en manuel, seulement quand tu le demandes. Si vous modifiez tous les deux les mêmes données, l'app fusionne les modifications et, si le même champ a changé des deux côtés, garde la plus récente.
+Quando spunti o modifichi una cosa di un'altra persona, nel file resta scritto chi l'ha fatto. La sincronizzazione dipende dall'app che gestisce il file: verifica che sia aggiornato prima di decisioni importanti. ||| Quand tu coches ou modifies quelque chose d'une autre personne, le fichier garde la trace de qui l'a fait. La synchronisation dépend de l'app qui gère le fichier : vérifie qu'il est à jour avant une décision importante.
+Informativa privacy ||| Politique de confidentialité
+Remindella non chiede account, non ha accesso a Internet, non mostra pubblicità, non raccoglie statistiche e non invia i tuoi dati allo sviluppatore.  ||| Remindella ne demande pas de compte, n'a pas accès à Internet, n'affiche pas de publicité, ne collecte pas de statistiques et n'envoie pas tes données au développeur.
+Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; Remindella non registra né salva l'audio); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Seulement quand tu le demandes : elle utilise le micro pour la « Saisie rapide » vocale (l'audio est transcrit par la reconnaissance vocale du téléphone, qui peut utiliser Internet selon ses propres règles ; Remindella n'enregistre ni ne garde l'audio) ; elle utilise l'appareil photo pour prendre des photos à joindre ou à scanner ; elle lit le calendrier du téléphone pour importer les événements ; elle utilise les services Google Play du téléphone pour lire textes et codes sur les photos (le traitement a lieu sur le téléphone, mais les services Google peuvent envoyer des données techniques à Google selon leurs conditions) ; avec le Partage, elle écrit un fichier à l'endroit que tu choisis (ex. Google Drive), géré par ce service selon ses règles.⏎⏎
+Puoi cancellare tutto da Impostazioni › Dati e backup › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| Tu peux tout effacer depuis Réglages › Données et sauvegarde › Supprimer toutes les données ou en désinstallant l'app. Questions :
+Limitazione di responsabilità ||| Limitation de responsabilité
+L'app è fornita gratuitamente «così com'è», senza garanzia che funzioni sempre e senza errori.  ||| L'app est fournie gratuitement « telle quelle », sans garantie de fonctionnement permanent ni d'absence d'erreurs.
+Nei limiti consentiti dalla legge, lo sviluppatore non risponde dei danni diretti o indiretti dovuti all'uso o al mancato funzionamento dell'app, come scadenze mancate, sanzioni, interessi di mora, appuntamenti persi o dati perduti.  ||| Dans les limites permises par la loi, le développeur n'est pas responsable des dommages directs ou indirects liés à l'utilisation ou au non-fonctionnement de l'app, comme des échéances manquées, des amendes, des intérêts de retard, des rendez-vous manqués ou des données perdues.
+Restano salvi i casi di dolo o colpa grave e i diritti che la legge riconosce ai consumatori e che non possono essere esclusi. ||| Sont exclus les cas de faute intentionnelle ou de faute grave ainsi que les droits que la loi reconnaît aux consommateurs et qui ne peuvent être exclus.
+Modifiche ||| Modifications
+Questi termini possono cambiare: in quel caso l'app te li riproporrà da accettare.  ||| Ces conditions peuvent changer : dans ce cas, l'app te demandera de les accepter à nouveau.
+Versione %1$s, ottobre 2026. ||| Version %1$s, octobre 2026.
+Prima di iniziare, leggi come funziona e cosa può e non può fare l'app. ||| Avant de commencer, lis comment elle fonctionne et ce que l'app peut faire ou non.
+Termini d'uso e privacy ||| Conditions d'utilisation et confidentialité
+Ho letto e accetto i termini d'uso, la limitazione di responsabilità e l'informativa privacy. ||| J'ai lu et j'accepte les conditions d'utilisation, la limitation de responsabilité et la politique de confidentialité.
+Accetto e inizio ||| J'accepte et je commence
+Non accetto ||| Je refuse
+Accettati il %1$s ||| Acceptées le %1$s
+Chiudi ||| Fermer
+Senza accettare non si parte ||| Sans accepter, impossible de commencer
+Per usare Remindella devi accettare i termini. Puoi rileggerli con calma o chiudere l'app. ||| Pour utiliser Remindella, tu dois accepter les conditions. Tu peux les relire tranquillement ou fermer l'app.
+Rileggo ||| Relire
+Chiudi l'app ||| Fermer l'app
+In "Scrivi al volo" tocca il microfono e parla: la sfera ti ascolta e scrive per te. ||| Dans « Saisie rapide », touche le micro et parle : la boule t'écoute et écrit pour toi.
+Condivisione automatica ||| Partage automatique
+Il file condiviso si sincronizza da solo e, se avete modificato entrambi, unisce le modifiche senza perdere niente. ||| Le fichier partagé se synchronise tout seul et, si vous avez modifié tous les deux, fusionne les modifications sans rien perdre.
+Spese più chiare ||| Dépenses plus claires
+Riepiloghi per mese, per categoria e per cosa, con il confronto con l'anno prima. ||| Récapitulatifs par mois, par type et par objet, avec la comparaison avec l'année précédente.
+Calendario più leggibile ||| Calendrier plus lisible
+Il mese occupa tutto lo schermo: tocca un giorno per vedere i suoi impegni. ||| Le mois occupe tout l'écran : touche un jour pour voir ses rendez-vous.
+Cinque lingue ||| Cinq langues
+Italiano, English, Deutsch, Français ed Español: la scegli nelle Impostazioni. ||| Italiano, English, Deutsch, Français et Español : choisis-la dans les Réglages.
+Allegati con la fotocamera ||| Pièces jointes avec l'appareil photo
+Allegando un documento puoi anche scattare subito una foto. ||| En joignant un document, tu peux aussi prendre une photo tout de suite.
+Backup al sicuro ||| Sauvegardes en sécurité
+Ogni backup ha una copia di riserva: se un file si rovina, c'è l'altro. ||| Chaque sauvegarde a une copie de secours : si un fichier s'abîme, il reste l'autre.
+Widget più grande ||| Widget plus grand
+"La tua giornata" mostra più giorni se gli dai spazio. ||| « Ta journée » affiche plus de jours si tu lui laisses de la place.
+Tutorial nuovi ||| Nouveaux tutoriels
+Anche "Scrivi al volo" ha il suo tutorial. Se non li vuoi, nascondili nelle Impostazioni. ||| La « Saisie rapide » a aussi son tutoriel. Si tu n'en veux pas, masque-les dans les Réglages.
+Novità ||| Nouveautés
+Ecco cosa c'è di nuovo in Remindella. ||| Voici les nouveautés de Remindella.
+Versione %1$s ||| Version %1$s
+Fantastico! ||| Génial !
+Ciao, sono ||| Salut, je suis
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce? ||| Je retiens pour toi échéances, événements, rendez-vous, entretiens et anniversaires. Je te fais faire un petit tour ?
+Parti da zero ||| Partir de zéro
+Ho già un backup: ripristinalo ||| J'ai déjà une sauvegarde : la restaurer
+Inizia a usare Remindella ||| Commencer à utiliser Remindella
+Importa da Google Calendar ||| Importer depuis Google Agenda
+Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi di un tuo account Google già presente sul telefono.  ||| Je peux copier les événements, fêtes, anniversaires et rappels des 12 prochains mois d'un compte Google déjà présent sur le téléphone.
+Niente Internet: leggo solo il calendario del dispositivo. ||| Pas d'Internet : je lis seulement le calendrier de l'appareil.
+Nessun evento da importare. ||| Aucun événement à importer.
+Fatto! Ho importato %1$s eventi. ||| C'est fait ! J'ai importé %1$s événements.
+Senza il permesso al calendario non posso importare. Puoi farlo più tardi dalle Impostazioni. ||| Sans l'autorisation du calendrier, je ne peux pas importer. Tu pourras le faire plus tard depuis les Réglages.
+Scegli l'account ||| Choisis le compte
+Sul telefono non ci sono account Google con un calendario. ||| Aucun compte Google avec un calendrier sur ce téléphone.
+Import non riuscito, riprova. ||| Échec de l'import, réessaie.
+Importa eventi ||| Importer les événements
+Salta per ora ||| Passer pour l'instant
+Come preferisci? ||| Comment préfères-tu ?
+Alcune cose le faccio una volta l'anno o ogni tanto. Scegli se farle da sola, chiedertelo prima o mai. Tocca ? per vedere cosa succede. Potrai cambiare idea nelle Impostazioni. ||| Certaines choses, je les fais une fois par an ou de temps en temps. Choisis si je les fais toute seule, si je te demande avant, ou jamais. Touche ? pour voir ce qui se passe. Tu pourras changer d'avis dans les Réglages.
+Dove salvo il backup ||| Où j'enregistre la sauvegarde
+Nel file che hai scelto: lo aggiorno da sola. ||| Dans le fichier que tu as choisi : je le mets à jour toute seule.
+In Download/Remindella sul telefono. Per non perderlo se cambi telefono, sceglilo su Drive. ||| Dans Download/Remindella sur le téléphone. Pour ne pas la perdre si tu changes de téléphone, choisis Drive.
+Scegli dove salvarlo (es. Drive) ||| Choisis où l'enregistrer (ex. Drive)
+Cerca persone ||| Rechercher des personnes
+Nessuna persona archiviata ||| Aucune personne archivée
+Nessuna persona ||| Aucune personne
+Aggiungi le persone a cui collegare promemoria e cose. ||| Ajoute les personnes à qui relier rappels et objets.
+Aggiungi persona ||| Ajouter une personne
+Prossimo appuntamento ||| Prochain rendez-vous
+ · compie %1$s anni |||  · fête ses %1$s ans
+Nuova persona ||| Nouvelle personne
+Modifica persona ||| Modifier la personne
+Cognome ||| Nom
+Note (es. Mamma, Partner) ||| Notes (ex. Maman, Partenaire)
+Prossimi eventi ||| Prochains événements
+Eliminare la persona? ||| Supprimer la personne ?
+La persona verrà eliminata. I promemoria e le cose collegate restano, ma senza questo collegamento.  ||| La personne sera supprimée. Les rappels et objets liés restent, mais sans ce lien.
+Se vuoi solo nasconderla, usa "Archivia". ||| Si tu veux seulement la masquer, utilise « Archiver ».
+Non è stato possibile salvare la persona. Riprova. ||| Impossible d'enregistrer la personne. Réessaie.
+%1$s di %2$s ||| %1$s sur %2$s
+Pancia piena! Hai superato l'obiettivo di oggi ||| Ventre plein ! Tu as dépassé l'objectif du jour
+Obiettivo raggiunto: il mago è pieno di magia ✨ ||| Objectif atteint : le magicien déborde de magie ✨
+%1$s pozioni su %2$s · ne mancano %3$s ||| %1$s potions sur %2$s · encore %3$s
+Togli una pozione ||| Retirer une potion
+Bevi %1$s ml ||| Boire %1$s ml
+Ricordamelo ||| Me le rappeler
+Una notifica che suona come una pozione. Arrivato all'obiettivo smette da sola. ||| Une notification qui sonne comme une potion. Elle s'arrête toute seule une fois l'objectif atteint.
+Le notifiche di Remindella sono spente nelle Impostazioni. ||| Les notifications de Remindella sont désactivées dans les Réglages.
+Ogni ||| Toutes les
+Dalle ||| De
+Fino alle ||| Jusqu'à
+Obiettivo ||| Objectif
+Al giorno ||| Par jour
+Una pozione ||| Une potion
+un bicchiere ≈ 250 ml ||| un verre ≈ 250 ml
+Da %1$s a %2$s ml ||| De %1$s à %2$s ml
+%1$s min ||| %1$s min
+Il mago è pieno al %1$s%% ||| Le magicien est plein à %1$s%%
+settimane ||| semaines
+Questo promemoria non esiste più. ||| Ce rappel n'existe plus.
+Allegati ||| Pièces jointes
+Eliminare il promemoria? ||| Supprimer le rappel ?
+Il promemoria e il suo storico verranno eliminati definitivamente. Le persone e le cose collegate non vengono toccate. ||| Le rappel et son historique seront supprimés définitivement. Les personnes et objets liés ne sont pas touchés.
+Annullato ||| Annulé
+In arrivo ||| À venir
+Archiviato ||| Archivé
+Ora ||| Heure
+Quando ||| Quand
+Ricorrenza ||| Récurrence
+Scadenza km ||| Échéance km
+ (ogni %1$s) |||  (tous les %1$s)
+Notifica ||| Notification
+Disattivata ||| Désactivée
+Rimandato a ||| Reporté au
+Descrizione ||| Description
+Rimanda ||| Reporter
+Tra 10 minuti ||| Dans 10 minutes
+Tra 1 ora ||| Dans 1 heure
+Domani mattina ||| Demain matin
+Scegli data e ora… ||| Choisir la date et l'heure…
+Segna come da fare ||| Marquer comme à faire
+Riaperto ||| Rouvert
+Notifica rimandata ||| Notification reportée
+Ripristinato ||| Restauré
+Nuovo evento ||| Nouvel événement
+Nuova sveglia ||| Nouveau réveil
+Nuovo promemoria ||| Nouveau rappel
+Nascondi opzioni ||| Masquer les options
+Altre opzioni ||| Plus d'options
+Titolo * ||| Titre *
+Inserisci un titolo ||| Saisis un titre
+Data * ||| Date *
+Ora * ||| Heure *
+La sveglia ha bisogno di un orario. ||| Un réveil a besoin d'une heure.
+Anno di nascita ||| Année de naissance
+Facoltativo: così vedi quanti anni compie. ||| Facultatif : pour voir quel âge la personne va avoir.
+Dura più giorni ||| Dure plusieurs jours
+Es. una vacanza o un viaggio ||| Ex. des vacances ou un voyage
+Fino al * ||| Jusqu'au *
+L'ultimo giorno deve venire dopo il primo. ||| Le dernier jour doit venir après le premier.
+Senza orario il promemoria vale per tutto il giorno. ||| Sans heure, le rappel vaut pour toute la journée.
+Tipo ||| Type
+Si ripete ||| Se répète
+Unità ||| Unité
+Conta dall'ultima volta ||| Compter depuis la dernière fois
+Se lo fai prima o dopo, anche le date successive si spostano. ||| Si tu le fais avant ou après, les dates suivantes se décalent aussi.
+Fino al (opzionale) ||| Jusqu'au (facultatif)
+Priorità ||| Priorité
+Categoria (es. Casa, Lavoro) ||| Catégorie (ex. Maison, Travail)
+Collegamenti ||| Liens
+Chilometraggio ||| Kilométrage
+Attuali: %1$s ||| Actuel : %1$s
+Scadenza a km ||| Échéance en km
+Ogni km ||| Tous les km
+Avvisami ||| Me prévenir
+Persone collegate ||| Personnes liées
+Cose collegate ||| Objets liés
+Non hai ancora aggiunto cose. ||| Tu n'as pas encore ajouté d'objets.
+Ripeti ogni giorno ||| Répéter chaque jour
+Es. per le medicine ||| Ex. pour les médicaments
+Per mostrare la sveglia a tutto schermo serve un permesso. ||| Pour afficher le réveil en plein écran, il faut une autorisation.
+Concedi permesso ||| Accorder l'autorisation
+Tutti ||| Tous
+Scaduti ||| En retard
+Completati ||| Terminés
+Data (prima i più vicini) ||| Date (les plus proches d'abord)
+Data (prima i più lontani) ||| Date (les plus lointains d'abord)
+Titolo (A-Z) ||| Titre (A-Z)
+Cerca promemoria, cose, persone ||| Rechercher rappels, objets, personnes
+Nessun risultato con questi filtri. ||| Aucun résultat avec ces filtres.
+Non c'è nulla da ricordare qui. ||| Rien à retenir ici.
+Sempre ||| Toujours
+Tutto il mese ||| Tout le mois
+Tutto l'anno ||| Toute l'année
+Periodo precedente ||| Période précédente
+Anno %1$s ||| Année %1$s
+Periodo successivo ||| Période suivante
+Filtri e ordine ||| Filtres et tri
+Filtri · %1$s ||| Filtres · %1$s
+Ordine: %1$s ||| Tri : %1$s
+Azzera tutto ||| Tout effacer
+Togli filtro %1$s ||| Retirer le filtre %1$s
+Azzera ||| Effacer
+Periodo ||| Période
+Collegati a ||| Liés à
+Ordina per ||| Trier par
+Mostra 1 promemoria ||| Afficher 1 rappel
+Mostra %1$s promemoria ||| Afficher %1$s rappels
+Aereo ||| Avion
+Nave ||| Ferry
+Treno ||| Train
+Auto ||| Voiture
+Numero volo ||| Numéro de vol
+Nave / traghetto ||| Bateau / ferry
+Numero treno ||| Numéro de train
+Targa / noleggio ||| Immatriculation / location
+Posto ||| Siège
+Cabina / posto ||| Cabine / siège
+Carrozza e posto ||| Voiture et place
+Viaggio ||| Voyage
+Luogo / destinazione ||| Lieu / destination
+Nessuna carta d'imbarco trovata ||| Aucune carte d'embarquement trouvée
+Scansiona la carta d'imbarco ||| Scanner la carte d'embarquement
+Leggo il codice e compilo da sola volo, posto e prenotazione. ||| Je lis le code et je remplis toute seule le vol, le siège et la réservation.
+Scanner non disponibile ||| Scanner indisponible
+Compagnia ||| Compagnie
+Partenza ||| Départ
+Codice prenotazione ||| Code de réservation
+Alloggio ||| Logement
+Nome (hotel, casa, campeggio...) ||| Nom (hôtel, maison, camping…)
+Indirizzo ||| Adresse
+Check-in ||| Arrivée
+Check-out ||| Départ
+Telefono ||| Téléphone
+Prenotazione ||| Réservation
+Apri il percorso in Google Maps ||| Ouvrir l'itinéraire dans Google Maps
+Apri in Google Maps ||| Ouvrir dans Google Maps
+Portami lì · percorso in Maps ||| Emmène-moi · itinéraire dans Maps
+Tocca per aprirla in Maps ||| Touche pour l'ouvrir dans Maps
+Scrivi cosa vuoi fare quest'anno: a fine anno ti mostro quali propositi hai rispettato. ||| Écris ce que tu veux faire cette année : à la fin de l'année, je te montre quelles résolutions tu as tenues.
+Rispettati %1$s su %2$s ||| %1$s tenues sur %2$s
+Tutti rispettati: che anno magico! ||| Toutes tenues : quelle année magique !
+Più della metà: ottimo lavoro! ||| Plus de la moitié : excellent travail !
+Spunta i propositi man mano che li rispetti. ||| Coche tes résolutions au fur et à mesure que tu les tiens.
+Nuovo proposito ||| Nouvelle résolution
+Persone, cose, promemoria, note… ||| Personnes, objets, rappels, notes…
+Nessun risultato ||| Aucun résultat
+Prova con un'altra parola. ||| Essaie avec un autre mot.
+Promemoria ed eventi ||| Rappels et événements
+Manutenzioni ||| Entretiens
+Automatico ||| Automatique
+Chiedimi ||| Me demander
+Mai ||| Jamais
+Feste all'anno nuovo ||| Fêtes vers la nouvelle année
+A gennaio sposta all'anno nuovo le feste importate da Google (Pasqua ricalcolata). ||| En janvier, déplace vers la nouvelle année les fêtes importées de Google (Pâques recalculée).
+Pulizia annuale ||| Ménage annuel
+A gennaio elimina i promemoria più vecchi di un anno non importanti o senza persone e cose: l'ultimo anno resta sempre. ||| En janvier, supprime les rappels de plus d'un an peu importants ou sans personnes ni objets : la dernière année reste toujours.
+Ogni quanto aggiornare il backup ||| Fréquence de mise à jour de la sauvegarde
+Lo faccio da sola e ti avviso con un messaggio. ||| Je le fais toute seule et je te préviens par un message.
+Aggiorna il backup ||| Mettre à jour la sauvegarde
+Salva il backup ||| Enregistrer la sauvegarde
+Sovrascrive il file precedente. ||| Écrase le fichier précédent.
+Scegli dove salvarlo (es. Drive): le prossime volte verrà sovrascritto. ||| Choisis où l'enregistrer (ex. Drive) : les fois suivantes, il sera écrasé.
+Nuova versione ||| Nouvelle version
+Crea un nuovo file e tiene quello vecchio. ||| Crée un nouveau fichier et garde l'ancien.
+Condividi ||| Partager
+Invialo con un'app (email, chat...). ||| Envoie-le avec une app (e-mail, messagerie…).
+Scegli il file ||| Choisir le fichier
+Il file .zip di Remindella. Prima di sostituire i dati ti mostro cosa contiene. ||| Le fichier .zip de Remindella. Avant de remplacer tes données, je te montre ce qu'il contient.
+Esporta backup ||| Exporter une sauvegarde
+Importa backup ||| Importer une sauvegarde
+Predefiniti per tipo ||| Valeurs par défaut par type
+Orario, notifica e preavviso proposti quando crei un promemoria di ogni tipo. ||| Heure, notification et préavis proposés quand tu crées un rappel de chaque type.
+Alle %1$s ||| À %1$s
+Orario da scegliere ||| Heure à choisir
+senza notifica ||| sans notification
+Proposti per i nuovi promemoria ||| Proposés pour les nouveaux rappels
+Orario ||| Heure
+Ti avviso io ||| Je te préviens
+Nessuna notifica ||| Aucune notification
+Preavviso ||| Préavis
+Suonano come sveglia, finché non rispondi ||| Sonnent comme un réveil jusqu'à ce que tu répondes
+Solo le sveglie ||| Seulement les réveils
+Sveglie e promemoria urgenti ||| Réveils et rappels urgents
+Sveglie e promemoria importanti o urgenti ||| Réveils et rappels importants ou urgents
+Vibrazione ||| Vibration
+La sveglia vibra mentre suona. ||| Le réveil vibre pendant qu'il sonne.
+Volume crescente ||| Volume progressif
+Parte piano e arriva al massimo in 30 secondi. ||| Commence doucement et atteint le maximum en 30 secondes.
+Posticipa di ||| Répéter dans
+%1$s minuti ||| %1$s minutes
+Suono ||| Son
+Incantesimo di Remindella ||| Sortilège de Remindella
+Suoneria sveglia del telefono ||| Sonnerie de réveil du téléphone
+Versione ||| Version
+Sei già uno sviluppatore: trovi la sezione qui sotto ||| Tu es déjà développeur : la section est plus bas
+Ora sei uno sviluppatore! 🧙 ||| Tu es maintenant développeur ! 🧙
+Ancora 1 tocco ||| Encore 1 appui
+Ancora %1$s tocchi ||| Encore %1$s appuis
+Sviluppatore ||| Développeur
+Invia notifica di prova ||| Envoyer une notification de test
+Subito, per vedere l'aspetto della notifica. ||| Tout de suite, pour voir à quoi elle ressemble.
+Notifica di prova tra 10 secondi ||| Notification de test dans 10 secondes
+Chiudi l'app per vederla arrivare in background. ||| Ferme l'app pour la voir arriver en arrière-plan.
+Arriva tra 10 secondi ||| Arrive dans 10 secondes
+Sveglia di giorno tra 10 secondi ||| Réveil de jour dans 10 secondes
+Il maghetto e l'orso che dorme. Blocca lo schermo per vederla a tutto schermo. ||| Le petit magicien et l'ours qui dort. Verrouille l'écran pour le voir en plein écran.
+Suona tra 10 secondi ||| Sonne dans 10 secondes
+Sveglia di notte tra 10 secondi ||| Réveil de nuit dans 10 secondes
+Il maghetto sotto le stelle. Blocca lo schermo per vederla a tutto schermo. ||| Le petit magicien sous les étoiles. Verrouille l'écran pour le voir en plein écran.
+Esci dalla modalità demo ||| Quitter le mode démo
+Modalità demo per gli screenshot ||| Mode démo pour les captures d'écran
+Torni ai tuoi dati veri, che non sono stati toccati. ||| Tu retrouves tes vraies données, qui n'ont pas été touchées.
+Una famiglia finta con promemoria, cose, viaggio e compleanni. I tuoi dati restano da parte e tornano uscendo. ||| Une famille fictive avec rappels, objets, voyage et anniversaires. Tes données sont mises de côté et reviennent en sortant.
+L'app si riavvia con i tuoi dati veri. ||| L'app redémarre avec tes vraies données.
+L'app si riavvia con dati finti e notifiche spente. Per uscire torna qui: le modifiche fatte in demo restano solo in demo. ||| L'app redémarre avec des données fictives et les notifications désactivées. Pour sortir, reviens ici : les modifications faites en démo restent en démo.
+Crea dati di esempio ||| Créer des données d'exemple
+Una persona, un'auto, una vacanza con volo e nave, una visita, un compleanno, un pagamento scaduto e, dell'anno scorso, due feste e una cena. ||| Une personne, une voiture, des vacances avec vol et ferry, un rendez-vous médical, un anniversaire, un paiement en retard et, de l'an dernier, deux fêtes et un dîner.
+Aggiungo ai tuoi dati alcuni promemoria, una persona e un'auto di esempio. Potrai eliminarli quando vuoi. ||| J'ajoute à tes données quelques rappels, une personne et une voiture d'exemple. Tu pourras les supprimer quand tu veux.
+Dati di esempio creati ||| Données d'exemple créées
+Simula l'inizio di un anno nuovo ||| Simuler le début d'une nouvelle année
+Fa comparire in Home le proposte di spostare le feste e di fare la pulizia annuale, con la loro animazione. ||| Affiche dans l'Accueil les propositions de déplacer les fêtes et de faire le ménage annuel, avec leur animation.
+Faccio come se fosse il primo avvio dell'anno e ti porto in Home, dove ti vengono proposte le operazioni di inizio anno. Se non ci sono feste né promemoria vecchi ne aggiungo di esempio. ||| Je fais comme si c'était le premier lancement de l'année et je t'emmène à l'Accueil, où les opérations de début d'année te sont proposées. S'il n'y a ni fêtes ni anciens rappels, j'en ajoute en exemple.
+%1$s feste da spostare, %2$s promemoria da pulire ||| %1$s fêtes à déplacer, %2$s rappels à nettoyer
+Simula gennaio: buoni propositi ||| Simuler janvier : bonnes résolutions
+La Home fa come se fosse il 2 gennaio: prima il recap dell'anno che finisce, poi l'invito a scrivere i propositi nuovi. ||| L'Accueil fait comme si on était le 2 janvier : d'abord le bilan de l'année qui se termine, puis l'invitation à écrire de nouvelles résolutions.
+Fino alla chiusura dell'app la Home crede che sia il 2 gennaio dell'anno prossimo. I propositi di prova dell'anno prossimo vengono azzerati. ||| Jusqu'à la fermeture de l'app, l'Accueil croit qu'on est le 2 janvier de l'année prochaine. Les résolutions de test de l'année prochaine sont effacées.
+Ecco la Home al 2 gennaio ||| Voici l'Accueil au 2 janvier
+Simula dicembre: recap dei propositi ||| Simuler décembre : bilan des résolutions
+La Home fa come se fosse il 28 dicembre e propone il recap di quest'anno (con propositi di esempio se non ne hai). ||| L'Accueil fait comme si on était le 28 décembre et propose le bilan de cette année (avec des résolutions d'exemple si tu n'en as pas).
+Fino alla chiusura dell'app la Home crede che sia il 28 dicembre. Se quest'anno non hai propositi ne aggiungo tre di esempio. ||| Jusqu'à la fermeture de l'app, l'Accueil croit qu'on est le 28 décembre. Si tu n'as pas de résolutions cette année, j'en ajoute trois en exemple.
+Ecco la Home al 28 dicembre ||| Voici l'Accueil au 28 décembre
+Mostra l'invito al backup ||| Afficher l'invitation à sauvegarder
+Fa comparire subito in Home la richiesta di aggiornare il backup. ||| Affiche tout de suite dans l'Accueil la demande de mettre à jour la sauvegarde.
+Faccio come se fosse scaduto l'intervallo del backup. ||| Je fais comme si l'intervalle de sauvegarde avait expiré.
+Ecco l'invito al backup ||| Voici l'invitation à sauvegarder
+Mostra le novità ||| Afficher les nouveautés
+Fa ricomparire la finestra delle novità, come al primo avvio dopo un aggiornamento. ||| Fait réapparaître la fenêtre des nouveautés, comme au premier lancement après une mise à jour.
+Ecco le novità ||| Voici les nouveautés
+Rivedi i tutorial automatici ||| Revoir les tutoriels automatiques
+I tutorial che compaiono da soli la prima volta (es. Scrivi al volo) ricompaiono: in Home tocca la barra. ||| Les tutoriels qui apparaissent tout seuls la première fois (ex. Saisie rapide) reviennent : dans l'Accueil, touche la barre.
+Tocca la barra di Scrivi al volo ||| Touche la barre de Saisie rapide
+Accettati il %1$s (versione %2$s di %3$s). Tocca per richiederli. ||| Acceptées le %1$s (version %2$s sur %3$s). Touche pour les redemander.
+Non ancora accettati. ||| Pas encore acceptées.
+Annullo l'accettazione: l'app mostra subito i termini e non si usa finché non li accetti di nuovo. ||| J'annule l'acceptation : l'app affiche tout de suite les conditions et ne s'utilise plus tant que tu ne les acceptes pas à nouveau.
+Ricalcola le notifiche ||| Recalculer les notifications
+Riprogramma gli allarmi di tutti i promemoria. ||| Reprogramme les alarmes de tous les rappels.
+Riprogrammo le notifiche di tutti i promemoria. Quelle già passate non vengono ripetute. ||| Je reprogramme les notifications de tous les rappels. Celles déjà passées ne sont pas répétées.
+Notifiche riprogrammate ||| Notifications reprogrammées
+Aggiorna il widget ||| Mettre à jour le widget
+Ridisegna subito il widget del calendario. ||| Redessine tout de suite le widget du calendrier.
+Widget aggiornato ||| Widget mis à jour
+Rifai la configurazione iniziale ||| Refaire la configuration initiale
+Mostra di nuovo benvenuto, tutorial e import dal calendario. ||| Affiche de nouveau l'accueil, le tutoriel et l'import du calendrier.
+Ti mostro di nuovo la configurazione iniziale. I tuoi dati restano. ||| Je te remontre la configuration initiale. Tes données restent.
+Configurazione riavviata ||| Configuration relancée
+Spazio occupato ||| Espace occupé
+Calcolo... ||| Calcul…
+Database: %1$s (versione %2$s) ·  ||| Base de données : %1$s (version %2$s) ·
+Foto: %1$s file, %2$s ·  ||| Photos : %1$s fichiers, %2$s ·
+Cache: %1$s ||| Cache : %1$s
+Svuota la cache ||| Vider le cache
+Backup temporanei, suoni e file di lavoro (si ricreano da soli). ||| Sauvegardes temporaires, sons et fichiers de travail (ils se recréent tout seuls).
+Svuoto la cache. Non tocca i tuoi dati, le foto né i backup salvati. ||| Je vide le cache. Ça ne touche ni tes données, ni les photos, ni les sauvegardes enregistrées.
+Cache svuotata ||| Cache vidé
+Esci dalla modalità sviluppatore ||| Quitter le mode développeur
+La sezione sparisce; 7 tocchi sulla versione per riaverla. ||| La section disparaît ; touche 7 fois la version pour la récupérer.
+La sezione Sviluppatore sparirà. Per riaverla tocca 7 volte la versione. ||| La section Développeur va disparaître. Pour la récupérer, touche 7 fois la version.
+Un attimo di magia… ||| Un instant de magie…
+Ripristinare il backup? ||| Restaurer la sauvegarde ?
+Backup del %1$s ||| Sauvegarde du %1$s
+promemoria ||| rappels
+persone ||| personnes
+cose ||| objets
+manutenzioni ||| entretiens
+file allegati ||| pièces jointes
+Attenzione: tutti i dati attuali verranno sostituiti da quelli del backup. ||| Attention : toutes les données actuelles seront remplacées par celles de la sauvegarde.
+Ritrovi tutto com'era: promemoria, cose, persone, foto e impostazioni. ||| Tu retrouves tout comme avant : rappels, objets, personnes, photos et réglages.
+Ripristina sostituendo i dati ||| Restaurer en remplaçant les données
+Ripristina ||| Restaurer
+È di %1$s ||| C'est à %1$s
+Vuoi davvero segnare come fatto «%1$s»? ||| Veux-tu vraiment marquer « %1$s » comme fait ?
+Vuoi davvero riaprire «%1$s»? ||| Veux-tu vraiment rouvrir « %1$s » ?
+Vuoi davvero modificare «%1$s»? ||| Veux-tu vraiment modifier « %1$s » ?
+Lo sincronizzo subito e %1$s saprà che l'hai fatto tu. ||| Je synchronise tout de suite et %1$s saura que c'est toi.
+Sì, continua ||| Oui, continuer
+Scrivi i propositi per il %1$s ||| Écris tes résolutions pour %1$s
+%1$s: rispettati %2$s su %3$s ||| %1$s : %2$s tenues sur %3$s
+Aspetto ||| Apparence
+Tema, lingua, calendario e suoni ||| Thème, langue, calendrier et sons
+Tema ||| Thème
+Sistema ||| Système
+Chiaro ||| Clair
+Scuro ||| Sombre
+Lingua ||| Langue
+Primo giorno della settimana ||| Premier jour de la semaine
+Formato data ||| Format de date
+Suoni delle scelte ||| Sons des choix
+Un piccolo suono quando scegli categorie e cose. Tocca per provarlo. ||| Un petit son quand tu choisis catégories et objets. Touche pour l'essayer.
+Notifiche ||| Notifications
+Permessi, orari, anticipo e predefiniti per tipo ||| Autorisations, horaires, préavis et valeurs par type
+Notifiche abilitate ||| Notifications activées
+Remindella ti avvisa anche ad app chiusa. ||| Remindella te prévient même quand l'app est fermée.
+Suono e vibrazione ||| Son et vibration
+Gestiti dalle impostazioni di sistema del canale "Promemoria". ||| Gérés dans les paramètres système du canal « Rappels ».
+Orario promemoria senza ora ||| Heure des rappels sans heure
+Notifica alle %1$s ||| Notification à %1$s
+Anticipo predefinito ||| Préavis par défaut
+Suono, vibrazione, volume e posticipo ||| Son, vibration, volume et répétition
+Dati e backup ||| Données et sauvegarde
+Backup, importazione e operazioni di inizio anno ||| Sauvegarde, import et opérations de début d'année
+Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione. ||| Un fichier .zip compressé au maximum : chaque fois il écrase le précédent, sauf si tu demandes une nouvelle version.
+Ripristina un backup sostituendo i dati attuali. ||| Restaure une sauvegarde en remplaçant les données actuelles.
+Copia di riserva ||| Copie de secours
+Dell'ultimo backup, sul telefono: %1$s. Usala se il file di backup si rovina. ||| De la dernière sauvegarde, sur le téléphone : %1$s. Utilise-la si le fichier de sauvegarde est abîmé.
+Backup automatico ||| Sauvegarde automatique
+%1$s, da sola: nel file scelto o in Download/Remindella. ||| %1$s, toute seule : dans le fichier choisi ou dans Download/Remindella.
+%1$s alle %2$s, da sola: nel file scelto o in Download/Remindella. ||| %1$s à %2$s, toute seule : dans le fichier choisi ou dans Download/Remindella.
+Spento: tocca per scegliere l'orario. ||| Désactivée : touche pour choisir l'heure.
+Copia gli eventi di un account Google presente sul telefono. ||| Copie les événements d'un compte Google présent sur le téléphone.
+Elimina tutti i dati ||| Supprimer toutes les données
+Cancella persone, cose, promemoria e storico da questo dispositivo. ||| Efface personnes, objets, rappels et historique de cet appareil.
+Operazioni periodiche ||| Opérations périodiques
+Tutorial, privacy, assistenza e versione ||| Tutoriel, confidentialité, assistance et version
+Cosa c'è di nuovo nella versione %1$s ||| Nouveautés de la version %1$s
+Rivedi il tutorial ||| Revoir le tutoriel
+Come funzionano le sezioni dell'app. ||| Comment fonctionnent les sections de l'app.
+Mostra i tutorial ||| Afficher les tutoriels
+Le spiegazioni che compaiono da sole la prima volta. Spente, le trovi sempre nel "?". ||| Les explications qui apparaissent toutes seules la première fois. Désactivées, tu les trouves toujours sous « ? ».
+Crediti ||| Crédits
+Da un'idea Lanni Labs ||| Une idée de Lanni Labs
+Cosa fa l'app, i suoi limiti e i tuoi dati. ||| Ce que fait l'app, ses limites et tes données.
+Assistenza ||| Assistance
+Questo backup è rovinato ||| Cette sauvegarde est abîmée
+Non riesco a leggerlo. C'è però la copia di riserva che tengo sul telefono: vuoi usare quella? ||| Je n'arrive pas à la lire. Mais il y a la copie de secours que je garde sur le téléphone : veux-tu l'utiliser ?
+Usa la copia di riserva ||| Utiliser la copie de secours
+Eliminare tutti i dati? ||| Supprimer toutes les données ?
+Verranno eliminati definitivamente persone, cose, promemoria, manutenzioni e storico.  ||| Personnes, objets, rappels, entretiens et historique seront supprimés définitivement.
+Se vuoi conservarli, esporta prima un backup. ||| Si tu veux les garder, exporte d'abord une sauvegarde.
+Continua ||| Continuer
+Questa operazione non si può annullare. ||| Cette opération est irréversible.
+Elimina tutto ||| Tout supprimer
+Permesso di notifica ||| Autorisation de notification
+Concesso ||| Accordée
+Non concesso: tocca per attivarlo ||| Non accordée : touche pour l'activer
+Promemoria puntuali ||| Rappels à l'heure
+Le notifiche con orario arrivano al minuto esatto. ||| Les notifications avec heure arrivent à la minute près.
+Non consentito: le notifiche possono arrivare con qualche minuto di ritardo. Tocca per consentire. ||| Non autorisé : les notifications peuvent arriver avec quelques minutes de retard. Touche pour autoriser.
+Backup aggiornato (file precedente sovrascritto). ||| Sauvegarde mise à jour (fichier précédent écrasé).
+Backup salvato. ||| Sauvegarde enregistrée.
+Il file scelto non è un backup di Remindella. ||| Le fichier choisi n'est pas une sauvegarde de Remindella.
+Questo backup è stato creato con una versione più recente di Remindella. Aggiorna l'app e riprova. ||| Cette sauvegarde a été créée avec une version plus récente de Remindella. Mets l'app à jour et réessaie.
+Il backup è danneggiato (%1$s). Nessun dato è stato modificato. ||| La sauvegarde est endommagée (%1$s). Aucune donnée n'a été modifiée.
+Backup ripristinato. ||| Sauvegarde restaurée.
+Tutti i dati sono stati eliminati. ||| Toutes les données ont été supprimées.
+Operazione non riuscita. Nessun dato è stato perso: riprova. ||| Opération échouée. Aucune donnée n'a été perdue : réessaie.
+Condivisione ||| Partage
+Condividi promemoria, persone, cose e spese con un'altra persona (partner, famiglia) tramite un file su Google Drive. ||| Partage rappels, personnes, objets et dépenses avec une autre personne (partenaire, famille) grâce à un fichier sur Google Drive.
+Crea il file condiviso ||| Créer le fichier partagé
+Apri il file condiviso con me ||| Ouvrir le fichier partagé avec moi
+Condivisione attiva ||| Partage actif
+Sincronizzo… ||| Synchronisation…
+Ultimo tentativo non riuscito: il file non è raggiungibile (sei offline o è stato spostato). Le tue modifiche restano qui e partono appena possibile. ||| Dernière tentative échouée : le fichier est inaccessible (tu es hors ligne ou il a été déplacé). Tes modifications restent ici et partiront dès que possible.
+Ultimo aggiornamento: %1$s ||| Dernière mise à jour : %1$s
+Mai sincronizzato ||| Jamais synchronisé
+Io sono %1$s ||| Je suis %1$s
+Chi sei tu? ||| Qui es-tu ?
+Le tue cose si sincronizzano da sole. Se spunti o modifichi quelle di un altro ti chiedo conferma e glielo faccio sapere. ||| Tes affaires se synchronisent toutes seules. Si tu coches ou modifies celles de quelqu'un d'autre, je te demande confirmation et je le lui fais savoir.
+Ultime attività ||| Activité récente
+Sincronizza ora ||| Synchroniser
+Smetti ||| Arrêter
+File creato! Ora condividilo ||| Fichier créé ! Maintenant, partage-le
+Apri Google Drive, trova «remindella-condiviso.rmd», tocca ⋮ › Condividi e aggiungi l'altra persona come Editor. Se lei non lo vede nel selettore, in Drive può usare «Aggiungi scorciatoia a Il mio Drive». ||| Ouvre Google Drive, trouve « remindella-condiviso.rmd », touche ⋮ › Partager et ajoute l'autre personne comme Éditeur. Si elle ne le voit pas dans le sélecteur, elle peut utiliser dans Drive « Ajouter un raccourci dans Mon Drive ».
+Smettere di condividere? ||| Arrêter le partage ?
+I dati restano su questo telefono e nel file, ma non si aggiorneranno più. Potrai riaprire il file quando vuoi. ||| Les données restent sur ce téléphone et dans le fichier, mais ne seront plus mises à jour. Tu pourras rouvrir le fichier quand tu veux.
+Automatica ||| Automatique
+Si aggiorna da sola: quando apri e chiudi l'app, pochi secondi dopo ogni modifica, ogni due minuti mentre l'app è aperta e ogni mezz'ora in background. ||| Se met à jour toute seule : quand tu ouvres et fermes l'app, quelques secondes après chaque modification, toutes les deux minutes quand l'app est ouverte et toutes les demi-heures en arrière-plan.
+Manuale ||| Manuelle
+Si aggiorna solo quando tocchi «Sincronizza ora»: decidi tu quando mandare e ricevere le modifiche. ||| Se met à jour seulement quand tu touches « Synchroniser » : tu décides quand envoyer et recevoir les modifications.
+Scelta ||| Choisie
+Come vuoi sincronizzare? ||| Comment veux-tu synchroniser ?
+In tutti e due i casi, se avete modificato entrambi (anche senza Internet) unisco le modifiche: niente viene sovrascritto o perso. Puoi cambiare modalità quando vuoi nelle Impostazioni. ||| Dans les deux cas, si vous avez modifié tous les deux (même sans Internet), je fusionne les modifications : rien n'est écrasé ni perdu. Tu peux changer de mode quand tu veux dans les Réglages.
+Scegliti tra le persone. Promemoria e cose collegati solo ad altri saranno «loro»: prima di toccarli ti chiedo conferma. ||| Choisis-toi parmi les personnes. Les rappels et objets liés seulement à d'autres seront « à eux » : avant d'y toucher, je te demande confirmation.
+Non hai ancora aggiunto persone: aggiungi te stesso nella sezione Persone. ||| Tu n'as pas encore ajouté de personnes : ajoute-toi dans la section Personnes.
+Non impostare ||| Ne pas définir
+Grazie di cuore! ||| Merci du fond du cœur !
+Grazie per il supporto ||| Merci pour ton soutien
+Il maghetto si è innamorato di te. Ogni pozione aiuta Remindella a crescere. ||| Le petit magicien est tombé amoureux de toi. Chaque potion aide Remindella à grandir.
+Remindella è gratuita e senza pubblicità. Se ti fa comodo, puoi offrirmi una pozione (o un caffè) con una piccola donazione. ||| Remindella est gratuite et sans publicité. Si elle t'est utile, tu peux m'offrir une potion (ou un café) avec un petit don.
+Dona con PayPal ||| Faire un don avec PayPal
+Apri con un'altra app ||| Ouvrir avec une autre app
+Non riesco ad aprire questo PDF. ||| Je n'arrive pas à ouvrir ce PDF.
+Pagina %1$s ||| Page %1$s
+Il documento è vuoto o non si riesce a leggere. ||| Le document est vide ou illisible.
+Questo tipo di file non si può vedere nell'app. ||| Ce type de fichier ne peut pas être affiché dans l'app.
+Usa il pulsante in alto a destra per aprirlo con un'altra app. ||| Utilise le bouton en haut à droite pour l'ouvrir avec une autre app.
+Moto ||| Moto
+Scooter ||| Scooter
+Altro veicolo ||| Autre véhicule
+Lavastoviglie ||| Lave-vaisselle
+Frigorifero ||| Réfrigérateur
+Forno ||| Four
+Condizionatore ||| Climatiseur
+Altro per la casa ||| Autre pour la maison
+Smartphone ||| Smartphone
+Tablet ||| Tablette
+Computer ||| Ordinateur
+Console ||| Console
+Altra elettronica ||| Autre électronique
+Documento personale ||| Document personnel
+Contratto ||| Contrat
+Altro documento ||| Autre document
+Attrezzatura ||| Équipement
+Oggetto ||| Objet
+Al ||| Au
+Da ||| Du
+Ok ||| OK
+Km ||| Km
+Km: %1$s ||| Km : %1$s
+TV ||| TV
+A ||| À
+Nessuna ||| Aucune
+Ogni 2 settimane ||| Toutes les 2 semaines
+Ogni 6 mesi ||| Tous les 6 mois
+Personalizzata ||| Personnalisée
+Home ||| Accueil
+%1$s h ||| %1$s h
+%1$s h %2$s ||| %1$s h %2$s
+Scrivi al volo ||| Saisie rapide
+Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline). ||| La reconnaissance vocale du téléphone n'a pas cette langue : télécharge-la dans les paramètres du clavier ou de Google (Voix › Reconnaissance vocale hors connexion).
+cena con Luca sabato alle 20 ||| dîner avec Luca samedi à 20h

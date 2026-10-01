@@ -122,6 +122,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var showOdometer by rememberSaveable { mutableStateOf(false) }
     var addingKind by rememberSaveable { mutableStateOf<ExpenseKind?>(null) }
+    var editingRecord by remember { mutableStateOf<com.ricordella.app.domain.model.MaintenanceRecord?>(null) }
 
     LaunchedEffect(state.deleted) { if (state.deleted) navigator.back() }
     LaunchedEffect(state.message) {
@@ -183,6 +184,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 isVehicle = entry.isVehicle,
                 onAdd = { addingKind = it },
                 onDelete = viewModel::onDeleteMaintenance,
+                onEdit = { editingRecord = it },
             )
 
             SectionHeader(tr("Promemoria")) {
@@ -259,6 +261,21 @@ fun ItemDetailScreen(navigator: AppNavigator) {
             current = entry.item.odometerKm,
             onDismiss = { showOdometer = false },
             onConfirm = { viewModel.onUpdateOdometer(it); showOdometer = false },
+        )
+    }
+    editingRecord?.let { record ->
+        val current = entry ?: return@let
+        ExpenseDialog(
+            profile = ExpenseProfiles.of(current.category?.kind, current.group),
+            initialKind = record.kind,
+            isVehicle = current.isVehicle,
+            currentKm = current.item.odometerKm,
+            initial = record,
+            onDismiss = { editingRecord = null },
+            onConfirm = { expenseKind, title, date, km, cost, liters, description, _ ->
+                viewModel.onUpdateMaintenance(record.copy(kind = expenseKind, title = title, date = date, odometerKm = km, costCents = cost, liters = liters, description = description))
+                editingRecord = null
+            },
         )
     }
     addingKind?.let { kind ->

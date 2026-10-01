@@ -9,5 +9,5 @@
     <string name="widget_resolutions_label">Resolutions</string>
     <string name="widget_resolutions_description">This year\'s resolutions: scroll the list and tick the ones you kept</string>
     <string name="widget_agenda_label">Remindella Day</string>
-    <string name="widget_agenda_description">Today\'s and tomorrow\'s plans: mark them done, browse the days</string>
+    <string name="widget_agenda_description">Plans for today, tomorrow and the days after: mark them done, browse the days</string>
 </resources>

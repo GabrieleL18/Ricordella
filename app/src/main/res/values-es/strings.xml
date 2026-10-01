@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_reminders">Recordatorios</string>
+    <string name="notification_channel_reminders_description">Notificaciones de recordatorios y vencimientos</string>
+    <string name="widget_description">Calendario del mes con tus recordatorios y botones para añadir al vuelo</string>
+    <string name="widget_label">Calendario Remindella</string>
+    <string name="widget_water_label">Pociones Remindella</string>
+    <string name="widget_water_description">El agua bebida hoy: añade o quita una poción con un toque</string>
+    <string name="widget_resolutions_label">Buenos propósitos</string>
+    <string name="widget_resolutions_description">Los propósitos del año: desliza la lista y marca los que has cumplido</string>
+    <string name="widget_agenda_label">Día Remindella</string>
+    <string name="widget_agenda_description">Los planes de hoy, mañana y los días siguientes: márcalos, recorre los días</string>
+</resources>

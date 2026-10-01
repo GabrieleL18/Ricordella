@@ -1,16 +1,29 @@
 package com.ricordella.app.data.share
 
 import com.ricordella.app.data.backup.BackupDatabaseContent
+import com.ricordella.app.domain.model.Item
+import com.ricordella.app.domain.model.MaintenanceRecord
+import com.ricordella.app.domain.model.Person
+import com.ricordella.app.domain.model.Reminder
+import com.ricordella.app.domain.model.ReminderCompletion
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import java.time.Instant
 
 /**
  * Unione a tre vie tra i dati di questo telefono ([local]), quelli del file condiviso ([remote])
- * e lo stato dell'ultima sincronizzazione ([base]).
+ * e lo stato dell'ultima sincronizzazione ([base]). Pensata per non perdere mai una modifica,
+ * anche quando entrambi hanno lavorato offline:
  *
- * - Elemento presente da entrambe le parti: vince la modifica più recente.
- * - Elemento che manca da una parte ma c'era all'ultima sincronizzazione: è stato cancellato lì,
- *   quindi si cancella anche qui, a meno che nel frattempo dall'altra parte non sia stato modificato.
- * - Elemento nuovo (non c'era all'ultima sincronizzazione): si tiene.
+ * - Elemento cambiato da una parte sola (rispetto alla base): vince quella modifica.
+ * - Cambiato da entrambe le parti: si uniscono i campi; se lo stesso campo è cambiato da tutte e due,
+ *   vince la modifica più recente.
+ * - Cancellazioni: valgono solo se c'è una segnalazione esplicita ([deleted], id → versione cancellata).
+ *   Un elemento che manca nel file senza segnalazione (file sovrascritto da Drive, copia vecchia) non
+ *   viene cancellato: si tiene e si riscrive. Se dopo la cancellazione qualcuno lo ha modificato, torna.
+ * - Elemento nuovo: si tiene.
  *
  * Si uniscono persone, cose, promemoria (con ricorrenza e collegamenti), storico dei completamenti
  * e spese. Foto e allegati non viaggiano nel file: restano sul telefono che li ha.
@@ -19,11 +32,34 @@ object ShareMerge {
 
     private enum class Side { LOCAL, REMOTE }
 
-    /** Sceglie, per ogni id, quale versione tenere (o nessuna se è stato cancellato). */
+    private val json = Json { encodeDefaults = true }
+
+    /** Unione campo per campo di un elemento modificato da entrambe le parti. */
+    private fun <T> mergeFields(serializer: KSerializer<T>, base: T, local: T, remote: T, remoteNewer: Boolean): T {
+        val b = json.encodeToJsonElement(serializer, base).jsonObject
+        val l = json.encodeToJsonElement(serializer, local).jsonObject
+        val r = json.encodeToJsonElement(serializer, remote).jsonObject
+        val merged = (l.keys + r.keys).associateWith { key ->
+            val lv = l[key]
+            val rv = r[key]
+            when {
+                lv == rv -> lv
+                lv == b[key] -> rv
+                rv == b[key] -> lv
+                remoteNewer -> rv
+                else -> lv
+            }
+        }.filterValues { it != null }.mapValues { it.value!! }
+        return json.decodeFromJsonElement(serializer, JsonObject(merged))
+    }
+
+    /** Sceglie, per ogni id, la versione da tenere e da che parte arriva (o nessuna se è stato cancellato). */
     private fun <T> pick(
         base: List<T>?,
         local: List<T>,
         remote: List<T>,
+        deleted: Map<String, Instant>,
+        serializer: KSerializer<T>,
         id: (T) -> String,
         stamp: (T) -> Instant,
     ): Map<String, Pair<T, Side>> {
@@ -35,27 +71,61 @@ object ShareMerge {
             val lv = l[key]
             val rv = r[key]
             val bv = b[key]
-            val chosen = when {
-                lv != null && rv != null -> if (stamp(rv) > stamp(lv)) rv to Side.REMOTE else lv to Side.LOCAL
-                lv != null -> if (bv == null || stamp(lv) > stamp(bv)) lv to Side.LOCAL else null
-                rv != null -> if (bv == null || stamp(rv) > stamp(bv)) rv to Side.REMOTE else null
-                else -> null
+            val chosen: Pair<T, Side> = when {
+                lv != null && rv != null -> when {
+                    lv == rv -> lv to Side.LOCAL
+                    bv != null && lv == bv -> rv to Side.REMOTE
+                    bv != null && rv == bv -> lv to Side.LOCAL
+                    bv != null -> {
+                        val remoteNewer = stamp(rv) > stamp(lv)
+                        mergeFields(serializer, bv, lv, rv, remoteNewer) to (if (remoteNewer) Side.REMOTE else Side.LOCAL)
+                    }
+                    else -> if (stamp(rv) > stamp(lv)) rv to Side.REMOTE else lv to Side.LOCAL
+                }
+                lv != null -> lv to Side.LOCAL
+                else -> rv!! to Side.REMOTE
             }
-            if (chosen != null) result[key] = chosen
+            // Cancellato da qualcuno: resta cancellato, a meno che non sia stato modificato dopo.
+            val deletedVersion = deleted[key]
+            if (deletedVersion != null && stamp(chosen.first) <= deletedVersion) return@forEach
+            result[key] = chosen
         }
         return result
     }
 
     /**
-     * Restituisce i dati uniti. Foto e allegati di questo telefono vengono mantenuti; quelli che
-     * arrivano dal file sono sempre vuoti (vedi [forFile]).
+     * Cancellazioni fatte su questo telefono dall'ultima sincronizzazione: elementi che erano nella base
+     * e qui non ci sono più. Per ognuno si annota la versione cancellata (il suo istante di modifica).
      */
-    fun merge(base: BackupDatabaseContent?, local: BackupDatabaseContent, remote: BackupDatabaseContent): BackupDatabaseContent {
-        val people = pick(base?.people, local.people, remote.people, { it.id }, { it.updatedAt })
-        val items = pick(base?.items, local.items, remote.items, { it.id }, { it.updatedAt })
-        val reminders = pick(base?.reminders, local.reminders, remote.reminders, { it.id }, { it.updatedAt })
-        val completions = pick(base?.completions, local.completions, remote.completions, { it.id }, { it.completedAt })
-        val maintenance = pick(base?.maintenance, local.maintenance, remote.maintenance, { it.id }, { it.createdAt })
+    fun localDeletions(base: BackupDatabaseContent?, local: BackupDatabaseContent): Map<String, Instant> {
+        if (base == null) return emptyMap()
+        fun <T> gone(baseList: List<T>, localList: List<T>, id: (T) -> String, stamp: (T) -> Instant): Map<String, Instant> {
+            val ids = localList.mapTo(HashSet(), id)
+            return baseList.filter { id(it) !in ids }.associate { id(it) to stamp(it) }
+        }
+        return gone(base.people, local.people, { it.id }, { it.updatedAt }) +
+            gone(base.items, local.items, { it.id }, { it.updatedAt }) +
+            gone(base.reminders, local.reminders, { it.id }, { it.updatedAt }) +
+            gone(base.completions, local.completions, { it.id }, { it.completedAt }) +
+            gone(base.maintenance, local.maintenance, { it.id }, { it.createdAt })
+    }
+
+    /**
+     * Restituisce i dati uniti. Foto e allegati di questo telefono vengono mantenuti; quelli che
+     * arrivano dal file sono sempre vuoti (vedi [forFile]). [deleted] sono tutte le cancellazioni
+     * note: quelle scritte nel file più quelle di questo telefono ([localDeletions]).
+     */
+    fun merge(
+        base: BackupDatabaseContent?,
+        local: BackupDatabaseContent,
+        remote: BackupDatabaseContent,
+        deleted: Map<String, Instant> = emptyMap(),
+    ): BackupDatabaseContent {
+        val people = pick(base?.people, local.people, remote.people, deleted, Person.serializer(), { it.id }, { it.updatedAt })
+        val items = pick(base?.items, local.items, remote.items, deleted, Item.serializer(), { it.id }, { it.updatedAt })
+        val reminders = pick(base?.reminders, local.reminders, remote.reminders, deleted, Reminder.serializer(), { it.id }, { it.updatedAt })
+        val completions = pick(base?.completions, local.completions, remote.completions, deleted, ReminderCompletion.serializer(), { it.id }, { it.completedAt })
+        val maintenance = pick(base?.maintenance, local.maintenance, remote.maintenance, deleted, MaintenanceRecord.serializer(), { it.id }, { it.createdAt })
 
         val localPeople = local.people.associateBy { it.id }
         val localItems = local.items.associateBy { it.id }

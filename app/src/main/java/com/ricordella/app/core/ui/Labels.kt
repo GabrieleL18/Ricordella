@@ -182,7 +182,6 @@ val OdometerStatus.label: String
         OdometerStatus.OVERDUE -> tr("Superata")
     }
 
-private val dayMonth get() = DateTimeFormatter.ofPattern(if (com.ricordella.app.core.i18n.Lang.english) "MMMM d" else "d MMMM", com.ricordella.app.core.i18n.Lang.locale)
 
 /** Es. "Ogni 6 mesi", "Ogni 2 settimane (lun, gio)", "Ogni anno il 18 novembre". */
 fun RecurrenceRule.describe(): String {
@@ -191,7 +190,7 @@ fun RecurrenceRule.describe(): String {
         RecurrenceFrequency.DAILY -> if (n == 1) tr("Ogni giorno") else trf("Ogni %1\$s giorni", n)
         RecurrenceFrequency.WEEKLY -> if (n == 1) tr("Ogni settimana") else trf("Ogni %1\$s settimane", n)
         RecurrenceFrequency.MONTHLY -> if (n == 1) tr("Ogni mese") else trf("Ogni %1\$s mesi", n)
-        RecurrenceFrequency.YEARLY -> (if (n == 1) tr("Ogni anno") else trf("Ogni %1\$s anni", n)) + tr(" il ") + dayMonth.format(startDate)
+        RecurrenceFrequency.YEARLY -> (if (n == 1) tr("Ogni anno") else trf("Ogni %1\$s anni", n)) + tr(" il ") + com.ricordella.app.core.date.DateTexts.dayMonth(startDate)
     }
     val days = if (frequency == RecurrenceFrequency.WEEKLY && daysOfWeek.isNotEmpty()) {
         daysOfWeek.sortedBy { it.value }.joinToString(prefix = " (", postfix = ")") {

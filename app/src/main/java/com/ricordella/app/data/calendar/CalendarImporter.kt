@@ -205,15 +205,22 @@ class CalendarImporter(
         const val GOOGLE_ACCOUNT_TYPE = "com.google"
         const val CATEGORY = "Google Calendar"
 
+        // Italiano e inglese, più le parole più comuni di tedesco, francese e spagnolo.
         private val typeKeywords = listOf(
-            ReminderType.BIRTHDAY to listOf("compleanno", "birthday", "buon compleanno"),
-            ReminderType.VACATION to listOf("vacanza", "vacanze", "ferie", "viaggio", "vacation", "holiday trip"),
-            ReminderType.MEDICAL_VISIT to listOf("visita", "medico", "dott.", "dottor", "dentista", "analisi", "oculista", "esami del sangue"),
-            ReminderType.PAYMENT to listOf("pagamento", "pagare", "bolletta", "rata", "bonifico", "f24"),
-            ReminderType.RENEWAL to listOf("rinnovo", "rinnovare", "abbonamento"),
-            ReminderType.MAINTENANCE to listOf("tagliando", "revisione", "manutenzione", "cambio gomme"),
-            ReminderType.WARRANTY to listOf("garanzia"),
-            ReminderType.DEADLINE to listOf("scadenza", "scade"),
+            ReminderType.BIRTHDAY to listOf("compleanno", "birthday", "buon compleanno", "geburtstag", "anniversaire", "cumpleaños", "cumpleanos"),
+            ReminderType.VACATION to listOf("vacanza", "vacanze", "ferie", "viaggio", "vacation", "holiday trip", "urlaub", "vacances", "voyage", "vacaciones", "viaje"),
+            ReminderType.MEDICAL_VISIT to listOf(
+                "visita", "medico", "dott.", "dottor", "dentista", "analisi", "oculista", "esami del sangue",
+                "doctor", "dentist", "arzt", "médecin", "medecin", "dentiste", "médico", "cita médica",
+            ),
+            ReminderType.PAYMENT to listOf(
+                "pagamento", "pagare", "bolletta", "rata", "bonifico", "f24",
+                "pay ", "bill", "bezahlen", "rechnung", "miete", "payer", "facture", "loyer", "pagar", "factura", "alquiler",
+            ),
+            ReminderType.RENEWAL to listOf("rinnovo", "rinnovare", "abbonamento", "renew", "subscription", "verlängern", "renouveler", "abonnement", "renovar", "suscripción"),
+            ReminderType.MAINTENANCE to listOf("tagliando", "revisione", "manutenzione", "cambio gomme", "service", "inspektion", "wartung", "entretien", "mantenimiento"),
+            ReminderType.WARRANTY to listOf("garanzia", "warranty", "garantie", "garantía"),
+            ReminderType.DEADLINE to listOf("scadenza", "scade", "deadline", "frist", "échéance", "vencimiento"),
         )
 
         /** Tipo dedotto da titolo e descrizione (es. "compleanno" nella descrizione → compleanno). */

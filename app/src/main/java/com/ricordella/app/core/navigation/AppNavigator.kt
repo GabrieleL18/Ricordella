@@ -28,6 +28,8 @@ class AppNavigator(private val navController: NavController) {
     fun openPotions() = navController.navigate(PotionsRoute) { launchSingleTop = true }
     fun openResolutions(year: Int, recap: Boolean = false) = navController.navigate(ResolutionsRoute(year, recap)) { launchSingleTop = true }
     fun openReminders() = openTopLevel(RemindersRoute)
+    fun openHome() = openTopLevel(HomeRoute)
+    fun openExpenses() = navController.navigate(ExpensesRoute) { launchSingleTop = true }
 
     fun openReminder(id: String) = navController.navigate(ReminderDetailRoute(id))
 

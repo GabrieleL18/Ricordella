@@ -106,8 +106,26 @@ class DeveloperTools(
                 cleanupMode = if (it.cleanupMode == AutoMode.OFF) AutoMode.ASK else it.cleanupMode,
             )
         }
-        return housekeeping.holidaysToRoll() to housekeeping.countCleanupCandidates()
+        var counts = housekeeping.holidaysToRoll() to housekeeping.countCleanupCandidates()
+        // Deve sempre esserci qualcosa da vedere: senza feste o promemoria vecchi se ne aggiungono di esempio.
+        if (counts.first == 0 && counts.second == 0) {
+            val now = time.now()
+            val today = time.today()
+            listOf(
+                Reminder(title = tr("Natale"), type = ReminderType.HOLIDAY, dueDate = LocalDate.of(today.year - 1, 12, 25), notificationsEnabled = false, createdAt = now, updatedAt = now),
+                Reminder(title = tr("Pasqua"), type = ReminderType.HOLIDAY, dueDate = Holidays.easter(today.year - 1), notificationsEnabled = false, createdAt = now, updatedAt = now),
+                Reminder(title = tr("Cena dell'anno scorso"), type = ReminderType.EVENT, dueDate = today.minusYears(1).minusMonths(2), createdAt = now, updatedAt = now),
+            ).forEach { saveReminder(ReminderDraft(it, null, emptySet(), emptySet())) }
+            counts = housekeeping.holidaysToRoll() to housekeeping.countCleanupCandidates()
+        }
+        return counts
     }
+
+    /** Le novità ricompaiono come dopo un aggiornamento. */
+    suspend fun showNewsAgain() = settings.update { it.copy(newsSeenVersion = 0) }
+
+    /** I tutorial che compaiono da soli ricompaiono (e si riaccendono se erano nascosti). */
+    suspend fun resetTutorials() = settings.update { it.copy(tutorialsEnabled = true, quickEntryTutorialSeen = false, backupTutorialSeen = false) }
 
     /**
      * Giorno finto usato dalla Home per gli inviti dei buoni propositi: permette di provarli

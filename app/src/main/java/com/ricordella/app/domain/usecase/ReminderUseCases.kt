@@ -22,10 +22,17 @@ class SaveReminderUseCase(
     private val planner: ReminderAlarmPlanner,
     private val time: TimeSource,
 ) {
-    suspend operator fun invoke(draft: ReminderDraft) {
+    /** Conferma per le cose degli altri (file condiviso); null = nessun controllo. */
+    var guard: OwnershipGuard? = null
+
+    /** [guarded] = false quando il salvataggio fa parte di un'azione già confermata (es. la garanzia di una cosa). */
+    suspend operator fun invoke(draft: ReminderDraft, guarded: Boolean = true) {
+        val guard = guard.takeIf { guarded }
         val now = time.now()
         val input = draft.reminder
-        val existing = reminders.getReminder(input.id)?.reminder
+        val existingEntry = reminders.getReminder(input.id)
+        val existing = existingEntry?.reminder
+        if (existingEntry != null && guard?.allow(existingEntry.people, existingEntry.reminder.title, GuardedAction.EDIT) == false) return
         val dateChanged = existing == null || existing.dueDate != input.dueDate || existing.dueTime != input.dueTime
         val base = input.copy(
             title = input.title.trim(),
@@ -47,6 +54,7 @@ class SaveReminderUseCase(
         val recurrence = draft.recurrence?.copy(startDate = reminder.dueDate)
         reminders.save(draft.copy(reminder = reminder, recurrence = recurrence))
         scheduler.refresh()
+        if (existingEntry != null) guard?.done(existingEntry.people, reminder.title, GuardedAction.EDIT)
     }
 }
 
@@ -60,10 +68,13 @@ class CompleteReminderUseCase(
     private val recurrence: RecurrenceCalculator,
     private val time: TimeSource,
 ) {
+    var guard: OwnershipGuard? = null
+
     suspend operator fun invoke(reminderId: String) {
         val entry = reminders.getReminder(reminderId) ?: return
         val reminder = entry.reminder
         if (reminder.status != ReminderStatus.ACTIVE || !reminder.type.isCompletable) return
+        if (guard?.allow(entry.people, reminder.title, GuardedAction.COMPLETE) == false) return
         val now = time.now()
         val today = time.today()
         val completion = ReminderCompletion(reminderId = reminder.id, occurrenceDate = reminder.dueDate, completedAt = now)
@@ -95,6 +106,7 @@ class CompleteReminderUseCase(
         reminders.recordCompletion(updated, completion, movedRule)
         scheduler.dismissNotification(reminder.id)
         scheduler.refresh()
+        guard?.done(entry.people, reminder.title, GuardedAction.COMPLETE)
     }
 }
 
@@ -108,10 +120,13 @@ class UndoCompletionUseCase(
     private val scheduler: ReminderScheduler,
     private val time: TimeSource,
 ) {
+    var guard: OwnershipGuard? = null
+
     suspend operator fun invoke(reminderId: String, occurrence: LocalDate) {
         val entry = reminders.getReminder(reminderId) ?: return
         val latest = reminders.observeCompletions(reminderId).first().maxByOrNull { it.completedAt } ?: return
         if (latest.occurrenceDate != occurrence) return
+        if (guard?.allow(entry.people, entry.reminder.title, GuardedAction.REOPEN) == false) return
         val now = time.now()
         // ponytail: i km della prossima manutenzione restano quelli avanzati; lo storico non salva i precedenti.
         val updated = entry.reminder.copy(
@@ -125,6 +140,7 @@ class UndoCompletionUseCase(
         val rule = entry.recurrenceRule?.takeIf { it.fromLastDone }?.copy(startDate = occurrence)
         reminders.undoCompletion(updated, latest.id, rule)
         scheduler.refresh()
+        guard?.done(entry.people, entry.reminder.title, GuardedAction.REOPEN)
     }
 }
 
@@ -134,13 +150,18 @@ class ReopenReminderUseCase(
     private val scheduler: ReminderScheduler,
     private val time: TimeSource,
 ) {
+    var guard: OwnershipGuard? = null
+
     suspend operator fun invoke(reminderId: String) {
-        val reminder = reminders.getReminder(reminderId)?.reminder ?: return
+        val entry = reminders.getReminder(reminderId) ?: return
+        val reminder = entry.reminder
         if (reminder.status == ReminderStatus.ACTIVE) return
+        if (guard?.allow(entry.people, reminder.title, GuardedAction.REOPEN) == false) return
         reminders.update(
             reminder.copy(status = ReminderStatus.ACTIVE, completedAt = null, lastNotifiedAt = time.now(), updatedAt = time.now()),
         )
         scheduler.refresh()
+        guard?.done(entry.people, reminder.title, GuardedAction.REOPEN)
     }
 }
 

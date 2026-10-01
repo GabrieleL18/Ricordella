@@ -47,9 +47,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // Solo italiano e inglese: le traduzioni delle librerie nelle altre lingue sarebbero peso inutile.
+    // Solo le lingue dell'app: le traduzioni delle librerie nelle altre lingue sarebbero peso inutile.
     androidResources {
-        localeFilters += listOf("it", "en")
+        localeFilters += listOf("it", "en", "de", "fr", "es")
     }
 
     buildFeatures {

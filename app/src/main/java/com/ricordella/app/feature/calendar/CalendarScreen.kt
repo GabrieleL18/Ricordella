@@ -1,5 +1,16 @@
 package com.ricordella.app.feature.calendar
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxWithConstraints
+import com.ricordella.app.core.ui.PushButton
+import androidx.compose.material.icons.rounded.Add
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -107,6 +118,31 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
 
     // Il "+" crea promemoria ed eventi nel giorno selezionato, non oggi.
     TopLevelScaffold(title = tr("Calendario"), navigator = navigator, onAdd = { onAddOn(state.selectedDate) }) { padding ->
+        if (state.mode == CalendarMode.MONTH) {
+            var dayOpen by rememberSaveable { mutableStateOf(false) }
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = padding.calculateTopPadding())
+                    .contentWidth()
+                    .padding(horizontal = RicordellaDimensions.screenPadding)
+                    .padding(bottom = RicordellaDimensions.spaceS),
+                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+            ) {
+                ModeSelector(state.mode, viewModel::onModeChange)
+                MonthView(
+                    state,
+                    viewModel,
+                    today,
+                    onDayClick = { day -> viewModel.onSelectDate(day); dayOpen = true },
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            if (dayOpen) {
+                DaySheet(state, navigator, viewModel, today, onAdd = { onAddOn(state.selectedDate) }, onDismiss = { dayOpen = false })
+            }
+            return@TopLevelScaffold
+        }
         // In Mese e Giorno si cambia giornata trascinando in qualunque punto dello schermo
         // (sulla griglia del mese, invece, si cambia mese: vince il gesto più interno).
         val swipesDays = state.mode != CalendarMode.AGENDA
@@ -126,23 +162,9 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
             ),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            item(key = "mode") {
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    CalendarMode.entries.forEachIndexed { index, mode ->
-                        SegmentedButton(
-                            selected = state.mode == mode,
-                            onClick = { viewModel.onModeChange(mode) },
-                            shape = SegmentedButtonDefaults.itemShape(index, CalendarMode.entries.size),
-                        ) { Text(mode.label) }
-                    }
-                }
-            }
+            item(key = "mode") { ModeSelector(state.mode, viewModel::onModeChange) }
             when (state.mode) {
-                CalendarMode.MONTH -> {
-                    item(key = "month") { MonthView(state, viewModel, today) }
-                    item(key = "day-header") { SectionHeader(DateTexts.dayHeader(state.selectedDate, today)) }
-                    dayItems(state.selectedOccurrences, state, navigator, viewModel, state.selectedDate)
-                }
+                CalendarMode.MONTH -> Unit
                 CalendarMode.DAY -> {
                     item(key = "day-nav") {
                         PeriodHeader(
@@ -190,6 +212,82 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ModeSelector(current: CalendarMode, onChange: (CalendarMode) -> Unit) {
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        CalendarMode.entries.forEachIndexed { index, mode ->
+            SegmentedButton(
+                selected = current == mode,
+                onClick = { onChange(mode) },
+                shape = SegmentedButtonDefaults.itemShape(index, CalendarMode.entries.size),
+            ) { Text(mode.label) }
+        }
+    }
+}
+
+/** Gli impegni del giorno toccato, in un foglio che sale dal basso; si sfoglia ai giorni vicini trascinando. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DaySheet(
+    state: CalendarUiState,
+    navigator: AppNavigator,
+    viewModel: CalendarViewModel,
+    today: LocalDate,
+    onAdd: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.background,
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .horizontalSwipe(onPrevious = { viewModel.onShiftDay(-1) }, onNext = { viewModel.onShiftDay(1) })
+                .padding(horizontal = RicordellaDimensions.screenPadding)
+                .navigationBarsPadding()
+                .padding(bottom = RicordellaDimensions.spaceL),
+            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+        ) {
+            PeriodHeader(
+                title = DateTexts.dayHeader(state.selectedDate, today),
+                onPrevious = { viewModel.onShiftDay(-1) },
+                onNext = { viewModel.onShiftDay(1) },
+                onToday = { viewModel.onToday(today) },
+            )
+            AnimatedContent(
+                targetState = state.selectedDate to state.selectedOccurrences,
+                contentKey = { it.first },
+                transitionSpec = { slideTowards(targetState.first > initialState.first) },
+                label = "sheetDay",
+            ) { (date, occurrences) ->
+                Column(
+                    Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                ) {
+                    if (occurrences.isEmpty()) {
+                        EmptyState(
+                            icon = Icons.Rounded.EventAvailable,
+                            title = tr("Nessun promemoria"),
+                            message = tr("Non c'è nulla da ricordare in questa giornata."),
+                        )
+                    }
+                    occurrences.forEach { occurrence ->
+                        OccurrenceCard(occurrence, state, navigator, viewModel, swipeToComplete = false)
+                    }
+                }
+            }
+            PushButton(
+                tr("Aggiungi"),
+                icon = Icons.Rounded.Add,
+                onClick = { onDismiss(); onAdd() },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
@@ -287,7 +385,13 @@ private fun slideTowards(forward: Boolean): ContentTransform =
             fadeOut(tween(RicordellaMotion.MICRO)))
 
 @Composable
-private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, today: LocalDate) {
+private fun MonthView(
+    state: CalendarUiState,
+    viewModel: CalendarViewModel,
+    today: LocalDate,
+    onDayClick: (LocalDate) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     var pickingMonth by remember { mutableStateOf(false) }
     if (pickingMonth) {
         AlertDialog(
@@ -301,7 +405,7 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
             },
         )
     }
-    Column {
+    Column(modifier) {
         PeriodHeader(
             title = DateTexts.monthTitle(state.month),
             onPrevious = { viewModel.onShiftMonth(-1) },
@@ -315,7 +419,7 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
                     DateTexts.weekdayShort(day.dayOfWeek),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -324,14 +428,19 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
         AnimatedContent(
             targetState = state.month,
             transitionSpec = { slideTowards(targetState > initialState) },
-            modifier = Modifier.horizontalSwipe(onPrevious = { viewModel.onShiftMonth(-1) }, onNext = { viewModel.onShiftMonth(1) }),
+            modifier = Modifier
+                .weight(1f)
+                .horizontalSwipe(onPrevious = { viewModel.onShiftMonth(-1) }, onNext = { viewModel.onShiftMonth(1) }),
             label = "month",
         ) { month ->
             val lanes = remember(state.occurrences) { spanLanes(state.occurrences) }
-            val laneCount = (lanes.values.maxOrNull()?.plus(1) ?: 0).coerceAtMost(MAX_LANES)
-            Column {
-                monthGrid(month, state.firstDayOfWeek).chunked(7).forEach { week ->
-                    Row(Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxSize()) {
+                // Solo le settimane che toccano il mese: niente righe intere del mese dopo.
+                monthGrid(month, state.firstDayOfWeek).chunked(7).filter { week -> week.any { it.month == month.month } }.forEach { week ->
+                    // Spazio per le barre solo nelle settimane che ne hanno.
+                    val laneCount = week.flatMap { state.occurrences[it].orEmpty() }.filter { it.isMultiDay }
+                        .mapNotNull { lanes[spanKey(it)] }.maxOrNull()?.plus(1)?.coerceAtMost(MAX_LANES) ?: 0
+                    Row(Modifier.fillMaxWidth().weight(1f)) {
                         week.forEachIndexed { index, day ->
                             DayCell(
                                 date = day,
@@ -342,16 +451,16 @@ private fun MonthView(state: CalendarUiState, viewModel: CalendarViewModel, toda
                                 inMonth = day.month == month.month,
                                 isToday = day == today,
                                 isSelected = day == state.selectedDate,
-                                onClick = { viewModel.onSelectDate(day) },
+                                onClick = { onDayClick(day) },
                                 // I giorni a sinistra stanno sopra: il titolo di una barra può scorrere sui giorni seguenti.
-                                modifier = Modifier.weight(1f).zIndex((7 - index).toFloat()),
+                                modifier = Modifier.weight(1f).fillMaxHeight().zIndex((7 - index).toFloat()),
                             )
                         }
                     }
                 }
             }
         }
-        Legend()
+
     }
 }
 
@@ -389,45 +498,70 @@ private fun DayCell(
         if (occurrences.isNotEmpty()) append(trf(", %1\$s promemoria", occurrences.size))
         if (hasDeadline) append(tr(", con scadenze"))
     }
-    Column(modifier) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(2.dp)
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(RoundedCornerShape(16.dp))
+        modifier
+            .padding(1.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(background)
-            .then(if (isToday && !isSelected) Modifier.border(2.dp, colors.primary, RoundedCornerShape(16.dp)) else Modifier)
+            .then(if (isToday && !isSelected) Modifier.border(2.dp, colors.primary, RoundedCornerShape(12.dp)) else Modifier)
             .semantics {
                 contentDescription = description
                 selected = isSelected
             }
-            .clickable(role = Role.Button, onClick = onClick),
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             date.dayOfMonth.toString(),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = if (isToday || isSelected) FontWeight.ExtraBold else FontWeight.Medium,
             color = when {
                 isSelected -> extra.onBolt
                 inMonth -> colors.onSurface
                 else -> colors.outline
             },
+            modifier = Modifier.graphicsLayer { scaleX = scale; scaleY = scale },
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp), modifier = Modifier.height(8.dp).padding(top = 2.dp)) {
-            if (hasTask) Marker(MarkerShape.DOT)
-            if (hasEvent) Marker(MarkerShape.RING)
-            if (hasDeadline) Marker(MarkerShape.SQUARE)
+        SpanBars(date, occurrences.filter { it.isMultiDay }, lanes, laneCount, firstDayOfWeek)
+        // Gli impegni del giorno col loro colore: quanti ne entrano, poi "+N".
+        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 2.dp)) {
+            // Se c'è posto i titoli vanno su due righe, così si leggono interi.
+            val twoLines = 30.dp * single.size <= maxHeight
+            val fit = ((maxHeight - 2.dp) / 17.dp).toInt().coerceAtLeast(0)
+            val shown = if (single.size > fit) (fit - 1).coerceAtLeast(0) else single.size
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                single.take(shown).forEach { occurrence -> DayChip(occurrence, dimmed = !inMonth, lines = if (twoLines) 2 else 1) }
+                if (single.size > shown && fit > 0) {
+                    Text(
+                        "+${single.size - shown}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isSelected) extra.onBolt else colors.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
     }
-    SpanBars(date, occurrences.filter { it.isMultiDay }, lanes, laneCount, firstDayOfWeek)
-    }
+}
+
+/** Un impegno dentro il giorno: pastiglia col colore del tipo e il titolo (abbreviato se serve). */
+@Composable
+private fun DayChip(occurrence: ReminderOccurrence, dimmed: Boolean, lines: Int) {
+    val tone = occurrence.reminder.type.tone
+    Text(
+        occurrence.reminder.title,
+        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 13.sp, hyphens = androidx.compose.ui.text.style.Hyphens.Auto, lineBreak = androidx.compose.ui.text.style.LineBreak.Paragraph),
+        color = tone.content,
+        maxLines = lines,
+        overflow = TextOverflow.Clip,
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer { alpha = if (dimmed) 0.5f else 1f }
+            .background(tone.container, RoundedCornerShape(4.dp))
+            .padding(horizontal = 3.dp, vertical = 1.dp),
+    )
 }
 
 private const val MAX_LANES = 3
@@ -462,11 +596,11 @@ private fun SpanBars(
     val byLane = spans.associateBy { lanes[spanKey(it)] ?: MAX_LANES }
     val rowStart = date.dayOfWeek == firstDayOfWeek
     val rowEnd = date.dayOfWeek == firstDayOfWeek.minus(1)
-    Column(Modifier.fillMaxWidth().padding(bottom = 2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         repeat(laneCount) { lane ->
             val span = byLane[lane]
             if (span == null) {
-                Box(Modifier.height(12.dp))
+                Box(Modifier.height(15.dp))
             } else {
                 val first = date == span.start
                 val last = date == span.end
@@ -481,7 +615,7 @@ private fun SpanBars(
                     Modifier
                         .fillMaxWidth()
                         .padding(start = if (first) 3.dp else 0.dp, end = if (last) 3.dp else 0.dp)
-                        .height(12.dp)
+                        .height(15.dp)
                         .background(tone.solid, shape),
                     contentAlignment = Alignment.CenterStart,
                 ) {
@@ -491,7 +625,7 @@ private fun SpanBars(
                         val days = minOf(leftInRow.toLong(), ChronoUnit.DAYS.between(date, span.end)).toInt() + 1
                         Text(
                             span.reminder.title,
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp, lineHeight = 9.sp),
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp),
                             color = MaterialTheme.colorScheme.surfaceContainerLowest,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

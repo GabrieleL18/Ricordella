@@ -2,6 +2,8 @@ package com.ricordella.app.core.ui
 
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Event
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Euro
@@ -85,6 +87,8 @@ import kotlin.math.sin
 class TutorialPage(
     val title: String,
     val body: String,
+    /** Contenuto in più sotto il testo (es. gli esempi da provare nell'ultima pagina). */
+    val extra: (@Composable () -> Unit)? = null,
     val illustration: @Composable () -> Unit,
 )
 
@@ -134,6 +138,10 @@ fun TutorialPager(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
                         )
+                        page.extra?.let {
+                            Spacer(Modifier.height(RicordellaDimensions.spaceM))
+                            it()
+                        }
                     }
                 }
                 if (landscape) {
@@ -544,7 +552,7 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
     ) { AddIllustration() },
     TutorialPage(
         tr("Il widget"),
-        tr("Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi e domani, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi."),
+        tr("Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi, domani e i giorni dopo se c'è spazio, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi."),
     ) { WidgetIllustration() },
 )
 
@@ -938,6 +946,102 @@ val SharingTutorialPages: List<TutorialPage>
         ) { SharingIllustration(1) },
         TutorialPage(
             tr("Sempre allineati"),
-            tr("Quando apri o chiudi Remindella i dati si uniscono: vince la modifica più recente e le cancellazioni valgono per entrambi. Foto e allegati restano sul telefono di chi li ha aggiunti."),
+            tr("In automatico si aggiorna da solo, in manuale quando tocchi «Sincronizza ora». Se avete modificato entrambi, anche offline, unisco le modifiche senza perderne nessuna. Foto e allegati restano sul telefono di chi li ha aggiunti."),
         ) { SharingIllustration(2) },
     )
+
+/* ---------- Illustrazioni di "Scrivi al volo" ---------- */
+
+/** La barra si riempie lettera per lettera, poi sotto compare l'anteprima di cosa ho capito. */
+@Composable
+fun QuickTypeIllustration() {
+    val t = loopTime(4600)
+    val c = MaterialTheme.ricordellaColors
+    val phrase = tr("dentista domani alle 9")
+    val typed = phrase.take((phrase.length * t.phase(0.05f, 0.5f)).toInt())
+    val preview = t.phase(0.55f, 0.68f) * (1f - t.phase(0.94f, 1f))
+    Column(Modifier.size(260.dp, 220.dp), verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .border(2.dp, c.cyan.solid, CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest, CircleShape)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Rounded.AutoAwesome, null, tint = c.cyan.solid, modifier = Modifier.size(18.dp))
+            Text(typed + if (t < 0.55f) "|" else "", style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .graphicsLayer { alpha = preview; translationY = (1f - preview) * 24.dp.toPx() }
+                .background(c.lavender.container, RoundedCornerShape(16.dp))
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            RoundIcon(Icons.Rounded.Event, c.lavender, size = 34.dp)
+            Column(Modifier.weight(1f)) {
+                Text(tr("Dentista"), style = MaterialTheme.typography.titleSmall, color = c.lavender.content)
+                Text(tr("Domani · 09:00"), style = MaterialTheme.typography.labelMedium, color = c.lavender.content)
+            }
+            Box(Modifier.background(c.bolt, CircleShape).padding(horizontal = 10.dp, vertical = 5.dp)) {
+                Icon(Icons.Rounded.Add, null, tint = Color.Black, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
+}
+
+/** Le parole che capisco arrivano una dopo l'altra, ognuna col suo colore e la sua icona. */
+@Composable
+fun QuickWordsIllustration(words: List<Triple<ImageVector, String, Tone>>) {
+    val t = loopTime(3600)
+    Column(
+        Modifier.size(260.dp, 220.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        words.forEachIndexed { i, (icon, text, tone) ->
+            val show = t.phase(0.05f + i * 0.12f, 0.2f + i * 0.12f) * (1f - t.phase(0.92f, 1f))
+            Row(
+                Modifier
+                    .graphicsLayer { alpha = show; translationX = (1f - show) * (if (i % 2 == 0) -40 else 40).dp.toPx() }
+                    .background(tone.container, CircleShape)
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                RoundIcon(icon, tone, size = 26.dp)
+                Text(text, style = MaterialTheme.typography.titleSmall, color = tone.content)
+            }
+        }
+    }
+}
+
+/** Il microfono: la sfera ascolta (anelli che si allargano) e la frase compare sotto. */
+@Composable
+fun QuickVoiceIllustration() {
+    val t = loopTime(3200)
+    val c = MaterialTheme.ricordellaColors
+    val phrase = tr("palestra ogni lunedì")
+    val words = phrase.split(' ')
+    val shown = words.take((words.size * t.phase(0.3f, 0.8f) + 0.5f).toInt()).joinToString(" ")
+    Column(Modifier.size(260.dp, 220.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Box(Modifier.size(150.dp), contentAlignment = Alignment.Center) {
+            repeat(3) { i ->
+                val r = (t * 2 + i / 3f) % 1f
+                Box(
+                    Modifier
+                        .size(70.dp + 80.dp * r)
+                        .border(2.dp, c.cyan.solid.copy(alpha = 1f - r), CircleShape),
+                )
+            }
+            CrystalBallMascot(size = 70.dp, interactive = false)
+            Box(Modifier.align(Alignment.BottomEnd).padding(8.dp)) { RoundIcon(Icons.Rounded.Mic, c.cyan, size = 32.dp) }
+        }
+        Text(shown.ifEmpty { " " }, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+    }
+}
+

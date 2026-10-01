@@ -103,6 +103,7 @@ internal fun ExpensesSection(
     isVehicle: Boolean,
     onAdd: (ExpenseKind) -> Unit,
     onDelete: (MaintenanceRecord) -> Unit,
+    onEdit: (MaintenanceRecord) -> Unit = {},
 ) {
     val colors = MaterialTheme.ricordellaColors
     SectionHeader(profile.sectionTitle, icon = Icons.Rounded.ReceiptLong, tone = colors.mint)
@@ -134,7 +135,7 @@ internal fun ExpensesSection(
     val shown = if (showAll) sorted else sorted.take(RECENT)
     Column(Modifier.animateContentSize().padding(top = RicordellaDimensions.spaceS)) {
         shown.forEachIndexed { index, record ->
-            RecordRow(profile, record, isLast = index == shown.lastIndex, onDelete = { onDelete(record) })
+            RecordRow(profile, record, isLast = index == shown.lastIndex, onDelete = { onDelete(record) }, onEdit = { onEdit(record) })
         }
     }
     if (sorted.size > RECENT) {
@@ -232,9 +233,10 @@ private fun StatTile(label: String, value: String, icon: ImageVector, tone: Tone
 }
 
 @Composable
-private fun RecordRow(profile: ExpenseProfile, record: MaintenanceRecord, isLast: Boolean, onDelete: () -> Unit) {
+private fun RecordRow(profile: ExpenseProfile, record: MaintenanceRecord, isLast: Boolean, onDelete: () -> Unit, onEdit: () -> Unit) {
     var confirm by remember { mutableStateOf(false) }
     HistoryItem(
+        modifier = Modifier.clickable(onClickLabel = tr("Modifica"), onClick = onEdit),
         date = record.date,
         title = record.title,
         tone = record.kind.tone(),
@@ -275,14 +277,16 @@ internal fun ExpenseDialog(
     currentKm: Int?,
     onDismiss: () -> Unit,
     onConfirm: (ExpenseKind, String, LocalDate, Int?, Long?, Double?, String?, NextMaintenance?) -> Unit,
+    /** Voce da modificare (null = nuova voce). */
+    initial: MaintenanceRecord? = null,
 ) {
-    var kind by rememberSaveable { mutableStateOf(initialKind) }
-    var title by rememberSaveable { mutableStateOf(if (initialKind == ExpenseKind.FUEL) tr("Rifornimento") else "") }
-    var date by remember { mutableStateOf(LocalDate.now()) }
-    var km by rememberSaveable { mutableStateOf(currentKm?.toString().orEmpty()) }
-    var liters by rememberSaveable { mutableStateOf("") }
-    var cost by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
+    var kind by rememberSaveable { mutableStateOf(initial?.kind ?: initialKind) }
+    var title by rememberSaveable { mutableStateOf(initial?.title ?: if (initialKind == ExpenseKind.FUEL) tr("Rifornimento") else "") }
+    var date by remember { mutableStateOf(initial?.date ?: LocalDate.now()) }
+    var km by rememberSaveable { mutableStateOf((initial?.odometerKm ?: currentKm.takeIf { initial == null })?.toString().orEmpty()) }
+    var liters by rememberSaveable { mutableStateOf(initial?.liters?.let { "%.2f".format(Lang.locale, it).trimEnd('0').trimEnd(',', '.') }.orEmpty()) }
+    var cost by rememberSaveable { mutableStateOf(initial?.costCents?.let { "%.2f".format(Lang.locale, it / 100.0) }.orEmpty()) }
+    var description by rememberSaveable { mutableStateOf(initial?.description.orEmpty()) }
     var scheduleNext by rememberSaveable { mutableStateOf(false) }
     var nextMonths by rememberSaveable { mutableStateOf(profile.nextMonths.toString()) }
     var nextKm by rememberSaveable { mutableStateOf(profile.nextKm?.toString().orEmpty()) }
@@ -305,7 +309,7 @@ internal fun ExpenseDialog(
                         Icon(kind.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
                     }
                     Column {
-                        Text(tr("Nuova voce"), style = MaterialTheme.typography.titleLarge, color = tone.content)
+                        Text(if (initial == null) tr("Nuova voce") else tr("Modifica voce"), style = MaterialTheme.typography.titleLarge, color = tone.content)
                         Text(profile.label(kind), style = MaterialTheme.typography.bodyMedium, color = tone.content)
                     }
                 }
@@ -375,7 +379,7 @@ internal fun ExpenseDialog(
                         label = { Text(tr("Note")) },
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    if (kind == ExpenseKind.SERVICE) {
+                    if (kind == ExpenseKind.SERVICE && initial == null) {
                         Row(
                             Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLow, MaterialTheme.shapes.medium).padding(horizontal = 12.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,

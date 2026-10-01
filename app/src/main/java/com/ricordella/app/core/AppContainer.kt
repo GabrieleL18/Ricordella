@@ -1,5 +1,6 @@
 package com.ricordella.app.core
 
+import kotlinx.coroutines.flow.map
 import com.ricordella.app.domain.usecase.UndoCompletionUseCase
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
@@ -90,7 +91,26 @@ class AppContainer(context: Context) {
     val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository)
     val restoreBackup = RestoreBackupUseCase(backupRepository, reminderScheduler)
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
-    val sharedSpace = com.ricordella.app.data.share.SharedSpace(appContext, database.backupDao(), settingsRepository, reminderScheduler, applicationScope, enabled = !isDemo)
+    val sharedSpace = com.ricordella.app.data.share.SharedSpace(
+        appContext,
+        database.backupDao(),
+        settingsRepository,
+        reminderScheduler,
+        applicationScope,
+        databaseChanges = database.invalidationTracker
+            .createFlow("person", "item", "reminder", "recurrence_rule", "reminder_completion", "maintenance_record", "reminder_person", "reminder_item", "person_item", emitInitialState = false)
+            .map { },
+        enabled = !isDemo,
+    )
+
+    /** Conferma e annotazione quando si toccano le cose degli altri nel file condiviso. */
+    val sharedOwnership = com.ricordella.app.data.share.SharedOwnership(settingsRepository, sharedSpace).also { guard ->
+        saveReminder.guard = guard
+        completeReminder.guard = guard
+        reopenReminder.guard = guard
+        undoCompletion.guard = guard
+        saveItem.guard = guard
+    }
     val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
     val developerTools = DeveloperTools(
         appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time, databaseFileName,

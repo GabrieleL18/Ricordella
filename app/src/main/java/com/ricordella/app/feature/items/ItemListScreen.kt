@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.items
 
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.foundation.background
@@ -93,7 +94,7 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca per nome, marca, modello, targa"))
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "expenses") {
-                ExpensesBanner(expenses)
+                ExpensesBanner(expenses, onClick = navigator::openExpenses)
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "groups") {
                 IconChipRow {
@@ -207,13 +208,15 @@ private fun Fact(icon: ImageVector, text: String) {
 
 /** Totale delle spese dell'anno di tutte le cose (manutenzioni, rifornimenti, altre spese). */
 @Composable
-private fun ExpensesBanner(stats: ExpenseStats?) {
+private fun ExpensesBanner(stats: ExpenseStats?, onClick: () -> Unit) {
     if (stats == null) return
     val tone = MaterialTheme.ricordellaColors.mint
     Row(
         Modifier
             .fillMaxWidth()
-            .background(tone.container, MaterialTheme.shapes.large)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
             .padding(RicordellaDimensions.spaceL),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
@@ -232,5 +235,6 @@ private fun ExpensesBanner(stats: ExpenseStats?) {
                 color = tone.content,
             )
         }
+        Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Riepilogo delle spese"), tint = tone.content)
     }
 }

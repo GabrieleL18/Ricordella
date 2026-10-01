@@ -14,6 +14,15 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Solo per importare, su richiesta, gli eventi di Google Calendar già presenti sul telefono. -->
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!-- Solo per "Scrivi al volo" a voce, dopo il consenso: l'audio va al riconoscimento vocale del telefono. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Per trovare il servizio di riconoscimento vocale del telefono (visibilità dei pacchetti, Android 11+). -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
     <application
         android:name=".RicordellaApplication"
@@ -85,6 +94,10 @@
 
         <receiver
             android:name=".core.notifications.AutoBackupReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".data.share.SharedSyncReceiver"
             android:exported="false" />
 
         <receiver

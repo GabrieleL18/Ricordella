@@ -37,11 +37,42 @@ class ShareMergeTest {
     @Test
     fun deletionsPropagateUnlessEditedAfterwards() {
         val base = BackupDatabaseContent(reminders = listOf(reminder("a", "A", t0), reminder("b", "B", t0)))
-        // Io ho cancellato "a"; l'altra persona ha cancellato "b" ma io l'avevo modificato dopo.
+        // Io ho cancellato "a"; l'altra persona ha cancellato "b" (e lo ha scritto nel file) ma io l'avevo modificato dopo.
         val mine = BackupDatabaseContent(reminders = listOf(reminder("b", "B modificato", at(3))))
         val theirs = BackupDatabaseContent(reminders = listOf(reminder("a", "A", t0)))
-        val merged = ShareMerge.merge(base, mine, theirs)
+        val deleted = ShareMerge.localDeletions(base, mine) + mapOf("b" to t0)
+        val merged = ShareMerge.merge(base, mine, theirs, deleted)
         assertEquals(listOf("b"), merged.reminders.map { it.id })
+    }
+
+    @Test
+    fun missingFromFileWithoutDeletionIsKept() {
+        // Il file è stato sovrascritto da una copia vecchia (Drive offline): "a" manca ma nessuno l'ha cancellato.
+        val base = BackupDatabaseContent(reminders = listOf(reminder("a", "A", t0)))
+        val mine = BackupDatabaseContent(reminders = listOf(reminder("a", "A", t0)))
+        val merged = ShareMerge.merge(base, mine, BackupDatabaseContent(), ShareMerge.localDeletions(base, mine))
+        assertEquals(listOf("a"), merged.reminders.map { it.id })
+    }
+
+    @Test
+    fun bothEditedDifferentFieldsKeepsBoth() {
+        val start = reminder("a", "Dentista", t0)
+        val base = BackupDatabaseContent(reminders = listOf(start))
+        // Offline: io cambio il titolo, l'altra persona la data. Nessuna delle due modifiche va persa.
+        val mine = BackupDatabaseContent(reminders = listOf(start.copy(title = "Dentista Sofia", updatedAt = at(5))))
+        val theirs = BackupDatabaseContent(reminders = listOf(start.copy(dueDate = LocalDate.of(2026, 10, 9), updatedAt = at(8))))
+        val merged = ShareMerge.merge(base, mine, theirs).reminders.single()
+        assertEquals("Dentista Sofia", merged.title)
+        assertEquals(LocalDate.of(2026, 10, 9), merged.dueDate)
+    }
+
+    @Test
+    fun editedOnlyThereWinsEvenIfOlderClock() {
+        // Solo l'altra parte ha cambiato la voce rispetto all'ultima sincronizzazione: vince, qualunque sia l'orologio.
+        val base = BackupDatabaseContent(reminders = listOf(reminder("a", "A", at(10))))
+        val mine = BackupDatabaseContent(reminders = listOf(reminder("a", "A", at(10))))
+        val theirs = BackupDatabaseContent(reminders = listOf(reminder("a", "A cambiato", at(9))))
+        assertEquals("A cambiato", ShareMerge.merge(base, mine, theirs).reminders.single().title)
     }
 
     @Test

@@ -36,6 +36,8 @@ class SaveItemUseCase(
     private val saveReminder: SaveReminderUseCase,
     private val time: TimeSource,
 ) {
+    var guard: OwnershipGuard? = null
+
     suspend operator fun invoke(
         item: Item,
         people: Map<String, PersonItemRole>,
@@ -43,11 +45,14 @@ class SaveItemUseCase(
     ) {
         val now = time.now()
         val existing = items.getItem(item.id)?.item
+        val owners = if (existing != null) items.getOwners(item.id).map { it.person } else emptyList()
+        if (existing != null && guard?.allow(owners, existing.name, GuardedAction.EDIT) == false) return
         val saved = item.copy(name = item.name.trim(), createdAt = existing?.createdAt ?: now, updatedAt = now)
         items.save(saved, people)
         syncWarrantyReminder(saved, people.keys)
         val offset = settings.current().defaultNotifyOffsetMinutes
         suggestions.forEach { createSuggestedReminder(saved, people.keys, it, offset) }
+        if (existing != null) guard?.done(owners, saved.name, GuardedAction.EDIT)
     }
 
     private suspend fun syncWarrantyReminder(item: Item, personIds: Set<String>) {
@@ -72,7 +77,7 @@ class SaveItemUseCase(
             // Se la data di scadenza cambia, la garanzia torna attiva.
             status = if (base.dueDate != endDate) ReminderStatus.ACTIVE else base.status,
         )
-        saveReminder(ReminderDraft(reminder, recurrence = null, personIds = personIds, itemIds = setOf(item.id)))
+        saveReminder(ReminderDraft(reminder, recurrence = null, personIds = personIds, itemIds = setOf(item.id)), guarded = false)
     }
 
     private suspend fun createSuggestedReminder(

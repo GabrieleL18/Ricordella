@@ -1,5 +1,14 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.rounded.PhotoCamera
+import androidx.compose.material.icons.rounded.FolderOpen
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -146,6 +155,8 @@ fun AttachmentsSection(
     onOpen: (Attachment) -> Unit,
 ) {
     val pickFile = rememberFilePicker(onAdd)
+    val takePhoto = rememberCameraCapture(onAdd)
+    var choosing by rememberSaveable { mutableStateOf(false) }
     SectionHeader(
         if (attachments.isEmpty()) title else "$title · ${attachments.size}",
         icon = Icons.Rounded.AttachFile,
@@ -165,7 +176,72 @@ fun AttachmentsSection(
                 onRemove = { onRemove(attachment) },
             )
         }
-        AddFileTile(onClick = pickFile)
+        AddFileTile(onClick = { choosing = true })
+    }
+    if (choosing) {
+        AttachChoiceDialog(
+            onCamera = { choosing = false; takePhoto() },
+            onFile = { choosing = false; pickFile() },
+            onDismiss = { choosing = false },
+        )
+    }
+}
+
+/**
+ * Scatta una foto con la fotocamera del telefono (nessun permesso: la scatta l'app Fotocamera)
+ * e la allega come copia compressa in WebP, come le foto scelte dalla galleria.
+ */
+@Composable
+fun rememberCameraCapture(onPicked: (PickedFile) -> Unit): () -> Unit {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val target = remember { java.io.File(java.io.File(context.cacheDir, "camera").apply { mkdirs() }, "attachment.jpg") }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        if (!taken) return@rememberLauncherForActivityResult
+        scope.launch {
+            val stored = withContext(Dispatchers.IO) {
+                MediaStorage.storeCompressedImage(context, androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", target))
+            }
+            target.delete()
+            if (stored != null) {
+                val name = trf("Foto del %1\$s", com.ricordella.app.core.date.DateTexts.dateWithTime(java.time.LocalDate.now(), java.time.LocalTime.now().withSecond(0).withNano(0), com.ricordella.app.domain.model.DateFormatStyle.NUMERIC))
+                onPicked(PickedFile(stored, name, "image/webp"))
+            }
+        }
+    }
+    return {
+        try {
+            launcher.launch(androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", target))
+        } catch (_: ActivityNotFoundException) {
+            android.widget.Toast.makeText(context, tr("Nessuna app fotocamera disponibile"), android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+}
+
+/** Come allegare: foto scattata adesso o file già sul telefono. Stessa grafica della scelta "Scansiona". */
+@Composable
+private fun AttachChoiceDialog(onCamera: () -> Unit, onFile: () -> Unit, onDismiss: () -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        androidx.compose.material3.Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 460.dp)) {
+            Column(
+                Modifier.verticalScroll(rememberScrollState()).padding(com.ricordella.app.core.ui.theme.RicordellaDimensions.spaceXl),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(com.ricordella.app.core.ui.theme.RicordellaDimensions.spaceM),
+            ) {
+                HappyWizard(size = 88.dp, scene = WizardScene.READING)
+                Text(tr("Allega un documento"), style = MaterialTheme.typography.headlineSmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text(
+                    tr("Scatta una foto adesso o scegli un file che hai già sul telefono."),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+                ChoiceTile(Icons.Rounded.PhotoCamera, tr("Scatta una foto"), tr("Con la fotocamera, adesso"), colors.cyan, onCamera)
+                ChoiceTile(Icons.Rounded.FolderOpen, tr("Scegli un file"), tr("Foto, PDF o documenti già sul telefono"), colors.lavender, onFile)
+                TextButton(onClick = onDismiss) { Text(tr("Annulla")) }
+            }
+        }
     }
 }
 

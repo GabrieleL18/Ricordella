@@ -230,12 +230,17 @@ sealed interface AgendaRow {
     ) : AgendaRow
 }
 
+/** Altezza indicativa (dp) di un'intestazione di giorno e di una riga del widget Giornata. */
+private const val AGENDA_DAY_DP = 26
+private const val AGENDA_ROW_DP = 44
+
 /**
  * Impegni di [start] e del giorno dopo, fatti compresi: per i ricorrenti già avanzati
  * le occorrenze fatte si ricavano dallo storico dei completamenti.
+ * Se in [heightDp] (lo spazio della lista) ci stanno, si aggiungono altri giorni, fino a una settimana.
  */
-suspend fun agendaRows(repository: ReminderRepository, calculator: RecurrenceCalculator, start: LocalDate): List<AgendaRow> {
-    val end = start.plusDays(1)
+suspend fun agendaRows(repository: ReminderRepository, calculator: RecurrenceCalculator, start: LocalDate, heightDp: Int = 0): List<AgendaRow> {
+    val end = start.plusDays(6)
     val entries = repository.observeForRange(start, end).first().filter { it.reminder.status != ReminderStatus.CANCELLED }
     val completions = repository.getCompletionsBetween(start, end)
     val doneKeys = completions.mapTo(HashSet()) { it.reminderId to it.occurrenceDate }
@@ -256,13 +261,22 @@ suspend fun agendaRows(repository: ReminderRepository, calculator: RecurrenceCal
         items[key] = AgendaRow.Item(reminder, completion.occurrenceDate, done = true, toggleable = true)
     }
     val order = compareBy<AgendaRow.Item>({ it.reminder.dueTime ?: LocalTime.MIN }, { it.reminder.title.lowercase() })
-    return listOf(start, end).flatMap { day ->
+    val rows = mutableListOf<AgendaRow>()
+    var used = 0
+    for (n in 0L..6L) {
+        val day = start.plusDays(n)
         val ofDay = items.filterKeys { it.second == day }.values.sortedWith(order)
-        listOf(AgendaRow.Day(day)) + ofDay.ifEmpty { listOf(AgendaRow.Empty(day)) }
+        val block = listOf(AgendaRow.Day(day)) + ofDay.ifEmpty { listOf(AgendaRow.Empty(day)) }
+        val cost = AGENDA_DAY_DP + (block.size - 1) * AGENDA_ROW_DP
+        // Oggi e domani ci sono sempre (la lista scorre); gli altri giorni solo se entrano interi.
+        if (n >= 2 && used + cost > heightDp) break
+        rows += block
+        used += cost
     }
+    return rows
 }
 
-/** Impegni del giorno e del successivo: le frecce cambiano giorno, il titolo torna a oggi, il cerchio spunta. */
+/** Impegni del giorno e dei successivi (quanti ne entrano): le frecce cambiano giorno, il titolo torna a oggi, il cerchio spunta. */
 class AgendaWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -291,6 +305,10 @@ class AgendaWidgetProvider : AppWidgetProvider() {
             else -> super.onReceive(context, intent)
         }
     }
+
+    // Ridimensionato: con più spazio entrano più giorni.
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, widgetId: Int, newOptions: android.os.Bundle) =
+        onUpdate(context, manager, intArrayOf(widgetId))
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         val offset = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_OFFSET, 0)
@@ -335,7 +353,9 @@ class AgendaWidgetProvider : AppWidgetProvider() {
 /** Fornisce le righe delle liste scorrevoli (propositi e giornata). */
 class WidgetListService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        if (intent.getStringExtra(EXTRA_KIND) == KIND_AGENDA) AgendaFactory(applicationContext) else ResolutionsFactory(applicationContext)
+        if (intent.getStringExtra(EXTRA_KIND) == KIND_AGENDA) {
+            AgendaFactory(applicationContext, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID))
+        } else ResolutionsFactory(applicationContext)
 
     companion object {
         const val EXTRA_KIND = "com.ricordella.app.widget.LIST_KIND"
@@ -380,7 +400,7 @@ private class ResolutionsFactory(context: Context) : SimpleFactory(context) {
     }
 }
 
-private class AgendaFactory(context: Context) : SimpleFactory(context) {
+private class AgendaFactory(context: Context, private val widgetId: Int) : SimpleFactory(context) {
     private var rows = emptyList<AgendaRow>()
     private var today: LocalDate = LocalDate.now()
 
@@ -388,7 +408,9 @@ private class AgendaFactory(context: Context) : SimpleFactory(context) {
         val container = context.container
         today = container.time.today()
         val offset = context.getSharedPreferences(AgendaWidgetProvider.PREFS, Context.MODE_PRIVATE).getInt(AgendaWidgetProvider.KEY_OFFSET, 0)
-        rows = runBlocking { agendaRows(container.reminderRepository, container.recurrenceCalculator, today.plusDays(offset.toLong())) }
+        // Altezza in verticale (MAX_HEIGHT) meno intestazione e margini del widget.
+        val height = AppWidgetManager.getInstance(context).getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) - 62
+        rows = runBlocking { agendaRows(container.reminderRepository, container.recurrenceCalculator, today.plusDays(offset.toLong()), height) }
     }
 
     override fun getCount() = rows.size

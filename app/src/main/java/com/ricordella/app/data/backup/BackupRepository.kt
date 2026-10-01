@@ -60,13 +60,43 @@ class BackupRepository(
         FileProvider.getUriForFile(context, fileProviderAuthority(), file)
     }
 
-    /** Scrive il backup nel documento scelto dall'utente, sovrascrivendone il contenuto. */
+    private val reserveDir get() = File(context.filesDir, RESERVE_DIR).apply { mkdirs() }
+
+    /** Copia di riserva dell'ultimo backup, sul telefono: serve se il file principale si rovina. */
+    val reserveFile: File get() = File(reserveDir, "remindella-backup-riserva.zip")
+
+    /** Quando è stata fatta la copia di riserva (millisecondi), null se non c'è. */
+    fun reserveSavedAt(): Long? = reserveFile.takeIf { it.exists() }?.lastModified()
+
+    /**
+     * Scrive il backup nel documento scelto dall'utente, sovrascrivendone il contenuto.
+     * Prima lo prepara sul telefono e controlla che si rilegga bene; poi lo copia nel file scelto
+     * e ricontrolla anche quello. Il backup preparato diventa la nuova copia di riserva.
+     */
     suspend fun exportTo(destination: Uri) = withContext(Dispatchers.IO) {
+        val fresh = File(reserveDir, "in-preparazione.zip")
+        fresh.outputStream().buffered().use { writeBackup(it) }
+        if (!isReadable { fresh.inputStream() }) {
+            fresh.delete()
+            throw IOException(tr("Backup non valido"))
+        }
         val output = runCatching { resolver.openOutputStream(destination, "wt") }.getOrNull()
             ?: resolver.openOutputStream(destination, "w")
             ?: throw IOException(tr("Destinazione non disponibile"))
-        output.buffered().use { writeBackup(it) }
+        output.buffered().use { out -> fresh.inputStream().use { it.copyTo(out) } }
+        // La copia di riserva si aggiorna solo con un backup sano: quella vecchia resta finché la nuova non è pronta.
+        fresh.copyTo(reserveFile, overwrite = true)
+        fresh.delete()
+        if (!isReadable { resolver.openInputStream(destination) ?: throw IOException() }) throw IOException(tr("Il file di backup scritto non si rilegge"))
     }
+
+    /** Il backup si rilegge per intero (manifest, dati e impronta)? */
+    private fun isReadable(open: () -> java.io.InputStream): Boolean = runCatching {
+        open().use { input -> codec.read(input) { _, content -> val buffer = ByteArray(8192); while (content.read(buffer) >= 0) Unit } } is BackupReadResult.Valid
+    }.getOrDefault(false)
+
+    /** Legge la copia di riserva per ripristinarla (stesso controllo e conferma di un backup scelto). */
+    suspend fun readReserve(): Pair<BackupReadResult, PendingRestore?> = read(Uri.fromFile(reserveFile))
 
     /**
      * File per il backup automatico quando l'utente non ne ha scelto uno: Download/Remindella
@@ -186,6 +216,7 @@ class BackupRepository(
     private companion object {
         const val RESTORED_DIR = "restored"
         const val EXPORT_DIR = "exports"
+        const val RESERVE_DIR = "backup-reserve"
         const val MAX_IMAGE_SIDE = 1280
         const val IMAGE_QUALITY = 70
     }

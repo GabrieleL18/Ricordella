@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.settings
 
+import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.rounded.NewReleases
 import androidx.compose.material.icons.rounded.Gavel
 import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.date.DateTexts
@@ -104,7 +106,7 @@ fun VersionRow(developerMode: Boolean, onUnlock: () -> Unit) {
 
 /** Comandi per sviluppatori: notifiche di prova, dati di esempio, simulazioni e informazioni tecniche. */
 @Composable
-fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSettings) -> Unit, justUnlocked: Boolean = false) {
+fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSettings) -> Unit, justUnlocked: Boolean = false, onGoHome: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var refresh by remember { mutableIntStateOf(0) }
@@ -117,6 +119,15 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
             action()
             refresh++
             toast(context, message)
+        }
+    }
+    /** Prove che si vedono in Home: dopo averle preparate ci si torna da soli. */
+    fun runAtHome(message: String, action: suspend () -> Unit) {
+        scope.launch {
+            runCatching { action() }
+            refresh++
+            toast(context, message)
+            onGoHome()
         }
     }
 
@@ -157,15 +168,12 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         Icons.Rounded.Celebration,
         tr("Simula l'inizio di un anno nuovo"),
         tr("Fa comparire in Home le proposte di spostare le feste e di fare la pulizia annuale, con la loro animazione."),
-        confirm = tr("Faccio come se fosse il primo avvio dell'anno: tornando alla Home ti verranno proposte le operazioni di inizio anno."),
+        confirm = tr("Faccio come se fosse il primo avvio dell'anno e ti porto in Home, dove ti vengono proposte le operazioni di inizio anno. Se non ci sono feste né promemoria vecchi ne aggiungo di esempio."),
     ) {
         scope.launch {
             val (holidays, cleanup) = tools.simulateNewYear()
-            toast(
-                context,
-                if (holidays == 0 && cleanup == 0) tr("Niente da proporre: non ci sono feste né promemoria degli anni passati. Crea prima i dati di esempio.")
-                else trf("Torna alla Home: %1\$s feste da spostare, %2\$s promemoria da pulire", holidays, cleanup),
-            )
+            toast(context, trf("%1\$s feste da spostare, %2\$s promemoria da pulire", holidays, cleanup))
+            onGoHome()
         }
     }
     DevRow(
@@ -173,19 +181,29 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         tr("Simula gennaio: buoni propositi"),
         tr("La Home fa come se fosse il 2 gennaio: prima il recap dell'anno che finisce, poi l'invito a scrivere i propositi nuovi."),
         confirm = tr("Fino alla chiusura dell'app la Home crede che sia il 2 gennaio dell'anno prossimo. I propositi di prova dell'anno prossimo vengono azzerati."),
-    ) { run(tr("Guarda la Home")) { tools.simulateResolutionsNewYear() } }
+    ) { runAtHome(tr("Ecco la Home al 2 gennaio")) { tools.simulateResolutionsNewYear() } }
     DevRow(
         Icons.Rounded.EmojiEvents,
         tr("Simula dicembre: recap dei propositi"),
         tr("La Home fa come se fosse il 28 dicembre e propone il recap di quest'anno (con propositi di esempio se non ne hai)."),
         confirm = tr("Fino alla chiusura dell'app la Home crede che sia il 28 dicembre. Se quest'anno non hai propositi ne aggiungo tre di esempio."),
-    ) { run(tr("Guarda la Home")) { tools.simulateResolutionsRecap() } }
+    ) { runAtHome(tr("Ecco la Home al 28 dicembre")) { tools.simulateResolutionsRecap() } }
     DevRow(
         Icons.Rounded.CloudUpload,
         tr("Mostra l'invito al backup"),
         tr("Fa comparire subito in Home la richiesta di aggiornare il backup."),
         confirm = tr("Faccio come se fosse scaduto l'intervallo del backup."),
-    ) { run(tr("Guarda la Home")) { tools.forceBackupReminder() } }
+    ) { runAtHome(tr("Ecco l'invito al backup")) { tools.forceBackupReminder() } }
+    DevRow(
+        Icons.Rounded.NewReleases,
+        tr("Mostra le novità"),
+        tr("Fa ricomparire la finestra delle novità, come al primo avvio dopo un aggiornamento."),
+    ) { runAtHome(tr("Ecco le novità")) { tools.showNewsAgain() } }
+    DevRow(
+        Icons.Rounded.School,
+        tr("Rivedi i tutorial automatici"),
+        tr("I tutorial che compaiono da soli la prima volta (es. Scrivi al volo) ricompaiono: in Home tocca la barra."),
+    ) { runAtHome(tr("Tocca la barra di Scrivi al volo")) { tools.resetTutorials() } }
     val terms = LocalAppSettings.current
     DevRow(
         Icons.Rounded.Gavel,

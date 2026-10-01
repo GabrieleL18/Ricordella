@@ -1,13 +1,16 @@
 """Impagina le schermate per il Play Store: titolo in alto, telefono con la schermata, cielo magico.
 
-Metti le schermate del telefono in store/screenshots/ con i nomi elencati in SCREENS (anche .jpg) e lancia:
+Metti le schermate del telefono in store/screenshots/<lingua>/ (it, en, de, fr, es) con i nomi elencati
+in LAYOUT (anche .jpg) e lancia:
 
-    python store/make_screens.py
+    python store/make_screens.py          # tutte le lingue
+    python store/make_screens.py de       # solo tedesco
 
-Le immagini finite (1080x1920, formato accettato da Google Play) finiscono in store/output/.
+Le immagini finite (1080x1920, formato accettato da Google Play) finiscono in store/output/<lingua>/.
 Serve Microsoft Edge o Google Chrome installato: disegna l'HTML e ne salva la schermata.
 """
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -20,19 +23,73 @@ BROWSERS = [
     Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
 ]
 
-# Titolo, sottotitolo, colori (cielo alto, cielo basso, accento) e schermate di ogni immagine.
-# Le schermate sono i nomi dei file in store/screenshots/ (senza estensione): due nomi = due telefoni affiancati.
+# Colori (cielo alto, cielo basso, accento) e schermate di ogni immagine: i nomi dei file in
+# store/screenshots/<lingua>/ (senza estensione); due nomi = due telefoni affiancati.
 # Si ottengono dalla modalità demo (Impostazioni > Sviluppatore > Modalità demo per gli screenshot).
-SCREENS = [
-    ("La tua giornata,<br>sotto controllo", "Il saluto giusto, l'ora e tutto quello che c'è da fare oggi", "#3B1F73", "#2E7FBF", "#F2D43D", ["home"]),
-    ("Tutto il mese<br>a portata di dito", "Sfoglia giorni e mesi con uno swipe, viaggi e feste compresi", "#1F4E8C", "#5FC3C9", "#F2D43D", ["calendar"]),
-    ("Ogni promemoria<br>al suo posto", "Oggi, in arrivo o scaduti: li trovi in un tocco", "#2A1450", "#7A3FB8", "#FF9E7A", ["reminders"]),
-    ("Il viaggio,<br>tutto in un posto", "Voli, hotel e prenotazioni. E un tocco per arrivarci", "#0F5F73", "#3FA9E0", "#F2D43D", ["trip"]),
-    ("Auto, casa<br>e documenti", "Bollo, tagliando e garanzie: ti avviso io", "#6B2E1F", "#E0873A", "#F2D43D", ["items", "car"]),
-    ("La tua cerchia<br>magica", "Ogni persona ha il suo maghetto e i suoi promemoria", "#0F5F73", "#58C9A8", "#F2D43D", ["people", "person"]),
-    ("Bevi, e il mago<br>si riempie", "L'acqua di oggi in pozioni. Se esageri, gli si gonfia la pancia", "#0B3D6B", "#3FA9E0", "#F2D43D", ["potions", "potions-full"]),
-    ("Sveglie<br>incantate", "Di giorno o di notte, il maghetto ti sveglia col sorriso", "#1A1446", "#E0873A", "#F2D43D", ["alarm-day", "alarm-night"]),
+LAYOUT = [
+    ("#3B1F73", "#2E7FBF", "#F2D43D", ["home"]),
+    ("#1A1446", "#7A3FB8", "#F2D43D", ["quick", "voice"]),
+    ("#1F4E8C", "#5FC3C9", "#F2D43D", ["calendar-day"]),
+    ("#0F5F73", "#3FA9E0", "#F2D43D", ["trip"]),
+    ("#6B2E1F", "#E0873A", "#F2D43D", ["items", "car"]),
+    ("#0E4D3A", "#3FB88A", "#F2D43D", ["expenses"]),
+    ("#2A1450", "#2E7FBF", "#FF9E7A", ["sharing", "backup"]),
+    ("#0F5F73", "#58C9A8", "#F2D43D", ["people", "person"]),
 ]
+
+# Titolo (con <br>: la seconda riga prende il colore d'accento) e sottotitolo, per lingua.
+TEXTS = {
+    "it": [
+        ("La tua giornata,<br>sotto controllo", "Il saluto giusto, l'ora e tutto quello che c'è da fare oggi"),
+        ("Scrivilo o<br>dillo a voce", "«Cena con Luca sabato alle 20» e ci penso io: giorno, ora e ripetizioni"),
+        ("Tutto il mese<br>a portata di dito", "Tocca un giorno e vedi i suoi impegni, viaggi e feste compresi"),
+        ("Il viaggio,<br>tutto in un posto", "Voli, hotel e prenotazioni. E un tocco per arrivarci"),
+        ("Auto, casa<br>e documenti", "Bollo, tagliando e garanzie: ti avviso io"),
+        ("Le spese,<br>finalmente chiare", "Mese per mese, per tipo e per cosa, con il confronto con l'anno prima"),
+        ("I tuoi dati,<br>dove vuoi tu", "Scegli dove salvare il backup, condividilo e sincronizzati con chi vuoi"),
+        ("La tua cerchia<br>magica", "Ogni persona ha il suo maghetto e i suoi promemoria"),
+    ],
+    "en": [
+        ("Your day,<br>under control", "The right greeting, the time and everything you need to do today"),
+        ("Type it or<br>just say it", "\"Dinner with Luca Saturday at 8pm\" and I take care of it: day, time and repeats"),
+        ("The whole month<br>at your fingertips", "Tap a day to see its plans, trips and holidays included"),
+        ("Your trip,<br>all in one place", "Flights, hotels and bookings. And one tap to get there"),
+        ("Car, home<br>and documents", "Road tax, services and warranties: I'll remind you"),
+        ("Expenses,<br>finally clear", "Month by month, by type and by item, compared with last year"),
+        ("Your data,<br>where you want it", "Choose where to save your backup, share it and sync with whoever you like"),
+        ("Your magical<br>circle", "Everyone gets their own little wizard and reminders"),
+    ],
+    "de": [
+        ("Dein Tag,<br>im Griff", "Der passende Gruß, die Uhrzeit und alles, was heute ansteht"),
+        ("Tippen oder<br>einfach sagen", "„Essen mit Luca Samstag um 20“ und ich kümmere mich: Tag, Uhrzeit, Wiederholung"),
+        ("Der ganze Monat<br>im Blick", "Tippe auf einen Tag und sieh seine Termine, Reisen und Feiertage"),
+        ("Die Reise,<br>alles an einem Ort", "Flüge, Hotels und Buchungen. Und ein Tippen bis zum Ziel"),
+        ("Auto, Zuhause<br>und Dokumente", "Kfz-Steuer, Inspektion und Garantien: Ich erinnere dich"),
+        ("Ausgaben,<br>endlich klar", "Monat für Monat, nach Typ und Ding, mit Vorjahresvergleich"),
+        ("Deine Daten,<br>wo du willst", "Wähle, wo das Backup liegt, teile es und synchronisiere mit wem du willst"),
+        ("Dein magischer<br>Kreis", "Jede Person hat ihren kleinen Zauberer und ihre Erinnerungen"),
+    ],
+    "fr": [
+        ("Ta journée,<br>sous contrôle", "Le bon salut, l'heure et tout ce qu'il y a à faire aujourd'hui"),
+        ("Écris-le ou<br>dis-le", "« Dîner avec Luca samedi à 20h » et je m'en occupe : jour, heure et répétitions"),
+        ("Tout le mois<br>sous les doigts", "Touche un jour et vois ses rendez-vous, voyages et fêtes compris"),
+        ("Le voyage,<br>tout au même endroit", "Vols, hôtels et réservations. Et un geste pour y aller"),
+        ("Voiture, maison<br>et documents", "Taxe, révision et garanties : je te préviens"),
+        ("Les dépenses,<br>enfin claires", "Mois par mois, par type et par objet, comparées à l'an dernier"),
+        ("Tes données,<br>où tu veux", "Choisis où enregistrer la sauvegarde, partage-la et synchronise-toi avec qui tu veux"),
+        ("Ton cercle<br>magique", "Chaque personne a son petit magicien et ses rappels"),
+    ],
+    "es": [
+        ("Tu día,<br>bajo control", "El saludo justo, la hora y todo lo que hay que hacer hoy"),
+        ("Escríbelo o<br>dilo en voz alta", "«Cena con Luca el sábado a las 20» y yo me encargo: día, hora y repeticiones"),
+        ("Todo el mes<br>a mano", "Toca un día y ve sus planes, viajes y festivos incluidos"),
+        ("El viaje,<br>todo en un sitio", "Vuelos, hoteles y reservas. Y un toque para llegar"),
+        ("Coche, casa<br>y documentos", "Impuesto, revisión y garantías: yo te aviso"),
+        ("Los gastos,<br>por fin claros", "Mes a mes, por tipo y por cosa, comparados con el año anterior"),
+        ("Tus datos,<br>donde quieras", "Elige dónde guardar la copia, compártela y sincronízate con quien quieras"),
+        ("Tu círculo<br>mágico", "Cada persona tiene su pequeño mago y sus recordatorios"),
+    ],
+}
 
 # Parte alta delle schermate da tagliare (la barra di stato di Android), in proporzione alla larghezza.
 STATUS_BAR = 0.135
@@ -279,9 +336,12 @@ PROPS = {
 }
 
 
+LANG = "it"
+
+
 def screenshot(name):
     for ext in ("png", "jpg", "jpeg", "webp"):
-        path = ROOT / "screenshots" / f"{name}.{ext}"
+        path = ROOT / "screenshots" / LANG / f"{name}.{ext}"
         if path.exists():
             return f'<img src="{path.as_uri()}">'
     return f'<div class="missing">{name}</div>'
@@ -300,7 +360,7 @@ def render(html, target, width, height):
     browser = next((b for b in BROWSERS if b.exists()), None)
     if browser is None:
         raise SystemExit("Serve Microsoft Edge o Google Chrome per creare le immagini.")
-    target.parent.mkdir(exist_ok=True)
+    target.parent.mkdir(parents=True, exist_ok=True)
     page = target.with_name(f"_{target.stem}.html")
     page.write_text(html, encoding="utf-8")
     target.unlink(missing_ok=True)
@@ -325,15 +385,17 @@ def render(html, target, width, height):
 
 
 def main():
-    for n, (title, subtitle, top, bottom, accent, names) in enumerate(SCREENS, start=1):
-        # La prima riga del titolo resta bianca, la seconda prende il colore d'accento.
-        first, _, second = title.partition("<br>")
-        html = PAGE.format(
-            fonts=FONTS.as_uri(), title_css=TITLE_CSS, brand=brand_title(46), crop=f"{STATUS_BAR * 100:.1f}", top=top, bottom=bottom, accent=accent, stars=stars(n),
-            props="\n".join(PROPS.get(n, [])),
-            title=f"{first}<br><span>{second}</span>", subtitle=subtitle, phones=phones(names),
-        )
-        render(html, OUT / f"remindella-{n}.png", 1080, 1920)
+    global LANG
+    for LANG in (sys.argv[1:] or list(TEXTS)):
+        for n, ((top, bottom, accent, names), (title, subtitle)) in enumerate(zip(LAYOUT, TEXTS[LANG]), start=1):
+            # La prima riga del titolo resta bianca, la seconda prende il colore d'accento.
+            first, _, second = title.partition("<br>")
+            html = PAGE.format(
+                fonts=FONTS.as_uri(), title_css=TITLE_CSS, brand=brand_title(46), crop=f"{STATUS_BAR * 100:.1f}", top=top, bottom=bottom, accent=accent, stars=stars(n),
+                props="\n".join(PROPS.get(n, [])),
+                title=f"{first}<br><span>{second}</span>", subtitle=subtitle, phones=phones(names),
+            )
+            render(html, OUT / LANG / f"remindella-{n}.png", 1080, 1920)
 
 
 if __name__ == "__main__":

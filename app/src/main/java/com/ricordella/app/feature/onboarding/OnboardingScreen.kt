@@ -132,7 +132,7 @@ class CalendarImportViewModel(
     fun finishOnboarding() {
         viewModelScope.launch {
             housekeeping.startBackupClockIfNeeded()
-            settings.update { it.copy(onboardingDone = true) }
+            settings.update { it.copy(onboardingDone = true, newsSeenVersion = com.ricordella.app.BuildConfig.VERSION_CODE) }
         }
     }
 }

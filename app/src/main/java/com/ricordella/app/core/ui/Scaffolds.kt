@@ -19,6 +19,7 @@ import com.ricordella.app.core.ui.theme.ricordellaColors
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -151,7 +152,8 @@ fun DetailScaffold(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        // imePadding: con la tastiera aperta il contenuto si restringe e il campo in uso resta visibile.
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).imePadding(),
         topBar = {
             TopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },

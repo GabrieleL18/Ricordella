@@ -58,16 +58,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // File condiviso: si aggiorna quando si apre l'app (per vedere le novità dell'altra persona)
-    // e quando la si chiude (per mandarle le proprie).
+    // File condiviso in automatico: si aggiorna quando si apre l'app (e ogni due minuti mentre è aperta,
+    // per vedere le novità dell'altra persona) e quando la si chiude (per mandarle le proprie).
     override fun onStart() {
         super.onStart()
-        (application as RicordellaApplication).container.sharedSpace.syncInBackground()
+        (application as RicordellaApplication).container.sharedSpace.onForeground(true)
     }
 
     override fun onStop() {
         super.onStop()
-        (application as RicordellaApplication).container.sharedSpace.syncInBackground()
+        (application as RicordellaApplication).container.sharedSpace.onForeground(false)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -1040,7 +1040,10 @@ Nessun impegno: è il momento giusto per aggiungerne uno. ||| Nothing planned: a
 Più giorni ||| Several days
 Prova un esempio ||| Try an example
 Scrivi al volo ||| Quick add
-Scrivi come parli: capisco quando, a che ora, se si ripete, quanto dura e quanto è importante. Quello che resta diventa il titolo. Mentre scrivi ti suggerisco le parole giuste. ||| Write the way you talk: I understand when, what time, whether it repeats, how long it lasts and how important it is. The rest becomes the title. As you type I suggest the right words.
+Scrivi o dillo col microfono, come parli: il resto diventa il titolo. ||| Type it or say it into the mic, the way you talk: the rest becomes the title.
+Cosa capisco ||| What I understand
+Dillo a voce ||| Say it
+Il riconoscimento vocale non è disponibile su questo telefono ||| Speech recognition isn't available on this phone
 alle 9, alle 18:30, alle 9 e mezza, alle 6 meno un quarto · stamattina, stasera, stanotte · a pranzo, a cena · tra mezz'ora, tra 2 ore ||| at 9, at 6:30pm · this morning, tonight · at lunch, at dinner, at noon · in half an hour, in 2 hours
 dal 10 al 15 agosto · per 3 giorni ||| from 10 to 15 august · for 3 days
 fino al %1$s ||| until %1$s
@@ -1063,6 +1066,167 @@ Pozioni: bevi abbastanza ||| Potions: drink enough
 Scansiona documenti ||| Scan documents
 Scansiona la carta d'imbarco ||| Scan the boarding pass
 Scontrini e carte d'imbarco hanno un solo pulsante "Scansiona": toccalo e scegli se inquadrare con la fotocamera o aprire una foto o un PDF già sul telefono.  ||| Receipts and boarding passes have a single "Scan" button: tap it and choose whether to use the camera or open a photo or PDF already on the phone. 
-Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi e domani, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi. ||| On your phone's home screen you can add Remindella widgets: monthly Calendar, Your day (today and tomorrow, to tick off), Potions (+ and − for water) and Resolutions.
+Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi, domani e i giorni dopo se c'è spazio, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi. ||| On your phone's home screen you can add Remindella widgets: monthly Calendar, Your day (today, tomorrow and more days if there's room, to tick off), Potions (+ and − for water) and Resolutions.
 Tocca per aprirla in Maps ||| Tap to open it in Maps
 Un file già sul telefono, anche un PDF ricevuto per email ||| A file already on the phone, even a PDF received by email
+Senza il microfono puoi sempre scrivere. Puoi attivarlo nelle impostazioni di Android. ||| Without the mic you can still type. You can turn it on in Android settings.
+Posso ascoltarti? ||| Can I listen to you?
+Uso il microfono solo mentre la sfera è aperta, per capire cosa vuoi ricordare. La voce la trascrive il riconoscimento vocale del telefono: Remindella non registra né salva l'audio. ||| I use the microphone only while the orb is open, to understand what you want to remember. Your voice is transcribed by the phone's speech recognition: Remindella doesn't record or keep the audio.
+Non ora ||| Not now
+Consenti ||| Allow
+Non ho sentito niente. ||| I didn't hear anything.
+Il riconoscimento vocale ha bisogno di internet su questo telefono. ||| Speech recognition needs internet on this phone.
+Manca il permesso del microfono. ||| Microphone permission is missing.
+Non sono riuscita ad ascoltare. ||| I couldn't listen.
+Ti ascolto… ||| I'm listening…
+Ops! ||| Oops!
+Dimmi cosa ricordare, ad esempio «dentista domani alle 9» ||| Tell me what to remember, e.g. "dentist tomorrow at 9"
+Riprova ||| Try again
+Manutenzione annuale ||| Annual service
+Anna ||| Anna
+Palermo ||| Palermo
+ITA Airways ||| ITA Airways
+Palermo PMO ||| Palermo PMO
+La Suprema ||| La Suprema
+Via Roma 1, Palermo ||| Via Roma 1, Palermo
+%,d km ||| %,d km
+Foto del %1$s ||| Photo of %1$s
+Nessuna app fotocamera disponibile ||| No camera app available
+Allega un documento ||| Attach a document
+Scatta una foto adesso o scegli un file che hai già sul telefono. ||| Take a photo now or pick a file already on your phone.
+Scatta una foto ||| Take a photo
+Con la fotocamera, adesso ||| With the camera, right now
+Scegli un file ||| Choose a file
+Foto, PDF o documenti già sul telefono ||| Photos, PDFs or documents already on your phone
+In automatico si aggiorna da solo, in manuale quando tocchi «Sincronizza ora». Se avete modificato entrambi, anche offline, unisco le modifiche senza perderne nessuna. Foto e allegati restano sul telefono di chi li ha aggiunti. ||| In automatic mode it updates by itself, in manual mode when you tap "Sync now". If you both made changes, even offline, I merge them without losing any. Photos and attachments stay on the phone of whoever added them.
+dentista domani alle 9 ||| dentist tomorrow at 9
+Dentista ||| Dentist
+Domani · 09:00 ||| Tomorrow · 09:00
+palestra ogni lunedì ||| gym every monday
+Backup non valido ||| Invalid backup
+Il file di backup scritto non si rilegge ||| The backup file just written can't be read back
+L'altra persona ||| The other person
+%1$s ha segnato come fatto «%2$s» di %3$s ||| %1$s marked "%2$s" of %3$s as done
+%1$s ha riaperto «%2$s» di %3$s ||| %1$s reopened "%2$s" of %3$s
+%1$s ha modificato «%2$s» di %3$s ||| %1$s edited "%2$s" of %3$s
+Novità dal file condiviso ||| News from the shared file
+Backup ||| Backup
+Remindella ||| Remindella
+dentista domani alle 9 e mezza ||| dentist tomorrow at 9:30
+palestra ogni lunedì e giovedì alle 18 ||| gym every monday and thursday at 6pm
+vacanza dal 10 al 15 agosto ||| holiday from 10 to 15 august
+pagare affitto ogni mese il 5 urgente ||| pay rent every month on the 5th urgent
+chiamare Luca tra 2 ore ||| call Luca in 2 hours
+sveglia alle 7 ||| alarm at 7
+Scrivi come parli ||| Write the way you talk
+Scrivi una frase come la diresti: capisco quando, a che ora, se si ripete e quanto è importante. Quello che resta diventa il titolo, e mentre scrivi ti suggerisco le parole giuste. ||| Write a sentence the way you'd say it: I understand when, what time, whether it repeats and how important it is. Whatever is left becomes the title, and as you type I suggest the right words.
+Quando e a che ora ||| When and what time
+oggi, domani, lunedì, sabato prossimo, 24/12, 31 gennaio, tra 3 giorni, nel weekend, fine mese · alle 9, alle 18:30, alle 9 e mezza, stasera, a pranzo, tra 2 ore ||| today, tomorrow, monday, next saturday, 12/24, january 31, in 3 days, this weekend, end of month · at 9, at 6:30pm, tonight, at lunch, in 2 hours
+sabato prossimo ||| next saturday
+alle 18:30 ||| at 6:30pm
+stasera ||| tonight
+Si ripete, dura, conta ||| Repeats, lasts, matters
+ogni giorno, ogni lunedì e giovedì, giorni feriali, ogni 2 settimane, ogni mese il 5, ogni anno · dal 10 al 15 agosto, per 3 giorni · urgente o !!, importante o ! ||| every day, every monday and thursday, weekdays, every 2 weeks, every month on the 5th, every year · from 10 to 15 august, for 3 days · urgent or !!, important or !
+ogni lunedì ||| every monday
+dal 10 al 15 agosto ||| from 10 to 15 august
+urgente ||| urgent
+Capisco anche il tipo ||| I also understand the type
+«sveglia alle 7» diventa una sveglia, «compleanno di…» si ripete ogni anno, «dentista» è una visita medica, «pagare» o «bolletta» un pagamento. ||| "alarm at 7" becomes an alarm, "birthday of…" repeats every year, "dentist" is a medical visit, "pay" or "bill" a payment.
+compleanno di Marco ||| Marco's birthday
+pagare la bolletta ||| pay the bill
+Oppure dillo ||| Or just say it
+Tocca il microfono e parla: la sfera ti ascolta e scrive per te. Il permesso del microfono te lo chiedo solo la prima volta. ||| Tap the mic and talk: the orb listens and writes for you. I ask for microphone permission only the first time.
+Prova tu ||| Your turn
+Tocca un esempio: finisce nella barra e vedi subito cosa ho capito. ||| Tap an example: it goes into the bar and you instantly see what I understood.
+Rifornimenti ||| Refuelling
+Altre spese ||| Other expenses
+Spese ||| Expenses
+Per tipo ||| By type
+Per cosa ||| By item
+Cosa eliminata ||| Deleted item
+Tutte le spese del %1$s ||| All expenses in %1$s
+Anno prima ||| Year before
+Media al mese ||| Monthly average
+La spesa più alta ||| Biggest expense
+Nessuna spesa registrata in quest'anno. ||| No expenses recorded this year.
+Mese per mese ||| Month by month
+Costo al km ||| Cost per km
+Modifica voce ||| Edit entry
+Voce aggiornata ||| Entry updated
+Riepilogo delle spese ||| Expense summary
+Tieni il file in un posto sicuro (Drive, un computer): non è cifrato e chi lo ha può leggerne il contenuto.  ||| Keep the file somewhere safe (Drive, a computer): it isn't encrypted and anyone who has it can read it.
+Di ogni backup l'app tiene anche una copia di riserva sul telefono, per quando il file principale si rovina; anche la copia sparisce se disinstalli l'app. ||| For every backup the app also keeps a spare copy on the phone, in case the main file gets damaged; the copy is removed too if you uninstall the app.
+Condivisione con un'altra persona ||| Sharing with another person
+Con la Condivisione due telefoni leggono e scrivono lo stesso file (es. su Google Drive). Chi ha il file può leggere e modificare promemoria, persone, cose e spese che contiene: condividilo solo con chi vuoi.  ||| With Sharing, two phones read and write the same file (e.g. on Google Drive). Anyone with the file can read and edit the reminders, people, items and expenses in it: share it only with people you choose.
+In automatico il file si aggiorna da solo, anche in background; in manuale solo quando lo chiedi. Se entrambi modificate gli stessi dati, l'app unisce le modifiche e, se lo stesso campo è cambiato da tutti e due, tiene la più recente.  ||| In automatic mode the file updates by itself, even in the background; in manual mode only when you ask. If you both edit the same data, the app merges the changes and, if the same field changed on both sides, keeps the most recent.
+Quando spunti o modifichi una cosa di un'altra persona, nel file resta scritto chi l'ha fatto. La sincronizzazione dipende dall'app che gestisce il file: verifica che sia aggiornato prima di decisioni importanti. ||| When you tick off or edit something belonging to another person, the file records who did it. Syncing depends on the app that manages the file: check it's up to date before important decisions.
+Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; Remindella non registra né salva l'audio); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Only when you ask: it uses the microphone for voice "Quick add" (the audio is transcribed by the phone's speech recognition, which may use the Internet under its own rules; Remindella doesn't record or keep the audio); it uses the camera to take photos to attach or scan; it reads the phone's calendar to import events; it uses the phone's Google Play services to read text and codes from photos (processing happens on the phone, but Google services may send technical data to Google under their terms); with Sharing it writes a file in the place you choose (e.g. Google Drive), managed by that service under its own rules.⏎⏎
+In "Scrivi al volo" tocca il microfono e parla: la sfera ti ascolta e scrive per te. ||| In "Quick add" tap the mic and talk: the orb listens and writes for you.
+Condivisione automatica ||| Automatic sharing
+Il file condiviso si sincronizza da solo e, se avete modificato entrambi, unisce le modifiche senza perdere niente. ||| The shared file syncs by itself and, if you both made changes, merges them without losing anything.
+Spese più chiare ||| Clearer expenses
+Riepiloghi per mese, per categoria e per cosa, con il confronto con l'anno prima. ||| Summaries by month, type and item, compared with the year before.
+Calendario più leggibile ||| Easier-to-read calendar
+Il mese occupa tutto lo schermo: tocca un giorno per vedere i suoi impegni. ||| The month fills the screen: tap a day to see its plans.
+Cinque lingue ||| Five languages
+Italiano, English, Deutsch, Français ed Español: la scegli nelle Impostazioni. ||| Italiano, English, Deutsch, Français and Español: pick yours in Settings.
+Allegati con la fotocamera ||| Attach with the camera
+Allegando un documento puoi anche scattare subito una foto. ||| When attaching a document you can also take a photo right away.
+Backup al sicuro ||| Safer backups
+Ogni backup ha una copia di riserva: se un file si rovina, c'è l'altro. ||| Every backup has a spare copy: if one file gets damaged, there's the other.
+Widget più grande ||| Bigger widget
+"La tua giornata" mostra più giorni se gli dai spazio. ||| "Your day" shows more days if you give it room.
+Tutorial nuovi ||| New tutorials
+Anche "Scrivi al volo" ha il suo tutorial. Se non li vuoi, nascondili nelle Impostazioni. ||| "Quick add" has its own tutorial too. If you don't want them, hide them in Settings.
+Novità ||| What's new
+Ecco cosa c'è di nuovo in Remindella. ||| Here's what's new in Remindella.
+Versione %1$s ||| Version %1$s
+Fantastico! ||| Awesome!
+Faccio come se fosse il primo avvio dell'anno e ti porto in Home, dove ti vengono proposte le operazioni di inizio anno. Se non ci sono feste né promemoria vecchi ne aggiungo di esempio. ||| I'll act as if it were the first launch of the year and take you to Home, where the new-year tasks are offered. If there are no holidays or old reminders I'll add some samples.
+%1$s feste da spostare, %2$s promemoria da pulire ||| %1$s holidays to move, %2$s reminders to clean up
+Ecco la Home al 2 gennaio ||| Here's Home on January 2
+Ecco la Home al 28 dicembre ||| Here's Home on December 28
+Ecco l'invito al backup ||| Here's the backup prompt
+Mostra le novità ||| Show what's new
+Fa ricomparire la finestra delle novità, come al primo avvio dopo un aggiornamento. ||| Shows the "What's new" window again, as on the first launch after an update.
+Ecco le novità ||| Here's what's new
+Rivedi i tutorial automatici ||| See automatic tutorials again
+I tutorial che compaiono da soli la prima volta (es. Scrivi al volo) ricompaiono: in Home tocca la barra. ||| The tutorials that appear by themselves the first time (e.g. Quick add) come back: on Home tap the bar.
+Tocca la barra di Scrivi al volo ||| Tap the Quick add bar
+È di %1$s ||| It belongs to %1$s
+Vuoi davvero segnare come fatto «%1$s»? ||| Do you really want to mark "%1$s" as done?
+Vuoi davvero riaprire «%1$s»? ||| Do you really want to reopen "%1$s"?
+Vuoi davvero modificare «%1$s»? ||| Do you really want to edit "%1$s"?
+Lo sincronizzo subito e %1$s saprà che l'hai fatto tu. ||| I'll sync right away and %1$s will know it was you.
+Sì, continua ||| Yes, continue
+Copia di riserva ||| Spare copy
+Dell'ultimo backup, sul telefono: %1$s. Usala se il file di backup si rovina. ||| Of the latest backup, on the phone: %1$s. Use it if the backup file gets damaged.
+Cosa c'è di nuovo nella versione %1$s ||| What's new in version %1$s
+Mostra i tutorial ||| Show tutorials
+Le spiegazioni che compaiono da sole la prima volta. Spente, le trovi sempre nel "?". ||| The explanations that appear by themselves the first time. When off, you can always find them under "?".
+Questo backup è rovinato ||| This backup is damaged
+Non riesco a leggerlo. C'è però la copia di riserva che tengo sul telefono: vuoi usare quella? ||| I can't read it. But there's the spare copy I keep on the phone: do you want to use that?
+Usa la copia di riserva ||| Use the spare copy
+Ultimo tentativo non riuscito: il file non è raggiungibile (sei offline o è stato spostato). Le tue modifiche restano qui e partono appena possibile. ||| Last attempt failed: the file can't be reached (you're offline or it was moved). Your changes stay here and go out as soon as possible.
+Io sono %1$s ||| I'm %1$s
+Chi sei tu? ||| Who are you?
+Le tue cose si sincronizzano da sole. Se spunti o modifichi quelle di un altro ti chiedo conferma e glielo faccio sapere. ||| Your things sync by themselves. If you tick off or edit someone else's, I ask you first and let them know.
+Ultime attività ||| Recent activity
+Automatica ||| Automatic
+Si aggiorna da sola: quando apri e chiudi l'app, pochi secondi dopo ogni modifica, ogni due minuti mentre l'app è aperta e ogni mezz'ora in background. ||| Updates by itself: when you open and close the app, a few seconds after each change, every two minutes while the app is open and every half hour in the background.
+Manuale ||| Manual
+Si aggiorna solo quando tocchi «Sincronizza ora»: decidi tu quando mandare e ricevere le modifiche. ||| Updates only when you tap "Sync now": you decide when to send and receive changes.
+Scelta ||| Selected
+Come vuoi sincronizzare? ||| How do you want to sync?
+In tutti e due i casi, se avete modificato entrambi (anche senza Internet) unisco le modifiche: niente viene sovrascritto o perso. Puoi cambiare modalità quando vuoi nelle Impostazioni. ||| Either way, if you both made changes (even without Internet) I merge them: nothing is overwritten or lost. You can change mode anytime in Settings.
+Scegliti tra le persone. Promemoria e cose collegati solo ad altri saranno «loro»: prima di toccarli ti chiedo conferma. ||| Pick yourself among the people. Reminders and items linked only to others will be "theirs": before you touch them I'll ask you.
+Non hai ancora aggiunto persone: aggiungi te stesso nella sezione Persone. ||| You haven't added any people yet: add yourself in the People section.
+Non impostare ||| Don't set
+Scooter ||| Scooter
+Smartphone ||| Smartphone
+Tablet ||| Tablet
+Computer ||| Computer
+Console ||| Console
+TV ||| TV
+Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline). ||| The phone's speech recognition doesn't have this language: download it in the keyboard or Google settings (Voice › Offline speech recognition).
+cena con Luca sabato alle 20 ||| dinner with Luca saturday at 8pm

@@ -34,6 +34,10 @@ data class SettingsUiState(
     val shareUri: Uri? = null,
     /** Nessun file di backup scelto (o non più scrivibile): va chiesto dove salvarlo. */
     val askNewFile: Boolean = false,
+    /** Il backup scelto è rovinato ma c'è la copia di riserva: si propone di usare quella. */
+    val offerReserve: Boolean = false,
+    /** Quando è stata fatta la copia di riserva (millisecondi). */
+    val reserveSavedAt: Long? = null,
 )
 
 class SettingsViewModel(
@@ -49,7 +53,8 @@ class SettingsViewModel(
     private var pendingRestore: PendingRestore? = null
 
     val uiState: StateFlow<SettingsUiState> = combine(settingsRepository.settings, local) { settings, state ->
-        state.copy(settings = settings)
+        // lastBackupMillis cambia a ogni backup: così la data della copia di riserva resta aggiornata.
+        state.copy(settings = settings, reserveSavedAt = backupRepository.reserveSavedAt())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     /** Aggiorna le preferenze; se cambiano le notifiche, la pianificazione viene ricostruita. */
@@ -89,8 +94,22 @@ class SettingsViewModel(
 
     fun onAskedNewFile() = local.update { it.copy(askNewFile = false) }
 
-    fun readBackup(source: Uri) = runBusy {
-        val (result, pending) = backupRepository.read(source)
+    fun readBackup(source: Uri) = runBusy { handleRead(backupRepository.read(source), fromReserve = false) }
+
+    /** Ripristino dalla copia di riserva che l'app tiene sul telefono. */
+    fun readReserve() = runBusy {
+        local.update { it.copy(offerReserve = false) }
+        handleRead(backupRepository.readReserve(), fromReserve = true)
+    }
+
+    fun onReserveOfferDismissed() = local.update { it.copy(offerReserve = false) }
+
+    private fun handleRead(read: Pair<BackupReadResult, PendingRestore?>, fromReserve: Boolean) {
+        val (result, pending) = read
+        if (!fromReserve && result is BackupReadResult.Corrupted && backupRepository.reserveSavedAt() != null) {
+            local.update { it.copy(offerReserve = true) }
+            return
+        }
         when (result) {
             is BackupReadResult.Valid -> {
                 pendingRestore = pending

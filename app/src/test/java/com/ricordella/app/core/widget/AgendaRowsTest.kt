@@ -53,4 +53,14 @@ class AgendaRowsTest {
         val empty = agendaRows(FakeReminderRepository(), calculator, today)
         assertEquals(listOf(AgendaRow.Day(today), AgendaRow.Empty(today), AgendaRow.Day(today.plusDays(1)), AgendaRow.Empty(today.plusDays(1))), empty)
     }
+
+    @Test
+    fun `se il widget è alto entrano più giorni, solo interi e al massimo una settimana`() = runTest {
+        val empty = FakeReminderRepository()
+        fun days(rows: List<AgendaRow>) = rows.count { it is AgendaRow.Day }
+        assertEquals(2, days(agendaRows(empty, calculator, today, heightDp = 100)))
+        // Ogni giorno vuoto occupa 26 + 44 = 70 dp: in 300 dp ne entrano 4.
+        assertEquals(4, days(agendaRows(empty, calculator, today, heightDp = 300)))
+        assertEquals(7, days(agendaRows(empty, calculator, today, heightDp = 5000)))
+    }
 }

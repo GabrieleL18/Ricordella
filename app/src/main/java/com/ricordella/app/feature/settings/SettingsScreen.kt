@@ -21,6 +21,9 @@ import kotlinx.coroutines.delay
 import com.ricordella.app.feature.legal.TermsScreen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Row
+import com.ricordella.app.core.ui.theme.ricordellaColors
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -63,7 +66,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.NewReleases
 import androidx.compose.material.icons.rounded.School
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material3.Surface
 import androidx.compose.ui.window.Dialog
@@ -129,7 +134,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onGoHome: () -> Unit = onBack) {
     val viewModel = appViewModel { c, _ ->
         SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
@@ -142,6 +147,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
     var pickAllDayTime by rememberSaveable { mutableStateOf(false) }
     var pickBackupTime by rememberSaveable { mutableStateOf(false) }
     var showSectionsTutorial by rememberSaveable { mutableStateOf(false) }
+    var showNews by rememberSaveable { mutableStateOf(false) }
     var showCalendarImport by rememberSaveable { mutableStateOf(false) }
 
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -206,10 +212,8 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
                 Text(tr("Lingua"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
                 // Di default segue il sistema; cambiandola l'app si ridisegna subito nella nuova lingua.
                 var language by remember { mutableStateOf(Lang.current(context)) }
-                Segmented(
-                    options = AppLanguage.entries,
+                LanguagePicker(
                     selected = language,
-                    label = { when (it) { AppLanguage.SYSTEM -> tr("Sistema"); AppLanguage.ITALIAN -> "Italiano"; AppLanguage.ENGLISH -> "English" } },
                     onSelected = { chosen ->
                         language = chosen
                         Lang.set(context, chosen)
@@ -294,6 +298,15 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
                     subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
                     onClick = { backupAction(BACKUP_IMPORT) },
                 )
+                state.reserveSavedAt?.let { millis ->
+                    val at = java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(millis), java.time.ZoneId.systemDefault())
+                    SettingRow(
+                        icon = Icons.Rounded.Shield,
+                        title = tr("Copia di riserva"),
+                        subtitle = trf("Dell'ultimo backup, sul telefono: %1\$s. Usala se il file di backup si rovina.", DateTexts.relativeWithTime(at.toLocalDate(), at.toLocalTime().withSecond(0).withNano(0), LocalDate.now())),
+                        onClick = viewModel::readReserve,
+                    )
+                }
                 SettingRow(
                     icon = Icons.Rounded.Schedule,
                     title = tr("Backup automatico"),
@@ -331,10 +344,25 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
 
             SettingsGroup(Icons.Rounded.Info, tr("Informazioni"), tr("Tutorial, privacy, assistenza e versione")) {
                 SettingRow(
+                    icon = Icons.Rounded.NewReleases,
+                    title = tr("Novità"),
+                    subtitle = trf("Cosa c'è di nuovo nella versione %1\$s", com.ricordella.app.BuildConfig.VERSION_NAME),
+                    onClick = { showNews = true },
+                )
+                SettingRow(
                     icon = Icons.Rounded.School,
                     title = tr("Rivedi il tutorial"),
                     subtitle = tr("Come funzionano le sezioni dell'app."),
                     onClick = { showSectionsTutorial = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Lightbulb,
+                    title = tr("Mostra i tutorial"),
+                    subtitle = tr("Le spiegazioni che compaiono da sole la prima volta. Spente, le trovi sempre nel \"?\"."),
+                    onClick = { viewModel.update { it.copy(tutorialsEnabled = !it.tutorialsEnabled) } },
+                    trailing = {
+                        Switch(checked = settings.tutorialsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(tutorialsEnabled = value) } })
+                    },
                 )
                 SettingRow(
                     icon = Icons.Rounded.Lightbulb,
@@ -361,11 +389,20 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
             }
             if (settings.developerMode) {
                 val tools = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.developerTools
-                DeveloperSection(tools, viewModel::update, justUnlocked)
+                DeveloperSection(tools, viewModel::update, justUnlocked, onGoHome = onGoHome)
             }
         }
     }
 
+    if (state.offerReserve) {
+        ConfirmDialog(
+            title = tr("Questo backup è rovinato"),
+            message = tr("Non riesco a leggerlo. C'è però la copia di riserva che tengo sul telefono: vuoi usare quella?"),
+            confirmLabel = tr("Usa la copia di riserva"),
+            onConfirm = viewModel::readReserve,
+            onDismiss = viewModel::onReserveOfferDismissed,
+        )
+    }
     state.restoreSummary?.let { summary ->
         RestoreDialog(summary, onConfirm = viewModel::confirmRestore, onCancel = viewModel::cancelRestore)
     }
@@ -412,6 +449,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
     }
 
     if (showSectionsTutorial) TutorialDialog(SectionTutorialPages, onDismiss = { showSectionsTutorial = false })
+    if (showNews) com.ricordella.app.feature.news.NewsDialog(com.ricordella.app.feature.news.AllNews, onDismiss = { showNews = false })
 
     if (showCalendarImport) {
         val importViewModel = appViewModel { c, _ -> CalendarImportViewModel(c.calendarImporter, c.settingsRepository, c.housekeeping) }
@@ -603,5 +641,38 @@ private fun openAppNotificationSettings(context: Context) {
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(intent)
+}
+
+/** Lingue come pastiglie con la bandiera: quella scelta è gialla, come le altre selezioni dell'app. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun LanguagePicker(selected: AppLanguage, onSelected: (AppLanguage) -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+    ) {
+        AppLanguage.entries.forEach { language ->
+            val isSelected = language == selected
+            Row(
+                Modifier
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(if (isSelected) colors.bolt else MaterialTheme.colorScheme.surfaceContainerLowest)
+                    .border(1.dp, if (isSelected) colors.bolt else MaterialTheme.colorScheme.outlineVariant, androidx.compose.foundation.shape.CircleShape)
+                    .clickable { onSelected(language) }
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(language.flag, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    if (language == AppLanguage.SYSTEM) tr("Sistema") else language.nativeName,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (isSelected) colors.onBolt else MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+    }
 }
 

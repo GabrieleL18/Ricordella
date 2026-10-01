@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_reminders">Rappels</string>
+    <string name="notification_channel_reminders_description">Notifications des rappels et des échéances</string>
+    <string name="widget_description">Calendrier du mois avec tes rappels et des boutons pour ajouter en un geste</string>
+    <string name="widget_label">Calendrier Remindella</string>
+    <string name="widget_water_label">Potions Remindella</string>
+    <string name="widget_water_description">L\'eau bue aujourd\'hui : ajoute ou retire une potion d\'un geste</string>
+    <string name="widget_resolutions_label">Bonnes résolutions</string>
+    <string name="widget_resolutions_description">Les résolutions de l\'année : fais défiler la liste et coche celles que tu as tenues</string>
+    <string name="widget_agenda_label">Journée Remindella</string>
+    <string name="widget_agenda_description">Les rendez-vous d\'aujourd\'hui, de demain et des jours suivants : coche-les, parcours les jours</string>
+</resources>

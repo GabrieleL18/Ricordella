@@ -59,6 +59,12 @@ data class AppSettings(
     val onboardingDone: Boolean = false,
     /** Il tutorial di esporta/importa è già stato mostrato. */
     val backupTutorialSeen: Boolean = false,
+    /** Tutorial che compaiono da soli la prima volta (si possono sempre riaprire dal "?"). */
+    val tutorialsEnabled: Boolean = true,
+    /** Il tutorial di "Scrivi al volo" è già stato mostrato. */
+    val quickEntryTutorialSeen: Boolean = false,
+    /** Ultima versione dell'app di cui si sono viste le novità (0 = prima installazione, nessuna novità). */
+    val newsSeenVersion: Int = 0,
     /** Giorno (epochDay) da cui contare l'intervallo per chiedere un nuovo backup. */
     val backupCheckEpochDay: Long? = null,
     /** Ogni quanti giorni aggiornare il backup (1, 7, 30, 90, 365): di default ogni giorno. */
@@ -79,6 +85,12 @@ data class AppSettings(
     val sharedFileUri: String? = null,
     /** Ultima sincronizzazione riuscita del file condiviso (millisecondi). */
     val sharedLastSync: Long? = null,
+    /** Sincronizzazione automatica del file condiviso (altrimenti solo con "Sincronizza ora"). */
+    val sharedAutoSync: Boolean = true,
+    /** Chi sono io tra le persone (su questo telefono): le cose degli altri chiedono conferma. */
+    val sharedMeId: String? = null,
+    /** Nome di [sharedMeId], scritto nelle attività che vede l'altra persona. */
+    val sharedMeName: String? = null,
     /** Sezione Sviluppatore sbloccata (7 tocchi sulla versione). */
     val developerMode: Boolean = false,
     /** Ultimo anno in cui è stata proposta la pulizia dei promemoria vecchi. */

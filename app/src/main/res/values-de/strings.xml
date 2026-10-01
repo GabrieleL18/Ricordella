@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_reminders">Erinnerungen</string>
+    <string name="notification_channel_reminders_description">Benachrichtigungen für Erinnerungen und Fristen</string>
+    <string name="widget_description">Kalender des Monats mit deinen Erinnerungen und Schnelltasten</string>
+    <string name="widget_label">Remindella Kalender</string>
+    <string name="widget_water_label">Remindella Tränke</string>
+    <string name="widget_water_description">Heute getrunkenes Wasser: mit einem Tipp einen Trank hinzufügen oder entfernen</string>
+    <string name="widget_resolutions_label">Gute Vorsätze</string>
+    <string name="widget_resolutions_description">Die Vorsätze des Jahres: scrolle die Liste und hake die eingehaltenen ab</string>
+    <string name="widget_agenda_label">Remindella Tag</string>
+    <string name="widget_agenda_description">Termine von heute, morgen und den folgenden Tagen: abhaken, durch die Tage blättern</string>
+</resources>

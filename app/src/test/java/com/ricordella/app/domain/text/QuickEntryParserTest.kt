@@ -143,4 +143,31 @@ class QuickEntryParserTest {
         assertEquals("palestra ogni settimana ", QuickEntryParser.applySuggestion("palestra ogni se", "ogni settimana"))
         assertEquals("dentista alle 9 ", QuickEntryParser.applySuggestion("dentista ", "alle 9"))
     }
+
+    @Test
+    fun germanFrenchSpanish() {
+        parse("Zahnarzt morgen um 9").let {
+            assertEquals("Zahnarzt", it.title)
+            assertEquals(LocalDate.of(2026, 10, 2), it.date)
+            assertEquals(LocalTime.of(9, 0), it.time)
+        }
+        parse("dentiste demain à 9h30").let {
+            assertEquals("Dentiste", it.title)
+            assertEquals(LocalDate.of(2026, 10, 2), it.date)
+            assertEquals(LocalTime.of(9, 30), it.time)
+        }
+        parse("gimnasio cada lunes a las 18").let {
+            assertEquals("Gimnasio", it.title)
+            assertEquals(RecurrenceFrequency.WEEKLY, it.recurrence?.frequency)
+            assertEquals(setOf(DayOfWeek.MONDAY), it.recurrence?.daysOfWeek)
+            assertEquals(LocalTime.of(18, 0), it.time)
+        }
+        parse("Urlaub vom 10. bis 15. August").let {
+            assertEquals("Urlaub", it.title)
+            assertEquals(LocalDate.of(2027, 8, 10), it.date)
+            assertEquals(LocalDate.of(2027, 8, 15), it.endDate)
+        }
+        parse("cena por la mañana").let { assertEquals(LocalTime.of(9, 0), it.time) }
+        assertEquals(listOf("morgen", "montag"), QuickEntryParser.suggestions("Zahnarzt ", now, "de").take(2))
+    }
 }

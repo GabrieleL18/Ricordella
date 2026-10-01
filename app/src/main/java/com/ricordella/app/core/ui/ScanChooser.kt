@@ -122,7 +122,7 @@ private fun ScanChoiceDialog(title: String, onChoose: (ScanSource) -> Unit, onDi
 }
 
 @Composable
-private fun ChoiceTile(icon: ImageVector, title: String, subtitle: String, tone: Tone, onClick: () -> Unit) {
+internal fun ChoiceTile(icon: ImageVector, title: String, subtitle: String, tone: Tone, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()

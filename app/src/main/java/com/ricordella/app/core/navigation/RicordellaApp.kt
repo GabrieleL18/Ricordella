@@ -82,6 +82,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -157,6 +158,16 @@ fun RicordellaApp(
         OnboardingScreen()
         return
     }
+    // Primo avvio dopo un aggiornamento: le novità della versione (una volta sola).
+    val news = com.ricordella.app.feature.news.newsSince(LocalAppSettings.current.newsSeenVersion)
+        .filter { it.versionCode <= com.ricordella.app.BuildConfig.VERSION_CODE }
+    if (news.isNotEmpty()) {
+        val container = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+        val scope = rememberCoroutineScope()
+        com.ricordella.app.feature.news.NewsDialog(news, onDismiss = {
+            scope.launch { container.settingsRepository.update { it.copy(newsSeenVersion = com.ricordella.app.BuildConfig.VERSION_CODE) } }
+        })
+    }
     val navController = rememberNavController()
     val navigator = remember(navController) { AppNavigator(navController) }
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -190,6 +201,7 @@ fun RicordellaApp(
         onWidgetRequestHandled()
     }
 
+    com.ricordella.app.feature.settings.OwnershipQuestionHost()
     val adaptiveType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfoV2())
     CompositionLocalProvider(LocalQuickAddOpen provides showQuickAdd) {
     NavigationSuiteScaffold(
@@ -205,7 +217,19 @@ fun RicordellaApp(
                     selected = selected,
                     onClick = { navigator.openTopLevel(top.route) },
                     icon = { NavIcon(top, selected) },
-                    label = { Text(top.label, maxLines = 1) },
+                    label = {
+                        // Parole lunghe (es. "Erinnerungen") in corpo più piccolo, così non vengono tagliate.
+                        Text(
+                            top.label,
+                            maxLines = 1,
+                            softWrap = false,
+                            style = when {
+                                top.label.length > 11 -> MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+                                top.label.length > 9 -> MaterialTheme.typography.labelSmall
+                                else -> MaterialTheme.typography.labelMedium
+                            },
+                        )
+                    },
                 )
             }
         },
@@ -239,8 +263,9 @@ fun RicordellaApp(
             composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd) }
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
             composable<SearchRoute> { SearchScreen(navigator) }
-            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }) }
+            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onGoHome = navigator::openHome) }
             composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
+            composable<ExpensesRoute> { com.ricordella.app.feature.items.ExpensesScreen(navigator) }
             composable<ResolutionsRoute> { entry ->
                 val route = entry.toRoute<ResolutionsRoute>()
                 ResolutionsScreen(route.year, route.recap, onBack = navigator::back)

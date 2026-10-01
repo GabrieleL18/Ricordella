@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import com.ricordella.app.data.local.database.BuiltInCategories
 import com.ricordella.app.domain.date.Holidays
+import com.ricordella.app.domain.model.ExpenseKind
 import com.ricordella.app.domain.model.Item
 import com.ricordella.app.domain.model.ItemKind
 import com.ricordella.app.domain.model.MaintenanceRecord
@@ -57,6 +58,8 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
             termsAcceptedVersion = com.ricordella.app.feature.legal.TERMS_VERSION,
             termsAcceptedEpochDay = time.today().toEpochDay(),
             backupTutorialSeen = true,
+            quickEntryTutorialSeen = true,
+            newsSeenVersion = com.ricordella.app.BuildConfig.VERSION_CODE,
             developerMode = true,
             notificationsEnabled = false,
             backupCheckEpochDay = time.today().toEpochDay(),
@@ -104,6 +107,13 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         MaintenanceRecord(itemId = car.id, title = tr("Tagliando"), date = today.minusMonths(7), odometerKm = 41_200, costCents = 23_000, description = tr("Olio, filtri e controllo freni"), createdAt = now),
         MaintenanceRecord(itemId = car.id, title = tr("Pneumatici"), date = today.minusMonths(11), odometerKm = 37_900, costCents = 48_000, description = tr("Cambio gomme invernali"), createdAt = now),
         MaintenanceRecord(itemId = boiler.id, title = tr("Controllo fumi"), date = today.minusMonths(10), costCents = 9_000, createdAt = now),
+        // Rifornimenti e altre spese dell'anno, per un riepilogo delle spese credibile.
+        MaintenanceRecord(itemId = car.id, title = tr("Rifornimento"), date = today.minusMonths(1).withDayOfMonth(12), odometerKm = 47_900, costCents = 6_200, liters = 34.0, kind = ExpenseKind.FUEL, createdAt = now),
+        MaintenanceRecord(itemId = car.id, title = tr("Rifornimento"), date = today.minusMonths(2).withDayOfMonth(20), odometerKm = 47_250, costCents = 5_800, liters = 32.5, kind = ExpenseKind.FUEL, createdAt = now),
+        MaintenanceRecord(itemId = car.id, title = tr("Rifornimento"), date = today.minusMonths(4).withDayOfMonth(3), odometerKm = 46_600, costCents = 6_500, liters = 35.0, kind = ExpenseKind.FUEL, createdAt = now),
+        MaintenanceRecord(itemId = car.id, title = tr("Assicurazione"), date = today.minusMonths(5).withDayOfMonth(15), costCents = 41_000, kind = ExpenseKind.OTHER, createdAt = now),
+        MaintenanceRecord(itemId = car.id, title = tr("Bollo auto"), date = today.minusMonths(8).withDayOfMonth(28), costCents = 18_700, kind = ExpenseKind.OTHER, createdAt = now),
+        MaintenanceRecord(itemId = boiler.id, title = tr("Manutenzione annuale"), date = today.minusMonths(3).withDayOfMonth(9), costCents = 12_000, createdAt = now),
     ).forEach { maintenanceRepository.save(it) }
 
     fun at(date: LocalDate, title: String, type: ReminderType, time: LocalTime? = null, build: Reminder.() -> Reminder = { this }) =
