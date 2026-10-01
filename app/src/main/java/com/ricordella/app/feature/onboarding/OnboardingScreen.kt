@@ -191,7 +191,7 @@ private fun Welcome(onNext: () -> Unit) {
         }
     }
     // Se il ripristino va a buon fine le impostazioni del backup chiudono da sole la configurazione iniziale.
-    backup?.let { OpenedBackupImport(it, onDone = { backup = null }) }
+    backup?.let { OpenedBackupImport(it, onDone = { backup = null }, firstStart = true) }
 }
 
 /** Import facoltativo: permesso calendario → scelta account Google → import. */

@@ -1,5 +1,6 @@
 package com.ricordella.app.core
 
+import com.ricordella.app.domain.usecase.UndoCompletionUseCase
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.ricordella.app.core.notifications.AlarmManagerReminderScheduler
@@ -79,6 +80,7 @@ class AppContainer(context: Context) {
     val saveReminder = SaveReminderUseCase(reminderRepository, settingsRepository, reminderScheduler, alarmPlanner, time)
     val completeReminder = CompleteReminderUseCase(reminderRepository, reminderScheduler, recurrenceCalculator, time)
     val reopenReminder = ReopenReminderUseCase(reminderRepository, reminderScheduler, time)
+    val undoCompletion = UndoCompletionUseCase(reminderRepository, reminderScheduler, time)
     val snoozeReminder = SnoozeReminderUseCase(reminderRepository, settingsRepository, reminderScheduler, time)
     val deleteReminder = DeleteReminderUseCase(reminderRepository, reminderScheduler)
     val saveItem = SaveItemUseCase(itemRepository, reminderRepository, settingsRepository, saveReminder, time)
@@ -88,6 +90,7 @@ class AppContainer(context: Context) {
     val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository)
     val restoreBackup = RestoreBackupUseCase(backupRepository, reminderScheduler)
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
+    val sharedSpace = com.ricordella.app.data.share.SharedSpace(appContext, database.backupDao(), settingsRepository, reminderScheduler, applicationScope, enabled = !isDemo)
     val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
     val developerTools = DeveloperTools(
         appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time, databaseFileName,

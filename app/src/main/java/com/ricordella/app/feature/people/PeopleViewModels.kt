@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.people
 
+import java.time.LocalDate
+import kotlinx.coroutines.flow.map
 import com.ricordella.app.core.i18n.tr
 
 import androidx.lifecycle.SavedStateHandle
@@ -38,10 +40,21 @@ data class PersonListUiState(
     val query: String = "",
     val showArchived: Boolean = false,
     val people: List<Person> = emptyList(),
+    /** Il prossimo promemoria (entro [NEXT_WITH_PEOPLE_DAYS] giorni) collegato a qualcuno. */
+    val next: ReminderWithLinks? = null,
+    val today: LocalDate = LocalDate.now(),
 )
 
+const val NEXT_WITH_PEOPLE_DAYS = 60L
+
 @OptIn(ExperimentalCoroutinesApi::class)
-class PersonListViewModel(people: PersonRepository) : ViewModel() {
+class PersonListViewModel(people: PersonRepository, reminders: ReminderRepository, time: TimeSource) : ViewModel() {
+
+    private val today = time.today()
+    private val next = reminders.observeActiveUntil(today.plusDays(NEXT_WITH_PEOPLE_DAYS), 300).map { list ->
+        list.filter { it.people.isNotEmpty() && !it.reminder.dueDate.isBefore(today) }
+            .minWithOrNull(compareBy({ it.reminder.dueDate }, { it.reminder.dueTime }))
+    }
 
     private val query = MutableStateFlow("")
     private val showArchived = MutableStateFlow(false)
@@ -50,11 +63,12 @@ class PersonListViewModel(people: PersonRepository) : ViewModel() {
         showArchived.flatMapLatest { people.observePeople(archived = it) },
         query,
         showArchived,
-    ) { list, text, archived ->
+        next,
+    ) { list, text, archived, upcoming ->
         val filtered = if (text.isBlank()) list else list.filter {
             it.displayName.contains(text.trim(), ignoreCase = true) || it.notes?.contains(text.trim(), ignoreCase = true) == true
         }
-        PersonListUiState(isLoading = false, query = text, showArchived = archived, people = filtered)
+        PersonListUiState(isLoading = false, query = text, showArchived = archived, people = filtered, next = upcoming, today = today)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonListUiState())
 
     fun onQueryChange(value: String) {

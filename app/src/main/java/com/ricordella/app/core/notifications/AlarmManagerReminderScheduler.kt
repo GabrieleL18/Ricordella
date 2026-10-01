@@ -38,6 +38,7 @@ class AlarmManagerReminderScheduler(
     override suspend fun refresh() = mutex.withLock {
         // Ogni modifica ai promemoria passa di qui: è il punto giusto per ridisegnare il widget.
         CalendarWidgetProvider.requestUpdate(context)
+        com.ricordella.app.core.widget.AgendaWidgetProvider.requestUpdate(context)
         val appSettings = settings.current()
         if (!appSettings.notificationsEnabled) {
             alarmManager.cancel(alarmIntent())
@@ -50,8 +51,11 @@ class AlarmManagerReminderScheduler(
             val today = time.today()
             plan.dueNow.forEach { id ->
                 val entry = reminders.getReminder(id) ?: return@forEach
-                // Le sveglie suonano a tutto schermo; se Android non lo consente, notifica normale.
-                val rang = entry.reminder.type == ReminderType.ALARM && AlarmRingService.start(context, id, entry.reminder.title, appSettings)
+                // Le sveglie (e, se scelto, i promemoria importanti/urgenti) suonano a tutto schermo
+                // finché non si risponde; se Android non lo consente, notifica normale.
+                val insistent = entry.reminder.type == ReminderType.ALARM ||
+                    (entry.reminder.type.isCompletable && appSettings.insistentLevel.applies(entry.reminder.priority))
+                val rang = insistent && AlarmRingService.start(context, id, entry.reminder.title, appSettings)
                 if (!rang) notifier.show(entry, today)
             }
             reminders.markNotified(plan.dueNow, now)

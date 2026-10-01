@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget Giornata: impegni del giorno e del successivo, da spuntare (e da riaprire). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/agenda_logo"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/widget_logo_background"
+            android:contentDescription="@string/app_name"
+            android:padding="3dp"
+            android:src="@drawable/ic_widget_bolt" />
+
+        <TextView
+            android:id="@+id/agenda_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_text"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/agenda_prev"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_round_button"
+            android:contentDescription="Giorno precedente"
+            android:padding="6dp"
+            android:src="@drawable/ic_widget_chevron_left" />
+        <ImageView
+            android:id="@+id/agenda_next"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/widget_round_button"
+            android:contentDescription="Giorno successivo"
+            android:padding="6dp"
+            android:src="@drawable/ic_widget_chevron_right" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/agenda_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:scrollbars="none" />
+</LinearLayout>

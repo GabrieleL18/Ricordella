@@ -10,6 +10,7 @@ import com.ricordella.app.domain.model.MaintenanceRecord
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.PersonItemRole
 import com.ricordella.app.domain.model.PersonWithRole
+import com.ricordella.app.domain.model.RecurrenceRule
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderCompletion
 import com.ricordella.app.domain.model.ReminderDraft
@@ -36,8 +37,11 @@ interface ReminderRepository {
     /** Crea o aggiorna promemoria, ricorrenza e collegamenti in un'unica transazione. */
     suspend fun save(draft: ReminderDraft)
     suspend fun update(reminder: Reminder)
-    /** Aggiorna il promemoria e registra il completamento nello storico, atomicamente. */
-    suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion)
+    /** Aggiorna il promemoria (e la ricorrenza, se spostata) e registra il completamento nello storico, atomicamente. */
+    suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion, rule: RecurrenceRule? = null)
+    /** Annulla il completamento [completionId] riportando il promemoria (e la ricorrenza) com'erano. */
+    suspend fun undoCompletion(updated: Reminder, completionId: String, rule: RecurrenceRule?)
+    suspend fun getCompletionsBetween(from: LocalDate, to: LocalDate): List<ReminderCompletion>
     suspend fun delete(id: String)
     suspend fun getSchedulingCandidates(): List<SchedulingCandidate>
     suspend fun markNotified(ids: List<String>, at: Instant)
@@ -70,6 +74,8 @@ interface ItemRepository {
 
 interface MaintenanceRepository {
     fun observeForItem(itemId: String): Flow<List<MaintenanceRecord>>
+    /** Spese di tutte le cose da [from] in poi. */
+    fun observeSince(from: LocalDate): Flow<List<MaintenanceRecord>>
     suspend fun save(record: MaintenanceRecord)
     suspend fun delete(id: String)
     suspend fun search(query: String, limit: Int): List<MaintenanceRecord>

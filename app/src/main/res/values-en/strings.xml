@@ -4,4 +4,10 @@
     <string name="notification_channel_reminders_description">Notifications for reminders and deadlines</string>
     <string name="widget_description">This month’s calendar with your reminders and quick-add buttons</string>
     <string name="widget_label">Remindella Calendar</string>
+    <string name="widget_water_label">Remindella Potions</string>
+    <string name="widget_water_description">Water drunk today: add or remove a potion with one tap</string>
+    <string name="widget_resolutions_label">Resolutions</string>
+    <string name="widget_resolutions_description">This year\'s resolutions: scroll the list and tick the ones you kept</string>
+    <string name="widget_agenda_label">Remindella Day</string>
+    <string name="widget_agenda_description">Today\'s and tomorrow\'s plans: mark them done, browse the days</string>
 </resources>

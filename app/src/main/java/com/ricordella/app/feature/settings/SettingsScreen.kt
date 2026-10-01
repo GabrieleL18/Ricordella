@@ -1,5 +1,32 @@
 package com.ricordella.app.feature.settings
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import com.ricordella.app.core.ui.RicordellaMotion
+import com.ricordella.app.core.ui.rememberReducedMotion
+import kotlinx.coroutines.delay
+import com.ricordella.app.feature.legal.TermsScreen
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Storage
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.ui.UiSound
 import com.ricordella.app.core.ui.UiSoundPlayer
@@ -90,7 +117,6 @@ import com.ricordella.app.core.ui.ConfirmDialog
 import com.ricordella.app.core.ui.DetailScaffold
 import com.ricordella.app.core.ui.DropdownField
 import com.ricordella.app.core.ui.NotifyOffsetPresets
-import com.ricordella.app.core.ui.SectionHeader
 import com.ricordella.app.core.ui.TimePickerDialogFor
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
@@ -103,7 +129,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit) {
     val viewModel = appViewModel { c, _ ->
         SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
@@ -159,167 +185,180 @@ fun SettingsScreen(onBack: () -> Unit) {
         ) {
             if (state.isBusy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
-            SectionHeader(tr("Aspetto"))
-            Text(tr("Tema"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
-            Segmented(
-                options = ThemeMode.entries,
-                selected = settings.themeMode,
-                label = { when (it) { ThemeMode.SYSTEM -> tr("Sistema"); ThemeMode.LIGHT -> tr("Chiaro"); ThemeMode.DARK -> tr("Scuro") } },
-                onSelected = { mode -> viewModel.update { it.copy(themeMode = mode) } },
-            )
-            Text(tr("Lingua"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
-            // Di default segue il sistema; cambiandola l'app si ridisegna subito nella nuova lingua.
-            var language by remember { mutableStateOf(Lang.current(context)) }
-            Segmented(
-                options = AppLanguage.entries,
-                selected = language,
-                label = { when (it) { AppLanguage.SYSTEM -> tr("Sistema"); AppLanguage.ITALIAN -> "Italiano"; AppLanguage.ENGLISH -> "English" } },
-                onSelected = { chosen ->
-                    language = chosen
-                    Lang.set(context, chosen)
-                    CalendarWidgetProvider.requestUpdate(context)
-                    (context as? android.app.Activity)?.recreate()
-                },
+            val year = LocalDate.now().year
+            val resolutions = settings.resolutions.filter { it.year == year }
+            SettingRow(
+                icon = Icons.Rounded.AutoAwesome,
+                title = tr("Buoni propositi"),
+                subtitle = if (resolutions.isEmpty()) trf("Scrivi i propositi per il %1\$s", year)
+                else trf("%1\$s: rispettati %2\$s su %3\$s", year, resolutions.count { it.kept }, resolutions.size),
+                onClick = { onOpenResolutions(year) },
             )
 
-            SectionHeader(tr("Calendario"))
-            Text(tr("Primo giorno della settimana"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
-            Segmented(
-                options = listOf(DayOfWeek.MONDAY, DayOfWeek.SUNDAY, DayOfWeek.SATURDAY),
-                selected = settings.firstDayOfWeek,
-                label = DateTexts::weekdayFull,
-                onSelected = { day -> viewModel.update { it.copy(firstDayOfWeek = day) } },
-            )
-            Text(tr("Formato data"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
-            val sample = LocalDate.of(2026, 3, 12)
-            Segmented(
-                options = DateFormatStyle.entries,
-                selected = settings.dateFormat,
-                label = { DateTexts.date(sample, it) },
-                onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
-            )
+            SettingsGroup(Icons.Rounded.Palette, tr("Aspetto"), tr("Tema, lingua, calendario e suoni")) {
+                Text(tr("Tema"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+                Segmented(
+                    options = ThemeMode.entries,
+                    selected = settings.themeMode,
+                    label = { when (it) { ThemeMode.SYSTEM -> tr("Sistema"); ThemeMode.LIGHT -> tr("Chiaro"); ThemeMode.DARK -> tr("Scuro") } },
+                    onSelected = { mode -> viewModel.update { it.copy(themeMode = mode) } },
+                )
+                Text(tr("Lingua"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+                // Di default segue il sistema; cambiandola l'app si ridisegna subito nella nuova lingua.
+                var language by remember { mutableStateOf(Lang.current(context)) }
+                Segmented(
+                    options = AppLanguage.entries,
+                    selected = language,
+                    label = { when (it) { AppLanguage.SYSTEM -> tr("Sistema"); AppLanguage.ITALIAN -> "Italiano"; AppLanguage.ENGLISH -> "English" } },
+                    onSelected = { chosen ->
+                        language = chosen
+                        Lang.set(context, chosen)
+                        CalendarWidgetProvider.requestUpdate(context)
+                        (context as? android.app.Activity)?.recreate()
+                    },
+                )
+                Text(tr("Primo giorno della settimana"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+                Segmented(
+                    options = listOf(DayOfWeek.MONDAY, DayOfWeek.SUNDAY, DayOfWeek.SATURDAY),
+                    selected = settings.firstDayOfWeek,
+                    label = DateTexts::weekdayFull,
+                    onSelected = { day -> viewModel.update { it.copy(firstDayOfWeek = day) } },
+                )
+                Text(tr("Formato data"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+                val sample = LocalDate.of(2026, 3, 12)
+                Segmented(
+                    options = DateFormatStyle.entries,
+                    selected = settings.dateFormat,
+                    label = { DateTexts.date(sample, it) },
+                    onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.MusicNote,
+                    title = tr("Suoni delle scelte"),
+                    subtitle = tr("Un piccolo suono quando scegli categorie e cose. Tocca per provarlo."),
+                    onClick = { UiSoundPlayer.play(UiSound.DING) },
+                    trailing = {
+                        Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
+                    },
+                )
+            }
 
-            SectionHeader(tr("Suoni"))
-            SettingRow(
-                icon = Icons.Rounded.MusicNote,
-                title = tr("Suoni delle scelte"),
-                subtitle = tr("Un piccolo suono quando scegli categorie e cose. Tocca per provarlo."),
-                onClick = { UiSoundPlayer.play(UiSound.DING) },
-                trailing = {
-                    Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
-                },
-            )
+            SettingsGroup(Icons.Rounded.Notifications, tr("Notifiche"), tr("Permessi, orari, anticipo e predefiniti per tipo")) {
+                SettingRow(
+                    icon = Icons.Rounded.Notifications,
+                    title = tr("Notifiche abilitate"),
+                    subtitle = tr("Remindella ti avvisa anche ad app chiusa."),
+                    trailing = {
+                        Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
+                    },
+                )
+                NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
+                ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
+                SettingRow(
+                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                    title = tr("Suono e vibrazione"),
+                    subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),
+                    onClick = { openChannelSettings(context) },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Orario promemoria senza ora"),
+                    subtitle = trf("Notifica alle %1\$s", DateTexts.time(settings.allDayNotificationTime)),
+                    onClick = { pickAllDayTime = true },
+                )
+                DropdownField(
+                    label = tr("Anticipo predefinito"),
+                    options = NotifyOffsetPresets,
+                    selected = settings.defaultNotifyOffsetMinutes,
+                    optionLabel = ::notifyOffsetLabel,
+                    onSelected = { minutes -> viewModel.update { it.copy(defaultNotifyOffsetMinutes = minutes) } },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                )
+                TypeDefaultsSection(settings, viewModel::update)
+            }
 
-            SectionHeader(tr("Notifiche"))
-            SettingRow(
-                icon = Icons.Rounded.Notifications,
-                title = tr("Notifiche abilitate"),
-                subtitle = tr("Remindella ti avvisa anche ad app chiusa."),
-                trailing = {
-                    Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
-                },
-            )
-            NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
-            ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
-            SettingRow(
-                icon = Icons.AutoMirrored.Rounded.VolumeUp,
-                title = tr("Suono e vibrazione"),
-                subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),
-                onClick = { openChannelSettings(context) },
-            )
-            SettingRow(
-                icon = Icons.Rounded.Schedule,
-                title = tr("Orario promemoria senza ora"),
-                subtitle = trf("Notifica alle %1\$s", DateTexts.time(settings.allDayNotificationTime)),
-                onClick = { pickAllDayTime = true },
-            )
-            DropdownField(
-                label = tr("Anticipo predefinito"),
-                options = NotifyOffsetPresets,
-                selected = settings.defaultNotifyOffsetMinutes,
-                optionLabel = ::notifyOffsetLabel,
-                onSelected = { minutes -> viewModel.update { it.copy(defaultNotifyOffsetMinutes = minutes) } },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            )
+            SettingsGroup(Icons.Rounded.Alarm, tr("Sveglia"), tr("Suono, vibrazione, volume e posticipo")) {
+                AlarmSettingsSection(settings, viewModel::update)
+            }
 
-            TypeDefaultsSection(settings, viewModel::update)
-            AlarmSettingsSection(settings, viewModel::update)
+            SettingsGroup(Icons.Rounded.Storage, tr("Dati e backup"), tr("Backup, importazione e operazioni di inizio anno")) {
+                SettingRow(
+                    icon = Icons.Rounded.Upload,
+                    title = tr("Esporta backup"),
+                    subtitle = tr("Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione."),
+                    onClick = { backupAction(BACKUP_EXPORT) },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Download,
+                    title = tr("Importa backup"),
+                    subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
+                    onClick = { backupAction(BACKUP_IMPORT) },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Backup automatico"),
+                    subtitle = settings.autoBackupTime?.let {
+                        if (settings.backupEveryHours > 0) trf("%1\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.frequencyLabel(settings))
+                        else trf("%1\$s alle %2\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.intervalLabel(settings.backupIntervalDays), DateTexts.time(it))
+                    } ?: tr("Spento: tocca per scegliere l'orario."),
+                    onClick = { pickBackupTime = true },
+                    trailing = {
+                        Switch(
+                            checked = settings.autoBackupTime != null,
+                            onCheckedChange = { on -> if (on) pickBackupTime = true else viewModel.update { it.copy(autoBackupTime = null) } },
+                        )
+                    },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.CalendarMonth,
+                    title = tr("Importa da Google Calendar"),
+                    subtitle = tr("Copia gli eventi di un account Google presente sul telefono."),
+                    onClick = { showCalendarImport = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.DeleteForever,
+                    title = tr("Elimina tutti i dati"),
+                    subtitle = tr("Cancella persone, cose, promemoria e storico da questo dispositivo."),
+                    onClick = { confirmDelete = 1 },
+                )
+                Text(tr("Operazioni periodiche"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(vertical = 8.dp))
+                AutomationSettings(settings, viewModel::update, includeBackup = true)
+            }
 
-            SectionHeader(tr("Dati"))
-            SettingRow(
-                icon = Icons.Rounded.Upload,
-                title = tr("Esporta backup"),
-                subtitle = tr("Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione."),
-                onClick = { backupAction(BACKUP_EXPORT) },
-            )
-            SettingRow(
-                icon = Icons.Rounded.Download,
-                title = tr("Importa backup"),
-                subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
-                onClick = { backupAction(BACKUP_IMPORT) },
-            )
-            SettingRow(
-                icon = Icons.Rounded.Schedule,
-                title = tr("Backup automatico"),
-                subtitle = settings.autoBackupTime?.let {
-                    trf("%1\$s alle %2\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.intervalLabel(settings.backupIntervalDays), DateTexts.time(it))
-                } ?: tr("Spento: tocca per scegliere l'orario."),
-                onClick = { pickBackupTime = true },
-                trailing = {
-                    Switch(
-                        checked = settings.autoBackupTime != null,
-                        onCheckedChange = { on -> if (on) pickBackupTime = true else viewModel.update { it.copy(autoBackupTime = null) } },
-                    )
-                },
-            )
-            SettingRow(
-                icon = Icons.Rounded.CalendarMonth,
-                title = tr("Importa da Google Calendar"),
-                subtitle = tr("Copia gli eventi di un account Google presente sul telefono."),
-                onClick = { showCalendarImport = true },
-            )
-            SettingRow(
-                icon = Icons.Rounded.DeleteForever,
-                title = tr("Elimina tutti i dati"),
-                subtitle = tr("Cancella persone, cose, promemoria e storico da questo dispositivo."),
-                onClick = { confirmDelete = 1 },
-            )
-
-            SectionHeader(tr("Operazioni periodiche"))
-            AutomationSettings(settings, viewModel::update, includeBackup = true)
+            SharingSection(settings, (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.sharedSpace)
 
             SupportCard(loved = settings.supportLoved, onLoved = { viewModel.update { it.copy(supportLoved = true) } })
 
-            SectionHeader(tr("Informazioni"))
-            SettingRow(
-                icon = Icons.Rounded.School,
-                title = tr("Rivedi il tutorial"),
-                subtitle = tr("Come funzionano le sezioni dell'app."),
-                onClick = { showSectionsTutorial = true },
-            )
-            SettingRow(
-                icon = Icons.Rounded.Lightbulb,
-                title = tr("Crediti"),
-                subtitle = tr("Da un'idea di GGL"),
-            )
-            VersionRow(settings.developerMode, onUnlock = { justUnlocked = true; viewModel.update { it.copy(developerMode = true) } })
-            SettingRow(
-                icon = Icons.Rounded.PrivacyTip,
-                title = tr("Privacy"),
-                subtitle = tr("I tuoi dati restano sul dispositivo."),
-                onClick = { showPrivacy = true },
-            )
-            val context = LocalContext.current
-            SettingRow(
-                icon = Icons.Rounded.Email,
-                title = tr("Assistenza"),
-                subtitle = SUPPORT_EMAIL,
-                onClick = {
-                    runCatching {
-                        context.startActivity(Intent(Intent.ACTION_SENDTO, "mailto:$SUPPORT_EMAIL?subject=Remindella".toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    }
-                },
-            )
+            SettingsGroup(Icons.Rounded.Info, tr("Informazioni"), tr("Tutorial, privacy, assistenza e versione")) {
+                SettingRow(
+                    icon = Icons.Rounded.School,
+                    title = tr("Rivedi il tutorial"),
+                    subtitle = tr("Come funzionano le sezioni dell'app."),
+                    onClick = { showSectionsTutorial = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Lightbulb,
+                    title = tr("Crediti"),
+                    subtitle = tr("Da un'idea Lanni Labs"),
+                )
+                VersionRow(settings.developerMode, onUnlock = { justUnlocked = true; viewModel.update { it.copy(developerMode = true) } })
+                SettingRow(
+                    icon = Icons.Rounded.PrivacyTip,
+                    title = tr("Termini d'uso e privacy"),
+                    subtitle = tr("Cosa fa l'app, i suoi limiti e i tuoi dati."),
+                    onClick = { showPrivacy = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Email,
+                    title = tr("Assistenza"),
+                    subtitle = SUPPORT_EMAIL,
+                    onClick = {
+                        runCatching {
+                            context.startActivity(Intent(Intent.ACTION_SENDTO, "mailto:$SUPPORT_EMAIL?subject=Remindella".toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
+                    },
+                )
+            }
             if (settings.developerMode) {
                 val tools = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.developerTools
                 DeveloperSection(tools, viewModel::update, justUnlocked)
@@ -352,20 +391,12 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
 
     if (showPrivacy) {
-        AlertDialog(
+        Dialog(
             onDismissRequest = { showPrivacy = false },
-            title = { Text(tr("Privacy")) },
-            text = {
-                Text(
-                    tr("Remindella funziona completamente offline e non richiede alcun account. ") +
-                        tr("Tutti i dati restano sul tuo dispositivo: l'app non ha accesso a Internet, ") +
-                        tr("non usa servizi cloud né statistiche di utilizzo.\n\n") +
-                        tr("I dati sono esclusi dal backup automatico di Android. ") +
-                        tr("Per trasferirli usa \"Esporta backup\": il file resta sotto il tuo controllo."),
-                )
-            },
-            confirmButton = { TextButton(onClick = { showPrivacy = false }) { Text("OK") } },
-        )
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            TermsScreen(onAccept = null, onDecline = { showPrivacy = false })
+        }
     }
 
     if (showExportChoices || showImportChoices) {
@@ -435,6 +466,58 @@ private fun <T> Segmented(options: List<T>, selected: T, label: (T) -> String, o
                 onClick = { onSelected(option) },
                 shape = SegmentedButtonDefaults.itemShape(index, options.size),
             ) { Text(label(option), maxLines = 1) }
+        }
+    }
+}
+
+/**
+ * Gruppo di impostazioni chiuso di default: la schermata resta corta e si apre solo ciò che serve.
+ * Aprendosi diventa una scheda: lo sfondo sale dietro al titolo, la freccia gira, il contenuto
+ * scende dall'alto e la schermata scorre quanto basta per mostrarlo.
+ */
+@Composable
+private fun SettingsGroup(icon: ImageVector, title: String, subtitle: String, content: @Composable () -> Unit) {
+    var open by rememberSaveable(title) { mutableStateOf(false) }
+    val reduced = rememberReducedMotion()
+    val long = if (reduced) 0 else RicordellaMotion.LONG
+    val short = if (reduced) 0 else RicordellaMotion.SHORT
+    val arrow by animateFloatAsState(if (open) 180f else 0f, tween(long, easing = RicordellaMotion.EaseOut), label = "groupArrow")
+    val card by animateColorAsState(
+        if (open) MaterialTheme.colorScheme.surfaceContainerLow else MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0f),
+        tween(short),
+        label = "groupCard",
+    )
+    val requester = remember { BringIntoViewRequester() }
+    LaunchedEffect(open) {
+        if (open) {
+            delay(long.toLong())
+            requester.bringIntoView()
+        }
+    }
+    Column(
+        Modifier
+            .padding(vertical = 2.dp)
+            .bringIntoViewRequester(requester)
+            .clip(MaterialTheme.shapes.large)
+            .background(card),
+    ) {
+        ListItem(
+            headlineContent = { Text(title) },
+            supportingContent = { Text(subtitle) },
+            leadingContent = { Icon(icon, contentDescription = null) },
+            trailingContent = { Icon(Icons.Rounded.ExpandMore, contentDescription = null, modifier = Modifier.rotate(arrow)) },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            modifier = Modifier.clickable { open = !open },
+        )
+        AnimatedVisibility(
+            visible = open,
+            enter = expandVertically(tween(long, easing = RicordellaMotion.EaseOut), expandFrom = Alignment.Top) +
+                fadeIn(tween(short, delayMillis = if (reduced) 0 else RicordellaMotion.MICRO)) +
+                slideInVertically(tween(long, easing = RicordellaMotion.EaseOut)) { -it / 10 },
+            exit = shrinkVertically(tween(short, easing = RicordellaMotion.EaseInOut), shrinkTowards = Alignment.Top) +
+                fadeOut(tween(if (reduced) 0 else RicordellaMotion.MICRO)),
+        ) {
+            Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)) { content() }
         }
     }
 }

@@ -1,5 +1,18 @@
 package com.ricordella.app.feature.reminders
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.ui.geometry.Offset
+import com.ricordella.app.core.ui.ScanCard
+import com.ricordella.app.core.ui.ScanFileTypes
+import com.ricordella.app.core.ui.ScanSource
+import com.ricordella.app.core.ui.scanInputImage
 import java.time.LocalTime
 import com.ricordella.app.core.ui.currentMinute
 import com.ricordella.app.core.ui.rememberReducedMotion
@@ -132,11 +145,13 @@ private val TravelMode.seatLabel: String
 fun TripFields(trip: TripInfo, onChange: (TripInfo) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     SectionHeader(tr("Viaggio"), icon = Icons.Rounded.Luggage, tone = colors.mint)
+    val context = LocalContext.current
     Text_(
         value = trip.destination,
         label = tr("Luogo / destinazione"),
         onValue = { onChange(trip.copy(destination = it)) },
     )
+    PlaceTileWhenTyped(trip.destination, directions = false) { openMaps(context, it) }
     trip.legs.forEachIndexed { index, leg ->
         LegCard(
             leg = leg,
@@ -169,23 +184,22 @@ private fun BoardingPassImport(onLegs: (List<TripLeg>) -> Unit) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { readBarcodes(context, it, onCodes) }
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), modifier = Modifier.fillMaxWidth()) {
-        AssistChip(
-            onClick = {
-                val options = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(BARCODE_FORMAT, *OTHER_BARCODE_FORMATS).build()
-                GmsBarcodeScanning.getClient(context, options).startScan()
-                    .addOnSuccessListener { onCodes(listOfNotNull(it.rawValue)) }
-                    .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
-            },
-            label = { Text(tr("Scansiona carta d'imbarco")) },
-            leadingIcon = { Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp)) },
-        )
-        AssistChip(
-            onClick = { picker.launch(arrayOf("image/*", "application/pdf")) },
-            label = { Text(tr("Da foto o PDF")) },
-            leadingIcon = { Icon(Icons.Rounded.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp)) },
-        )
-    }
+    ScanCard(
+        title = tr("Scansiona la carta d'imbarco"),
+        subtitle = tr("Leggo il codice e compilo da sola volo, posto e prenotazione."),
+        tone = MaterialTheme.ricordellaColors.cyan,
+        onChoose = { source ->
+            when (source) {
+                ScanSource.CAMERA -> {
+                    val options = GmsBarcodeScannerOptions.Builder().setBarcodeFormats(BARCODE_FORMAT, *OTHER_BARCODE_FORMATS).build()
+                    GmsBarcodeScanning.getClient(context, options).startScan()
+                        .addOnSuccessListener { onCodes(listOfNotNull(it.rawValue)) }
+                        .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+                }
+                ScanSource.FILE -> picker.launch(ScanFileTypes)
+            }
+        },
+    )
 }
 
 /** Le carte d'imbarco usano PDF417 o Aztec; QR e Data Matrix per sicurezza. */
@@ -193,29 +207,12 @@ private const val BARCODE_FORMAT = Barcode.FORMAT_PDF417
 private val OTHER_BARCODE_FORMATS = intArrayOf(Barcode.FORMAT_AZTEC, Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX)
 
 private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<String>) -> Unit) {
-    val image = runCatching {
-        if (context.contentResolver.getType(uri) == "application/pdf") InputImage.fromBitmap(renderFirstPage(context, uri), 0)
-        else InputImage.fromFilePath(context, uri)
-    }.getOrElse { return onCodes(emptyList()) }
+    val image = runCatching { scanInputImage(context, uri) }.getOrElse { return onCodes(emptyList()) }
     val options = BarcodeScannerOptions.Builder().setBarcodeFormats(BARCODE_FORMAT, *OTHER_BARCODE_FORMATS).build()
     BarcodeScanning.getClient(options).process(image)
         .addOnSuccessListener { codes -> onCodes(codes.mapNotNull { it.rawValue }) }
         .addOnFailureListener { onCodes(emptyList()) }
 }
-
-// ponytail: legge solo la prima pagina del PDF, dove c'è quasi sempre il codice; scorrere le pagine se servisse.
-private fun renderFirstPage(context: Context, uri: Uri): Bitmap =
-    context.contentResolver.openFileDescriptor(uri, "r")!!.use { fd ->
-        PdfRenderer(fd).use { pdf ->
-            pdf.openPage(0).use { page ->
-                val width = 2000
-                Bitmap.createBitmap(width, width * page.height / page.width, Bitmap.Config.ARGB_8888).apply {
-                    eraseColor(android.graphics.Color.WHITE)
-                    page.render(this, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                }
-            }
-        }
-    }
 
 @Composable
 private fun LegCard(leg: TripLeg, number: Int, onChange: (TripLeg) -> Unit, onRemove: () -> Unit) {
@@ -250,6 +247,8 @@ private fun StayCard(stay: TripStay, onChange: (TripStay) -> Unit) {
     FormCard(title = tr("Alloggio"), icon = Icons.Rounded.Hotel, tone = MaterialTheme.ricordellaColors.lavender) {
         Text_(stay.name, tr("Nome (hotel, casa, campeggio...)")) { onChange(stay.copy(name = it)) }
         Text_(stay.address, tr("Indirizzo")) { onChange(stay.copy(address = it)) }
+        val context = LocalContext.current
+        PlaceTileWhenTyped(stay.address, directions = true) { openDirections(context, it) }
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             DateField(tr("Check-in"), stay.checkIn, { onChange(stay.copy(checkIn = it)) }, Modifier.weight(1f), clearable = true)
             DateField(tr("Check-out"), stay.checkOut, { onChange(stay.copy(checkOut = it)) }, Modifier.weight(1f), clearable = true)
@@ -309,17 +308,7 @@ fun TripSection(trip: TripInfo) {
     val colors = MaterialTheme.ricordellaColors
     SectionHeader(tr("Viaggio"), icon = Icons.Rounded.Luggage, tone = colors.mint)
     trip.destination?.let { destination ->
-        Row(
-            Modifier.fillMaxWidth().clickable { openMaps(context, destination) }.padding(vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(Icons.Rounded.Place, contentDescription = null, tint = colors.coral.solid)
-            Text(destination, style = MaterialTheme.typography.titleMedium, textDecoration = TextDecoration.Underline)
-        }
-    }
-    (trip.stay?.address ?: trip.destination)?.let { place ->
-        TakeMeThere(place, name = trip.stay?.name?.takeIf { trip.stay.address != null }, onClick = { openDirections(context, place) })
+        MapPlaceTile(destination, directions = false, onClick = { openMaps(context, destination) })
     }
     trip.legs.forEach { leg ->
         FormCard(title = listOfNotNull(leg.from, leg.to).joinToString(" → ").ifEmpty { leg.mode.label }, icon = leg.mode.icon, tone = colors.cyan) {
@@ -332,14 +321,7 @@ fun TripSection(trip: TripInfo) {
     }
     trip.stay?.takeIf { !it.isEmpty }?.let { stay ->
         FormCard(title = stay.name ?: tr("Alloggio"), icon = Icons.Rounded.Hotel, tone = colors.lavender) {
-            stay.address?.let { address ->
-                Text(
-                    address,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { openMaps(context, address) },
-                )
-            }
+            stay.address?.let { address -> MapPlaceTile(address, directions = true, onClick = { openDirections(context, address) }) }
             stay.checkIn?.let { InfoRow(tr("Check-in"), DateTexts.date(it, format)) }
             stay.checkOut?.let { InfoRow(tr("Check-out"), DateTexts.date(it, format)) }
             stay.bookingCode?.let { InfoRow(tr("Prenotazione"), it) }
@@ -356,54 +338,102 @@ fun TripSection(trip: TripInfo) {
     }
 }
 
+/** Nel modulo: appena c'è un luogo scritto compare il suo riquadro mappa, per capire che toccandolo si va su Maps. */
+@Composable
+private fun PlaceTileWhenTyped(place: String?, directions: Boolean, onOpen: (String) -> Unit) {
+    AnimatedVisibility(
+        visible = !place.isNullOrBlank(),
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically(),
+    ) {
+        val shown = place?.trim().orEmpty()
+        if (shown.isNotEmpty()) MapPlaceTile(shown, directions, onClick = { onOpen(shown) })
+    }
+}
+
 /**
- * "Portami lì": pulsante grande a sfumatura verde-azzurra con la freccia di navigazione che
- * oscilla piano, il nome del posto e l'indirizzo. Apre Google Maps con il percorso già pronto.
+ * Un luogo che si apre in Google Maps: a sinistra una mini mappa con le strade e il segnaposto
+ * che saltella (o la freccia del navigatore se apre il percorso), a destra il nome e cosa succede
+ * toccandolo. Stesso riquadro per la destinazione e per l'alloggio, nel modulo e nel dettaglio.
  */
 @Composable
-private fun TakeMeThere(place: String, name: String?, onClick: () -> Unit) {
+private fun MapPlaceTile(place: String, directions: Boolean, onClick: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
+    val tone = if (directions) colors.mint else colors.cyan
     val interaction = remember { MutableInteractionSource() }
-    val nudge = if (rememberReducedMotion()) 0f else rememberInfiniteTransition(label = "nudge").animateFloat(
-        -1f,
+    val bounce = if (rememberReducedMotion()) 0f else rememberInfiniteTransition(label = "pin").animateFloat(
+        0f,
         1f,
         infiniteRepeatable(tween(1100, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse),
-        label = "nudgeX",
+        label = "bounce",
     ).value
     Row(
         Modifier
             .fillMaxWidth()
             .pressScale(interaction)
-            .clip(MaterialTheme.shapes.extraLarge)
-            .background(Brush.horizontalGradient(listOf(colors.mint.solid, colors.cyan.solid)))
-            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClickLabel = tr("Apri il percorso in Google Maps"), onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                role = Role.Button,
+                onClickLabel = if (directions) tr("Apri il percorso in Google Maps") else tr("Apri in Google Maps"),
+                onClick = onClick,
+            )
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Box(Modifier.size(48.dp).background(Color.White.copy(alpha = 0.25f), CircleShape), contentAlignment = Alignment.Center) {
-            Icon(
-                Icons.Rounded.Navigation,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(28.dp).graphicsLayer { rotationZ = 45f + nudge * 8f },
-            )
-        }
+        MiniMap(tone, directions, bounce)
         Column(Modifier.weight(1f)) {
-            Text(tr("Portami lì"), style = MaterialTheme.typography.titleLarge, color = Color.White)
-            Text(
-                listOfNotNull(name, place).joinToString(" · "),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.9f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Text(place, style = MaterialTheme.typography.titleMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Icon(if (directions) Icons.Rounded.Navigation else Icons.Rounded.Map, contentDescription = null, tint = tone.content, modifier = Modifier.size(14.dp))
+                Text(
+                    if (directions) tr("Portami lì · percorso in Maps") else tr("Tocca per aprirla in Maps"),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = tone.content,
+                )
+            }
         }
         Icon(
             Icons.AutoMirrored.Rounded.ArrowForward,
             contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.graphicsLayer { translationX = nudge * 4.dp.toPx() },
+            tint = tone.content,
+            modifier = Modifier.graphicsLayer { translationX = bounce * 4.dp.toPx() },
+        )
+    }
+}
+
+/** Mini mappa disegnata: strade bianche, un parco, e il segnaposto (o la freccia) che si muove. */
+@Composable
+private fun MiniMap(tone: Tone, directions: Boolean, bounce: Float) {
+    val colors = MaterialTheme.ricordellaColors
+    val road = MaterialTheme.colorScheme.surfaceContainerLowest
+    Box(
+        Modifier.size(56.dp).clip(RoundedCornerShape(14.dp)).background(colors.cyan.container.copy(alpha = 0.6f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(Modifier.matchParentSize()) {
+            val w = size.width
+            drawCircle(colors.mint.solid.copy(alpha = 0.35f), radius = w * 0.22f, center = Offset(w * 0.8f, w * 0.8f))
+            drawLine(road, Offset(0f, w * 0.35f), Offset(w, w * 0.55f), strokeWidth = w * 0.09f)
+            drawLine(road, Offset(w * 0.3f, 0f), Offset(w * 0.45f, w), strokeWidth = w * 0.07f)
+            drawLine(road, Offset(w * 0.6f, 0f), Offset(w, w * 0.3f), strokeWidth = w * 0.05f)
+            if (directions) {
+                // Il percorso tratteggiato che arriva al posto.
+                drawLine(tone.solid, Offset(w * 0.12f, w * 0.88f), Offset(w * 0.5f, w * 0.45f), strokeWidth = w * 0.05f,
+                    pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(w * 0.08f, w * 0.06f), w * 0.14f * bounce))
+            }
+        }
+        Icon(
+            if (directions) Icons.Rounded.Navigation else Icons.Rounded.Place,
+            contentDescription = null,
+            tint = if (directions) tone.solid else colors.coral.solid,
+            modifier = Modifier.size(28.dp).graphicsLayer {
+                translationY = -bounce * 5.dp.toPx()
+                if (directions) rotationZ = 45f
+            },
         )
     }
 }

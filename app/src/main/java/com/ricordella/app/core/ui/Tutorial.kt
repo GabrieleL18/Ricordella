@@ -1,5 +1,12 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Euro
+import androidx.compose.material.icons.rounded.Storefront
+import androidx.compose.foundation.layout.fillMaxHeight
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.animation.animateColorAsState
@@ -517,14 +524,135 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
         tr("Collega promemoria e cose alle persone: nella loro scheda trovi compleanni, eventi e tutto ciò che le riguarda."),
     ) { PeopleIllustration() },
     TutorialPage(
+        tr("Pozioni: bevi abbastanza"),
+        tr("La goccia in alto apre le Pozioni: scegli quanta acqua bere al giorno e ogni quanto ricordartelo. ") +
+            tr("A ogni bicchiere tocca +: il mago si riempie e gli avvisi si fermano quando hai raggiunto l'obiettivo."),
+    ) { PotionsIllustration() },
+    TutorialPage(
+        tr("Buoni propositi"),
+        tr("A gennaio ti propongo di scrivere i buoni propositi dell'anno; spuntali quando li rispetti. ") +
+            tr("A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi anche nelle Impostazioni e nel widget."),
+    ) { ResolutionsIllustration() },
+    TutorialPage(
+        tr("Scansiona documenti"),
+        tr("Scontrini e carte d'imbarco hanno un solo pulsante \"Scansiona\": toccalo e scegli se inquadrare con la fotocamera o aprire una foto o un PDF già sul telefono. ") +
+            tr("Leggo io data, prezzo, negozio e garanzia, oppure volo e posto. Tutto sul telefono, senza Internet."),
+    ) { ScanIllustration() },
+    TutorialPage(
         tr("Il pulsante +"),
         tr("Da qualunque sezione, il + giallo aggiunge al volo un promemoria, un evento, una cosa o una persona."),
     ) { AddIllustration() },
     TutorialPage(
         tr("Il widget"),
-        tr("Aggiungi il widget Calendario alla schermata Home del telefono: vedi questo mese e il prossimo, con i giorni impegnati colorati. Tocca un giorno per vederne gli impegni."),
+        tr("Sulla schermata Home del telefono puoi aggiungere i widget di Remindella: Calendario del mese, La tua giornata (oggi e domani, da spuntare), Pozioni (+ e − per l'acqua) e Buoni propositi."),
     ) { WidgetIllustration() },
 )
+
+/** Pozioni: la boccetta si riempie a ogni goccia che cade, poi compare "+250 ml". */
+@Composable
+fun PotionsIllustration() {
+    val t = loopTime(3600)
+    val c = MaterialTheme.ricordellaColors
+    val fill = (t.phase(0.1f, 0.8f) * 0.85f).coerceAtMost(0.85f)
+    val drop = (t * 4f) % 1f
+    Box(Modifier.size(240.dp), contentAlignment = Alignment.Center) {
+        Icon(
+            Icons.Rounded.WaterDrop,
+            null,
+            tint = c.cyan.solid,
+            modifier = Modifier.size(28.dp).graphicsLayer {
+                translationY = (-90f + drop * 70f).dp.toPx()
+                alpha = 1f - drop
+            },
+        )
+        Box(
+            Modifier
+                .size(96.dp, 130.dp)
+                .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp, bottomStart = 40.dp, bottomEnd = 40.dp))
+                .background(c.cyan.container)
+                .border(4.dp, c.cyan.solid, RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp, bottomStart = 40.dp, bottomEnd = 40.dp)),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Box(Modifier.fillMaxWidth().fillMaxHeight(fill).background(c.cyan.solid.copy(alpha = 0.75f)))
+        }
+        val pop = t.phase(0.55f, 0.7f) * (1f - t.phase(0.9f, 1f))
+        Text(
+            "+250 ml",
+            style = MaterialTheme.typography.labelLarge,
+            color = c.cyan.content,
+            modifier = Modifier
+                .graphicsLayer { translationX = 70.dp.toPx(); translationY = (-40f - pop * 20f).dp.toPx(); alpha = pop }
+                .background(c.cyan.container, CircleShape)
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+        )
+    }
+}
+
+/** Buoni propositi: tre propositi si spuntano uno dopo l'altro, poi arriva la coppa del recap. */
+@Composable
+fun ResolutionsIllustration() {
+    val t = loopTime(4000)
+    val c = MaterialTheme.ricordellaColors
+    PhoneFrame {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("2027", style = MaterialTheme.typography.titleMedium, color = c.pear.content, modifier = Modifier.weight(1f))
+                Icon(Icons.Rounded.AutoAwesome, null, tint = c.pear.solid, modifier = Modifier.size(18.dp))
+            }
+            repeat(3) { i -> MiniCard(c.pear, checked = t.phase(0.15f + i * 0.15f, 0.25f + i * 0.15f)) }
+            val trophy = t.phase(0.7f, 0.8f) * (1f - t.phase(0.95f, 1f))
+            Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
+                RoundIcon(Icons.Rounded.EmojiEvents, c.pear, size = 48.dp, modifier = Modifier.graphicsLayer { scaleX = trophy; scaleY = trophy; alpha = trophy })
+            }
+        }
+    }
+}
+
+/** Scansione: la linea passa sul documento e i dati letti escono come pastiglie colorate. */
+@Composable
+fun ScanIllustration() {
+    val t = loopTime(3800)
+    val c = MaterialTheme.ricordellaColors
+    val scan = t.phase(0.05f, 0.5f)
+    Row(Modifier.size(260.dp, 220.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+        Box(
+            Modifier
+                .size(110.dp, 160.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .border(3.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+                .padding(12.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(70.dp, 50.dp, 80.dp, 40.dp, 64.dp, 30.dp).forEach { Bar(it) }
+            }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .graphicsLayer { translationY = scan * 130.dp.toPx(); alpha = 1f - t.phase(0.5f, 0.55f) }
+                    .background(c.cyan.solid),
+            )
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            listOf(Triple(Icons.Rounded.CalendarMonth, "12/03", c.lavender), Triple(Icons.Rounded.Euro, "€ 349", c.mint), Triple(Icons.Rounded.Storefront, "Shop", c.pear))
+                .forEachIndexed { i, (icon, text, tone) ->
+                    val show = t.phase(0.5f + i * 0.08f, 0.6f + i * 0.08f) * (1f - t.phase(0.92f, 1f))
+                    Row(
+                        Modifier
+                            .graphicsLayer { alpha = show; translationX = (1f - show) * -30.dp.toPx() }
+                            .background(tone.container, CircleShape)
+                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Icon(icon, null, tint = tone.content, modifier = Modifier.size(14.dp))
+                        Text(text, style = MaterialTheme.typography.labelMedium, color = tone.content)
+                    }
+                }
+        }
+    }
+}
 
 /* ---------- Illustrazioni del backup ---------- */
 
@@ -757,3 +885,59 @@ fun CleanupIllustration() {
         RoundIcon(Icons.Rounded.CleaningServices, c.pear, size = 40.dp, modifier = Modifier.offset(x = (-80).dp, y = 85.dp).graphicsLayer { rotationZ = sin(t * 18f) * 20f })
     }
 }
+
+/* ---------- Condivisione tramite file su Drive ---------- */
+
+/** Due telefoni e una nuvola: i dati partono da uno, passano dal file su Drive e arrivano all'altro. */
+@Composable
+fun SharingIllustration(step: Int = 0) {
+    val t = loopTime(3200)
+    val c = MaterialTheme.ricordellaColors
+    Box(Modifier.size(260.dp), contentAlignment = Alignment.Center) {
+        PhoneFrame(Modifier.offset(x = (-80).dp, y = 30.dp).graphicsLayer { scaleX = 0.5f; scaleY = 0.5f }) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { MiniCard(c.coral); MiniCard(c.cyan) }
+        }
+        PhoneFrame(Modifier.offset(x = 80.dp, y = 30.dp).graphicsLayer { scaleX = 0.5f; scaleY = 0.5f }) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { MiniCard(c.lavender); MiniCard(c.mint) }
+        }
+        RoundIcon(
+            if (step == 1) Icons.Rounded.Share else Icons.Rounded.CloudDone,
+            c.cyan,
+            size = 64.dp,
+            modifier = Modifier.offset(y = (-80).dp).graphicsLayer { val s = 1f + 0.08f * sin(t * 2 * PI).toFloat(); scaleX = s; scaleY = s },
+        )
+        // Un dato sale dal primo telefono alla nuvola e scende nel secondo, e viceversa.
+        listOf(0f, 0.5f).forEachIndexed { i, offset ->
+            val p = (t + offset) % 1f
+            val up = (p * 2f).coerceAtMost(1f)
+            val down = ((p - 0.5f) * 2f).coerceIn(0f, 1f)
+            val fromX = if (i == 0) -80f else 80f
+            val x = if (p < 0.5f) fromX * (1f - up) else -fromX * down
+            val y = if (p < 0.5f) 10f - 90f * up else -80f + 90f * down
+            Box(
+                Modifier
+                    .offset(x = x.dp, y = y.dp)
+                    .size(14.dp)
+                    .graphicsLayer { alpha = sin(p * PI).toFloat() }
+                    .background(if (i == 0) c.coral.solid else c.lavender.solid, CircleShape),
+            )
+        }
+    }
+}
+
+/** Tutorial della condivisione con un'altra persona tramite un file su Drive. */
+val SharingTutorialPages: List<TutorialPage>
+    get() = listOf(
+        TutorialPage(
+            tr("Un file in comune"),
+            tr("Crea il file condiviso: scegli Google Drive come posizione. Dentro ci sono promemoria, persone, cose e spese."),
+        ) { SharingIllustration(0) },
+        TutorialPage(
+            tr("Condividilo su Drive"),
+            tr("Apri Google Drive, tocca ⋮ sul file › Condividi e aggiungi l'altra persona come Editor. Lei apre Remindella › Impostazioni › Condivisione › «Apri il file condiviso con me»."),
+        ) { SharingIllustration(1) },
+        TutorialPage(
+            tr("Sempre allineati"),
+            tr("Quando apri o chiudi Remindella i dati si uniscono: vince la modifica più recente e le cancellazioni valgono per entrambi. Foto e allegati restano sul telefono di chi li ha aggiunti."),
+        ) { SharingIllustration(2) },
+    )

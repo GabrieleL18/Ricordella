@@ -73,4 +73,14 @@ class HousekeepingTest {
         assertEquals(ReminderType.BIRTHDAY, CalendarImporter.guessType("Compleanno di Anna"))
         assertEquals(ReminderType.EVENT, CalendarImporter.guessType("Cena"))
     }
+
+    @Test
+    fun `backup ogni 3 ore - dovuto solo quando sono passate`() {
+        val hour = 3_600_000L
+        val app = com.ricordella.app.domain.model.AppSettings(backupEveryHours = 3, lastBackupMillis = 10 * hour)
+        val day = java.time.LocalDate.of(2026, 10, 1)
+        org.junit.Assert.assertFalse(Housekeeping.isBackupDue(app, day, nowMillis = 12 * hour))
+        org.junit.Assert.assertTrue(Housekeeping.isBackupDue(app, day, nowMillis = 13 * hour))
+        org.junit.Assert.assertTrue(Housekeeping.isBackupDue(app.copy(lastBackupMillis = null), day, nowMillis = 0))
+    }
 }

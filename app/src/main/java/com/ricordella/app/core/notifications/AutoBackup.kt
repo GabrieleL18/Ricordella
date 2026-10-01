@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 /**
- * Backup automatico: ogni giorno all'orario scelto, se è passato l'intervallo, sovrascrive da solo
+ * Backup automatico: ogni giorno all'orario scelto (o ogni 1, 3, 6 ore), se è passato l'intervallo, sovrascrive da solo
  * il file di backup. Se l'utente non ne ha scelto uno (o non è più scrivibile) ne crea uno in Download/Remindella.
  */
 class AutoBackup(
@@ -32,7 +32,7 @@ class AutoBackup(
     fun watch(scope: CoroutineScope) {
         scope.launch {
             settings.settings
-                .map { Triple(it.autoBackupTime, it.backupTargetUri, it.backupIntervalDays) }
+                .map { listOf(it.autoBackupTime, it.backupTargetUri, it.backupIntervalDays, it.backupEveryHours) }
                 .distinctUntilChanged()
                 .collect { refresh() }
         }
@@ -43,14 +43,21 @@ class AutoBackup(
      * lo fa subito. Dopo un tentativo ([afterRun]) si passa comunque a domani, anche se è fallito.
      */
     suspend fun refresh(afterRun: Boolean = false) {
-        val at = settings.current().autoBackupTime
+        val app = settings.current()
+        val at = app.autoBackupTime
         if (at == null) {
             alarmManager.cancel(alarmIntent())
             return
         }
         val now = LocalDateTime.now(time.zone)
         val todayAt = now.toLocalDate().atTime(at)
+        val hours = app.backupEveryHours.toLong()
         val next = when {
+            // Ogni N ore dall'ultimo backup riuscito: riaprire l'app non sposta in avanti il prossimo.
+            hours > 0 && afterRun -> now.plusHours(hours)
+            hours > 0 -> app.lastBackupMillis
+                ?.let { LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(it), time.zone).plusHours(hours) }
+                ?.takeIf { it > now } ?: now.plusMinutes(1)
             todayAt > now -> todayAt
             !afterRun && isDue() -> now.plusMinutes(1)
             else -> todayAt.plusDays(1)
@@ -68,7 +75,7 @@ class AutoBackup(
     /** Mai fatto un backup su file: il primo si fa subito, senza aspettare l'intervallo. */
     private suspend fun isDue(): Boolean {
         val app = settings.current()
-        return app.backupTargetUri == null || Housekeeping.isBackupDue(app, time.today())
+        return app.backupTargetUri == null || Housekeeping.isBackupDue(app, time.today(), time.now().toEpochMilli())
     }
 
     private fun alarmIntent(): PendingIntent = PendingIntent.getBroadcast(

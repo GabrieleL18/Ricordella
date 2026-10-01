@@ -22,7 +22,7 @@ enum class RecurrencePreset(private val italianLabel: String, val frequency: Rec
     companion object {
         fun from(rule: RecurrenceRule?): RecurrencePreset {
             if (rule == null) return NONE
-            if (rule.daysOfWeek.isNotEmpty() || rule.endDate != null) return CUSTOM
+            if (rule.daysOfWeek.isNotEmpty() || rule.endDate != null || rule.fromLastDone) return CUSTOM
             return entries.firstOrNull { it.frequency == rule.frequency && it.interval == rule.interval } ?: CUSTOM
         }
     }

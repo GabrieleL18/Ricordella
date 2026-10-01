@@ -1,5 +1,10 @@
 package com.ricordella.app.feature.calendar
 
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import com.ricordella.app.core.ui.MagicTime
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.WizardScene
 import com.ricordella.app.core.ui.birthdayAgeLabel
 import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
@@ -69,6 +74,9 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 
+/** Colonna degli orari: largo abbastanza per "18:30" scritto in stile magico. */
+private val LABEL_WIDTH = 56.dp
+
 /**
  * Timeline oraria di una giornata: una riga per ora con linea verticale, i promemoria
  * all'ora giusta con icona del tipo e descrizione, e (oggi) l'indicatore dell'ora corrente
@@ -122,8 +130,12 @@ fun DayTimeline(
                 }
             }
         }
-        if (!nowPlaced) if (occurrences.isEmpty()) EmptyClock(now) else NowRow()
-        AddRow(if (occurrences.isEmpty()) tr("Nessun impegno: aggiungine uno") else tr("Aggiungi"), onAdd)
+        if (occurrences.isEmpty()) {
+            FreeDay(isToday, now, onAdd)
+        } else {
+            if (!nowPlaced) NowRow()
+            AddRow(tr("Aggiungi"), onAdd)
+        }
     }
 }
 
@@ -131,27 +143,61 @@ fun DayTimeline(
 @Composable
 private fun NowRow() {
     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.width(68.dp))
+        Box(Modifier.width(LABEL_WIDTH + 20.dp))
         Box(Modifier.weight(1f)) { NowIndicator() }
     }
 }
 
+/** "Aggiungi" a pastiglia, allineato alle schede della timeline. */
 @Composable
 private fun AddRow(text: String, onAdd: () -> Unit) {
+    Box(Modifier.fillMaxWidth().padding(start = LABEL_WIDTH + 26.dp, top = 4.dp)) { AddPill(text, onAdd) }
+}
+
+@Composable
+private fun AddPill(text: String, onAdd: () -> Unit) {
+    val tone = MaterialTheme.ricordellaColors.lavender
     Row(
         Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp)
-            .clip(MaterialTheme.shapes.small)
+            .clip(CircleShape)
+            .background(tone.container)
             .clickable(role = Role.Button, onClick = onAdd)
-            .padding(vertical = 8.dp),
+            .padding(start = 6.dp, end = 16.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(Modifier.width(60.dp), contentAlignment = Alignment.CenterEnd) {
-            Icon(Icons.Rounded.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+        Box(Modifier.size(28.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Icons.Rounded.Add, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(18.dp))
         }
-        Text(text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        Text(text, style = MaterialTheme.typography.labelLarge, color = tone.content)
+    }
+}
+
+/**
+ * Giornata senza impegni: oggi un grande orologio magico che brilla, gli altri giorni il mago
+ * che legge; sotto l'invito ad aggiungere qualcosa.
+ */
+@Composable
+private fun FreeDay(isToday: Boolean, now: LocalDateTime, onAdd: () -> Unit) {
+    val tone = MaterialTheme.ricordellaColors.lavender
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        if (isToday) MagicTime(DateTexts.time(now.toLocalTime().withSecond(0).withNano(0)), 56.sp, live = true)
+        else HappyWizard(size = 88.dp, scene = WizardScene.READING)
+        Text(if (isToday) tr("Giornata libera ✨") else tr("Niente in programma ✨"), style = MaterialTheme.typography.titleMedium, color = tone.content)
+        Text(
+            tr("Nessun impegno: è il momento giusto per aggiungerne uno."),
+            style = MaterialTheme.typography.bodyMedium,
+            color = tone.content,
+            textAlign = TextAlign.Center,
+        )
+        AddPill(tr("Aggiungi un impegno"), onAdd)
     }
 }
 
@@ -159,12 +205,7 @@ private fun AddRow(text: String, onAdd: () -> Unit) {
 private fun HourRow(label: String, nowMinute: Int?, content: @Composable () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = if (nowMinute != null) colors.coral.content else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.width(48.dp).padding(top = 12.dp),
-        )
+        MagicTime(label, 16.sp, modifier = Modifier.width(LABEL_WIDTH).padding(top = 8.dp), live = nowMinute != null)
         // Linea del tempo con il pallino dell'ora.
         Box(Modifier.width(20.dp).fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
             Box(Modifier.width(2.dp).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
@@ -209,14 +250,6 @@ fun LiveTime(now: LocalDateTime, style: TextStyle, color: Color, modifier: Modif
         Text("%02d".format(now.hour), style = style, color = color)
         Text(":", style = style, color = MaterialTheme.ricordellaColors.coral.solid, modifier = Modifier.graphicsLayer { alpha = blink })
         Text("%02d".format(now.minute), style = style, color = color)
-    }
-}
-
-/** Giornata libera: al posto della timeline, un grande orologio. */
-@Composable
-private fun EmptyClock(now: LocalDateTime) {
-    Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-        LiveTime(now, MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.SemiBold), MaterialTheme.colorScheme.onSurface)
     }
 }
 

@@ -1,5 +1,10 @@
 package com.ricordella.app.feature.settings
 
+import androidx.compose.material.icons.rounded.Gavel
+import com.ricordella.app.core.ui.LocalAppSettings
+import com.ricordella.app.core.date.DateTexts
+import com.ricordella.app.feature.legal.TERMS_VERSION
+import java.time.LocalDate
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -11,6 +16,8 @@ import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.AccessAlarm
 import androidx.compose.material.icons.rounded.Celebration
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.CloudUpload
@@ -162,11 +169,32 @@ fun DeveloperSection(tools: DeveloperTools, update: ((AppSettings) -> AppSetting
         }
     }
     DevRow(
+        Icons.Rounded.AutoAwesome,
+        tr("Simula gennaio: buoni propositi"),
+        tr("La Home fa come se fosse il 2 gennaio: prima il recap dell'anno che finisce, poi l'invito a scrivere i propositi nuovi."),
+        confirm = tr("Fino alla chiusura dell'app la Home crede che sia il 2 gennaio dell'anno prossimo. I propositi di prova dell'anno prossimo vengono azzerati."),
+    ) { run(tr("Guarda la Home")) { tools.simulateResolutionsNewYear() } }
+    DevRow(
+        Icons.Rounded.EmojiEvents,
+        tr("Simula dicembre: recap dei propositi"),
+        tr("La Home fa come se fosse il 28 dicembre e propone il recap di quest'anno (con propositi di esempio se non ne hai)."),
+        confirm = tr("Fino alla chiusura dell'app la Home crede che sia il 28 dicembre. Se quest'anno non hai propositi ne aggiungo tre di esempio."),
+    ) { run(tr("Guarda la Home")) { tools.simulateResolutionsRecap() } }
+    DevRow(
         Icons.Rounded.CloudUpload,
         tr("Mostra l'invito al backup"),
         tr("Fa comparire subito in Home la richiesta di aggiornare il backup."),
         confirm = tr("Faccio come se fosse scaduto l'intervallo del backup."),
     ) { run(tr("Guarda la Home")) { tools.forceBackupReminder() } }
+    val terms = LocalAppSettings.current
+    DevRow(
+        Icons.Rounded.Gavel,
+        tr("Termini d'uso"),
+        terms.termsAcceptedEpochDay?.let {
+            trf("Accettati il %1\$s (versione %2\$s di %3\$s). Tocca per richiederli.", DateTexts.date(LocalDate.ofEpochDay(it), terms.dateFormat), terms.termsAcceptedVersion, TERMS_VERSION)
+        } ?: tr("Non ancora accettati."),
+        confirm = tr("Annullo l'accettazione: l'app mostra subito i termini e non si usa finché non li accetti di nuovo."),
+    ) { update { it.copy(termsAcceptedVersion = 0, termsAcceptedEpochDay = null) } }
     DevRow(
         Icons.Rounded.AccessAlarm,
         tr("Ricalcola le notifiche"),

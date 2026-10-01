@@ -3,6 +3,9 @@ package com.ricordella.app.feature.items
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.foundation.background
+import com.ricordella.app.core.i18n.trf
+import androidx.compose.material.icons.rounded.Euro
+import com.ricordella.app.domain.model.ExpenseStats
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -67,8 +70,9 @@ import com.ricordella.app.domain.model.ItemWithCategory
 
 @Composable
 fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
-    val viewModel = appViewModel { c, _ -> ItemListViewModel(c.itemRepository) }
+    val viewModel = appViewModel { c, _ -> ItemListViewModel(c.itemRepository, c.maintenanceRepository) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val expenses by viewModel.expenses.collectAsStateWithLifecycle()
     val tracker = rememberRevealTracker()
     val colors = MaterialTheme.ricordellaColors
 
@@ -87,6 +91,9 @@ fun ItemListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         ) {
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
                 SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca per nome, marca, modello, targa"))
+            }
+            item(span = { GridItemSpan(maxLineSpan) }, key = "expenses") {
+                ExpensesBanner(expenses)
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "groups") {
                 IconChipRow {
@@ -195,5 +202,35 @@ private fun Fact(icon: ImageVector, text: String) {
             Icon(icon, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Text(text, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Totale delle spese dell'anno di tutte le cose (manutenzioni, rifornimenti, altre spese). */
+@Composable
+private fun ExpensesBanner(stats: ExpenseStats?) {
+    if (stats == null) return
+    val tone = MaterialTheme.ricordellaColors.mint
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+    ) {
+        Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Icons.Rounded.Euro, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(trf("Spese %1\$s", stats.year), style = MaterialTheme.typography.labelLarge, color = tone.content)
+            Text(DateTexts.money(stats.totalCents), style = MaterialTheme.typography.titleLarge, color = tone.content)
+        }
+        if (stats.previousYearCents > 0) {
+            Text(
+                trf("Anno scorso: %1\$s", DateTexts.money(stats.previousYearCents)),
+                style = MaterialTheme.typography.bodySmall,
+                color = tone.content,
+            )
+        }
     }
 }

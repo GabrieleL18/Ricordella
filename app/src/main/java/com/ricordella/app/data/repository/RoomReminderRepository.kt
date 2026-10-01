@@ -2,6 +2,7 @@ package com.ricordella.app.data.repository
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ricordella.app.data.local.dao.ReminderDao
+import com.ricordella.app.domain.model.RecurrenceRule
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderCompletion
 import com.ricordella.app.domain.model.ReminderDraft
@@ -43,8 +44,13 @@ class RoomReminderRepository(private val dao: ReminderDao) : ReminderRepository 
 
     override suspend fun update(reminder: Reminder) = dao.updateReminder(reminder)
 
-    override suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion) =
-        dao.recordCompletion(updated, completion)
+    override suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion, rule: RecurrenceRule?) =
+        dao.recordCompletion(updated, completion, rule)
+
+    override suspend fun undoCompletion(updated: Reminder, completionId: String, rule: RecurrenceRule?) =
+        dao.undoCompletion(updated, completionId, rule)
+
+    override suspend fun getCompletionsBetween(from: LocalDate, to: LocalDate) = dao.getCompletionsBetween(from, to)
 
     override suspend fun delete(id: String) = dao.deleteWithDependencies(id)
 

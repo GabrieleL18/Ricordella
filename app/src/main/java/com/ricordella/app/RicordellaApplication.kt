@@ -24,5 +24,6 @@ class RicordellaApplication : Application() {
         container.applicationScope.launch { container.reminderScheduler.refresh() }
         container.potionReminders.watch(container.applicationScope)
         container.autoBackup.watch(container.applicationScope)
+        com.ricordella.app.core.widget.HomeWidgets.watch(this, container.applicationScope)
     }
 }

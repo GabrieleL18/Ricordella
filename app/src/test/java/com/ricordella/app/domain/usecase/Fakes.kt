@@ -66,10 +66,20 @@ class FakeReminderRepository : ReminderRepository {
         reminders.value = reminders.value + (reminder.id to reminder)
     }
 
-    override suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion) {
+    override suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion, rule: RecurrenceRule?) {
+        rule?.let { rules[it.id] = it }
         update(updated)
         completions += completion
     }
+
+    override suspend fun undoCompletion(updated: Reminder, completionId: String, rule: RecurrenceRule?) {
+        rule?.let { rules[it.id] = it }
+        update(updated)
+        completions.removeAll { it.id == completionId }
+    }
+
+    override suspend fun getCompletionsBetween(from: LocalDate, to: LocalDate) =
+        completions.filter { !it.occurrenceDate.isBefore(from) && !it.occurrenceDate.isAfter(to) }
 
     override suspend fun delete(id: String) {
         reminders.value[id]?.recurrenceRuleId?.let(rules::remove)

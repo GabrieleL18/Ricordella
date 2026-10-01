@@ -11,6 +11,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import com.ricordella.app.domain.model.ExpenseStats
+import com.ricordella.app.domain.repository.MaintenanceRepository
+import java.time.LocalDate
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -28,7 +32,15 @@ data class ItemListUiState(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ItemListViewModel(items: ItemRepository) : ViewModel() {
+class ItemListViewModel(items: ItemRepository, maintenance: MaintenanceRepository) : ViewModel() {
+
+    /** Spese di tutte le cose: anno corrente e anno scorso, per il riquadro in cima. */
+    val expenses: StateFlow<ExpenseStats?> = LocalDate.now().year.let { year ->
+        maintenance.observeSince(LocalDate.of(year - 1, 1, 1))
+            .map { records -> ExpenseStats.of(records, year).takeIf { it.totalCents > 0 || it.previousYearCents > 0 } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    }
+
 
     private val query = MutableStateFlow("")
     private val showArchived = MutableStateFlow(false)

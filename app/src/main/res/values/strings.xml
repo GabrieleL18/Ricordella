@@ -5,4 +5,10 @@
     <string name="notification_channel_reminders_description">Notifiche dei promemoria e delle scadenze</string>
     <string name="widget_description">Calendario del mese con i tuoi promemoria e i pulsanti per aggiungere al volo</string>
     <string name="widget_label">Calendario Remindella</string>
+    <string name="widget_water_label">Pozioni Remindella</string>
+    <string name="widget_water_description">L\'acqua bevuta oggi: aggiungi o togli una pozione con un tocco</string>
+    <string name="widget_resolutions_label">Buoni propositi</string>
+    <string name="widget_resolutions_description">I buoni propositi dell\'anno: scorri la lista e spunta quelli rispettati</string>
+    <string name="widget_agenda_label">Giornata Remindella</string>
+    <string name="widget_agenda_description">Gli impegni di oggi e di domani: segnali come fatti, sfoglia i giorni</string>
 </resources>

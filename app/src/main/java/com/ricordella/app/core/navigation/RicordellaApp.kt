@@ -1,5 +1,10 @@
 package com.ricordella.app.core.navigation
 
+import com.ricordella.app.feature.legal.TERMS_VERSION
+import com.ricordella.app.feature.legal.TermsScreen
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
@@ -100,6 +105,7 @@ import com.ricordella.app.feature.viewer.DocumentViewerScreen
 import androidx.navigation.toRoute
 import com.ricordella.app.feature.settings.SettingsScreen
 import com.ricordella.app.feature.potions.PotionsScreen
+import com.ricordella.app.feature.resolutions.ResolutionsScreen
 import kotlin.reflect.KClass
 
 private enum class TopLevelDestination(
@@ -131,6 +137,22 @@ fun RicordellaApp(
     widgetRequest: WidgetRequest? = null,
     onWidgetRequestHandled: () -> Unit = {},
 ) {
+    if (LocalAppSettings.current.termsAcceptedVersion < TERMS_VERSION) {
+        val container = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+        val activity = LocalContext.current as? android.app.Activity
+        val scope = rememberCoroutineScope()
+        TermsScreen(
+            onAccept = {
+                scope.launch {
+                    container.settingsRepository.update {
+                        it.copy(termsAcceptedVersion = TERMS_VERSION, termsAcceptedEpochDay = container.time.today().toEpochDay())
+                    }
+                }
+            },
+            onDecline = { activity?.finishAndRemoveTask() },
+        )
+        return
+    }
     if (!LocalAppSettings.current.onboardingDone) {
         OnboardingScreen()
         return
@@ -163,6 +185,7 @@ fun RicordellaApp(
             CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
             CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
             com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
+            com.ricordella.app.MainActivity.ACTION_OPEN_RESOLUTIONS -> navigator.openResolutions(java.time.LocalDate.now().year)
         }
         onWidgetRequestHandled()
     }
@@ -216,8 +239,12 @@ fun RicordellaApp(
             composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd) }
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
             composable<SearchRoute> { SearchScreen(navigator) }
-            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back) }
+            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }) }
             composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
+            composable<ResolutionsRoute> { entry ->
+                val route = entry.toRoute<ResolutionsRoute>()
+                ResolutionsScreen(route.year, route.recap, onBack = navigator::back)
+            }
             composable<ReminderDetailRoute> { ReminderDetailScreen(navigator) }
             composable<ReminderEditRoute> { ReminderEditScreen(onBack = navigator::back) }
             composable<ItemDetailRoute> { ItemDetailScreen(navigator) }

@@ -54,6 +54,8 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
     settingsRepository.update {
         it.copy(
             onboardingDone = true,
+            termsAcceptedVersion = com.ricordella.app.feature.legal.TERMS_VERSION,
+            termsAcceptedEpochDay = time.today().toEpochDay(),
             backupTutorialSeen = true,
             developerMode = true,
             notificationsEnabled = false,

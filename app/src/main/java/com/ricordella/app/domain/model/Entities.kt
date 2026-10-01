@@ -7,6 +7,7 @@
 
 package com.ricordella.app.domain.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -112,6 +113,11 @@ data class RecurrenceRule(
     val daysOfWeek: Set<DayOfWeek> = emptySet(),
     val dayOfMonth: Int? = null,
     val monthOfYear: Int? = null,
+    /**
+     * Si conta dall'ultima volta che è stato fatto: se un'occorrenza arriva prima o dopo
+     * (es. ogni 28 giorni, ma questo mese dopo 30) le successive si spostano di conseguenza.
+     */
+    @ColumnInfo(defaultValue = "0") val fromLastDone: Boolean = false,
 )
 
 @Serializable
@@ -225,6 +231,10 @@ data class MaintenanceRecord(
     val description: String? = null,
     val notes: String? = null,
     val createdAt: Instant,
+    /** Intervento, rifornimento o altra spesa (bollo, assicurazione...). */
+    @ColumnInfo(defaultValue = "SERVICE") val kind: ExpenseKind = ExpenseKind.SERVICE,
+    /** Litri del rifornimento, per calcolare il consumo. */
+    val liters: Double? = null,
 )
 
 @Serializable

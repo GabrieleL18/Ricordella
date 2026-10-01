@@ -54,7 +54,7 @@ fun YearlyTask.explanation(count: Int?, year: Int): String = when (this) {
         (if (count != null) trf("Ci sono %1\$s feste importate rimaste nell'anno passato. ", count) else "") +
             trf("Le sposto al %1\$s: Natale e le feste fisse restano nello stesso giorno, Pasqua, Pasquetta e le altre feste mobili vengono ricalcolate.", year)
     YearlyTask.CLEANUP ->
-        (if (count != null) trf("Ho trovato %1\$s promemoria ed eventi degli anni passati non importanti o senza persone e cose collegate. ", count) else "") +
+        (if (count != null) trf("Ho trovato %1\$s promemoria ed eventi più vecchi di un anno non importanti o senza persone e cose collegate. ", count) else "") +
             tr("Posso eliminarli per fare ordine. Quelli importanti e collegati a persone o cose restano.")
 }
 

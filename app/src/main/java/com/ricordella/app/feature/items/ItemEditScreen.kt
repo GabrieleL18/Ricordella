@@ -69,6 +69,7 @@ import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Check
 import com.ricordella.app.core.ui.PushButton
+import com.ricordella.app.core.ui.ReceiptScanCard
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -338,6 +339,7 @@ private fun DetailsForm(form: ItemForm, viewModel: ItemEditViewModel, onChangeCa
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
         GroupCrumb(form.group, onChange = onChangeCategory, kindName = form.category?.label)
+        if (ItemReminderTemplates.supportsWarranty(form.group)) ReceiptScanCard(onScanned = viewModel::onReceiptScanned)
         FormSection(tr("Com'è fatta"), Icons.Rounded.Info, form.group.tone) {
             PhotoRow(form, viewModel)
             MainFields(form, viewModel)

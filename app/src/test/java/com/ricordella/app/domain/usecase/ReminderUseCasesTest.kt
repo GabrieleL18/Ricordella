@@ -41,6 +41,7 @@ class ReminderUseCasesTest {
     private val snooze = SnoozeReminderUseCase(repository, settings, scheduler, time)
     private val delete = DeleteReminderUseCase(repository, scheduler)
     private val reopen = ReopenReminderUseCase(repository, scheduler, time)
+    private val undo = UndoCompletionUseCase(repository, scheduler, time)
 
     private fun reminder(date: LocalDate, time: LocalTime? = null) =
         Reminder(title = " Tagliando ", dueDate = date, dueTime = time, createdAt = Instant.EPOCH, updatedAt = Instant.EPOCH)
@@ -126,6 +127,41 @@ class ReminderUseCasesTest {
         saveDraft(r, RecurrenceRule(frequency = RecurrenceFrequency.DAILY, startDate = start))
         complete(r.id)
         assertEquals(today, repository.reminders.value.getValue(r.id).dueDate)
+    }
+
+    @Test
+    fun `ogni 28 giorni dall'ultima volta - fatto in ritardo sposta anche le successive`() = runTest {
+        val due = today.minusDays(2)
+        val r = reminder(due)
+        val rule = RecurrenceRule(frequency = RecurrenceFrequency.DAILY, interval = 28, startDate = due, fromLastDone = true)
+        saveDraft(r, rule)
+        complete(r.id)
+        assertEquals(today.plusDays(28), repository.reminders.value.getValue(r.id).dueDate)
+        // La regola riparte dalla nuova data: le occorrenze proiettate seguono lo spostamento.
+        assertEquals(today.plusDays(28), repository.rules.getValue(rule.id).startDate)
+        assertEquals(today.plusDays(56), RecurrenceCalculator().nextOccurrenceAfter(repository.rules.getValue(rule.id), today.plusDays(28)))
+    }
+
+    @Test
+    fun `annulla fatto - il ricorrente torna all'occorrenza e lo storico sparisce`() = runTest {
+        val r = reminder(today)
+        saveDraft(r, RecurrenceRule(frequency = RecurrenceFrequency.DAILY, startDate = today))
+        complete(r.id)
+        assertEquals(today.plusDays(1), repository.reminders.value.getValue(r.id).dueDate)
+        undo(r.id, today)
+        assertEquals(today, repository.reminders.value.getValue(r.id).dueDate)
+        assertEquals(0, repository.completions.size)
+    }
+
+    @Test
+    fun `annulla fatto - un promemoria semplice torna attivo`() = runTest {
+        val r = reminder(today)
+        saveDraft(r)
+        complete(r.id)
+        undo(r.id, today)
+        val back = repository.reminders.value.getValue(r.id)
+        assertEquals(ReminderStatus.ACTIVE, back.status)
+        assertNull(back.completedAt)
     }
 
     @Test

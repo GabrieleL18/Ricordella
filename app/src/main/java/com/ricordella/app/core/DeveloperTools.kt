@@ -32,6 +32,8 @@ import com.ricordella.app.domain.usecase.SaveReminderUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.ricordella.app.domain.model.Resolution
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -88,7 +90,7 @@ class DeveloperTools(
     /** Fa comparire subito in Home l'invito ad aggiornare il backup. */
     suspend fun forceBackupReminder() {
         val today = time.today().toEpochDay()
-        settings.update { it.copy(backupCheckEpochDay = today - it.backupIntervalDays) }
+        settings.update { it.copy(backupCheckEpochDay = today - it.backupIntervalDays, lastBackupMillis = null) }
     }
 
     /**
@@ -107,9 +109,36 @@ class DeveloperTools(
         return housekeeping.holidaysToRoll() to housekeeping.countCleanupCandidates()
     }
 
+    /**
+     * Giorno finto usato dalla Home per gli inviti dei buoni propositi: permette di provarli
+     * senza aspettare gennaio o dicembre. Resta in memoria fino alla chiusura dell'app.
+     */
+    val resolutionsDay = MutableStateFlow<LocalDate?>(null)
+
+    /** La Home fa come se fosse il 2 gennaio dell'anno prossimo: recap di quest'anno (se ci sono propositi), poi l'invito a scriverne di nuovi. */
+    suspend fun simulateResolutionsNewYear() {
+        val next = time.today().year + 1
+        settings.update { it.copy(resolutionsAskedYear = null, resolutionsRecapYear = null, resolutions = it.resolutions.filterNot { r -> r.year == next }) }
+        resolutionsDay.value = LocalDate.of(next, 1, 2)
+    }
+
+    /** La Home fa come se fosse il 28 dicembre: recap di quest'anno, con tre propositi di esempio se non ce ne sono. */
+    suspend fun simulateResolutionsRecap() {
+        val year = time.today().year
+        settings.update { current ->
+            val samples = if (current.resolutions.any { it.year == year }) emptyList() else listOf(
+                Resolution(year = year, text = tr("Bere più acqua"), kept = true),
+                Resolution(year = year, text = tr("Leggere un libro al mese")),
+                Resolution(year = year, text = tr("Fare una passeggiata ogni domenica"), kept = true),
+            )
+            current.copy(resolutionsRecapYear = null, resolutions = current.resolutions + samples)
+        }
+        resolutionsDay.value = LocalDate.of(year, 12, 28)
+    }
+
     suspend fun rescheduleAlarms() = scheduler.refresh()
 
-    fun refreshWidget() = CalendarWidgetProvider.requestUpdate(context)
+    fun refreshWidget() = com.ricordella.app.core.widget.HomeWidgets.updateAll(context)
 
     suspend fun info(): DeveloperInfo = withContext(Dispatchers.IO) {
         val media = File(context.filesDir, "media").listFiles().orEmpty()
@@ -169,7 +198,7 @@ class DeveloperTools(
             // Anno scorso: feste da spostare (Pasqua cambia data) e un evento da pulire.
             draft(Reminder(title = tr("Natale"), type = ReminderType.HOLIDAY, dueDate = LocalDate.of(today.year - 1, 12, 25), notificationsEnabled = false, createdAt = now, updatedAt = now)),
             draft(Reminder(title = tr("Pasqua"), type = ReminderType.HOLIDAY, dueDate = Holidays.easter(today.year - 1), notificationsEnabled = false, createdAt = now, updatedAt = now)),
-            draft(Reminder(title = tr("Cena dell'anno scorso"), type = ReminderType.EVENT, dueDate = LocalDate.of(today.year - 1, 11, 20), createdAt = now, updatedAt = now)),
+            draft(Reminder(title = tr("Cena dell'anno scorso"), type = ReminderType.EVENT, dueDate = today.minusYears(1).minusMonths(2), createdAt = now, updatedAt = now)),
         ).forEach { saveReminder(it) }
     }
 }

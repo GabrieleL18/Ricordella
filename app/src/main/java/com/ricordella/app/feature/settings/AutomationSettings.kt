@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.settings
 
+import java.time.LocalTime
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,19 +60,26 @@ fun AutomationSettings(settings: AppSettings, update: ((AppSettings) -> AppSetti
         )
         ModeRow(
             title = tr("Pulizia annuale"),
-            subtitle = tr("A gennaio elimina i promemoria degli anni passati non importanti o senza persone e cose."),
+            subtitle = tr("A gennaio elimina i promemoria più vecchi di un anno non importanti o senza persone e cose: l'ultimo anno resta sempre."),
             selected = settings.cleanupMode,
             onHelp = { help = YearlyTask.CLEANUP.name },
             onSelected = { mode -> update { it.copy(cleanupMode = mode) } },
         )
         if (includeBackup) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Valori negativi = ore (-3 = ogni 3 ore), positivi = giorni: un solo menu per entrambi.
                 DropdownField(
                     label = tr("Ogni quanto aggiornare il backup"),
-                    options = Housekeeping.BACKUP_INTERVALS,
-                    selected = settings.backupIntervalDays,
-                    optionLabel = Housekeeping::intervalLabel,
-                    onSelected = { days -> update { it.copy(backupIntervalDays = days) } },
+                    options = Housekeeping.BACKUP_HOURS.map { -it } + Housekeeping.BACKUP_INTERVALS,
+                    selected = if (settings.backupEveryHours > 0) -settings.backupEveryHours else settings.backupIntervalDays,
+                    optionLabel = { if (it < 0) Housekeeping.hoursLabel(-it) else Housekeeping.intervalLabel(it) },
+                    onSelected = { value ->
+                        update {
+                            // Ogni tot ore ha senso solo in automatico: lo si accende se era spento.
+                            if (value < 0) it.copy(backupEveryHours = -value, autoBackupTime = it.autoBackupTime ?: LocalTime.of(22, 0))
+                            else it.copy(backupEveryHours = 0, backupIntervalDays = value)
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = { help = "BACKUP" }) { Icon(Icons.AutoMirrored.Rounded.HelpOutline, contentDescription = tr("Come funziona")) }

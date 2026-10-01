@@ -55,7 +55,8 @@ class Housekeeping(
 
     private suspend fun markBackupDone() {
         val today = time.today().toEpochDay()
-        settings.update { it.copy(backupCheckEpochDay = today) }
+        val now = time.now().toEpochMilli()
+        settings.update { it.copy(backupCheckEpochDay = today, lastBackupMillis = now) }
     }
 
     /** Alla prima apertura fa partire il conteggio: il primo invito arriva dopo l'intervallo scelto. */
@@ -75,7 +76,7 @@ class Housekeeping(
     }
 
     /**
-     * Promemoria degli anni precedenti che la pulizia annuale eliminerebbe, se è il momento
+     * Promemoria più vecchi di un anno che la pulizia annuale eliminerebbe, se è il momento
      * (primo avvio in un anno nuovo); lista vuota altrimenti. Il primo anno d'uso non propone nulla.
      */
     suspend fun cleanupCandidates(): List<String> {
@@ -86,11 +87,14 @@ class Housekeeping(
             return emptyList()
         }
         if (last >= year) return emptyList()
-        return reminderDao.getCleanupCandidates(LocalDate.of(year, 1, 1))
+        return reminderDao.getCleanupCandidates(cleanupCutoff())
     }
 
-    /** Quanti promemoria degli anni passati eliminerebbe la pulizia (senza guardare se è il momento). */
-    suspend fun countCleanupCandidates(): Int = reminderDao.getCleanupCandidates(LocalDate.of(time.today().year, 1, 1)).size
+    /** Quanti promemoria più vecchi di un anno eliminerebbe la pulizia (senza guardare se è il momento). */
+    suspend fun countCleanupCandidates(): Int = reminderDao.getCleanupCandidates(cleanupCutoff()).size
+
+    /** La pulizia non tocca mai gli ultimi [KEEP_YEARS] anni: lo storico recente resta sempre consultabile. */
+    private fun cleanupCutoff(): LocalDate = time.today().minusYears(KEEP_YEARS)
 
     /** Quante feste sono rimaste negli anni passati e andrebbero spostate all'anno corrente. */
     suspend fun holidaysToRoll(): Int = reminderDao.getHolidaysBefore(LocalDate.of(time.today().year, 1, 1)).size
@@ -154,14 +158,30 @@ class Housekeeping(
 
     companion object {
         private const val POSTPONE_DAYS = 7L
+        private const val KEEP_YEARS = 1L
 
         /** Intervalli proposti nelle impostazioni, in giorni. */
         val BACKUP_INTERVALS = listOf(1, 7, 30, 90, 365)
 
-        fun isBackupDue(settings: AppSettings, today: LocalDate): Boolean {
+        /** Intervalli in ore per chi vuole un backup quasi continuo. */
+        val BACKUP_HOURS = listOf(1, 3, 6)
+
+        fun isBackupDue(settings: AppSettings, today: LocalDate, nowMillis: Long = System.currentTimeMillis()): Boolean {
+            if (settings.backupEveryHours > 0) {
+                val last = settings.lastBackupMillis ?: return true
+                return nowMillis - last >= settings.backupEveryHours * HOUR_MILLIS
+            }
             val since = settings.backupCheckEpochDay ?: return false
             return today.toEpochDay() - since >= settings.backupIntervalDays
         }
+
+        /** "Ogni 3 ore" o "Ogni settimana": la frequenza scelta, in ore o in giorni. */
+        fun frequencyLabel(settings: AppSettings): String =
+            if (settings.backupEveryHours > 0) hoursLabel(settings.backupEveryHours) else intervalLabel(settings.backupIntervalDays)
+
+        fun hoursLabel(hours: Int): String = if (hours == 1) tr("Ogni ora") else trf("Ogni %1\$s ore", hours)
+
+        private const val HOUR_MILLIS = 3_600_000L
 
         fun intervalLabel(days: Int): String = when (days) {
             1 -> tr("Ogni giorno")

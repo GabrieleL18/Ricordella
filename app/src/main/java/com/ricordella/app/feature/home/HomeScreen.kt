@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.home
 
+import androidx.compose.material.icons.rounded.AutoAwesome
+import com.ricordella.app.domain.model.ResolutionsPrompt
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.YearlyTask
@@ -97,9 +99,10 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
-    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping) }
+    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping, c.saveReminder, c.developerTools.resolutionsDay) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val yearly by viewModel.yearly.collectAsStateWithLifecycle()
+    val resolutions by viewModel.resolutions.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val backupEvent by viewModel.backupEvent.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -140,9 +143,25 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
+            item(key = "quick-entry") {
+                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
+            }
             item(key = "permission") { NotificationPermissionCard() }
             item(key = "backup") {
                 BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
+            }
+            resolutions?.let { (prompt, year) ->
+                item(key = "resolutions") {
+                    ResolutionsCard(
+                        prompt = prompt,
+                        year = year,
+                        count = LocalAppSettings.current.resolutions.count { it.year == year },
+                        onOpen = { navigator.openResolutions(year, recap = prompt == ResolutionsPrompt.RECAP) },
+                        onLater = { viewModel.onResolutionsLater(prompt) },
+                        onSkip = { viewModel.onResolutionsSkip(year) },
+                        modifier = Modifier.animateItem(),
+                    )
+                }
             }
 
             if (!state.isLoading && state.isEmpty) {
@@ -340,6 +359,50 @@ private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, 
                 Text(if (plus) "$value+" else "$value", style = MaterialTheme.typography.titleMedium)
             }
             Text(label, style = MaterialTheme.typography.labelLarge)
+        }
+    }
+}
+
+/** Buoni propositi: a gennaio l'invito a scriverli, a fine anno il recap di quelli rispettati. */
+@Composable
+private fun ResolutionsCard(
+    prompt: ResolutionsPrompt,
+    year: Int,
+    count: Int,
+    onOpen: () -> Unit,
+    onLater: () -> Unit,
+    onSkip: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tone = MaterialTheme.ricordellaColors.pear
+    val write = prompt == ResolutionsPrompt.WRITE
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = RicordellaDimensions.spaceS)
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+            Icon(Icons.Rounded.AutoAwesome, contentDescription = null, tint = tone.content)
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (write) trf("Buoni propositi per il %1\$s", year) else trf("Com'è andato il %1\$s?", year),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = tone.content,
+                )
+                Text(
+                    if (write) tr("Inizia l'anno con qualche proposito: a fine anno vediamo insieme quali hai rispettato.")
+                    else trf("Avevi %1\$s buoni propositi: segna quelli che hai rispettato e guarda il recap.", count),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = tone.content,
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+            PushButton(if (write) tr("Scrivili") else tr("Vedi il recap"), onClick = onOpen, modifier = Modifier.weight(1f))
+            TextButton(onClick = if (write) onSkip else onLater) { Text(if (write) tr("Non quest'anno") else tr("Più tardi")) }
         }
     }
 }

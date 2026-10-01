@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget Pozioni: l'acqua bevuta oggi, con un tocco si aggiunge o si toglie una pozione. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="6dp">
+
+        <ImageView
+            android:id="@+id/water_minus"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_round_button"
+            android:contentDescription="Togli una pozione"
+            android:padding="6dp"
+            android:src="@drawable/ic_widget_minus" />
+
+    <LinearLayout
+        android:id="@+id/water_open"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="6dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/water_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/widget_text"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/water_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginVertical="3dp"
+            android:max="100"
+            android:progressDrawable="@drawable/widget_progress_cyan" />
+
+        <TextView
+            android:id="@+id/water_goal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/widget_text_muted"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+        <ImageView
+            android:id="@+id/water_plus"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_round_button"
+            android:contentDescription="Aggiungi una pozione"
+            android:padding="6dp"
+            android:src="@drawable/ic_widget_plus" />
+</LinearLayout>

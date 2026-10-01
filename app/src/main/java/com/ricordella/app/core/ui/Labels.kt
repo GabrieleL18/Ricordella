@@ -201,7 +201,8 @@ fun RecurrenceRule.describe(): String {
         ""
     }
     val end = endDate?.let { tr(" fino al ") + DateTexts.date(it, com.ricordella.app.domain.model.DateFormatStyle.NUMERIC) } ?: ""
-    return base + days + end
+    val floating = if (fromLastDone) tr(" dall'ultima volta") else ""
+    return base + floating + days + end
 }
 
 /** Etichetta dell'anticipo di notifica. */

@@ -161,7 +161,12 @@ class BackupRepository(
             newFiles.forEach { File(restoredDir, it).delete() }
             throw error
         }
-        contents.settings?.let { restored -> settingsRepository.update { restored } }
+        // L'accettazione dei termini è di chi usa questo telefono: il backup (magari di prima) non la tocca.
+        contents.settings?.let { restored ->
+            settingsRepository.update { current ->
+                restored.copy(termsAcceptedVersion = current.termsAcceptedVersion, termsAcceptedEpochDay = current.termsAcceptedEpochDay)
+            }
+        }
         // I file ripristinati in precedenza e non più referenziati vengono rimossi.
         restoredDir.listFiles()?.filter { it.name !in newFiles }?.forEach { it.delete() }
         pending.stagingDir.deleteRecursively()

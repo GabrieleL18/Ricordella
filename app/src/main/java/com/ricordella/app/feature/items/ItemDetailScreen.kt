@@ -1,5 +1,17 @@
 package com.ricordella.app.feature.items
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
+import com.ricordella.app.domain.model.ExpenseProfiles
+import com.ricordella.app.domain.model.ExpenseKind
+import com.ricordella.app.domain.model.ExpenseStats
+import com.ricordella.app.core.i18n.Lang
+import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.LocalGasStation
+import androidx.compose.material.icons.rounded.Payments
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.ricordella.app.core.ui.HappyWizard
 import com.ricordella.app.core.ui.wizardSceneFor
 import com.ricordella.app.core.ui.HistoryItem
@@ -92,6 +104,9 @@ import com.ricordella.app.domain.model.warrantyStatus
 import com.ricordella.app.domain.usecase.NextMaintenance
 import java.time.LocalDate
 
+/** Su schermi almeno così larghi la scheda si divide in due colonne. */
+private val TWO_PANE_WIDTH = 840.dp
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ItemDetailScreen(navigator: AppNavigator) {
@@ -106,7 +121,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
     var menuOpen by remember { mutableStateOf(false) }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     var showOdometer by rememberSaveable { mutableStateOf(false) }
-    var showMaintenance by rememberSaveable { mutableStateOf(false) }
+    var addingKind by rememberSaveable { mutableStateOf<ExpenseKind?>(null) }
 
     LaunchedEffect(state.deleted) { if (state.deleted) navigator.back() }
     LaunchedEffect(state.message) {
@@ -139,19 +154,15 @@ fun ItemDetailScreen(navigator: AppNavigator) {
         },
     ) { padding ->
         if (entry == null) return@DetailScaffold
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .contentWidth()
-                .padding(RicordellaDimensions.screenPadding),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-        ) {
+        val profile = remember(entry.category?.kind, entry.group) { ExpenseProfiles.of(entry.category?.kind, entry.group) }
+        // Chi è la cosa: foto, dati, garanzia.
+        val identity: @Composable ColumnScope.() -> Unit = {
             ItemHeader(entry)
             InfoSection(entry, onUpdateOdometer = { showOdometer = true })
             WarrantySection(entry, state.now.toLocalDate(), onOpenDocument = { navigator.openViewer(it, null, tr("Documento di garanzia")) })
-
+        }
+        // Cosa succede: scadenze, manutenzione e spese, promemoria.
+        val activity: @Composable ColumnScope.() -> Unit = {
             if (state.deadlines.isNotEmpty()) {
                 SectionHeader(tr("Scadenze"))
                 state.deadlines.forEach { reminder ->
@@ -165,18 +176,14 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 }
             }
 
-            SectionHeader(tr("Manutenzione")) {
-                TextButton(onClick = { showMaintenance = true }) {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                    Text(tr("Intervento"), modifier = Modifier.padding(start = 4.dp))
-                }
-            }
-            if (state.maintenance.isEmpty()) {
-                Text(tr("Nessun intervento registrato."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            state.maintenance.forEachIndexed { index, record ->
-                MaintenanceRow(record, isLast = index == state.maintenance.lastIndex, onDelete = { viewModel.onDeleteMaintenance(record) })
-            }
+            ExpensesSection(
+                profile = profile,
+                records = state.maintenance,
+                year = state.now.year,
+                isVehicle = entry.isVehicle,
+                onAdd = { addingKind = it },
+                onDelete = viewModel::onDeleteMaintenance,
+            )
 
             SectionHeader(tr("Promemoria")) {
                 TextButton(onClick = { navigator.newReminder(itemId = entry.item.id, personId = state.owners.firstOrNull()?.person?.id) }) {
@@ -195,7 +202,9 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                     onToggleComplete = { viewModel.onCompleteReminder(reminder.reminder.id) },
                 )
             }
-
+        }
+        // Il resto: persone, documenti, note.
+        val extras: @Composable ColumnScope.() -> Unit = {
             if (state.owners.isNotEmpty()) {
                 SectionHeader(tr("Persone"))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -217,6 +226,32 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 Text(it, style = MaterialTheme.typography.bodyLarge)
             }
         }
+
+        BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
+            val column = Modifier.verticalScroll(rememberScrollState())
+            val spacing = Arrangement.spacedBy(RicordellaDimensions.spaceS)
+            if (maxWidth >= TWO_PANE_WIDTH) {
+                // Tablet e schermi larghi: a sinistra la cosa, a destra quello che le succede.
+                Row(
+                    Modifier.fillMaxSize().wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = 1280.dp).padding(horizontal = RicordellaDimensions.spaceL),
+                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceXl),
+                ) {
+                    Column(Modifier.weight(1f).then(column).padding(vertical = RicordellaDimensions.screenPadding), verticalArrangement = spacing) {
+                        identity()
+                        extras()
+                    }
+                    Column(Modifier.weight(1.2f).then(Modifier.verticalScroll(rememberScrollState())).padding(vertical = RicordellaDimensions.screenPadding), verticalArrangement = spacing) {
+                        activity()
+                    }
+                }
+            } else {
+                Column(Modifier.fillMaxSize().then(column).contentWidth().padding(RicordellaDimensions.screenPadding), verticalArrangement = spacing) {
+                    identity()
+                    activity()
+                    extras()
+                }
+            }
+        }
     }
 
     if (showOdometer && entry != null) {
@@ -226,14 +261,17 @@ fun ItemDetailScreen(navigator: AppNavigator) {
             onConfirm = { viewModel.onUpdateOdometer(it); showOdometer = false },
         )
     }
-    if (showMaintenance && entry != null) {
-        MaintenanceDialog(
-            isVehicle = entry.isVehicle,
-            currentKm = entry.item.odometerKm,
-            onDismiss = { showMaintenance = false },
-            onConfirm = { title, date, km, cost, description, next ->
-                viewModel.onAddMaintenance(title, date, km, cost, description, next)
-                showMaintenance = false
+    addingKind?.let { kind ->
+        val current = entry ?: return@let
+        ExpenseDialog(
+            profile = ExpenseProfiles.of(current.category?.kind, current.group),
+            initialKind = kind,
+            isVehicle = current.isVehicle,
+            currentKm = current.item.odometerKm,
+            onDismiss = { addingKind = null },
+            onConfirm = { expenseKind, title, date, km, cost, liters, description, next ->
+                viewModel.onAddMaintenance(expenseKind, title, date, km, cost, liters, description, next)
+                addingKind = null
             },
         )
     }
@@ -350,33 +388,6 @@ private data class WarrantyBadge(
 )
 
 @Composable
-private fun MaintenanceRow(record: MaintenanceRecord, isLast: Boolean, onDelete: () -> Unit) {
-    val colors = MaterialTheme.ricordellaColors
-    var confirm by remember { mutableStateOf(false) }
-    HistoryItem(
-        date = record.date,
-        title = record.title,
-        tone = colors.pear,
-        isLast = isLast,
-        subtitle = listOfNotNull(record.odometerKm?.let(DateTexts::kilometers), record.description).joinToString(" · ").ifEmpty { null },
-        badge = record.costCents?.let { DateTexts.money(it) to colors.mint },
-        trailing = {
-            IconButton(onClick = { confirm = true }) { Icon(Icons.Rounded.Delete, contentDescription = trf("Elimina intervento %1\$s", record.title)) }
-        },
-    )
-    if (confirm) {
-        ConfirmDialog(
-            title = tr("Eliminare l'intervento?"),
-            message = trf("\"%1\$s\" verrà rimosso dallo storico.", record.title),
-            confirmLabel = tr("Elimina"),
-            destructive = true,
-            onConfirm = onDelete,
-            onDismiss = { confirm = false },
-        )
-    }
-}
-
-@Composable
 private fun OdometerDialog(current: Int?, onDismiss: () -> Unit, onConfirm: (Int) -> Unit) {
     var value by rememberSaveable { mutableStateOf(current?.toString().orEmpty()) }
     AlertDialog(
@@ -397,107 +408,3 @@ private fun OdometerDialog(current: Int?, onDismiss: () -> Unit, onConfirm: (Int
         dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
     )
 }
-
-private val MaintenanceTitles get() = listOf(tr("Tagliando"), tr("Pneumatici"), tr("Revisione"), tr("Pulizia"), tr("Riparazione"), tr("Controllo"))
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun MaintenanceDialog(
-    isVehicle: Boolean,
-    currentKm: Int?,
-    onDismiss: () -> Unit,
-    onConfirm: (String, LocalDate, Int?, Long?, String?, NextMaintenance?) -> Unit,
-) {
-    var title by rememberSaveable { mutableStateOf("") }
-    var date by remember { mutableStateOf(LocalDate.now()) }
-    var km by rememberSaveable { mutableStateOf(currentKm?.toString().orEmpty()) }
-    var cost by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    var scheduleNext by rememberSaveable { mutableStateOf(false) }
-    var nextMonths by rememberSaveable { mutableStateOf("12") }
-    var nextKm by rememberSaveable { mutableStateOf(if (isVehicle) "15000" else "") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(tr("Nuovo intervento")) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(tr("Intervento *")) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    MaintenanceTitles.forEach { suggestion ->
-                        FilterChip(selected = title == suggestion, onClick = { title = suggestion }, label = { Text(suggestion) })
-                    }
-                }
-                DateField(tr("Data"), date, { it?.let { picked -> date = picked } }, modifier = Modifier.fillMaxWidth())
-                if (isVehicle) {
-                    OutlinedTextField(
-                        value = km,
-                        onValueChange = { km = it.filter(Char::isDigit).take(7) },
-                        label = { Text(tr("Km")) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OutlinedTextField(
-                    value = cost,
-                    onValueChange = { cost = it.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(10) },
-                    label = { Text(tr("Costo €")) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(tr("Descrizione")) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(tr("Ricordami il prossimo"), modifier = Modifier.weight(1f))
-                    Switch(checked = scheduleNext, onCheckedChange = { scheduleNext = it })
-                }
-                if (scheduleNext) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                        OutlinedTextField(
-                            value = nextMonths,
-                            onValueChange = { nextMonths = it.filter(Char::isDigit).take(3) },
-                            label = { Text(tr("Tra mesi")) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            modifier = Modifier.weight(1f),
-                        )
-                        if (isVehicle) {
-                            OutlinedTextField(
-                                value = nextKm,
-                                onValueChange = { nextKm = it.filter(Char::isDigit).take(6) },
-                                label = { Text(tr("o tra km")) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                singleLine = true,
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = title.isNotBlank(),
-                onClick = {
-                    val next = if (scheduleNext) NextMaintenance(nextMonths.toIntOrNull(), nextKm.toIntOrNull()) else null
-                    onConfirm(title, date, km.toIntOrNull(), parseCents(cost), description.trim().ifEmpty { null }, next)
-                },
-            ) { Text(tr("Salva")) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
-    )
-}
-

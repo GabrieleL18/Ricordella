@@ -119,6 +119,17 @@ Scelte principali:
 - **Sviluppatore**: 7 tocchi su "Versione" nelle Impostazioni sbloccano notifiche di prova, dati di esempio
   e comandi per forzare backup, pulizia annuale, feste, allarmi e widget.
 
+- **Scrivi al volo** (Home): "dentista domani alle 9", "ogni lunedì palestra alle 18:30", "bollo 31 gennaio"
+  diventano promemoria con tipo, data, ora e ripetizione (`domain/text/QuickEntryParser.kt`, italiano e inglese).
+- **Scansione dello scontrino**: ML Kit con modello incluso (offline) legge negozio, data, totale e prodotto
+  (`domain/text/ReceiptParser.kt`) e prepara la garanzia di 2 anni con lo scontrino allegato.
+- **Registro dei costi**: interventi, rifornimenti (con litri e consumo medio) e altre spese; totale annuo per cosa
+  e per tutte le cose (migrazione 4 → 5).
+- **Sveglia insistente**: a scelta i promemoria urgenti (o importanti) suonano come la sveglia finché non si risponde.
+- **Condivisione via Drive**: un file `.rmd` (JSON compresso) su Drive letto e scritto da entrambi i telefoni con il
+  selettore di Android; unione a tre vie con l'ultimo stato sincronizzato (`data/share/ShareMerge.kt`). Foto e
+  allegati restano sul telefono. Le traduzioni vanno scritte solo in `tools/i18n/en.txt`, mai in `EnglishStrings.kt`.
+
 ## Compilare ed eseguire
 
 Requisiti: Android Studio recente (o JDK 17+ e Android SDK 37).

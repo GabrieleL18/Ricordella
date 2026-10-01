@@ -12,6 +12,10 @@ interface MaintenanceDao {
     @Query("SELECT * FROM maintenance_record WHERE itemId = :itemId ORDER BY date DESC, createdAt DESC")
     fun observeForItem(itemId: String): Flow<List<MaintenanceRecord>>
 
+    /** Tutte le spese da [from] in poi (per il totale annuo di tutte le cose). */
+    @Query("SELECT * FROM maintenance_record WHERE date >= :from")
+    fun observeSince(from: java.time.LocalDate): Flow<List<MaintenanceRecord>>
+
     @Upsert
     suspend fun upsert(record: MaintenanceRecord)
 

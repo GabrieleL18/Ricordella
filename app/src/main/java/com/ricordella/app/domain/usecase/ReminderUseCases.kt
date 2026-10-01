@@ -1,5 +1,7 @@
 package com.ricordella.app.domain.usecase
 
+import java.time.LocalDate
+import kotlinx.coroutines.flow.first
 import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.RecurrenceCalculator
 import com.ricordella.app.domain.date.ReminderAlarmPlanner
@@ -66,9 +68,16 @@ class CompleteReminderUseCase(
         val today = time.today()
         val completion = ReminderCompletion(reminderId = reminder.id, occurrenceDate = reminder.dueDate, completedAt = now)
 
-        // Un promemoria in ritardo salta le occorrenze ormai passate.
+        // Un promemoria in ritardo salta le occorrenze ormai passate. Le regole "dall'ultima volta"
+        // ripartono da oggi: fatto prima o dopo, si spostano anche tutte le occorrenze successive.
         val after = maxOf(reminder.dueDate, today.minusDays(1))
-        val nextDate = entry.recurrenceRule?.let { recurrence.nextOccurrenceAfter(it, after) }
+        val rule = entry.recurrenceRule
+        val nextDate = when {
+            rule == null -> null
+            rule.fromLastDone -> recurrence.nextOccurrenceAfter(rule.copy(startDate = today), today)
+            else -> recurrence.nextOccurrenceAfter(rule, after)
+        }
+        val movedRule = if (rule != null && rule.fromLastDone && nextDate != null) rule.copy(startDate = nextDate) else null
         val kmInterval = reminder.odometerIntervalKm
         val nextKm = if (kmInterval != null && reminder.dueOdometerKm != null) {
             (entry.odometerItem?.odometerKm ?: reminder.dueOdometerKm) + kmInterval
@@ -83,8 +92,38 @@ class CompleteReminderUseCase(
             else -> reminder.copy(status = ReminderStatus.COMPLETED, completedAt = now)
         }.copy(snoozedUntil = null, updatedAt = now)
 
-        reminders.recordCompletion(updated, completion)
+        reminders.recordCompletion(updated, completion, movedRule)
         scheduler.dismissNotification(reminder.id)
+        scheduler.refresh()
+    }
+}
+
+/**
+ * Annulla il "fatto" dell'occorrenza [occurrence] (es. dal widget): il promemoria torna a quella data,
+ * attivo, e la riga dello storico sparisce. Si annulla solo l'ultimo completamento, così un ricorrente
+ * non salta indietro di più occorrenze.
+ */
+class UndoCompletionUseCase(
+    private val reminders: ReminderRepository,
+    private val scheduler: ReminderScheduler,
+    private val time: TimeSource,
+) {
+    suspend operator fun invoke(reminderId: String, occurrence: LocalDate) {
+        val entry = reminders.getReminder(reminderId) ?: return
+        val latest = reminders.observeCompletions(reminderId).first().maxByOrNull { it.completedAt } ?: return
+        if (latest.occurrenceDate != occurrence) return
+        val now = time.now()
+        // ponytail: i km della prossima manutenzione restano quelli avanzati; lo storico non salva i precedenti.
+        val updated = entry.reminder.copy(
+            dueDate = occurrence,
+            status = ReminderStatus.ACTIVE,
+            completedAt = null,
+            snoozedUntil = null,
+            lastNotifiedAt = now,
+            updatedAt = now,
+        )
+        val rule = entry.recurrenceRule?.takeIf { it.fromLastDone }?.copy(startDate = occurrence)
+        reminders.undoCompletion(updated, latest.id, rule)
         scheduler.refresh()
     }
 }

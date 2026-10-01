@@ -13,6 +13,7 @@ import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.Category
 import com.ricordella.app.domain.model.Item
 import com.ricordella.app.domain.model.ItemGroup
+import com.ricordella.app.core.ui.ScannedReceipt
 import com.ricordella.app.domain.model.ItemReminderTemplates
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.PersonItemRole
@@ -124,6 +125,27 @@ class ItemEditViewModel(
     }
 
     fun update(transform: (ItemForm) -> ItemForm) = _form.update(transform)
+
+    /**
+     * Compila il modulo dallo scontrino: data e prezzo d'acquisto, nome (se vuoto), e la garanzia
+     * di 2 anni (quella legale in Italia) dal giorno d'acquisto, con lo scontrino come documento.
+     */
+    fun onReceiptScanned(receipt: ScannedReceipt) = _form.update { form ->
+        val info = receipt.info
+        val purchase = info.date ?: form.purchaseDate
+        val warrantyStart = purchase ?: time.today()
+        form.copy(
+            name = form.name.ifBlank { info.product.orEmpty() },
+            purchaseDate = purchase,
+            purchasePrice = info.totalCents?.let(::formatCents) ?: form.purchasePrice,
+            hasWarranty = true,
+            warrantyStart = form.warrantyStart ?: warrantyStart,
+            warrantyEnd = form.warrantyEnd ?: warrantyStart.plusMonths(24),
+            warrantySeller = form.warrantySeller.ifBlank { info.store.orEmpty() },
+            warrantyDocumentUri = receipt.imageUri ?: form.warrantyDocumentUri,
+            errorMessage = tr("Ho letto lo scontrino: controlla i dati"),
+        )
+    }
 
     fun onErrorShown() = _form.update { it.copy(errorMessage = null) }
 

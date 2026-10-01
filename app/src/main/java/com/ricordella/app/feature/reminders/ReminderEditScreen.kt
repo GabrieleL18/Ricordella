@@ -294,6 +294,17 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
                 }
             }
         }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(tr("Conta dall'ultima volta"), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    tr("Se lo fai prima o dopo, anche le date successive si spostano."),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(checked = form.fromLastDone, onCheckedChange = { value -> update { it.copy(fromLastDone = value) } })
+        }
         DateField(
             label = tr("Fino al (opzionale)"),
             value = form.recurrenceEnd,

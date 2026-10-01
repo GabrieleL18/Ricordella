@@ -52,11 +52,11 @@ import androidx.compose.ui.unit.dp
 import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.ui.DropdownField
 import com.ricordella.app.core.ui.NotifyOffsetPresets
-import com.ricordella.app.core.ui.SectionHeader
 import com.ricordella.app.core.ui.icon
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.domain.model.AlarmSound
+import com.ricordella.app.domain.model.InsistentLevel
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.TypeDefaults
@@ -210,7 +210,20 @@ private fun DefaultsBlock(icon: ImageVector, title: String, content: @Composable
 /** Impostazioni della sveglia: vibrazione, durata del posticipo, volume crescente e suono. */
 @Composable
 internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) -> AppSettings) -> Unit) {
-    SectionHeader(tr("Sveglia"))
+    DropdownField(
+        label = tr("Suonano come sveglia, finché non rispondi"),
+        options = InsistentLevel.entries,
+        selected = settings.insistentLevel,
+        optionLabel = {
+            when (it) {
+                InsistentLevel.NONE -> tr("Solo le sveglie")
+                InsistentLevel.URGENT -> tr("Sveglie e promemoria urgenti")
+                InsistentLevel.IMPORTANT -> tr("Sveglie e promemoria importanti o urgenti")
+            }
+        },
+        onSelected = { level -> update { it.copy(insistentLevel = level) } },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+    )
     SettingRow(
         icon = Icons.Rounded.Vibration,
         title = tr("Vibrazione"),

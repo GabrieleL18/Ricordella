@@ -169,6 +169,13 @@ abstract class ReminderDao {
     @Insert
     abstract suspend fun insertCompletion(completion: ReminderCompletion)
 
+    @Query("DELETE FROM reminder_completion WHERE id = :id")
+    abstract suspend fun deleteCompletion(id: String)
+
+    /** Occorrenze completate nel periodo (per mostrarle come fatte anche dopo che il ricorrente è avanzato). */
+    @Query("SELECT * FROM reminder_completion WHERE occurrenceDate BETWEEN :from AND :to")
+    abstract suspend fun getCompletionsBetween(from: LocalDate, to: LocalDate): List<ReminderCompletion>
+
     @Query("DELETE FROM reminder WHERE id = :id")
     abstract suspend fun deleteReminder(id: String)
 
@@ -196,8 +203,17 @@ abstract class ReminderDao {
         insertItemLinks(itemIds.map { ReminderItemCrossRef(reminder.id, it) })
     }
 
+    /** Annulla un completamento: riporta il promemoria all'occorrenza e cancella la riga dello storico. */
     @Transaction
-    open suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion) {
+    open suspend fun undoCompletion(updated: Reminder, completionId: String, rule: RecurrenceRule?) {
+        rule?.let { upsertRule(it) }
+        updateReminder(updated)
+        deleteCompletion(completionId)
+    }
+
+    @Transaction
+    open suspend fun recordCompletion(updated: Reminder, completion: ReminderCompletion, rule: RecurrenceRule? = null) {
+        rule?.let { upsertRule(it) }
         updateReminder(updated)
         insertCompletion(completion)
     }

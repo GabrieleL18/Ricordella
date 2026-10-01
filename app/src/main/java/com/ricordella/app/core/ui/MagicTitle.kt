@@ -1,5 +1,12 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,3 +98,39 @@ fun MagicTitle(modifier: Modifier = Modifier, fontSize: TextUnit = BrandTitleSty
         }
     }
 }
+
+/**
+ * Un orario scritto come il titolo magico: cifre dorate col bordo viola che ondeggiano piano,
+ * i due punti sono due stelline. Con [live] le stelline brillano a ogni secondo, come un orologio.
+ */
+@Composable
+fun MagicTime(text: String, fontSize: TextUnit, modifier: Modifier = Modifier, live: Boolean = false) {
+    val px = with(LocalDensity.current) { fontSize.toPx() }
+    val base = BrandTitleStyle.copy(fontSize = fontSize)
+    val edge = base.copy(color = Outline, drawStyle = Stroke(width = px * 0.12f, join = StrokeJoin.Round))
+    val fill = TextStyle(brush = Brush.verticalGradient(Gold))
+    val reduced = rememberReducedMotion()
+    val transition = rememberInfiniteTransition(label = "magicTime")
+    val wave = if (reduced) 0f else transition.animateFloat(0f, 1f, infiniteRepeatable(tween(2400, easing = LinearEasing)), label = "wave").value
+    val twinkle = if (reduced || !live) 1f else transition.animateFloat(1f, 0.35f, infiniteRepeatable(tween(500, delayMillis = 500), RepeatMode.Reverse), label = "twinkle").value
+    Row(modifier.clearAndSetSemantics { contentDescription = text }, verticalAlignment = Alignment.CenterVertically) {
+        text.forEachIndexed { i, ch ->
+            if (ch == ':') {
+                Canvas(Modifier.width(with(LocalDensity.current) { (px * 0.34f).toDp() }).height(with(LocalDensity.current) { (px * 1.2f).toDp() })) {
+                    listOf(0.42f, 0.74f).forEach { y ->
+                        val c = Offset(size.width / 2, size.height * y)
+                        drawFourPointStar(c, px * 0.15f, Outline.copy(alpha = twinkle))
+                        drawFourPointStar(c, px * 0.11f, Gold[1].copy(alpha = twinkle), rotation = 45f * wave)
+                    }
+                }
+            } else {
+                val lift = kotlin.math.sin((wave + i * 0.18f) * 2 * Math.PI).toFloat()
+                Box(Modifier.graphicsLayer { translationY = px * 0.04f * lift; rotationZ = if (i % 2 == 0) -3f else 3f }) {
+                    Text(ch.toString(), style = edge)
+                    Text(ch.toString(), style = base.merge(fill))
+                }
+            }
+        }
+    }
+}
+

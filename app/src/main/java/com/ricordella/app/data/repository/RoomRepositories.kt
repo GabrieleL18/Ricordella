@@ -47,6 +47,7 @@ class RoomItemRepository(
 
 class RoomMaintenanceRepository(private val dao: MaintenanceDao) : MaintenanceRepository {
     override fun observeForItem(itemId: String) = dao.observeForItem(itemId)
+    override fun observeSince(from: java.time.LocalDate) = dao.observeSince(from)
     override suspend fun save(record: MaintenanceRecord) = dao.upsert(record)
     override suspend fun delete(id: String) = dao.delete(id)
     override suspend fun search(query: String, limit: Int) = dao.search(likePattern(query), limit)

@@ -14,4 +14,10 @@
     <color name="widget_busy">#FF4A3470</color>
     <color name="widget_weekend">#FFFF7A86</color>
     <color name="widget_busy_text">#FFEBDDFF</color>
+    <color name="widget_cyan_solid">#FF5BC0F5</color>
+    <color name="widget_pear_solid">#FFF2D43D</color>
+    <color name="widget_pear_content">#FFFBEEA6</color>
+    <color name="widget_mint_solid">#FF6FD39A</color>
+    <color name="widget_lavender_content">#FFEBDDFF</color>
+    <color name="widget_track">#33FFFFFF</color>
 </resources>

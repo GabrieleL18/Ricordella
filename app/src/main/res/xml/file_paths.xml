@@ -6,4 +6,6 @@
     <files-path name="media" path="media/" />
     <!-- Ultimo backup esportato, condiviso con l'app scelta dall'utente. -->
     <cache-path name="exports" path="exports/" />
+    <!-- Foto dello scontrino scattata con la fotocamera, prima di essere letta e compressa. -->
+    <cache-path name="camera" path="camera/" />
 </paths>

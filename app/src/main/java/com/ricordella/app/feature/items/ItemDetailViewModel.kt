@@ -13,6 +13,7 @@ import com.ricordella.app.domain.model.Attachment
 import com.ricordella.app.domain.model.AttachmentOwnerType
 import com.ricordella.app.domain.model.ItemWithCategory
 import com.ricordella.app.domain.model.MaintenanceRecord
+import com.ricordella.app.domain.model.ExpenseKind
 import com.ricordella.app.domain.model.PersonWithRole
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.ReminderWithLinks
@@ -94,13 +95,15 @@ class ItemDetailViewModel(
     }
 
     fun onAddMaintenance(
+        kind: ExpenseKind,
         title: String,
         date: LocalDate,
         odometerKm: Int?,
         costCents: Long?,
+        liters: Double?,
         description: String?,
         next: NextMaintenance?,
-    ) = launchAction(tr("Intervento registrato")) {
+    ) = launchAction(if (kind == ExpenseKind.SERVICE) tr("Intervento registrato") else tr("Spesa registrata")) {
         addMaintenanceRecord(
             MaintenanceRecord(
                 itemId = itemId,
@@ -110,6 +113,8 @@ class ItemDetailViewModel(
                 costCents = costCents,
                 description = description,
                 createdAt = time.now(),
+                kind = kind,
+                liters = liters,
             ),
             next,
         )

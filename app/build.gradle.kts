@@ -20,6 +20,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Stessa chiave di debug su tutti i computer (è nel progetto): installando da Android Studio su un
+    // altro PC l'app si aggiorna invece di chiedere di disinstallarla. Non usarla per la versione sullo Store.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -34,6 +45,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    // Solo italiano e inglese: le traduzioni delle librerie nelle altre lingue sarebbero peso inutile.
+    androidResources {
+        localeFilters += listOf("it", "en")
     }
 
     buildFeatures {
@@ -73,6 +89,9 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+    // Riconoscimento del testo degli scontrini e lettura dei codici dalle foto. Versioni "Play Services":
+    // il modello lo fornisce il sistema (scaricato all'installazione, vedi il manifest), non pesa sull'app.
+    implementation(libs.mlkit.text.recognition)
 
     // Carte d'imbarco: scansione con la fotocamera (senza permesso) e lettura da foto/PDF.
     implementation(libs.play.services.code.scanner)

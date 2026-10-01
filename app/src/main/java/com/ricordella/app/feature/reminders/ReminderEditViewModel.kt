@@ -58,6 +58,8 @@ data class ReminderForm(
     val customInterval: String = "1",
     val weekDays: Set<DayOfWeek> = emptySet(),
     val recurrenceEnd: LocalDate? = null,
+    /** Ricorrenza contata dall'ultima volta che è stato fatto (le date successive si spostano). */
+    val fromLastDone: Boolean = false,
     val personIds: Set<String> = emptySet(),
     val itemIds: Set<String> = emptySet(),
     val dueOdometerKm: String = "",
@@ -156,6 +158,7 @@ class ReminderEditViewModel(
             customInterval = (rule?.interval ?: 1).toString(),
             weekDays = rule?.daysOfWeek.orEmpty(),
             recurrenceEnd = rule?.endDate,
+            fromLastDone = rule?.fromLastDone == true,
             personIds = entry.people.mapTo(mutableSetOf()) { it.id },
             itemIds = entry.items.mapTo(mutableSetOf()) { it.id },
             dueOdometerKm = reminder.dueOdometerKm?.toString().orEmpty(),
@@ -253,6 +256,7 @@ class ReminderEditViewModel(
             startDate = date,
             endDate = if (preset == RecurrencePreset.CUSTOM) form.recurrenceEnd else null,
             daysOfWeek = if (preset == RecurrencePreset.CUSTOM && frequency == RecurrenceFrequency.WEEKLY) form.weekDays else emptySet(),
+            fromLastDone = preset == RecurrencePreset.CUSTOM && form.fromLastDone,
         )
     }
 }

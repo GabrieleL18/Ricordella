@@ -9,6 +9,11 @@ import com.ricordella.app.domain.repository.ReminderRepository
 import com.ricordella.app.domain.usecase.CompleteReminderUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import android.net.Uri
+import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.domain.model.Reminder
+import com.ricordella.app.domain.model.ReminderDraft
+import com.ricordella.app.domain.text.QuickEntry
+import com.ricordella.app.domain.usecase.SaveReminderUseCase
 import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.core.ui.YearlyTask
 import com.ricordella.app.domain.model.AutoMode
@@ -25,7 +30,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import com.ricordella.app.domain.model.ResolutionsPrompt
+import com.ricordella.app.domain.model.resolutionsPrompt
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.update
 
 data class HomeUiState(
     val isLoading: Boolean = true,
@@ -62,7 +72,33 @@ class HomeViewModel(
     private val time: TimeSource,
     private val settings: SettingsRepository,
     private val housekeeping: Housekeeping,
+    private val saveReminder: SaveReminderUseCase,
+    /** Giorno finto per gli inviti dei buoni propositi (sezione Sviluppatore); null = oggi. */
+    resolutionsDay: Flow<LocalDate?>,
 ) : ViewModel() {
+
+    /** Crea il promemoria scritto al volo, con i predefiniti del suo tipo. */
+    fun onQuickAdd(entry: QuickEntry) {
+        viewModelScope.launch {
+            val now = time.now()
+            val defaults = settings.current().defaultsFor(entry.type)
+            val reminder = Reminder(
+                title = entry.title,
+                type = entry.type,
+                dueDate = entry.date,
+                dueTime = entry.time ?: defaults.time,
+                endDate = entry.endDate,
+                priority = entry.priority,
+                notificationsEnabled = defaults.notificationsEnabled,
+                notifyOffsetMinutes = defaults.notifyOffsetMinutes,
+                createdAt = now,
+                updatedAt = now,
+            )
+            runCatching { saveReminder(ReminderDraft(reminder, entry.recurrence, emptySet(), emptySet())) }
+                .onSuccess { _message.value = trf("Aggiunto: %1\$s", entry.title) }
+                .onFailure { _message.value = tr("Non è stato possibile salvare il promemoria. Riprova.") }
+        }
+    }
 
     /** Operazioni annuali da proporre (feste da spostare, promemoria da pulire). */
     private val _yearly = MutableStateFlow(YearlyProposal())
@@ -159,6 +195,26 @@ class HomeViewModel(
         )
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(now = time.localNow()))
+
+    /** Inviti dei buoni propositi chiusi con "Più tardi": in questa sessione non tornano. */
+    private val laterResolutions = MutableStateFlow(emptySet<ResolutionsPrompt>())
+
+    /** Invito dei buoni propositi da mostrare (scriverli a gennaio, recap a fine anno), con l'anno. */
+    val resolutions: StateFlow<Pair<ResolutionsPrompt, Int>?> = combine(
+        settings.settings,
+        ticks.map { it.toLocalDate() }.distinctUntilChanged(),
+        resolutionsDay,
+        laterResolutions,
+    ) { appSettings, today, fakeDay, later ->
+        appSettings.resolutionsPrompt(fakeDay ?: today)?.takeIf { it.first !in later }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun onResolutionsLater(prompt: ResolutionsPrompt) = laterResolutions.update { it + prompt }
+
+    /** "Non quest'anno": l'invito a scrivere i propositi non torna fino al prossimo gennaio. */
+    fun onResolutionsSkip(year: Int) {
+        viewModelScope.launch { settings.update { it.copy(resolutionsAskedYear = year) } }
+    }
 
     fun onToggleComplete(reminderId: String) {
         viewModelScope.launch { completeReminder(reminderId) }

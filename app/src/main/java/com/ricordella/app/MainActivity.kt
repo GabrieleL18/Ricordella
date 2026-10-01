@@ -1,5 +1,6 @@
 package com.ricordella.app
 
+import com.ricordella.app.feature.legal.TERMS_VERSION
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -51,10 +52,22 @@ class MainActivity : ComponentActivity() {
                         widgetRequest = pendingWidget,
                         onWidgetRequestHandled = { widgetRequest.value = null },
                     )
-                    pendingBackup?.let { OpenedBackupImport(it, onDone = { backupToOpen.value = null }) }
+                    if (settings.termsAcceptedVersion >= TERMS_VERSION) pendingBackup?.let { OpenedBackupImport(it, onDone = { backupToOpen.value = null }) }
                 }
             }
         }
+    }
+
+    // File condiviso: si aggiorna quando si apre l'app (per vedere le novità dell'altra persona)
+    // e quando la si chiude (per mandarle le proprie).
+    override fun onStart() {
+        super.onStart()
+        (application as RicordellaApplication).container.sharedSpace.syncInBackground()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (application as RicordellaApplication).container.sharedSpace.syncInBackground()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -71,11 +84,15 @@ class MainActivity : ComponentActivity() {
         }
         // Tocco sulla notifica delle pozioni: si apre la loro schermata.
         if (intent?.getBooleanExtra(EXTRA_OPEN_POTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_POTIONS, null)
+        // Tocco sul widget dei buoni propositi: si apre la loro schermata.
+        if (intent?.getBooleanExtra(EXTRA_OPEN_RESOLUTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_RESOLUTIONS, null)
     }
 
     companion object {
         const val EXTRA_REMINDER_ID = "com.ricordella.app.extra.OPEN_REMINDER_ID"
         const val EXTRA_OPEN_POTIONS = "com.ricordella.app.extra.OPEN_POTIONS"
         const val ACTION_OPEN_POTIONS = "potions"
+        const val EXTRA_OPEN_RESOLUTIONS = "com.ricordella.app.extra.OPEN_RESOLUTIONS"
+        const val ACTION_OPEN_RESOLUTIONS = "resolutions"
     }
 }

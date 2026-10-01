@@ -1,5 +1,9 @@
 package com.ricordella.app.feature.people
 
+import com.ricordella.app.domain.model.ReminderWithLinks
+import com.ricordella.app.domain.model.ageOn
+import com.ricordella.app.domain.date.RelativeDateDescriber
+import java.time.LocalDate
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -104,7 +108,7 @@ import java.time.Instant
 
 @Composable
 fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
-    val viewModel = appViewModel { c, _ -> PersonListViewModel(c.personRepository) }
+    val viewModel = appViewModel { c, _ -> PersonListViewModel(c.personRepository, c.reminderRepository, c.time) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val tracker = rememberRevealTracker()
 
@@ -121,9 +125,10 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
             horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
-            if (!state.showArchived && state.query.isBlank() && state.people.isNotEmpty()) {
-                item(span = { GridItemSpan(maxLineSpan) }, key = "circle") {
-                    CircleHeader(state.people, Modifier.reveal(tracker, "circle", 0))
+            val next = state.next
+            if (!state.showArchived && state.query.isBlank() && next != null) {
+                item(span = { GridItemSpan(maxLineSpan) }, key = "next") {
+                    NextWithPeople(next, state.today, onClick = { navigator.openReminder(next.reminder.id) }, modifier = Modifier.reveal(tracker, "next", 0))
                 }
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
@@ -159,10 +164,14 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
 }
 
-/** "La tua cerchia": avatar sovrapposti che arrivano uno dopo l'altro e ondeggiano piano. */
+/**
+ * Il prossimo appuntamento con le tue persone (es. un compleanno): cosa, quando e con chi.
+ * Gli avatar arrivano uno dopo l'altro e ondeggiano piano; un tocco apre il promemoria.
+ */
 @Composable
-private fun CircleHeader(people: List<Person>, modifier: Modifier = Modifier) {
+private fun NextWithPeople(entry: ReminderWithLinks, today: LocalDate, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val tone = MaterialTheme.ricordellaColors.coral
+    val reminder = entry.reminder
     val reduced = rememberReducedMotion()
     val wave = if (reduced) 0f else rememberInfiniteTransition(label = "circle").animateFloat(
         0f,
@@ -174,20 +183,24 @@ private fun CircleHeader(people: List<Person>, modifier: Modifier = Modifier) {
         modifier
             .fillMaxWidth()
             .padding(top = RicordellaDimensions.spaceS)
-            .background(tone.container, MaterialTheme.shapes.large)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
             .padding(RicordellaDimensions.spaceL),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(tr("La tua cerchia"), style = MaterialTheme.typography.titleLarge, color = tone.content)
+            Text(tr("Prossimo appuntamento"), style = MaterialTheme.typography.labelLarge, color = tone.content)
+            Text(reminder.title, style = MaterialTheme.typography.titleLarge, color = tone.content, maxLines = 2)
+            val age = reminder.ageOn(reminder.dueDate)?.let { trf(" · compie %1\$s anni", it) }.orEmpty()
             Text(
-                if (people.size == 1) tr("1 persona") else trf("%1\$s persone", people.size),
+                RelativeDateDescriber.describe(reminder.dueDate, today).replaceFirstChar { it.uppercase() } + age,
                 style = MaterialTheme.typography.bodyMedium,
                 color = tone.content,
             )
         }
         Box {
-            people.take(4).forEachIndexed { index, person ->
+            entry.people.take(4).forEachIndexed { index, person ->
                 val appear = remember { Animatable(if (reduced) 1f else 0f) }
                 LaunchedEffect(Unit) {
                     delay(120L + index * 90L)
