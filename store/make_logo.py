@@ -9,7 +9,13 @@ Crea in store/output/:
 """
 from make_screens import BOLT, FONTS, OUT, TITLE_CSS, crystal_ball, prop, render, sleeping_bear, brand_title, wizard
 
-MOTTO = "Ogni impegno al suo posto,<br>come per magia."
+MOTTI = {
+    "it": "Ogni impegno al suo posto,<br>come per magia.",
+    "en": "Every task in its place,<br>as if by magic.",
+    "de": "Alles an seinem Platz,<br>wie von Zauberhand.",
+    "fr": "Chaque chose à sa place,<br>comme par magie.",
+    "es": "Cada cosa en su sitio,<br>como por arte de magia.",
+}
 
 
 STYLE = """<!doctype html><html><head><meta charset="utf-8"><style>
@@ -51,17 +57,17 @@ def scene(x, y, k):
     return "".join(parts)
 
 
-def feature_graphic():
+def feature_graphic(lang="it"):
     body = (
         stars([(560, 40, 18, .8), (980, 70, 12, .6), (720, 440, 14, .5), (470, 30, 10, .5), (40, 40, 14, .6), (950, 420, 20, .7), (620, 110, 8, .5)])
         + moon(880, 40, 90)
         + scene(10, 20, 0.95)
         + '<div style="position:absolute;left:525px;top:110px;width:480px">'
         + brand_title(80)
-        + f'<div style="font-size:34px;font-weight:600;line-height:1.25;margin-top:18px">{MOTTO}</div>'
+        + f'<div style="font-size:34px;font-weight:600;line-height:1.25;margin-top:18px">{MOTTI[lang]}</div>'
         '</div>'
     )
-    render(STYLE.format(fonts=FONTS.as_uri(), title_css=TITLE_CSS, w=1024, h=500, body=body), OUT / "feature-graphic.png", 1024, 500)
+    render(STYLE.format(fonts=FONTS.as_uri(), title_css=TITLE_CSS, w=1024, h=500, body=body), OUT / lang / "feature-graphic.png", 1024, 500)
 
 
 def icon():
@@ -97,6 +103,7 @@ def simple_icons():
 
 
 if __name__ == "__main__":
-    feature_graphic()
+    for lang in MOTTI:
+        feature_graphic(lang)
     icon()
     simple_icons()

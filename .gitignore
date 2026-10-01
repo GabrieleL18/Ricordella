@@ -17,3 +17,4 @@
 /dist
 # Chiave di debug condivisa: compilando da qualsiasi PC l'app si aggiorna senza disinstallarla.
 !/app/debug.keystore
+keystore.properties

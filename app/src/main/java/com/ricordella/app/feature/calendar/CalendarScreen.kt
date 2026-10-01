@@ -434,12 +434,16 @@ private fun MonthView(
             label = "month",
         ) { month ->
             val lanes = remember(state.occurrences) { spanLanes(state.occurrences) }
-            Column(Modifier.fillMaxSize()) {
-                // Solo le settimane che toccano il mese: niente righe intere del mese dopo.
-                monthGrid(month, state.firstDayOfWeek).chunked(7).filter { week -> week.any { it.month == month.month } }.forEach { week ->
+            BoxWithConstraints(Modifier.fillMaxSize()) {
+              // Solo le settimane che toccano il mese: niente righe intere del mese dopo.
+              val weeks = monthGrid(month, state.firstDayOfWeek).chunked(7).filter { week -> week.any { it.month == month.month } }
+              // Quante barre entrano in una cella (data + marcatori + "+N" occupano il resto): le altre diventano "+N".
+              val maxLanes = ((maxHeight / weeks.size - 40.dp) / 17.dp).toInt().coerceIn(0, MAX_LANES)
+              Column(Modifier.fillMaxSize()) {
+                weeks.forEach { week ->
                     // Spazio per le barre solo nelle settimane che ne hanno.
                     val laneCount = week.flatMap { state.occurrences[it].orEmpty() }.filter { it.isMultiDay }
-                        .mapNotNull { lanes[spanKey(it)] }.maxOrNull()?.plus(1)?.coerceAtMost(MAX_LANES) ?: 0
+                        .mapNotNull { lanes[spanKey(it)] }.maxOrNull()?.plus(1)?.coerceAtMost(maxLanes) ?: 0
                     Row(Modifier.fillMaxWidth().weight(1f)) {
                         week.forEachIndexed { index, day ->
                             DayCell(
@@ -447,6 +451,7 @@ private fun MonthView(
                                 occurrences = state.occurrences[day].orEmpty(),
                                 lanes = lanes,
                                 laneCount = laneCount,
+                                maxLanes = maxLanes,
                                 firstDayOfWeek = state.firstDayOfWeek,
                                 inMonth = day.month == month.month,
                                 isToday = day == today,
@@ -458,9 +463,10 @@ private fun MonthView(
                         }
                     }
                 }
+              }
             }
         }
-
+        Legend()
     }
 }
 
@@ -470,6 +476,7 @@ private fun DayCell(
     occurrences: List<ReminderOccurrence>,
     lanes: Map<String, Int>,
     laneCount: Int,
+    maxLanes: Int,
     firstDayOfWeek: java.time.DayOfWeek,
     inMonth: Boolean,
     isToday: Boolean,
@@ -501,8 +508,8 @@ private fun DayCell(
     Column(
         modifier
             .padding(1.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(background)
+            // Niente clip: il titolo di una barra deve poter scorrere sui giorni seguenti.
+            .background(background, RoundedCornerShape(12.dp))
             .then(if (isToday && !isSelected) Modifier.border(2.dp, colors.primary, RoundedCornerShape(12.dp)) else Modifier)
             .semantics {
                 contentDescription = description
@@ -524,44 +531,16 @@ private fun DayCell(
             modifier = Modifier.graphicsLayer { scaleX = scale; scaleY = scale },
         )
         SpanBars(date, occurrences.filter { it.isMultiDay }, lanes, laneCount, firstDayOfWeek)
-        // Gli impegni del giorno col loro colore: quanti ne entrano, poi "+N".
-        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).padding(horizontal = 2.dp)) {
-            // Se c'è posto i titoli vanno su due righe, così si leggono interi.
-            val twoLines = 30.dp * single.size <= maxHeight
-            val fit = ((maxHeight - 2.dp) / 17.dp).toInt().coerceAtLeast(0)
-            val shown = if (single.size > fit) (fit - 1).coerceAtLeast(0) else single.size
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                single.take(shown).forEach { occurrence -> DayChip(occurrence, dimmed = !inMonth, lines = if (twoLines) 2 else 1) }
-                if (single.size > shown && fit > 0) {
-                    Text(
-                        "+${single.size - shown}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isSelected) extra.onBolt else colors.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+        // Eventi singoli: un marcatore per tipo (vedi la legenda); gli eventi lunghi nascosti per
+        // mancanza di spazio si contano in "+N".
+        val hidden = occurrences.count { it.isMultiDay && (lanes[spanKey(it)] ?: 0) >= maxLanes }
+        Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(10.dp).padding(top = 2.dp).graphicsLayer { alpha = if (inMonth) 1f else 0.5f }) {
+            if (hasTask) Marker(MarkerShape.DOT)
+            if (hasEvent) Marker(MarkerShape.RING)
+            if (hasDeadline) Marker(MarkerShape.SQUARE)
+            if (hidden > 0) Text("+$hidden", style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp), color = if (isSelected) extra.onBolt else colors.onSurfaceVariant)
         }
     }
-}
-
-/** Un impegno dentro il giorno: pastiglia col colore del tipo e il titolo (abbreviato se serve). */
-@Composable
-private fun DayChip(occurrence: ReminderOccurrence, dimmed: Boolean, lines: Int) {
-    val tone = occurrence.reminder.type.tone
-    Text(
-        occurrence.reminder.title,
-        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 13.sp, hyphens = androidx.compose.ui.text.style.Hyphens.Auto, lineBreak = androidx.compose.ui.text.style.LineBreak.Paragraph),
-        color = tone.content,
-        maxLines = lines,
-        overflow = TextOverflow.Clip,
-        modifier = Modifier
-            .fillMaxWidth()
-            .graphicsLayer { alpha = if (dimmed) 0.5f else 1f }
-            .background(tone.container, RoundedCornerShape(4.dp))
-            .padding(horizontal = 3.dp, vertical = 1.dp),
-    )
 }
 
 private const val MAX_LANES = 3
@@ -614,6 +593,14 @@ private fun SpanBars(
                 Box(
                     Modifier
                         .fillMaxWidth()
+                        // Le caselle hanno 1dp di margine: la barra lo copre da un giorno all'altro, senza stacchi.
+                        .layout { measurable, constraints ->
+                            val l = if (first || rowStart) 0 else 1.dp.roundToPx()
+                            val r = if (last || rowEnd) 0 else 1.dp.roundToPx()
+                            val w = constraints.maxWidth + l + r
+                            val p = measurable.measure(constraints.copy(minWidth = w, maxWidth = w))
+                            layout(constraints.maxWidth, p.height) { p.place(-l, 0) }
+                        }
                         .padding(start = if (first) 3.dp else 0.dp, end = if (last) 3.dp else 0.dp)
                         .height(15.dp)
                         .background(tone.solid, shape),

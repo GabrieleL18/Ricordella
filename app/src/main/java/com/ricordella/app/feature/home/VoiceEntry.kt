@@ -156,6 +156,9 @@ private fun VoiceListening(onResult: (String) -> Unit, onDismiss: () -> Unit) {
     var recognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
     // Prima si prova offline; se manca il pacchetto della lingua si riprova col servizio normale.
     var offline by remember { mutableStateOf(true) }
+    // La prima volta (permesso appena dato, servizio vocale ancora freddo) il riconoscitore può
+    // fallire per un attimo: si riprova una volta di nascosto prima di mostrare l'errore.
+    var retried by remember { mutableStateOf(false) }
 
     // Modalità demo (screenshot): solo l'animazione con una frase d'esempio, senza microfono.
     val demo = remember { com.ricordella.app.core.DemoMode.isOn(context) }
@@ -201,6 +204,11 @@ private fun VoiceListening(onResult: (String) -> Unit, onDismiss: () -> Unit) {
                     attempt++
                     return
                 }
+                if (!retried && code in listOf(SpeechRecognizer.ERROR_AUDIO, SpeechRecognizer.ERROR_CLIENT, SpeechRecognizer.ERROR_RECOGNIZER_BUSY)) {
+                    retried = true
+                    attempt++
+                    return
+                }
                 error = when (code) {
                     12, 13 -> tr("Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline).")
                     SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> tr("Non ho sentito niente.")
@@ -212,15 +220,21 @@ private fun VoiceListening(onResult: (String) -> Unit, onDismiss: () -> Unit) {
             }
             override fun onEvent(eventType: Int, params: Bundle?) = Unit
         })
-        speech.startListening(
-            Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLanguageTag())
-                .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-                .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, offline),
-        )
+        // Un attimo di respiro: subito dopo il permesso la finestra non ha ancora il microfono libero.
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        val start = Runnable {
+            speech.startListening(
+                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE, speechLanguageTag())
+                    .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                    .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, offline),
+            )
+        }
+        handler.postDelayed(start, 350)
         recognizer = speech
         onDispose {
+            handler.removeCallbacks(start)
             active = false
             speech.destroy()
             recognizer = null
