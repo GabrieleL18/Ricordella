@@ -39,6 +39,18 @@ data class TypeDefaults(
     val notifyOffsetMinutes: Int = 0,
 )
 
+/**
+ * Cosa finisce nel file condiviso con un'altra persona. Le sveglie sono personali: di default non si condividono
+ * (e suonano solo sul telefono della persona a cui sono assegnate).
+ */
+@Serializable
+data class ShareScope(
+    val people: Boolean = true,
+    val items: Boolean = true,
+    val reminders: Boolean = true,
+    val alarms: Boolean = false,
+)
+
 /** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
 @Serializable
 enum class AutoMode { AUTOMATIC, ASK, OFF }
@@ -127,6 +139,8 @@ data class AppSettings(
     /** Ciclo mestruale: una voce per persona, e la cronologia delle mestruazioni (solo su questo telefono). */
     val cycleProfiles: List<CycleProfile> = emptyList(),
     val cycleLog: List<CycleEntry> = emptyList(),
+    /** Cosa si condivide nel file condiviso (vedi [ShareScope]). */
+    val shareScope: ShareScope = ShareScope(),
 ) {
     fun defaultsFor(type: ReminderType): TypeDefaults =
         typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)

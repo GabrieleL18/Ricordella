@@ -1362,3 +1362,18 @@ Solo sul tuo telefono ||| Only on your phone
 Sostituisco con quello del calendario ||| Replace with the calendar's one
 Tengo il mio ||| Keep mine
 Tengo tutti e due ||| Keep both
+1. Crea il file e salvalo su Google Drive. ||| 1. Create the file and save it on Google Drive.
+2. In Drive condividi quel file con l'altra persona, come Editor: senza questo passaggio lei non può aprirlo. ||| 2. In Drive share that file with the other person as Editor: without this step they can't open it.
+3. Lei apre Remindella › Impostazioni › Condivisione › «Apri il file condiviso con me» e sceglie lo stesso file. ||| 3. They open Remindella › Settings › Sharing › "Open the file shared with me" and pick the same file.
+Come si usa, in 3 passi ||| How to use it, in 3 steps
+Con ripetizioni e storico dei completamenti. ||| With repeats and completion history.
+Cosa condividi ||| What you share
+Cose e spese ||| Things and expenses
+Garanzie, manutenzioni e spese, senza foto e documenti. ||| Warranties, maintenance and expenses, without photos and documents.
+La sveglia va assegnata a una persona: scegline una in «Altre opzioni › Collegamenti». ||| The alarm must be assigned to a person: pick one in "More options › Links".
+Nel file condiviso va solo quello che lasci acceso. Chi ha il file lo legge e lo modifica: condividilo solo con chi vuoi. ||| Only what you leave on goes into the shared file. Anyone with the file can read and edit it: share it only with people you choose.
+Nomi e note, senza le foto. ||| Names and notes, without photos.
+Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi. ||| Never shared: photos, documents and attachments (they stay on the phone of whoever has them), settings, cycle, water and resolutions.
+Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| What you turn off stays as is on your phone and in the file: it isn't deleted or changed.
+Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Choose what goes into the shared file. You can change your mind anytime.
+Suonano solo sul telefono della persona a cui sono assegnate. ||| They only ring on the phone of the person they're assigned to.

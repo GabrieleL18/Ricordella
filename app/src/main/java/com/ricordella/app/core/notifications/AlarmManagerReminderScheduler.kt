@@ -62,6 +62,8 @@ class AlarmManagerReminderScheduler(
             val today = time.today()
             plan.dueNow.forEach { id ->
                 val entry = reminders.getReminder(id) ?: return@forEach
+                // Una sveglia condivisa suona solo sul telefono della persona a cui è assegnata.
+                if (entry.reminder.type == ReminderType.ALARM && !isMine(entry, appSettings.sharedMeId)) return@forEach
                 // Le sveglie (e, se scelto, i promemoria importanti/urgenti) suonano a tutto schermo
                 // finché non si risponde; se Android non lo consente, notifica normale.
                 val insistent = entry.reminder.type == ReminderType.ALARM ||
@@ -97,12 +99,16 @@ class AlarmManagerReminderScheduler(
             if (preview.isAfter(now)) {
                 if (next == null || preview.isBefore(next)) next = preview
             } else if (Duration.between(preview, now) <= PREVIEW_GRACE && prefs.getLong(c.id, 0L) != trigger.toEpochMilli()) {
-                reminders.getReminder(c.id)?.let(notifier::showAlarmPreview)
+                reminders.getReminder(c.id)?.takeIf { isMine(it, settings.current().sharedMeId) }?.let(notifier::showAlarmPreview)
                 prefs.edit().putLong(c.id, trigger.toEpochMilli()).apply()
             }
         }
         return next
     }
+
+    /** Senza persona scelta come "io" (nessuna condivisione) vale tutto; altrimenti la sveglia deve essere assegnata a me. */
+    private fun isMine(entry: com.ricordella.app.domain.model.ReminderWithLinks, meId: String?): Boolean =
+        meId == null || entry.people.isEmpty() || entry.people.any { it.id == meId }
 
     override fun dismissNotification(reminderId: String) = notifier.dismiss(reminderId)
 

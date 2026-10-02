@@ -237,8 +237,12 @@ class SharedSpace(
     private suspend fun syncWith(uri: Uri): Boolean {
         val bytes = readBytes(uri)
         val remote = parse(bytes)
-        val local = backupDao.readAll()
-        val base = readBase()
+        val fullLocal = backupDao.readAll()
+        val scope = settings.current().shareScope
+        // Solo ciò che si condivide entra nell'unione; il resto resta com'è, qui e nel file.
+        val local = ShareMerge.strip(fullLocal, scope)
+        val remoteShared = ShareMerge.strip(remote.content, scope)
+        val base = readBase()?.let { ShareMerge.strip(it, scope) }
         val now = Instant.now()
 
         val deleted = HashMap<String, Instant>()
@@ -246,8 +250,9 @@ class SharedSpace(
         ShareMerge.localDeletions(base, local).forEach { (id, at) -> deleted[id] = maxOf(at, deleted[id] ?: Instant.EPOCH) }
         deleted.entries.removeAll { it.value.isBefore(now.minus(DELETION_MEMORY)) }
 
-        val merged = ShareMerge.merge(base, local, remote.content, deleted)
-        val forFile = ShareMerge.forFile(merged)
+        val mergedShared = ShareMerge.merge(base, local, remoteShared, deleted)
+        val merged = ShareMerge.plus(mergedShared, ShareMerge.rest(fullLocal, scope))
+        val forFile = ShareMerge.forFile(ShareMerge.plus(mergedShared, ShareMerge.rest(remote.content, scope)))
         val pending = readPending()
         val activity = (remote.activity + pending).distinctBy { it.id }.sortedByDescending { it.at }.take(MAX_ACTIVITY)
         val deletedText = deleted.mapValues { it.value.toString() }
@@ -259,7 +264,7 @@ class SharedSpace(
             write(uri, SharedFile(savedAt = now.toString(), content = forFile, deleted = deletedText, activity = activity))
         }
         pendingFile.delete()
-        val changedHere = !sameData(merged, local)
+        val changedHere = !sameData(merged, fullLocal)
         // ponytail: tra la lettura e la sostituzione passano pochi millisecondi; una modifica fatta
         // proprio in quell'istante verrebbe ripresa alla sincronizzazione successiva solo se ancora presente.
         if (changedHere) {

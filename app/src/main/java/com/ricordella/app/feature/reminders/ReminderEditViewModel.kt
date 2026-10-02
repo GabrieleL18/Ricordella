@@ -80,6 +80,8 @@ data class ReminderForm(
     val isAlarm: Boolean get() = type == ReminderType.ALARM
     /** La sveglia deve avere giorno e orario. */
     val timeError: Boolean get() = showErrors && isAlarm && time == null
+    /** Una sveglia è sempre di qualcuno: serve almeno una persona. */
+    val personError: Boolean get() = showErrors && isAlarm && personIds.isEmpty()
     val endDateError: Boolean get() = showErrors && multiDay && (endDate == null || date == null || !endDate.isAfter(date))
     val isRecurring: Boolean get() = recurrencePreset != RecurrencePreset.NONE
 }
@@ -228,10 +230,10 @@ class ReminderEditViewModel(
     fun save() {
         val form = _form.value
         val date = form.date
-        val invalid = form.title.isBlank() || date == null || (form.isAlarm && form.time == null) ||
+        val invalid = form.title.isBlank() || date == null || (form.isAlarm && (form.time == null || form.personIds.isEmpty())) ||
             (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))
         if (invalid || date == null) {
-            _form.update { it.copy(showErrors = true) }
+            _form.update { it.copy(showErrors = true, showAdvanced = it.showAdvanced || (it.isAlarm && it.personIds.isEmpty())) }
             return
         }
         _form.update { it.copy(isSaving = true) }

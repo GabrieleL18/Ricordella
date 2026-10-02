@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.settings
 
+import androidx.compose.material3.Switch
 import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -121,6 +122,15 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.cyan.content,
             )
+            Column(
+                Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f), MaterialTheme.shapes.medium).padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(tr("Come si usa, in 3 passi"), style = MaterialTheme.typography.titleSmall)
+                Text(tr("1. Crea il file e salvalo su Google Drive."), style = MaterialTheme.typography.bodySmall)
+                Text(tr("2. In Drive condividi quel file con l'altra persona, come Editor: senza questo passaggio lei non può aprirlo."), style = MaterialTheme.typography.bodySmall)
+                Text(tr("3. Lei apre Remindella › Impostazioni › Condivisione › «Apri il file condiviso con me» e sceglie lo stesso file."), style = MaterialTheme.typography.bodySmall)
+            }
             PushButton(
                 tr("Crea il file condiviso"),
                 onClick = { choosingMode = "create" },
@@ -203,6 +213,8 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
         }
     }
 
+    ShareScopeCard(settings.shareScope, shared, onChange = { scope -> update { it.copy(shareScope = scope) } })
+
     if (help) TutorialDialog(SharingTutorialPages, onDismiss = { help = false })
     choosingMode?.let { mode ->
         SyncModeDialog(
@@ -248,6 +260,51 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
             onConfirm = { scope.launch { space.leave() } },
             onDismiss = { confirmLeave = false },
         )
+    }
+}
+
+/** Cosa finisce nel file condiviso e cosa no, con gli interruttori per scegliere. */
+@Composable
+private fun ShareScopeCard(scope: com.ricordella.app.domain.model.ShareScope, active: Boolean, onChange: (com.ricordella.app.domain.model.ShareScope) -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
+    @Composable
+    fun row(title: String, subtitle: String, checked: Boolean, onToggle: (Boolean) -> Unit) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = checked, onCheckedChange = onToggle)
+        }
+    }
+    SectionHeader(tr("Cosa condividi"), icon = Icons.Rounded.CloudSync, tone = colors.cyan)
+    Column(
+        Modifier.fillMaxWidth().background(colors.cyan.container, MaterialTheme.shapes.large).padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        Text(
+            if (active) tr("Nel file condiviso va solo quello che lasci acceso. Chi ha il file lo legge e lo modifica: condividilo solo con chi vuoi.")
+            else tr("Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi."),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.cyan.content,
+        )
+        row(tr("Promemoria ed eventi"), tr("Con ripetizioni e storico dei completamenti."), scope.reminders) { onChange(scope.copy(reminders = it)) }
+        row(tr("Persone"), tr("Nomi e note, senza le foto."), scope.people) { onChange(scope.copy(people = it)) }
+        row(tr("Cose e spese"), tr("Garanzie, manutenzioni e spese, senza foto e documenti."), scope.items) { onChange(scope.copy(items = it)) }
+        row(tr("Sveglie"), tr("Suonano solo sul telefono della persona a cui sono assegnate."), scope.alarms) { onChange(scope.copy(alarms = it)) }
+        Text(
+            tr("Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi."),
+            style = MaterialTheme.typography.bodySmall,
+            color = colors.cyan.content,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        if (active) {
+            Text(
+                tr("Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato."),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.cyan.content,
+            )
+        }
     }
 }
 

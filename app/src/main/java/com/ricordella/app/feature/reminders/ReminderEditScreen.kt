@@ -180,6 +180,9 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     }
     if (form.isAlarm) {
         AlarmFields(form, update)
+        if (form.personError) {
+            Text(tr("La sveglia va assegnata a una persona: scegline una in «Altre opzioni › Collegamenti»."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        }
     }
     if (form.type == ReminderType.BIRTHDAY) {
         val age = form.birthYear.toIntOrNull()?.let { year -> form.date?.year?.minus(year) }?.takeIf { it in 1..150 }

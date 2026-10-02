@@ -1287,3 +1287,18 @@ Solo sul tuo telefono ||| Seulement sur ton téléphone
 Sostituisco con quello del calendario ||| Remplacer par celui du calendrier
 Tengo il mio ||| Garder le mien
 Tengo tutti e due ||| Garder les deux
+1. Crea il file e salvalo su Google Drive. ||| 1. Crée le fichier et enregistre-le sur Google Drive.
+2. In Drive condividi quel file con l'altra persona, come Editor: senza questo passaggio lei non può aprirlo. ||| 2. Dans Drive, partage ce fichier avec l'autre personne en tant qu'Éditeur : sans cette étape, elle ne peut pas l'ouvrir.
+3. Lei apre Remindella › Impostazioni › Condivisione › «Apri il file condiviso con me» e sceglie lo stesso file. ||| 3. Elle ouvre Remindella › Réglages › Partage › « Ouvrir le fichier partagé avec moi » et choisit le même fichier.
+Come si usa, in 3 passi ||| Comment ça marche, en 3 étapes
+Con ripetizioni e storico dei completamenti. ||| Avec répétitions et historique des réalisations.
+Cosa condividi ||| Ce que tu partages
+Cose e spese ||| Objets et dépenses
+Garanzie, manutenzioni e spese, senza foto e documenti. ||| Garanties, entretiens et dépenses, sans photos ni documents.
+La sveglia va assegnata a una persona: scegline una in «Altre opzioni › Collegamenti». ||| Le réveil doit être attribué à une personne : choisis-en une dans « Plus d'options › Liens ».
+Nel file condiviso va solo quello che lasci acceso. Chi ha il file lo legge e lo modifica: condividilo solo con chi vuoi. ||| Seul ce que tu laisses activé va dans le fichier partagé. Qui a le fichier peut le lire et le modifier : partage-le seulement avec qui tu veux.
+Nomi e note, senza le foto. ||| Noms et notes, sans photos.
+Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi. ||| Jamais partagés : photos, documents et pièces jointes (ils restent sur le téléphone de qui les a), réglages, cycle, eau et bonnes résolutions.
+Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| Ce que tu désactives reste tel quel sur ton téléphone et dans le fichier : ni supprimé ni modifié.
+Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Choisis ce qui va dans le fichier partagé. Tu peux changer d'avis quand tu veux.
+Suonano solo sul telefono della persona a cui sono assegnate. ||| Elles ne sonnent que sur le téléphone de la personne à qui elles sont attribuées.

@@ -173,6 +173,59 @@ object ShareMerge {
         )
     }
 
+    /** Solo ciò che si condivide secondo [scope], con i collegamenti che restano validi. */
+    fun strip(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope): BackupDatabaseContent {
+        val reminders = c.reminders.filter { if (it.type == com.ricordella.app.domain.model.ReminderType.ALARM) scope.alarms else scope.reminders }
+        val rIds = reminders.mapTo(HashSet()) { it.id }
+        val ruleIds = reminders.mapNotNullTo(HashSet()) { it.recurrenceRuleId }
+        val people = if (scope.people) c.people else emptyList()
+        val items = if (scope.items) c.items else emptyList()
+        val pIds = people.mapTo(HashSet()) { it.id }
+        val iIds = items.mapTo(HashSet()) { it.id }
+        return c.copy(
+            people = people,
+            items = items,
+            reminders = reminders,
+            recurrenceRules = c.recurrenceRules.filter { it.id in ruleIds },
+            completions = c.completions.filter { it.reminderId in rIds },
+            maintenance = c.maintenance.filter { it.itemId in iIds },
+            reminderPeople = c.reminderPeople.filter { it.reminderId in rIds && it.personId in pIds },
+            reminderItems = c.reminderItems.filter { it.reminderId in rIds && it.itemId in iIds },
+            personItems = c.personItems.filter { it.personId in pIds && it.itemId in iIds },
+        )
+    }
+
+    /** Il resto: ciò che [strip] lascia fuori. Non viaggia nel file ma non va perso (né qui né nel file). */
+    fun rest(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope): BackupDatabaseContent {
+        val kept = strip(c, scope)
+        return BackupDatabaseContent(
+            people = c.people - kept.people.toSet(),
+            items = c.items - kept.items.toSet(),
+            recurrenceRules = c.recurrenceRules - kept.recurrenceRules.toSet(),
+            reminders = c.reminders - kept.reminders.toSet(),
+            completions = c.completions - kept.completions.toSet(),
+            maintenance = c.maintenance - kept.maintenance.toSet(),
+            reminderPeople = c.reminderPeople - kept.reminderPeople.toSet(),
+            reminderItems = c.reminderItems - kept.reminderItems.toSet(),
+            personItems = c.personItems - kept.personItems.toSet(),
+        )
+    }
+
+    /** Unisce due parti disgiunte (la condivisa e il resto). */
+    fun plus(a: BackupDatabaseContent, b: BackupDatabaseContent) = BackupDatabaseContent(
+        people = a.people + b.people,
+        categories = a.categories,
+        items = a.items + b.items,
+        recurrenceRules = a.recurrenceRules + b.recurrenceRules,
+        reminders = a.reminders + b.reminders,
+        completions = a.completions + b.completions,
+        maintenance = a.maintenance + b.maintenance,
+        attachments = a.attachments,
+        reminderPeople = a.reminderPeople + b.reminderPeople,
+        reminderItems = a.reminderItems + b.reminderItems,
+        personItems = a.personItems + b.personItems,
+    )
+
     /** Versione da scrivere nel file condiviso: senza foto, documenti e allegati (sono file di questo telefono). */
     fun forFile(content: BackupDatabaseContent): BackupDatabaseContent = content.copy(
         people = content.people.map { it.copy(photoUri = null) },
