@@ -138,11 +138,16 @@ data class PotionSettings(
     /** Giorno (epochDay) a cui si riferisce [drankMl]: il giorno dopo si riparte da zero. */
     val day: Long? = null,
     val drankMl: Int = 0,
+    /** Acqua bevuta nei giorni passati (epochDay → ml), per il recap dell'ultima settimana. */
+    val history: Map<Long, Int> = emptyMap(),
 ) {
-    fun drankOn(epochDay: Long): Int = if (day == epochDay) drankMl else 0
+    fun drankOn(epochDay: Long): Int = if (day == epochDay) drankMl else history[epochDay] ?: 0
 
     /** Aggiunge (o toglie, se negativo) acqua bevuta nel giorno [epochDay]. */
-    fun drink(epochDay: Long, ml: Int): PotionSettings = copy(day = epochDay, drankMl = (drankOn(epochDay) + ml).coerceAtLeast(0))
+    fun drink(epochDay: Long, ml: Int): PotionSettings {
+        val past = if (day != null && day != epochDay) history + (day to drankMl) else history
+        return copy(day = epochDay, drankMl = (drankOn(epochDay) + ml).coerceAtLeast(0), history = past.filterKeys { it > epochDay - 14 })
+    }
 
     /**
      * Prossimo avviso dopo [now]: dalle [from] ogni [everyMinutes] minuti fino alle [until] comprese;

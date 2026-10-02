@@ -38,7 +38,8 @@ class AppNavigator(private val navController: NavController) {
         date: LocalDate? = null,
         itemId: String? = null,
         personId: String? = null,
-    ) = navController.navigate(ReminderEditRoute(type = type?.name, epochDay = date?.toEpochDay(), itemId = itemId, personId = personId))
+        quickText: String? = null,
+    ) = navController.navigate(ReminderEditRoute(type = type?.name, epochDay = date?.toEpochDay(), itemId = itemId, personId = personId, quickText = quickText))
 
     fun editReminder(id: String) = navController.navigate(ReminderEditRoute(id = id))
 

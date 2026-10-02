@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.settings
 
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -79,6 +80,7 @@ import java.time.ZoneId
 @Composable
 fun SharingSection(settings: AppSettings, space: SharedSpace) {
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
     val status by space.status.collectAsStateWithLifecycle()
     val activity by space.activity.collectAsStateWithLifecycle()
@@ -182,7 +184,17 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
                 activity.take(5).forEach { entry -> ActivityRow(entry) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                PushButton(tr("Sincronizza ora"), onClick = { scope.launch { space.sync() } }, icon = Icons.Rounded.Sync)
+                PushButton(
+                    if (status is SharedSpace.Status.Syncing) tr("Sincronizzo…") else tr("Sincronizza ora"),
+                    onClick = {
+                        if (status is SharedSpace.Status.Syncing) return@PushButton
+                        scope.launch {
+                            val ok = space.sync()
+                            Toast.makeText(context, if (ok) tr("Sincronizzato ✓") else tr("Sincronizzazione non riuscita"), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    icon = Icons.Rounded.Sync,
+                )
                 TextButton(onClick = { confirmLeave = true }) {
                     Icon(Icons.Rounded.LinkOff, contentDescription = null, modifier = Modifier.size(18.dp))
                     Text(tr("Smetti"), modifier = Modifier.padding(start = 4.dp))
@@ -382,6 +394,7 @@ private fun WizardFriends(modifier: Modifier = Modifier) {
             WizardAvatar(
                 seed = seed,
                 size = size,
+                toneIndex = index + 1, // un colore diverso per ognuno, sul fondo ciano
                 modifier = Modifier.graphicsLayer {
                     translationY = -hop * 10.dp.toPx()
                     rotationZ = (hop - 0.5f) * if (index % 2 == 0) 6f else -6f

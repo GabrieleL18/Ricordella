@@ -1,5 +1,8 @@
 package com.ricordella.app.core.navigation
 
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import com.ricordella.app.feature.legal.TERMS_VERSION
 import com.ricordella.app.feature.legal.TermsScreen
 import androidx.compose.ui.platform.LocalContext
@@ -234,7 +237,11 @@ fun RicordellaApp(
             }
         },
     ) {
+        // Con la barra laterale (tablet) o senza barra non c'è una barra in basso che gestisce la barra di sistema:
+        // si lascia lo spazio qui, così il contenuto non finisce sotto i tasti di navigazione (es. Galaxy Tab).
+        val layout = if (currentTopLevel != null) adaptiveType else NavigationSuiteType.None
         NavHost(
+            modifier = if (layout == NavigationSuiteType.NavigationBar) Modifier else Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             navController = navController,
             startDestination = HomeRoute,
             enterTransition = {

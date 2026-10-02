@@ -1159,4 +1159,9 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Scrivi al volo" to "Escribe al vuelo",
     "Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline)." to "El reconocimiento de voz del móvil no tiene este idioma: descárgalo en los ajustes del teclado o de Google (Voz › Reconocimiento de voz sin conexión).",
     "cena con Luca sabato alle 20" to "cena con Luca el sábado a las 20",
+    "Sincronizzato ✓" to "Sincronizado ✓",
+    "Sincronizzazione non riuscita" to "La sincronización ha fallado",
+    "Ultima settimana" to "Última semana",
+    "Media %1\$s al giorno · obiettivo raggiunto %2\$s volte su 7" to "Media de %1\$s al día · objetivo alcanzado %2\$s veces de 7",
+    "Cancella" to "Borrar",
 )

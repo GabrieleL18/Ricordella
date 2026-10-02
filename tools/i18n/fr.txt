@@ -1155,3 +1155,8 @@ Home ||| Accueil
 Scrivi al volo ||| Saisie rapide
 Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline). ||| La reconnaissance vocale du téléphone n'a pas cette langue : télécharge-la dans les paramètres du clavier ou de Google (Voix › Reconnaissance vocale hors connexion).
 cena con Luca sabato alle 20 ||| dîner avec Luca samedi à 20h
+Sincronizzato ✓ ||| Synchronisé ✓
+Sincronizzazione non riuscita ||| Échec de la synchronisation
+Ultima settimana ||| Dernière semaine
+Media %1$s al giorno · obiettivo raggiunto %2$s volte su 7 ||| Moyenne %1$s par jour · objectif atteint %2$s fois sur 7
+Cancella ||| Effacer

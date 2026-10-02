@@ -17,6 +17,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -171,6 +174,8 @@ fun PotionsScreen(onBack: () -> Unit) {
                 }
             }
 
+            WeekRecap(potions, today)
+
             SectionHeader(tr("Promemoria"), icon = Icons.Rounded.NotificationsActive, tone = MaterialTheme.ricordellaColors.cyan)
             ListItem(
                 headlineContent = { Text(tr("Ricordamelo")) },
@@ -207,6 +212,49 @@ fun PotionsScreen(onBack: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+/** Recap dell'ultima settimana: una colonna per giorno (oggi a destra), tratteggio all'obiettivo, media sotto. */
+@Composable
+private fun WeekRecap(potions: PotionSettings, today: Long) {
+    val colors = MaterialTheme.ricordellaColors
+    val days = (today - 6..today).toList()
+    val amounts = days.map { potions.drankOn(it) }
+    val goal = potions.goalMl.coerceAtLeast(1)
+    val top = maxOf(goal, amounts.max()).toFloat()
+    SectionHeader(tr("Ultima settimana"), icon = Icons.Rounded.WaterDrop, tone = colors.cyan)
+    Column(
+        Modifier.fillMaxWidth().background(colors.cyan.container, MaterialTheme.shapes.large).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(Modifier.fillMaxWidth().height(110.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Bottom) {
+            days.forEachIndexed { i, day ->
+                val ml = amounts[i]
+                Column(
+                    Modifier.weight(1f).fillMaxHeight().semantics(mergeDescendants = true) { contentDescription = liters(ml) },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom,
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight((ml / top).coerceAtLeast(0.03f) * 0.8f)
+                            .background(if (ml >= goal) colors.mint.solid else colors.cyan.solid, RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)),
+                    )
+                    Text(
+                        java.time.LocalDate.ofEpochDay(day).dayOfWeek.getDisplayName(java.time.format.TextStyle.NARROW, Lang.locale),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.cyan.content,
+                    )
+                }
+            }
+        }
+        Text(
+            trf("Media %1\$s al giorno · obiettivo raggiunto %2\$s volte su 7", liters(amounts.sum() / 7), amounts.count { it >= goal }),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.cyan.content,
+        )
     }
 }
 

@@ -1198,4 +1198,9 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Non impostare" to "Don't set",
     "Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline)." to "The phone's speech recognition doesn't have this language: download it in the keyboard or Google settings (Voice › Offline speech recognition).",
     "cena con Luca sabato alle 20" to "dinner with Luca saturday at 8pm",
+    "Sincronizzato ✓" to "Synced ✓",
+    "Sincronizzazione non riuscita" to "Sync failed",
+    "Ultima settimana" to "Last week",
+    "Media %1\$s al giorno · obiettivo raggiunto %2\$s volte su 7" to "Average %1\$s a day · goal reached %2\$s times out of 7",
+    "Cancella" to "Clear",
 )

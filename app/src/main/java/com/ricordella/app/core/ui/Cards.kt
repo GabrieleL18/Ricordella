@@ -5,6 +5,11 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -92,6 +97,7 @@ enum class ReminderDateMode { ABSOLUTE, RELATIVE, TIME_ONLY }
 /** Tempo lasciato alla festa della spunta prima di aggiornare i dati (e far sparire la card). */
 private const val CELEBRATION_MS = 420L
 private const val UNDO_MS = 3_000L
+private const val CLOSE_MS = 320L
 
 /**
  * Card di un promemoria. Si completa toccando il cerchio a destra oppure trascinando la card
@@ -116,6 +122,16 @@ fun ReminderCard(
     val scope = rememberCoroutineScope()
     var celebrating by remember(reminder.id, reminder.dueDate, reminder.status) { mutableStateOf(false) }
     var burst by remember { mutableIntStateOf(0) }
+    // Un evento ricorrente completato si chiude (rimpicciolisce e sfuma) prima di passare alla prossima data.
+    var closing by remember(reminder.id, reminder.dueDate, reminder.status) { mutableStateOf(false) }
+    val recurring = reminder.recurrenceRuleId != null
+    suspend fun closeThen(callback: (() -> Unit)?) {
+        if (recurring) {
+            closing = true
+            delay(CLOSE_MS)
+        }
+        callback?.invoke()
+    }
 
     // Le feste non hanno la spunta (né lo swipe per completare).
     val sounds = rememberUiSounds()
@@ -139,7 +155,7 @@ fun ReminderCard(
                 celebrate()
                 scope.launch {
                     delay(CELEBRATION_MS)
-                    callback()
+                    closeThen(callback)
                 }
             } else if (isDone) {
                 haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
@@ -154,7 +170,7 @@ fun ReminderCard(
             undoJob = scope.launch {
                 delay(UNDO_MS)
                 awaitingUndo = false
-                onToggleComplete?.invoke()
+                closeThen(onToggleComplete)
             }
         }
     }
@@ -180,6 +196,13 @@ fun ReminderCard(
         )
     }
 
+    val closable: @Composable () -> Unit = {
+        AnimatedVisibility(
+            visible = !closing,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut(tween(CLOSE_MS.toInt())) + shrinkVertically(tween(CLOSE_MS.toInt(), easing = RicordellaMotion.EaseInOut)),
+        ) { body() }
+    }
     if (swipeToComplete && toggle != null && !isDone) {
         val swipeState = rememberSwipeToDismissBoxState()
         SwipeToDismissBox(
@@ -216,9 +239,9 @@ fun ReminderCard(
                     Text(tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content)
                 }
             },
-        ) { body() }
+        ) { closable() }
     } else {
-        Box(modifier) { body() }
+        Box(modifier) { closable() }
     }
 }
 

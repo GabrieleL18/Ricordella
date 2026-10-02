@@ -1230,3 +1230,8 @@ Console ||| Console
 TV ||| TV
 Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline). ||| The phone's speech recognition doesn't have this language: download it in the keyboard or Google settings (Voice › Offline speech recognition).
 cena con Luca sabato alle 20 ||| dinner with Luca saturday at 8pm
+Sincronizzato ✓ ||| Synced ✓
+Sincronizzazione non riuscita ||| Sync failed
+Ultima settimana ||| Last week
+Media %1$s al giorno · obiettivo raggiunto %2$s volte su 7 ||| Average %1$s a day · goal reached %2$s times out of 7
+Cancella ||| Clear

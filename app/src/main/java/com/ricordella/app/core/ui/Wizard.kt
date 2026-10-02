@@ -694,9 +694,9 @@ private val HairTones = listOf(Color(0xFFFFFFFF), Color(0xFF6B4226), Color(0xFF2
  * Sbatte le palpebre, la punta del cappello ondeggia e la stella luccica (ognuno col suo ritmo).
  */
 @Composable
-fun WizardAvatar(seed: String, size: Dp, modifier: Modifier = Modifier) {
-    val tone = toneFor(seed)
+fun WizardAvatar(seed: String, size: Dp, modifier: Modifier = Modifier, toneIndex: Int? = null) {
     val colors = MaterialTheme.ricordellaColors
+    val tone = toneIndex?.let { listOf(colors.cyan, colors.lavender, colors.coral, colors.pear, colors.mint)[it % 5] } ?: toneFor(seed)
     val hash = seed.hashCode().let { if (it == Int.MIN_VALUE) 0 else kotlin.math.abs(it) }
     val skin = SkinTones[hash % SkinTones.size]
     val hair = HairTones[(hash / 7) % HairTones.size]

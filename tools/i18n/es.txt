@@ -1155,3 +1155,8 @@ Home ||| Inicio
 Scrivi al volo ||| Escribe al vuelo
 Il riconoscimento vocale del telefono non ha questa lingua: scaricala nelle impostazioni della tastiera o di Google (Voce › Riconoscimento offline). ||| El reconocimiento de voz del móvil no tiene este idioma: descárgalo en los ajustes del teclado o de Google (Voz › Reconocimiento de voz sin conexión).
 cena con Luca sabato alle 20 ||| cena con Luca el sábado a las 20
+Sincronizzato ✓ ||| Sincronizado ✓
+Sincronizzazione non riuscita ||| La sincronización ha fallado
+Ultima settimana ||| Última semana
+Media %1$s al giorno · obiettivo raggiunto %2$s volte su 7 ||| Media de %1$s al día · objetivo alcanzado %2$s veces de 7
+Cancella ||| Borrar

@@ -37,6 +37,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -132,8 +135,17 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
         mascot.celebrate()
     }
 
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
+    val attentionAt = 4 + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
+    val todayAt = attentionAt + if (state.attention.isNotEmpty()) 1 + state.attention.size else 0
+    val upcomingAt = todayAt + 2
+    val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
+
     TopLevelScaffold(title = tr("Remindella"), navigator = navigator, onAdd = onAdd, brandTitle = true) { padding ->
         LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
                 start = RicordellaDimensions.screenPadding,
@@ -143,9 +155,9 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             ),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
+            item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0), onAttention = { goTo(attentionAt) }, onToday = { goTo(todayAt) }, onUpcoming = { goTo(upcomingAt) }) }
             item(key = "quick-entry") {
-                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
+                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
             }
             item(key = "permission") { NotificationPermissionCard() }
             item(key = "backup") {
@@ -268,7 +280,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 }
 
 @Composable
-private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier) {
+private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier, onAttention: () -> Unit, onToday: () -> Unit, onUpcoming: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     Column(modifier.padding(top = RicordellaDimensions.spaceS, bottom = RicordellaDimensions.spaceS)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -294,9 +306,9 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                 horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
             ) {
-                CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral)
-                CountPill(state.today.size, tr("oggi"), Icons.Rounded.WbSunny, colors.pear)
-                CountPill(state.upcoming.size, tr("in arrivo"), Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming)
+                CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral, onClick = onAttention)
+                CountPill(state.today.size, tr("oggi"), Icons.Rounded.WbSunny, colors.pear, onClick = onToday)
+                CountPill(state.upcoming.size, tr("in arrivo"), Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming, onClick = onUpcoming)
             }
         }
     }
@@ -337,8 +349,9 @@ private fun DayPill(now: java.time.LocalDateTime) {
 
 /** Contatore a pillola: il numero scorre verso l'alto quando cambia. */
 @Composable
-private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, plus: Boolean = false) {
+private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, plus: Boolean = false, onClick: () -> Unit) {
     Surface(
+        onClick = onClick,
         color = tone.container,
         contentColor = tone.content,
         shape = CircleShape,

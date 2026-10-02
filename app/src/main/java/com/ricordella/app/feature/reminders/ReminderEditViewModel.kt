@@ -18,6 +18,7 @@ import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderDraft
 import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.TripInfo
+import com.ricordella.app.domain.text.QuickEntryParser
 import com.ricordella.app.domain.repository.ItemRepository
 import com.ricordella.app.domain.repository.PersonRepository
 import com.ricordella.app.domain.repository.ReminderRepository
@@ -117,6 +118,29 @@ class ReminderEditViewModel(
         if (entry == null) {
             val type = route.type?.let { runCatching { ReminderType.valueOf(it) }.getOrNull() } ?: ReminderType.TASK
             val defaults = appSettings.defaultsFor(type)
+            val quick = route.quickText?.let { QuickEntryParser.parse(it, time.localNow()) }
+            if (quick != null) {
+                val qd = appSettings.defaultsFor(quick.type)
+                val rule = quick.recurrence
+                _form.value = ReminderForm(
+                    isLoading = false,
+                    isNew = true,
+                    title = quick.title,
+                    date = quick.date,
+                    time = quick.time ?: qd.time,
+                    type = quick.type,
+                    priority = quick.priority,
+                    multiDay = quick.endDate != null,
+                    endDate = quick.endDate,
+                    recurrencePreset = RecurrencePreset.from(rule),
+                    customFrequency = rule?.frequency ?: RecurrenceFrequency.MONTHLY,
+                    customInterval = (rule?.interval ?: 1).toString(),
+                    weekDays = rule?.daysOfWeek.orEmpty(),
+                    notificationsEnabled = qd.notificationsEnabled,
+                    notifyOffsetMinutes = qd.notifyOffsetMinutes,
+                )
+                return
+            }
             _form.value = ReminderForm(
                 isLoading = false,
                 isNew = true,

@@ -30,6 +30,8 @@ data class ReminderEditRoute(
     val epochDay: Long? = null,
     val itemId: String? = null,
     val personId: String? = null,
+    /** Frase di "Scrivi al volo" da capire e portare nel modulo (per modificarla prima di salvare). */
+    val quickText: String? = null,
 )
 
 @Serializable data class ItemDetailRoute(val id: String)

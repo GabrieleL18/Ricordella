@@ -46,6 +46,8 @@ import com.ricordella.app.core.ui.tone
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -131,17 +133,15 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 IconButton(onClick = { navigator.editReminder(entry.reminder.id) }) {
                     Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica"))
                 }
+                IconButton(onClick = { showDeleteConfirm = true }) {
+                    Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error)
+                }
                 Box {
                     IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         DropdownMenuItem(
                             text = { Text(if (entry.reminder.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
                             onClick = { menuOpen = false; viewModel.onToggleArchived() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(tr("Elimina")) },
-                            leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                            onClick = { menuOpen = false; showDeleteConfirm = true },
                         )
                     }
                 }
@@ -175,6 +175,15 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             if (state.completions.isNotEmpty()) CompletionHistory(state.completions)
+            OutlinedButton(
+                onClick = { showDeleteConfirm = true },
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceM),
+            ) {
+                Icon(Icons.Rounded.Delete, contentDescription = null)
+                Text(tr("Elimina"), modifier = Modifier.padding(start = 8.dp))
+            }
         }
     }
 

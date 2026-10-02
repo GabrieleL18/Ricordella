@@ -76,7 +76,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_VIEW) intent.data?.let { backupToOpen.value = it }
+        // Solo i file (content/file): le notifiche usano ACTION_VIEW con ricordella://, non sono backup.
+        if (intent?.action == Intent.ACTION_VIEW) intent.data?.takeIf { it.scheme == "content" || it.scheme == "file" }?.let { backupToOpen.value = it }
         intent?.getStringExtra(EXTRA_REMINDER_ID)?.let { reminderToOpen.value = it }
         intent?.getStringExtra(CalendarWidgetProvider.EXTRA_ACTION)?.let { action ->
             val epochDay = intent.getLongExtra(CalendarWidgetProvider.EXTRA_EPOCH_DAY, Long.MIN_VALUE)

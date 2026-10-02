@@ -27,6 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Cake
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Event
@@ -92,7 +94,7 @@ import java.time.LocalDateTime
  * Il microfono (vedi [VoiceButton]) chiede prima il consenso, poi ascolta e scrive la frase nella barra.
  */
 @Composable
-fun QuickEntryBar(now: LocalDateTime, onAdd: (QuickEntry) -> Unit, modifier: Modifier = Modifier) {
+fun QuickEntryBar(now: LocalDateTime, onAdd: (QuickEntry) -> Unit, onEdit: (String) -> Unit, modifier: Modifier = Modifier) {
     var field by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     var focused by remember { mutableStateOf(false) }
     var showHelp by rememberSaveable { mutableStateOf(false) }
@@ -124,6 +126,9 @@ fun QuickEntryBar(now: LocalDateTime, onAdd: (QuickEntry) -> Unit, modifier: Mod
             leadingIcon = { Icon(Icons.Rounded.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             trailingIcon = {
                 Row {
+                    if (text.isNotEmpty()) IconButton(onClick = { setText("") }) {
+                        Icon(Icons.Rounded.Close, contentDescription = tr("Cancella"), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                     VoiceButton(onText = ::setText)
                     IconButton(onClick = { showHelp = true }) {
                         Icon(Icons.AutoMirrored.Rounded.HelpOutline, contentDescription = tr("Come funziona"), tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -161,7 +166,7 @@ fun QuickEntryBar(now: LocalDateTime, onAdd: (QuickEntry) -> Unit, modifier: Mod
             exit = fadeOut() + shrinkVertically(),
         ) {
             val shown = entry ?: return@AnimatedVisibility
-            Preview(shown, now, onAdd = { submit() })
+            Preview(shown, now, onAdd = { submit() }, onEdit = { onEdit(text); setText(""); focus.clearFocus() })
         }
     }
     if (showHelp) {
@@ -193,13 +198,15 @@ private fun SuggestionPill(word: String, onClick: () -> Unit, maxLines: Int = 1)
 
 /** Anteprima di cosa ho capito: tipo, titolo, quando (fino a quando), ripetizione e importanza. */
 @Composable
-private fun Preview(shown: QuickEntry, now: LocalDateTime, onAdd: () -> Unit) {
+private fun Preview(shown: QuickEntry, now: LocalDateTime, onAdd: () -> Unit, onEdit: () -> Unit) {
     val tone = shown.type.tone
     val settings = LocalAppSettings.current
     Row(
         Modifier
             .fillMaxWidth()
-            .background(tone.container, MaterialTheme.shapes.large)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onEdit) // tocco sull'anteprima: si apre il modulo già compilato, da modificare
             .padding(RicordellaDimensions.spaceM),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
