@@ -10,4 +10,6 @@
     <string name="widget_resolutions_description">Los propósitos del año: desliza la lista y marca los que has cumplido</string>
     <string name="widget_agenda_label">Día Remindella</string>
     <string name="widget_agenda_description">Los planes de hoy, mañana y los días siguientes: márcalos, recorre los días</string>
+    <string name="widget_alarm_label">Despertador Remindella</string>
+    <string name="widget_alarm_description">La próxima alarma que sonará: toca para abrirla, + para añadir una</string>
 </resources>

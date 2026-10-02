@@ -284,6 +284,7 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
                 tr("Notifica"),
                 if (reminder.notificationsEnabled) notifyOffsetLabel(reminder.notifyOffsetMinutes) else tr("Disattivata"),
             )
+            reminder.pausedUntil?.takeIf { it.isAfter(today) }?.let { InfoRow(tr("In pausa fino al"), DateTexts.date(it, settings.dateFormat)) }
             reminder.snoozedUntil?.takeIf { reminder.status == ReminderStatus.ACTIVE }?.let {
                 val local = LocalDateTime.ofInstant(it, ZoneId.systemDefault())
                 if (local.isAfter(now)) {

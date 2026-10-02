@@ -8,6 +8,10 @@ import android.os.Build
 import com.ricordella.app.core.alarm.AlarmRingService
 import com.ricordella.app.core.widget.CalendarWidgetProvider
 import com.ricordella.app.domain.model.ReminderType
+import com.ricordella.app.domain.model.SchedulingCandidate
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalTime
 import com.ricordella.app.domain.ReminderScheduler
 import com.ricordella.app.domain.date.ReminderAlarmPlanner
 import com.ricordella.app.domain.date.TimeSource
@@ -32,6 +36,10 @@ class AlarmManagerReminderScheduler(
     private val time: TimeSource,
 ) : ReminderScheduler {
 
+    private companion object {
+        val PREVIEW_GRACE: Duration = Duration.ofMinutes(10)
+    }
+
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
     private val mutex = Mutex()
 
@@ -39,13 +47,16 @@ class AlarmManagerReminderScheduler(
         // Ogni modifica ai promemoria passa di qui: è il punto giusto per ridisegnare il widget.
         CalendarWidgetProvider.requestUpdate(context)
         com.ricordella.app.core.widget.AgendaWidgetProvider.requestUpdate(context)
+        com.ricordella.app.core.widget.AlarmWidgetProvider.requestUpdate(context)
         val appSettings = settings.current()
         if (!appSettings.notificationsEnabled) {
             alarmManager.cancel(alarmIntent())
             return@withLock
         }
         val now = time.now()
-        val plan = planner.plan(reminders.getSchedulingCandidates(), now, appSettings.allDayNotificationTime, time.zone)
+        val candidates = reminders.getSchedulingCandidates()
+        val plan = planner.plan(candidates, now, appSettings.allDayNotificationTime, time.zone)
+        val nextPreview = showAlarmPreviews(candidates, appSettings.alarmPreNoticeMinutes, now, appSettings.allDayNotificationTime)
 
         if (plan.dueNow.isNotEmpty()) {
             val today = time.today()
@@ -59,14 +70,38 @@ class AlarmManagerReminderScheduler(
                 if (!rang) notifier.show(entry, today)
             }
             reminders.markNotified(plan.dueNow, now)
+            plan.dueNow.forEach(notifier::dismissAlarmPreview)
         }
 
         val next = plan.nextAlarmAt
-        if (next == null) {
-            alarmManager.cancel(alarmIntent())
-        } else {
-            setAlarm(next.toEpochMilli(), exact = plan.nextAlarmIsTimed)
+        when {
+            nextPreview != null && (next == null || nextPreview.isBefore(next)) -> setAlarm(nextPreview.toEpochMilli(), exact = true)
+            next == null -> alarmManager.cancel(alarmIntent())
+            else -> setAlarm(next.toEpochMilli(), exact = plan.nextAlarmIsTimed)
         }
+    }
+
+    /**
+     * Avviso silenzioso [leadMinutes] prima di ogni sveglia ripetuta, una volta per occorrenza
+     * (se la sveglia è stata creata a ridosso dell'orario non si avvisa). Restituisce il prossimo avviso da programmare.
+     */
+    private suspend fun showAlarmPreviews(candidates: List<SchedulingCandidate>, leadMinutes: Int, now: Instant, allDay: LocalTime): Instant? {
+        if (leadMinutes <= 0) return null
+        val prefs = context.getSharedPreferences("alarm_previews", Context.MODE_PRIVATE)
+        var next: Instant? = null
+        for (c in candidates) {
+            if (!c.isRecurringAlarm || c.snoozedUntil != null) continue
+            val trigger = planner.triggerAt(c, allDay, time.zone)
+            if (!trigger.isAfter(now)) continue
+            val preview = trigger.minusSeconds(leadMinutes * 60L)
+            if (preview.isAfter(now)) {
+                if (next == null || preview.isBefore(next)) next = preview
+            } else if (Duration.between(preview, now) <= PREVIEW_GRACE && prefs.getLong(c.id, 0L) != trigger.toEpochMilli()) {
+                reminders.getReminder(c.id)?.let(notifier::showAlarmPreview)
+                prefs.edit().putLong(c.id, trigger.toEpochMilli()).apply()
+            }
+        }
+        return next
     }
 
     override fun dismissNotification(reminderId: String) = notifier.dismiss(reminderId)

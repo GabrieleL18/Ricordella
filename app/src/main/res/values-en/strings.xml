@@ -10,4 +10,6 @@
     <string name="widget_resolutions_description">This year\'s resolutions: scroll the list and tick the ones you kept</string>
     <string name="widget_agenda_label">Remindella Day</string>
     <string name="widget_agenda_description">Plans for today, tomorrow and the days after: mark them done, browse the days</string>
+    <string name="widget_alarm_label">Remindella Alarm</string>
+    <string name="widget_alarm_description">The next alarm to ring: tap to open it, + to add one</string>
 </resources>

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.ricordella.app.domain.date.RecurrenceCalculator
 import com.ricordella.app.domain.date.ReminderTimeline
 import com.ricordella.app.domain.date.TimeSource
+import com.ricordella.app.domain.model.Priority
 import com.ricordella.app.domain.model.ReminderOccurrence
+import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.repository.ReminderRepository
 import com.ricordella.app.domain.repository.SettingsRepository
 import com.ricordella.app.domain.usecase.CompleteReminderUseCase
@@ -37,6 +39,8 @@ data class CalendarUiState(
     val now: LocalDateTime = LocalDateTime.now(),
     /** Occorrenze per giorno nel periodo caricato (griglia del mese, giorno o agenda). */
     val occurrences: Map<LocalDate, List<ReminderOccurrence>> = emptyMap(),
+    /** Le sveglie normali non si mostrano (restano quelle importanti o urgenti). */
+    val alarmsHidden: Boolean = false,
 ) {
     val gridDays: List<LocalDate> get() = monthGrid(month, firstDayOfWeek)
     val selectedOccurrences: List<ReminderOccurrence> get() = occurrences[selectedDate].orEmpty()
@@ -53,7 +57,7 @@ private data class Navigation(val mode: CalendarMode, val month: YearMonth, val 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CalendarViewModel(
     reminders: ReminderRepository,
-    settings: SettingsRepository,
+    private val settings: SettingsRepository,
     private val recurrence: RecurrenceCalculator,
     private val completeReminder: CompleteReminderUseCase,
     time: TimeSource,
@@ -76,7 +80,16 @@ class CalendarViewModel(
             }
         }
 
-    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks()) { nav, first, byDate, now ->
+    private val hideAlarms = settings.settings.map { it.hideNormalAlarmsInCalendar }.distinctUntilChanged()
+
+    fun onToggleAlarms(hidden: Boolean) {
+        viewModelScope.launch { settings.update { it.copy(hideNormalAlarmsInCalendar = hidden) } }
+    }
+
+    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks(), hideAlarms) { nav, first, all, now, hidden ->
+        val byDate = if (!hidden) all else all.mapValues { (_, list) ->
+            list.filterNot { it.reminder.type == ReminderType.ALARM && it.reminder.priority == Priority.NORMAL }
+        }
         CalendarUiState(
             isLoading = false,
             mode = nav.mode,
@@ -85,6 +98,7 @@ class CalendarViewModel(
             firstDayOfWeek = first,
             now = now,
             occurrences = byDate,
+            alarmsHidden = hidden,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
 

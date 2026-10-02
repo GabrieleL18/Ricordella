@@ -53,7 +53,38 @@ class ReminderNotifier(private val context: Context) {
         // Il suono di un canale non si può cambiare dopo la creazione: il vecchio canale senza suono va eliminato.
         system.deleteNotificationChannel("reminders")
         system.createNotificationChannel(channel)
+        // Avviso prima di una sveglia ripetuta: silenzioso, senza suono né vibrazione.
+        system.createNotificationChannel(
+            NotificationChannel(CHANNEL_ALARM_PREVIEW, tr("Avviso prima della sveglia"), NotificationManager.IMPORTANCE_LOW).apply {
+                setSound(null, null)
+                enableVibration(false)
+            },
+        )
     }
+
+    /** "Domani alle 6:30 suona la sveglia": silenzioso, con il pulsante per saltare questa volta. */
+    fun showAlarmPreview(entry: ReminderWithLinks) {
+        if (!canPostNotifications()) return
+        val reminder = entry.reminder
+        val time = reminder.dueTime?.let(DateTexts::time) ?: return
+        val notification = NotificationCompat.Builder(context, CHANNEL_ALARM_PREVIEW)
+            .setSmallIcon(R.drawable.ic_stat_reminder)
+            .setContentTitle(reminder.title)
+            .setContentText(trf("Tra poco suona la sveglia delle %1\$s. Vuoi spegnerla per questa volta?", time))
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setSilent(true)
+            .setAutoCancel(true)
+            .setContentIntent(openIntent(reminder.id))
+            .addAction(0, tr("Salta questa volta"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
+            .build()
+        try {
+            manager.notify(reminder.id, NOTIFICATION_ID_PREVIEW, notification)
+        } catch (_: SecurityException) {
+        }
+    }
+
+    fun dismissAlarmPreview(reminderId: String) = manager.cancel(reminderId, NOTIFICATION_ID_PREVIEW)
 
     fun canPostNotifications(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
@@ -178,5 +209,7 @@ class ReminderNotifier(private val context: Context) {
     companion object {
         const val CHANNEL_REMINDERS = "reminders_magic"
         private const val NOTIFICATION_ID = 1
+        private const val NOTIFICATION_ID_PREVIEW = 2
+        private const val CHANNEL_ALARM_PREVIEW = "alarm_preview"
     }
 }

@@ -157,6 +157,8 @@ data class Reminder(
     val trip: TripInfo? = null,
     /** Anno di nascita, solo per i compleanni: serve a mostrare quanti anni compie. */
     val birthYear: Int? = null,
+    /** Sveglia in pausa: non suona prima di questo giorno (la prossima data è già spostata). */
+    val pausedUntil: LocalDate? = null,
     val status: ReminderStatus = ReminderStatus.ACTIVE,
     val priority: Priority = Priority.NORMAL,
     val category: String? = null,

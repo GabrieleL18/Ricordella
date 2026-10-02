@@ -118,6 +118,10 @@ data class AppSettings(
     val termsAcceptedVersion: Int = 0,
     /** Giorno (epochDay) in cui sono stati accettati i termini. */
     val termsAcceptedEpochDay: Long? = null,
+    /** Minuti prima di una sveglia ripetuta in cui arriva l'avviso silenzioso "salti questa volta?" (0 = mai). */
+    val alarmPreNoticeMinutes: Int = 30,
+    /** Nel calendario si vedono solo le sveglie importanti o urgenti (le altre restano nelle liste). */
+    val hideNormalAlarmsInCalendar: Boolean = false,
 ) {
     fun defaultsFor(type: ReminderType): TypeDefaults =
         typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)

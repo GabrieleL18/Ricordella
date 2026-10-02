@@ -60,6 +60,7 @@ object HomeWidgets {
         WaterWidgetProvider.requestUpdate(context)
         ResolutionsWidgetProvider.requestUpdate(context)
         AgendaWidgetProvider.requestUpdate(context)
+        AlarmWidgetProvider.requestUpdate(context)
     }
 }
 
@@ -160,6 +161,46 @@ class WaterWidgetProvider : AppWidgetProvider() {
         private const val REQUEST_OPEN = 2_100
 
         fun requestUpdate(context: Context) = requestUpdate(context, WaterWidgetProvider::class.java)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Sveglia
+
+/** La prossima sveglia attiva (non in pausa): ora grande, titolo e giorno. Tocco = apre la sveglia, + = nuova sveglia. */
+class AlarmWidgetProvider : AppWidgetProvider() {
+
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        runAsync(context) {
+            val container = context.container
+            val today = container.time.today()
+            val now = container.time.localNow()
+            val next = container.reminderRepository.observeActiveUntil(today.plusDays(60), 300).first()
+                .map { it.reminder }
+                .filter { it.type == com.ricordella.app.domain.model.ReminderType.ALARM && it.dueTime != null && it.dueDate.atTime(it.dueTime).isAfter(now) }
+                .minByOrNull { it.dueDate.atTime(it.dueTime) }
+            val views = RemoteViews(context.packageName, R.layout.widget_alarm)
+            if (next == null) {
+                views.setTextViewText(R.id.alarm_time, "⏰")
+                views.setTextViewText(R.id.alarm_title, tr("Nessuna sveglia"))
+                views.setTextViewText(R.id.alarm_when, tr("Tocca + per crearne una"))
+                views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_NEW) { putExtra(MainActivity.EXTRA_NEW_ALARM, true) })
+            } else {
+                views.setTextViewText(R.id.alarm_time, DateTexts.time(next.dueTime!!))
+                views.setTextViewText(R.id.alarm_title, next.title)
+                views.setTextViewText(R.id.alarm_when, DateTexts.relativeWithTime(next.dueDate, null, today).replaceFirstChar { it.uppercase() })
+                views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_REMINDER_ID, next.id) })
+            }
+            views.setOnClickPendingIntent(R.id.alarm_add, openApp(context, REQUEST_NEW) { putExtra(MainActivity.EXTRA_NEW_ALARM, true) })
+            manager.updateAppWidget(ids, views)
+        }
+    }
+
+    companion object {
+        private const val REQUEST_OPEN = 2_300
+        private const val REQUEST_NEW = 2_301
+
+        fun requestUpdate(context: Context) = requestUpdate(context, AlarmWidgetProvider::class.java)
     }
 }
 

@@ -10,4 +10,6 @@
     <string name="widget_resolutions_description">Les résolutions de l\'année : fais défiler la liste et coche celles que tu as tenues</string>
     <string name="widget_agenda_label">Journée Remindella</string>
     <string name="widget_agenda_description">Les rendez-vous d\'aujourd\'hui, de demain et des jours suivants : coche-les, parcours les jours</string>
+    <string name="widget_alarm_label">Réveil Remindella</string>
+    <string name="widget_alarm_description">Le prochain réveil : touche pour l\'ouvrir, + pour en ajouter un</string>
 </resources>

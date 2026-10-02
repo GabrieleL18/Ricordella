@@ -121,7 +121,8 @@ abstract class ReminderDao {
 
     @Query(
         """
-        SELECT id, dueDate, dueTime, notifyOffsetMinutes, snoozedUntil, lastNotifiedAt FROM reminder
+        SELECT id, dueDate, dueTime, notifyOffsetMinutes, snoozedUntil, lastNotifiedAt,
+            (type = 'ALARM' AND recurrenceRuleId IS NOT NULL) AS isRecurringAlarm FROM reminder
         WHERE status = 'ACTIVE' AND isArchived = 0 AND notificationsEnabled = 1
         """,
     )

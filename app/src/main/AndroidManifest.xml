@@ -138,6 +138,18 @@
         </receiver>
 
         <receiver
+            android:name=".core.widget.AlarmWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_alarm_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/alarm_widget_info" />
+        </receiver>
+
+        <receiver
             android:name=".core.widget.ResolutionsWidgetProvider"
             android:exported="false"
             android:label="@string/widget_resolutions_label">

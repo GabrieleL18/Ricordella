@@ -59,6 +59,8 @@ data class ReminderForm(
     val customInterval: String = "1",
     val weekDays: Set<DayOfWeek> = emptySet(),
     val recurrenceEnd: LocalDate? = null,
+    /** Sveglia in pausa fino a questo giorno. */
+    val pausedUntil: LocalDate? = null,
     /** Ricorrenza contata dall'ultima volta che è stato fatto (le date successive si spostano). */
     val fromLastDone: Boolean = false,
     val personIds: Set<String> = emptySet(),
@@ -182,6 +184,7 @@ class ReminderEditViewModel(
             customInterval = (rule?.interval ?: 1).toString(),
             weekDays = rule?.daysOfWeek.orEmpty(),
             recurrenceEnd = rule?.endDate,
+            pausedUntil = reminder.pausedUntil?.takeIf { it.isAfter(time.today()) },
             fromLastDone = rule?.fromLastDone == true,
             personIds = entry.people.mapTo(mutableSetOf()) { it.id },
             itemIds = entry.items.mapTo(mutableSetOf()) { it.id },
@@ -242,8 +245,22 @@ class ReminderEditViewModel(
         }
     }
 
-    private fun buildDraft(form: ReminderForm, date: LocalDate): ReminderDraft {
+    /** Giorni in cui si ripete una sveglia (vuoto = non si ripete). */
+    private fun alarmDays(form: ReminderForm): Set<DayOfWeek> = when {
+        !form.isAlarm -> emptySet()
+        form.recurrencePreset == RecurrencePreset.DAILY -> DayOfWeek.entries.toSet()
+        form.recurrencePreset == RecurrencePreset.CUSTOM && form.customFrequency == RecurrenceFrequency.WEEKLY -> form.weekDays
+        else -> emptySet()
+    }
+
+    private fun buildDraft(form: ReminderForm, firstDate: LocalDate): ReminderDraft {
         val now = time.now()
+        // Una sveglia a giorni fissi parte dal primo giorno scelto; se è in pausa, dal primo giorno dopo la pausa.
+        val days = alarmDays(form)
+        val pausedUntil = form.pausedUntil?.takeIf { form.isAlarm && it.isAfter(time.today()) }
+        var date = firstDate
+        if (pausedUntil != null && date < pausedUntil) date = pausedUntil
+        if (days.isNotEmpty()) while (date.dayOfWeek !in days) date = date.plusDays(1)
         val base = existing ?: Reminder(title = "", dueDate = date, createdAt = now, updatedAt = now)
         val reminder = base.copy(
             title = form.title.trim(),
@@ -252,6 +269,7 @@ class ReminderEditViewModel(
             trip = form.trip.takeIf { form.type == ReminderType.VACATION && !it.isEmpty },
             birthYear = form.birthYear.toIntOrNull()?.takeIf { form.type == ReminderType.BIRTHDAY && it in 1900..date.year },
             dueTime = form.time,
+            pausedUntil = pausedUntil,
             type = form.type,
             description = form.description.trim().ifEmpty { null },
             notes = form.notes.trim().ifEmpty { null },

@@ -245,6 +245,14 @@ internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) 
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     )
     DropdownField(
+        label = tr("Avviso silenzioso prima delle sveglie ripetute"),
+        options = listOf(0, 15, 30, 60, 120),
+        selected = settings.alarmPreNoticeMinutes,
+        optionLabel = { if (it == 0) tr("Mai") else trf("%1\$s minuti prima", it) },
+        onSelected = { minutes -> update { it.copy(alarmPreNoticeMinutes = minutes) } },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+    )
+    DropdownField(
         label = tr("Suono"),
         options = AlarmSound.entries,
         selected = settings.alarmSound,

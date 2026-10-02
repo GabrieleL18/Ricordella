@@ -1160,3 +1160,16 @@ Sincronizzazione non riuscita ||| La sincronización ha fallado
 Ultima settimana ||| Última semana
 Media %1$s al giorno · obiettivo raggiunto %2$s volte su 7 ||| Media de %1$s al día · objetivo alcanzado %2$s veces de 7
 Cancella ||| Borrar
+Avviso prima della sveglia ||| Aviso antes de la alarma
+Tra poco suona la sveglia delle %1$s. Vuoi spegnerla per questa volta? ||| La alarma de las %1$s sonará pronto. ¿Quieres apagarla solo esta vez?
+Salta questa volta ||| Saltar esta vez
+Lun–Ven ||| Lun–Vie
+Una volta sola ||| Solo una vez
+Sospendi fino al (opzionale) ||| Pausar hasta el (opcional)
+In pausa non suona: riprende da sola in quel giorno. ||| En pausa no suena: se reactiva sola ese día.
+Sveglie nascoste (tranne le importanti) ||| Alarmas ocultas (salvo las importantes)
+Sveglie visibili ||| Alarmas visibles
+Avviso silenzioso prima delle sveglie ripetute ||| Aviso silencioso antes de las alarmas repetidas
+In pausa fino al ||| En pausa hasta el
+Nessuna sveglia ||| Ninguna alarma
+Tocca + per crearne una ||| Toca + para crear una

@@ -36,6 +36,7 @@ import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.core.ui.icon
 import com.ricordella.app.core.ui.tone
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
@@ -255,63 +256,66 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         minLines = 2,
     )
 
-    SectionHeader(tr("Ricorrenza"))
-    DropdownField(
-        label = tr("Si ripete"),
-        options = RecurrencePreset.entries,
-        selected = form.recurrencePreset,
-        optionLabel = { it.label },
-        onSelected = { preset -> update { it.copy(recurrencePreset = preset) } },
-    )
-    if (form.recurrencePreset == RecurrencePreset.CUSTOM) {
-        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = form.customInterval,
-                onValueChange = { value -> update { it.copy(customInterval = value.filter(Char::isDigit).take(3)) } },
-                label = { Text(tr("Ogni")) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.weight(0.4f),
-            )
-            DropdownField(
-                label = tr("Unità"),
-                options = RecurrenceFrequency.entries,
-                selected = form.customFrequency,
-                optionLabel = { it.unitLabel },
-                onSelected = { frequency -> update { it.copy(customFrequency = frequency) } },
-                modifier = Modifier.weight(0.6f),
-            )
-        }
-        if (form.customFrequency == RecurrenceFrequency.WEEKLY) {
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                DayOfWeek.entries.forEach { day ->
-                    val selected = day in form.weekDays
-                    FilterChip(
-                        selected = selected,
-                        onClick = { update { it.copy(weekDays = if (selected) it.weekDays - day else it.weekDays + day) } },
-                        label = { Text(DateTexts.weekdayFull(day).take(3)) },
-                    )
-                }
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(tr("Conta dall'ultima volta"), style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    tr("Se lo fai prima o dopo, anche le date successive si spostano."),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    // Per le sveglie la ripetizione si sceglie coi giorni, più sopra.
+    if (!form.isAlarm) {
+        SectionHeader(tr("Ricorrenza"))
+        DropdownField(
+            label = tr("Si ripete"),
+            options = RecurrencePreset.entries,
+            selected = form.recurrencePreset,
+            optionLabel = { it.label },
+            onSelected = { preset -> update { it.copy(recurrencePreset = preset) } },
+        )
+        if (form.recurrencePreset == RecurrencePreset.CUSTOM) {
+            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = form.customInterval,
+                    onValueChange = { value -> update { it.copy(customInterval = value.filter(Char::isDigit).take(3)) } },
+                    label = { Text(tr("Ogni")) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.weight(0.4f),
+                )
+                DropdownField(
+                    label = tr("Unità"),
+                    options = RecurrenceFrequency.entries,
+                    selected = form.customFrequency,
+                    optionLabel = { it.unitLabel },
+                    onSelected = { frequency -> update { it.copy(customFrequency = frequency) } },
+                    modifier = Modifier.weight(0.6f),
                 )
             }
-            Switch(checked = form.fromLastDone, onCheckedChange = { value -> update { it.copy(fromLastDone = value) } })
+            if (form.customFrequency == RecurrenceFrequency.WEEKLY) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    DayOfWeek.entries.forEach { day ->
+                        val selected = day in form.weekDays
+                        FilterChip(
+                            selected = selected,
+                            onClick = { update { it.copy(weekDays = if (selected) it.weekDays - day else it.weekDays + day) } },
+                            label = { Text(DateTexts.weekdayFull(day).take(3)) },
+                        )
+                    }
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(tr("Conta dall'ultima volta"), style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        tr("Se lo fai prima o dopo, anche le date successive si spostano."),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = form.fromLastDone, onCheckedChange = { value -> update { it.copy(fromLastDone = value) } })
+            }
+            DateField(
+                label = tr("Fino al (opzionale)"),
+                value = form.recurrenceEnd,
+                onValueChange = { value -> update { it.copy(recurrenceEnd = value) } },
+                clearable = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
-        DateField(
-            label = tr("Fino al (opzionale)"),
-            value = form.recurrenceEnd,
-            onValueChange = { value -> update { it.copy(recurrenceEnd = value) } },
-            clearable = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
     }
 
     SectionHeader(tr("Priorità"))
@@ -451,14 +455,47 @@ private fun AssistAddChip(label: String, onClick: () -> Unit) {
 @Composable
 private fun AlarmFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
     val context = LocalContext.current
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(tr("Ripeti ogni giorno"), style = MaterialTheme.typography.bodyLarge)
-            Text(tr("Es. per le medicine"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    // Giorni della settimana in cui suona: nessuno = una volta sola, tutti = ogni giorno, altrimenti a giorni fissi.
+    val days = when {
+        form.recurrencePreset == RecurrencePreset.DAILY -> DayOfWeek.entries.toSet()
+        form.recurrencePreset == RecurrencePreset.CUSTOM && form.customFrequency == RecurrenceFrequency.WEEKLY -> form.weekDays
+        else -> emptySet()
+    }
+    fun setDays(chosen: Set<DayOfWeek>) = update {
+        when {
+            chosen.isEmpty() -> it.copy(recurrencePreset = RecurrencePreset.NONE, weekDays = emptySet(), pausedUntil = null)
+            chosen.size == 7 -> it.copy(recurrencePreset = RecurrencePreset.DAILY, weekDays = chosen)
+            else -> it.copy(recurrencePreset = RecurrencePreset.CUSTOM, customFrequency = RecurrenceFrequency.WEEKLY, customInterval = "1", weekDays = chosen, fromLastDone = false)
         }
-        Switch(
-            checked = form.recurrencePreset == RecurrencePreset.DAILY,
-            onCheckedChange = { daily -> update { it.copy(recurrencePreset = if (daily) RecurrencePreset.DAILY else RecurrencePreset.NONE) } },
+    }
+    Text(tr("Si ripete"), style = MaterialTheme.typography.bodyLarge)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        DayOfWeek.entries.forEach { day ->
+            FilterChip(
+                selected = day in days,
+                onClick = { setDays(if (day in days) days - day else days + day) },
+                label = { Text(DateTexts.weekdayFull(day).take(3)) },
+            )
+        }
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        val workdays = DayOfWeek.entries.take(5).toSet()
+        AssistChip(onClick = { setDays(DayOfWeek.entries.toSet()) }, label = { Text(tr("Ogni giorno")) })
+        AssistChip(onClick = { setDays(workdays) }, label = { Text(tr("Lun–Ven")) })
+        AssistChip(onClick = { setDays(emptySet()) }, label = { Text(tr("Una volta sola")) })
+    }
+    if (days.isNotEmpty()) {
+        DateField(
+            label = tr("Sospendi fino al (opzionale)"),
+            value = form.pausedUntil,
+            onValueChange = { value -> update { it.copy(pausedUntil = value) } },
+            clearable = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            tr("In pausa non suona: riprende da sola in quel giorno."),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
     // Da Android 14 la schermata a tutto schermo può essere disattivata: si invita a riattivarla.

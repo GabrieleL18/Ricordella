@@ -36,6 +36,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -130,6 +131,7 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
             ) {
                 ModeSelector(state.mode, viewModel::onModeChange)
+                AlarmsToggle(state.alarmsHidden, viewModel::onToggleAlarms)
                 MonthView(
                     state,
                     viewModel,
@@ -162,7 +164,12 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
             ),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            item(key = "mode") { ModeSelector(state.mode, viewModel::onModeChange) }
+            item(key = "mode") {
+                Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+                    ModeSelector(state.mode, viewModel::onModeChange)
+                    AlarmsToggle(state.alarmsHidden, viewModel::onToggleAlarms)
+                }
+            }
             when (state.mode) {
                 CalendarMode.MONTH -> Unit
                 CalendarMode.DAY -> {
@@ -227,6 +234,17 @@ private fun ModeSelector(current: CalendarMode, onChange: (CalendarMode) -> Unit
             ) { Text(mode.label) }
         }
     }
+}
+
+/** Mostra o nasconde le sveglie normali nel calendario (quelle importanti o urgenti si vedono sempre). */
+@Composable
+private fun AlarmsToggle(hidden: Boolean, onChange: (Boolean) -> Unit) {
+    androidx.compose.material3.FilterChip(
+        selected = !hidden,
+        onClick = { onChange(!hidden) },
+        label = { Text(if (hidden) tr("Sveglie nascoste (tranne le importanti)") else tr("Sveglie visibili")) },
+        leadingIcon = { androidx.compose.material3.Icon(Icons.Rounded.Alarm, contentDescription = null, modifier = Modifier.size(18.dp)) },
+    )
 }
 
 /** Gli impegni del giorno toccato, in un foglio che sale dal basso; si sfoglia ai giorni vicini trascinando. */

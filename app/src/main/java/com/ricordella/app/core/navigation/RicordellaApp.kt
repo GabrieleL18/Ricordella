@@ -198,6 +198,7 @@ fun RicordellaApp(
             CalendarWidgetProvider.ACTION_ITEM -> navigator.newItem()
             CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
             CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
+            com.ricordella.app.MainActivity.ACTION_NEW_ALARM -> navigator.newReminder(type = ReminderType.ALARM)
             com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
             com.ricordella.app.MainActivity.ACTION_OPEN_RESOLUTIONS -> navigator.openResolutions(java.time.LocalDate.now().year)
         }

@@ -10,4 +10,6 @@
     <string name="widget_resolutions_description">Die Vorsätze des Jahres: scrolle die Liste und hake die eingehaltenen ab</string>
     <string name="widget_agenda_label">Remindella Tag</string>
     <string name="widget_agenda_description">Termine von heute, morgen und den folgenden Tagen: abhaken, durch die Tage blättern</string>
+    <string name="widget_alarm_label">Remindella Wecker</string>
+    <string name="widget_alarm_description">Der nächste Wecker: Tippen zum Öffnen, + zum Hinzufügen</string>
 </resources>
