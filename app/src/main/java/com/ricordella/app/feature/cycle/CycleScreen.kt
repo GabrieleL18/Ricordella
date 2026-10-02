@@ -116,10 +116,10 @@ fun CycleScreen(onBack: () -> Unit) {
                     onRemoveEntry = { entry -> update { it.copy(cycleLog = it.cycleLog - entry) } },
                 )
             }
-            val free = people.filter { p -> app.cycleProfiles.none { it.personId == p.id } }
+            // Si può tenere un solo ciclo.
             if (people.isEmpty()) {
                 Text(tr("Il ciclo va sempre assegnato a una persona: aggiungila prima nella sezione Persone."), style = MaterialTheme.typography.bodyLarge)
-            } else if (free.isNotEmpty()) {
+            } else if (app.cycleProfiles.isEmpty()) {
                 PushButton(tr("Aggiungi un ciclo"), onClick = { adding = true }, icon = Icons.Rounded.Add, modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceM))
             }
         }
@@ -233,26 +233,40 @@ private fun ProfileCard(
             color = tone.content,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
-            PushButton(tr("È iniziato oggi"), onClick = onStart, enabled = day == null)
+            PushButton(tr("È iniziato oggi"), onClick = onStart, enabled = day == null, modifier = Modifier.weight(1f))
             if (CycleCalendar.isOpen(profile, log, today)) TextButton(onClick = onEnd) { Text(tr("È finito oggi")) }
         }
         val history = CycleCalendar.history(profile, log, today)
         if (history.isNotEmpty()) {
             SectionHeader(tr("Cronologia (ultimi 2 anni)"))
+            Text(
+                tr("Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata."),
+                style = MaterialTheme.typography.bodySmall,
+                color = tone.content,
+            )
             history.forEach { row ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        listOfNotNull(
-                            DateTexts.date(row.entry.start, settings.dateFormat, today),
-                            trf("%1\$s giorni", row.days),
-                            row.cycleLength?.let { trf("ciclo di %1\$s giorni", it) },
-                        ).joinToString(" · "),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = tone.content,
-                        modifier = Modifier.weight(1f),
-                    )
+                val last = CycleCalendar.lastDay(row.entry, profile)
+                Row(
+                    Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest, MaterialTheme.shapes.medium).padding(start = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                        Text(
+                            trf("%1\$s → %2\$s", DateTexts.date(row.entry.start, settings.dateFormat, today), DateTexts.date(last, settings.dateFormat, today)),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Text(
+                            trf("Durata: %1\$s giorni", row.days) + (if (row.entry.end == null && !last.isBefore(today)) " · " + tr("in corso") else ""),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        Text(
+                            row.cycleLength?.let { trf("Arrivata %1\$s giorni dopo l'inizio della precedente", it) } ?: tr("Primo ciclo registrato"),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     IconButton(onClick = { onRemoveEntry(row.entry) }) {
-                        Icon(Icons.Rounded.Close, contentDescription = tr("Elimina"), tint = tone.content)
+                        Icon(Icons.Rounded.Close, contentDescription = tr("Elimina"))
                     }
                 }
             }

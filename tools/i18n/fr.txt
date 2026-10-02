@@ -166,9 +166,9 @@ Pagamento ||| Paiement
 Rinnovo ||| Renouvellement
 Altro ||| Autre
 Allarme ||| Alarme
-Normale ||| Normale
-Importante ||| Importante
-Urgente ||| Urgente
+Normale ||| Normal
+Importante ||| Important
+Urgente ||| Urgent
 Veicoli ||| Véhicules
 Casa ||| Maison
 Elettronica ||| Électronique
@@ -429,7 +429,7 @@ Tutto sotto controllo. Goditi la giornata. ||| Tout est sous contrôle. Profite 
 Niente di urgente: solo le cose di oggi. ||| Rien d'urgent : juste ce qui est prévu aujourd'hui.
 C'è 1 cosa che richiede attenzione. ||| 1 chose demande ton attention.
 Ci sono %1$s cose che richiedono attenzione. ||| %1$s choses demandent ton attention.
-da guardare ||| à surveiller
+da guardare ||| à voir
 in arrivo ||| à venir
 Buongiorno ||| Bonjour
 Buon pomeriggio ||| Bon après-midi
@@ -1349,3 +1349,87 @@ Scegli cosa condividere e come usare Drive. ||| Choisis ce que tu partages et co
 Scegli i giorni della settimana in cui suona (es. lunedì–venerdì per lavoro). Qualche minuto prima ricevi una notifica silenziosa per saltarla solo questa volta, e puoi sospenderla fino a una data. Ogni sveglia è assegnata a una persona e, se condividi il file, suona solo sul telefono della sua persona. Nel calendario puoi nascondere le sveglie normali. ||| Choisis les jours de la semaine où il sonne (ex. lundi–vendredi pour le travail). Quelques minutes avant, tu reçois une notification silencieuse pour le passer seulement cette fois, et tu peux le mettre en pause jusqu'à une date. Chaque réveil est attribué à une personne et, si tu partages le fichier, il ne sonne que sur son téléphone. Dans le calendrier tu peux masquer les réveils normaux.
 Ultime 3 copie con la data, anche su Drive. ||| 3 dernières copies datées, aussi sur Drive.
 Un pagamento può essere a rate: indichi quante, l'importo e ogni quanti mesi. Se l'importo cambia, modifichi ogni rata (anche le successive). Ogni rata pagata resta registrata con data e importo; finite le rate scegli se eliminare l'evento l'anno dopo. I pagamenti ripetuti possono essere annuali, mensili, settimanali o in un giorno preciso del mese. ||| Un paiement peut être à échéances : tu indiques combien, le montant et tous les combien de mois. Si le montant change, tu modifies chaque échéance (et les suivantes). Chaque échéance payée reste enregistrée avec date et montant ; une fois terminées, tu choisis de supprimer ou non l'événement l'année suivante. Les paiements répétés peuvent être annuels, mensuels, hebdomadaires ou un jour précis du mois.
+%1$s a testa ||| %1$s chacun
+%1$s rate ||| %1$s mensualités
+%1$s volte ||| %1$s fois
+%1$s novità ||| %1$s nouveautés
+Aggiungi una spesa, un abbonamento, delle rate o un'entrata: scegli le persone e come dividere il costo. ||| Ajoute une dépense, un abonnement, des mensualités ou une entrée d'argent : choisis les personnes et comment partager le coût.
+Arrivata %1$s giorni dopo l'inizio della precedente ||| Arrivé %1$s jours après le début du précédent
+Chi li riceve * ||| Qui le reçoit *
+Come si divide ||| Comment partager
+Cosa stai cercando? ||| Que cherches-tu ?
+Crea PDF ||| Créer un PDF
+Da 2 a 360 ||| De 2 à 360
+Durata: %1$s giorni ||| Durée : %1$s jours
+Entrata ||| Entrée
+Entrate ||| Entrées
+Il PDF contiene quello che vedi: %1$s. ||| Le PDF contient ce que tu vois : %1$s.
+Importi diversi ||| Montants différents
+Importo (€) * ||| Montant (€) *
+Importo per rata (€) * ||| Montant par mensualité (€) *
+Inserisci un importo maggiore di zero ||| Saisis un montant supérieur à zéro
+Mutuo, finanziamento, condominio: la data è quella della prima rata. ||| Prêt immobilier, crédit, charges de copropriété : la date est celle de la première mensualité.
+Nessuna spesa in quest'anno ||| Aucune dépense cette année
+Non hai ancora aggiunto persone: aggiungile dalla sezione Persone. ||| Tu n'as pas encore ajouté de personnes : ajoute-les dans la section Personnes.
+Non mostrarle ||| Ne pas les afficher
+Non è stato possibile creare il PDF ||| Impossible de créer le PDF
+Nuova spesa ||| Nouvelle dépense
+PDF salvato ||| PDF enregistré
+Parti uguali ||| Parts égales
+Per chi suona * ||| Pour qui il sonne *
+Persona eliminata ||| Personne supprimée
+Prima rata * ||| Première mensualité *
+Primo ciclo registrato ||| Premier cycle enregistré
+Quota di %1$s (€) ||| Part de %1$s (€)
+Saldo ||| Solde
+Scade ||| Échéance
+Scegli almeno una persona. ||| Choisis au moins une personne.
+Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni. ||| Écris ou dis-le à voix haute : je cherche dans les personnes, objets, rappels, notes et entretiens.
+Se non torna con l'importo, si divide in proporzione. ||| Si le total ne correspond pas au montant, on partage proportionnellement.
+Senza persona ||| Sans personne
+Si rinnova ||| Se renouvelle
+Si rinnova da solo: scegli ogni quanto. ||| Se renouvelle tout seul : choisis la fréquence.
+Soldi ||| Argent
+Soldi che ricevi: un bonifico, un regalo. ||| Argent que tu reçois : un virement, un cadeau.
+Solo importanti o urgenti ||| Seulement importants ou urgents
+Spesa ||| Dépense
+Spese e conti ||| Dépenses et comptes
+Spese, abbonamenti, rate ed entrate ||| Dépenses, abonnements, mensualités et entrées
+Sveglie nel calendario ||| Réveils dans le calendrier
+Totale entrate ||| Total des entrées
+Totale quote: %1$s ||| Total des parts : %1$s
+Totale spese ||| Total des dépenses
+Tutta la cerchia ||| Tout le cercle
+Un pagamento, anche ripetuto (es. una bolletta). ||| Un paiement, même répété (p. ex. une facture).
+Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata. ||| Une ligne par menstruation, la plus récente d'abord : début et fin, durée en jours et combien de jours après le début de la précédente elle est arrivée.
+in corso ||| en cours
+Mostra il dettaglio ||| Afficher le détail
+Nascondi ||| Masquer
+Più semplice ||| Plus simple
+Sveglie e ciclo nel calendario ||| Réveils et cycle dans le calendrier
+Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF. ||| Dépenses, abonnements, mensualités et entrées, partagés entre les personnes, avec le récapitulatif de l'année et le PDF.
+Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni. ||| Icônes et légende dans le calendrier ; les réveils s'affichent seulement si tu le choisis dans les Réglages.
+Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina. ||| Recherche avec le micro, formulaire plus clair, un seul Modifier/Supprimer.
+La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF. ||| La dépense est un événement spécial : choisis si c'est une dépense, un abonnement, un paiement échelonné ou une entrée, le montant, à qui elle est et comment la partager. Dans Dépenses et comptes tu vois le total de tout le cercle ou d'une personne sur l'année et tu crées un PDF.
+Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara. ||| Les réveils ont leur propre icône et n'apparaissent pas par défaut dans le calendrier : dans Réglages › Réveils tu choisis quand les afficher. Il y a aussi une légende pour le cycle, qui est maintenant unique et a un historique plus clair.
+La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più. ||| La recherche globale a le micro. Dans le formulaire tu choisis d'abord le type et les personnes obligatoires se voient tout de suite. Modifier, Supprimer et Archiver n'apparaissent qu'une fois ; la description et la catégorie n'existent plus.
+Seguici su Instagram ||| Suis-nous sur Instagram
+Riapri ||| Rouvrir
+modalità debug ||| mode débogage
+Mutuo casa ||| Prêt immobilier
+Palestra di Marco ||| Salle de sport de Marco
+Vacanza in montagna ||| Vacances à la montagne
+Spese condominiali ||| Charges de copropriété
+Regalo di compleanno ||| Cadeau d'anniversaire
+Bonifico dalla nonna ||| Virement de mamie
+Pagamenti ||| Paiements
+Affitto studio ||| Loyer du studio
+Condominio ||| Copropriété
+Assicurazione auto ||| Assurance auto
+Corso di nuoto di Sofia ||| Cours de natation de Sofia
+Cena di gruppo ||| Dîner de groupe
+Regalo per la nonna ||| Cadeau pour mamie
+Rimborso del dentista ||| Remboursement du dentiste
+Libri e zaino di Sofia ||| Livres et sac à dos de Sofia
+Stipendio extra ||| Salaire supplémentaire
+Finisce qui ||| Se termine ici

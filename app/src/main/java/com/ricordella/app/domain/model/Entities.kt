@@ -161,6 +161,8 @@ data class Reminder(
     val pausedUntil: LocalDate? = null,
     /** Pagamento a rate (condominio, mutuo...): scadenze, importi e rate già pagate. */
     val plan: InstallmentPlan? = null,
+    /** Denaro (spesa, abbonamento, rate, entrata): importo e quote per persona. Solo per i pagamenti. */
+    val money: MoneyInfo? = null,
     val status: ReminderStatus = ReminderStatus.ACTIVE,
     val priority: Priority = Priority.NORMAL,
     val category: String? = null,

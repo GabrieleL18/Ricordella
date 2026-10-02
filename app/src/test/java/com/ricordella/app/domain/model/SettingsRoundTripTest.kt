@@ -16,7 +16,7 @@ class SettingsRoundTripTest {
             cycleProfiles = listOf(CycleProfile("anna", 5, 28, true)),
             cycleLog = listOf(CycleEntry("anna", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 5))),
             alarmPreNoticeMinutes = 60,
-            hideNormalAlarmsInCalendar = true,
+            alarmsInCalendar = AlarmsInCalendar.ALL,
             backupFolderUri = "content://folder",
         )
         assertEquals(settings, json.decodeFromString(AppSettings.serializer(), json.encodeToString(AppSettings.serializer(), settings)))

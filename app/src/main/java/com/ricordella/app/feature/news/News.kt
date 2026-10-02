@@ -19,6 +19,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Payments
@@ -72,6 +78,28 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 6,
+            versionName = "0.4.0",
+            date = java.time.LocalDate.of(2026, 10, 3),
+            items = listOf(
+                NewsItem(
+                    Icons.Rounded.Payments, { it.mint }, tr("Spese e conti"),
+                    tr("Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF."),
+                    tr("La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF."),
+                ),
+                NewsItem(
+                    Icons.Rounded.Alarm, { it.coral }, tr("Sveglie e ciclo nel calendario"),
+                    tr("Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni."),
+                    tr("Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara."),
+                ),
+                NewsItem(
+                    Icons.Rounded.TouchApp, { it.cyan }, tr("Più semplice"),
+                    tr("Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina."),
+                    tr("La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più."),
+                ),
+            ),
+        ),
         NewsRelease(
             versionCode = 5,
             versionName = "0.3.0",
@@ -143,40 +171,40 @@ val AllNews: List<NewsRelease>
 fun newsSince(seenVersion: Int): List<NewsRelease> = AllNews.filter { it.versionCode > seenVersion }
 
 /**
- * Finestra delle novità: il mago che fa magie, le card colorate che entrano una dopo l'altra
- * e un pulsante giallo in fondo, sempre visibile.
+ * Finestra delle novità, semplice: una riga per versione che si apre toccandola, e sotto le novità
+ * con icona, titolo e testo. Con una sola versione (dopo un aggiornamento) è già aperta.
  */
 @Composable
 fun NewsDialog(releases: List<NewsRelease>, onDismiss: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
-    var open by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<NewsItem?>(null) }
-    open?.let { NewsDetail(it, it.tone(colors), onDismiss = { open = null }) }
+    var expanded by remember { mutableStateOf(releases.singleOrNull()?.versionCode) }
     Dialog(onDismissRequest = onDismiss) {
         Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 520.dp)) {
             Column(Modifier.padding(RicordellaDimensions.spaceXl)) {
+                Text(tr("Novità"), style = MaterialTheme.typography.headlineSmall)
                 Column(
-                    Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+                    Modifier.weight(1f, fill = false).padding(top = RicordellaDimensions.spaceS).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 ) {
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        HappyWizard(size = 96.dp, scene = WizardScene.CONJURING)
-                        Text(tr("Novità"), style = MaterialTheme.typography.headlineSmall)
-                        Text(
-                            tr("Ecco cosa c'è di nuovo in Remindella."),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    var index = 0
                     releases.forEach { release ->
-                        Text(
-                            trf("Versione %1\$s", release.versionName) + (release.date?.let { " · " + com.ricordella.app.core.date.DateTexts.date(it, com.ricordella.app.core.ui.LocalAppSettings.current.dateFormat) } ?: ""),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = RicordellaDimensions.spaceS),
-                        )
-                        release.items.forEach { item -> NewsCard(item, item.tone(colors), delayIndex = index++, onOpen = { open = item }) }
+                        val open = expanded == release.versionCode
+                        Row(
+                            Modifier.fillMaxWidth().clickable { expanded = if (open) null else release.versionCode }.padding(vertical = RicordellaDimensions.spaceS),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(release.heading, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Icon(if (open) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = if (open) tr("Nascondi") else tr("Mostra il dettaglio"))
+                        }
+                        if (open) release.items.forEach { item ->
+                            val tone = item.tone(colors)
+                            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+                                Icon(item.icon, contentDescription = null, tint = tone.solid, modifier = Modifier.size(24.dp))
+                                Column {
+                                    Text(item.title, style = MaterialTheme.typography.titleSmall)
+                                    Text(item.body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
                     }
                 }
                 PushButton(tr("Fantastico!"), onClick = onDismiss, modifier = Modifier.align(Alignment.End).padding(top = RicordellaDimensions.spaceM))
@@ -185,51 +213,6 @@ fun NewsDialog(releases: List<NewsRelease>, onDismiss: () -> Unit) {
     }
 }
 
-@Composable
-private fun NewsCard(item: NewsItem, tone: Tone, delayIndex: Int, onOpen: () -> Unit) {
-    val reduced = rememberReducedMotion()
-    val appear = remember { Animatable(if (reduced) 1f else 0f) }
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(80L * delayIndex.coerceAtMost(8))
-        appear.animateTo(1f, tween(320))
-    }
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .graphicsLayer { alpha = appear.value; translationY = (1f - appear.value) * 24.dp.toPx() }
-            .clip(MaterialTheme.shapes.large)
-            .background(tone.container)
-            .clickable(onClick = onOpen)
-            .padding(RicordellaDimensions.spaceM),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
-    ) {
-        Box(Modifier.size(36.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-            Icon(item.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(20.dp))
-        }
-        Column(Modifier.weight(1f)) {
-            Text(item.title, style = MaterialTheme.typography.titleSmall, color = tone.content)
-            Text(item.summary, style = MaterialTheme.typography.bodySmall, color = tone.content, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-        }
-        Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Leggi tutto"), tint = tone.content)
-    }
-}
-
-/** La novità completa: icona grande, titolo e testo per intero. */
-@Composable
-private fun NewsDetail(item: NewsItem, tone: Tone, onDismiss: () -> Unit) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 520.dp)) {
-            Column(Modifier.padding(RicordellaDimensions.spaceXl), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-                Box(Modifier.size(64.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(item.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(34.dp))
-                }
-                Text(item.title, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
-                Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
-                    Text(item.body, style = MaterialTheme.typography.bodyLarge)
-                }
-                PushButton(tr("Chiudi"), onClick = onDismiss)
-            }
-        }
-    }
-}
+private val NewsRelease.heading: String
+    @Composable get() = trf("Versione %1\$s", versionName) +
+        (date?.let { " · " + com.ricordella.app.core.date.DateTexts.date(it, com.ricordella.app.core.ui.LocalAppSettings.current.dateFormat) } ?: "")

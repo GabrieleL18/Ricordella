@@ -2,7 +2,18 @@ package com.ricordella.app.feature.search
 
 import com.ricordella.app.core.i18n.tr
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.WizardScene
+import com.ricordella.app.core.ui.theme.ricordellaColors
+import com.ricordella.app.feature.home.VoiceButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -92,12 +103,39 @@ fun SearchScreen(navigator: AppNavigator) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             item(key = "field") {
-                SearchField(
-                    value = state.query,
-                    onValueChange = viewModel::onQueryChange,
-                    placeholder = tr("Persone, cose, promemoria, note…"),
-                    modifier = Modifier.focusRequester(focusRequester),
-                )
+                // Lo stesso stile delle altre carte colorate dell'app, con il microfono di "Scrivi al volo".
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.ricordellaColors.cyan.container, MaterialTheme.shapes.extraLarge)
+                        .padding(RicordellaDimensions.spaceM),
+                ) {
+                    SearchField(
+                        value = state.query,
+                        onValueChange = viewModel::onQueryChange,
+                        placeholder = tr("Persone, cose, promemoria, note…"),
+                        modifier = Modifier.focusRequester(focusRequester),
+                        extraTrailing = { VoiceButton(onText = viewModel::onQueryChange) },
+                    )
+                }
+            }
+            if (state.query.isBlank()) {
+                item(key = "hint") {
+                    Column(
+                        Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceXl),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                    ) {
+                        HappyWizard(size = 140.dp, scene = WizardScene.SEARCHING)
+                        Text(tr("Cosa stai cercando?"), style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            tr("Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni."),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
             }
             val results = state.results
             if (state.searched && results.isEmpty) {

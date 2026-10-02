@@ -226,18 +226,23 @@ fun SearchField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
+    /** Pulsanti in più a destra (es. il microfono). */
+    extraTrailing: (@Composable () -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
-        placeholder = { Text(placeholder) },
+        placeholder = { Text(placeholder, maxLines = 1) },
         leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
         trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Rounded.Clear, contentDescription = tr("Cancella ricerca"))
+            Row {
+                if (value.isNotEmpty()) {
+                    IconButton(onClick = { onValueChange("") }) {
+                        Icon(Icons.Rounded.Clear, contentDescription = tr("Cancella ricerca"))
+                    }
                 }
+                extraTrailing?.invoke()
             }
         },
         singleLine = true,

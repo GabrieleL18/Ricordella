@@ -43,6 +43,7 @@ class FakeReminderRepository : ReminderRepository {
     override fun observeForRange(from: LocalDate, to: LocalDate) = reminders.map { m -> m.values.map(::withLinks) }
     override fun observeFiltered(filter: ReminderFilter, today: LocalDate) = reminders.map { m -> m.values.map(::withLinks) }
     override fun observeForPerson(personId: String) = reminders.map { m -> m.values.map(::withLinks) }
+    override fun observePayments() = reminders.map { m -> m.values.map(::withLinks) }
     override fun observeForItem(itemId: String) = reminders.map { m -> m.values.map(::withLinks) }
     override fun observeCompletions(reminderId: String) = MutableStateFlow(completions.filter { it.reminderId == reminderId })
     override fun observeCategories() = MutableStateFlow(emptyList<String>())

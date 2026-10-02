@@ -40,6 +40,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -133,6 +134,19 @@ fun ReminderCard(
         callback?.invoke()
     }
 
+    // Eliminazione con lo swipe verso sinistra: chiede conferma, poi va nel Cestino come dal dettaglio.
+    var confirmDelete by remember { mutableStateOf(false) }
+    val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+    if (confirmDelete) {
+        ConfirmDialog(
+            title = tr("Eliminare il promemoria?"),
+            message = tr("Il promemoria e il suo storico vanno nel Cestino per 7 giorni, poi vengono eliminati. Le persone e le cose collegate non vengono toccate."),
+            confirmLabel = tr("Elimina"),
+            destructive = true,
+            onConfirm = { container.applicationScope.launch { container.deleteReminder(reminder.id) } },
+            onDismiss = { confirmDelete = false },
+        )
+    }
     // Le feste non hanno la spunta (né lo swipe per completare).
     val sounds = rememberUiSounds()
     // Completamento con lo swipe: per UNDO_MS si può annullare, poi viene salvato.
@@ -203,19 +217,22 @@ fun ReminderCard(
             exit = fadeOut(tween(CLOSE_MS.toInt())) + shrinkVertically(tween(CLOSE_MS.toInt(), easing = RicordellaMotion.EaseInOut)),
         ) { body() }
     }
-    if (swipeToComplete && toggle != null && !isDone) {
+    if (swipeToComplete) {
         val swipeState = rememberSwipeToDismissBoxState()
+        // Verso destra si completa, verso sinistra si elimina (dopo la conferma).
         SwipeToDismissBox(
             state = swipeState,
             modifier = modifier,
-            enableDismissFromEndToStart = false,
+            enableDismissFromStartToEnd = toggle != null && !isDone,
             onDismiss = { value ->
                 if (value == SwipeToDismissBoxValue.StartToEnd) swipeComplete()
+                else if (value == SwipeToDismissBoxValue.EndToStart) confirmDelete = true
                 // La card torna al suo posto: la festa della spunta fa il resto.
                 scope.launch { swipeState.reset() }
             },
             backgroundContent = {
-                val tone = MaterialTheme.ricordellaColors.mint
+                val delete = swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart
+                val tone = if (delete) MaterialTheme.ricordellaColors.coral else MaterialTheme.ricordellaColors.mint
                 val progress = swipeState.progress.coerceIn(0f, 1f)
                 Row(
                     modifier = Modifier
@@ -224,19 +241,22 @@ fun ReminderCard(
                         .background(tone.container)
                         .padding(horizontal = RicordellaDimensions.spaceXl),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS, if (delete) Alignment.End else Alignment.Start),
                 ) {
-                    Icon(
-                        Icons.Rounded.Check,
-                        contentDescription = null,
-                        tint = tone.content,
-                        modifier = Modifier.graphicsLayer {
-                            val scale = 0.6f + 0.8f * progress
-                            scaleX = scale
-                            scaleY = scale
-                        },
-                    )
-                    Text(tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    val icon = @Composable {
+                        Icon(
+                            if (delete) Icons.Rounded.Delete else Icons.Rounded.Check,
+                            contentDescription = null,
+                            tint = tone.content,
+                            modifier = Modifier.graphicsLayer {
+                                val scale = 0.6f + 0.8f * progress
+                                scaleX = scale
+                                scaleY = scale
+                            },
+                        )
+                    }
+                    val label = @Composable { Text(if (delete) tr("Elimina") else tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content) }
+                    if (delete) { label(); icon() } else { icon(); label() }
                 }
             },
         ) { closable() }
@@ -439,12 +459,17 @@ private fun CompleteToggle(checked: Boolean, burst: Int, onClick: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun ReminderBadges(entry: ReminderWithLinks, overdue: Boolean) {
     val odometer = entry.odometerStatus?.takeIf { it != OdometerStatus.FAR }
     if (!overdue && odometer == null && entry.reminder.priority.icon == null) return
     val colors = MaterialTheme.ricordellaColors
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 4.dp)) {
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.padding(top = 4.dp),
+    ) {
         if (overdue) {
             StatusBadge(tr("Scaduto"), colors.coral.container, colors.coral.content)
         }

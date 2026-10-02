@@ -51,6 +51,10 @@ data class ShareScope(
     val alarms: Boolean = false,
 )
 
+/** Quali sveglie si vedono nel calendario (con la loro icona): di default nessuna. */
+@Serializable
+enum class AlarmsInCalendar { NEVER, IMPORTANT, ALL }
+
 /** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
 @Serializable
 enum class AutoMode { AUTOMATIC, ASK, OFF }
@@ -134,8 +138,8 @@ data class AppSettings(
     val termsAcceptedEpochDay: Long? = null,
     /** Minuti prima di una sveglia ripetuta in cui arriva l'avviso silenzioso "salti questa volta?" (0 = mai). */
     val alarmPreNoticeMinutes: Int = 30,
-    /** Nel calendario si vedono solo le sveglie importanti o urgenti (le altre restano nelle liste). */
-    val hideNormalAlarmsInCalendar: Boolean = false,
+    /** Quali sveglie compaiono nel calendario (restano sempre nelle liste). */
+    val alarmsInCalendar: AlarmsInCalendar = AlarmsInCalendar.NEVER,
     /** Ciclo mestruale: una voce per persona, e la cronologia delle mestruazioni (solo su questo telefono). */
     val cycleProfiles: List<CycleProfile> = emptyList(),
     val cycleLog: List<CycleEntry> = emptyList(),

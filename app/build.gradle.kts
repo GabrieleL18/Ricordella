@@ -16,8 +16,8 @@ android {
         applicationId = "com.remindella.app"
         minSdk = 28
         targetSdk = 37
-        versionCode = 5
-        versionName = "0.3.0"
+        versionCode = 6
+        versionName = "0.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,6 +49,10 @@ android {
     }
 
     buildTypes {
+        // La build di debug si installa accanto a quella dello Store (altro pacchetto, altri dati).
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true

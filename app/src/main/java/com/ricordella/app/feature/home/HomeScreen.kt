@@ -279,6 +279,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier, onAttention: () -> Unit, onToday: () -> Unit, onUpcoming: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
@@ -302,8 +303,10 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
             else HappyWizard(size = 92.dp, waving = true, magic = mascot.sparks)
         }
         if (!state.isLoading && !state.isEmpty) {
-            Row(
+            // A capo se, in una lingua con parole lunghe, le pillole non entrano in una riga.
+            androidx.compose.foundation.layout.FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
             ) {
                 CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral, onClick = onAttention)

@@ -28,6 +28,9 @@ import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -119,7 +122,7 @@ private val ExpenseKind.summaryLabel: String
 fun ExpensesScreen(navigator: AppNavigator) {
     val viewModel = appViewModel { c, _ -> ExpensesViewModel(c.itemRepository, c.maintenanceRepository, c.time.today()) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    DetailScaffold(title = tr("Spese"), onBack = navigator::back) { padding ->
+    DetailScaffold(title = tr("Spese e conti"), onBack = navigator::back) { padding ->
         val current = state ?: return@DetailScaffold
         val stats = current.stats
         Column(
@@ -137,6 +140,14 @@ fun ExpensesScreen(navigator: AppNavigator) {
                 Text(current.year.toString(), style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
                 IconButton(onClick = { viewModel.onShiftYear(1) }) { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = tr("Anno successivo")) }
             }
+            // Persone: chi paga cosa (spese, abbonamenti, rate, entrate); Cose: i costi degli oggetti.
+            var tab by rememberSaveable { mutableIntStateOf(0) }
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                listOf(tr("Persone"), tr("Cose")).forEachIndexed { index, label ->
+                    SegmentedButton(selected = tab == index, onClick = { tab = index }, shape = SegmentedButtonDefaults.itemShape(index, 2)) { Text(label) }
+                }
+            }
+            if (tab == 0) MoneyRecap(current.year, navigator) else {
             TotalCard(stats)
             if (stats.totalCents > 0) {
                 MonthsCard(stats)
@@ -169,6 +180,7 @@ fun ExpensesScreen(navigator: AppNavigator) {
                         )
                     }
                 }
+            }
             }
         }
     }
@@ -220,7 +232,7 @@ private fun TotalCard(stats: ExpenseStats) {
 }
 
 @Composable
-private fun Fact(label: String, value: String, modifier: Modifier) {
+internal fun Fact(label: String, value: String, modifier: Modifier) {
     Column(
         modifier
             .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f), MaterialTheme.shapes.medium)

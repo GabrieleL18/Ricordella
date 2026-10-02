@@ -23,6 +23,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
@@ -129,7 +131,7 @@ private enum class TopLevelDestination(
     val label: String get() = tr(italianLabel)
 }
 
-private enum class QuickAddKind { REMINDER, EVENT, ALARM, VACATION, MEDICAL_VISIT, CYCLE, ITEM, PERSON }
+private enum class QuickAddKind { REMINDER, EVENT, ALARM, VACATION, MEDICAL_VISIT, EXPENSE, CYCLE, ITEM, PERSON }
 
 /**
  * Shell dell'app: navigazione adattiva (barra in basso su schermi compatti,
@@ -304,6 +306,7 @@ fun RicordellaApp(
                     QuickAddKind.ALARM -> navigator.newReminder(type = ReminderType.ALARM, date = quickAddDate)
                     QuickAddKind.VACATION -> navigator.newReminder(type = ReminderType.VACATION, date = quickAddDate)
                     QuickAddKind.MEDICAL_VISIT -> navigator.newReminder(type = ReminderType.MEDICAL_VISIT, date = quickAddDate)
+                    QuickAddKind.EXPENSE -> navigator.newReminder(type = ReminderType.PAYMENT, date = quickAddDate)
                     QuickAddKind.CYCLE -> navigator.openCycle()
                     QuickAddKind.ITEM -> navigator.newItem()
                     QuickAddKind.PERSON -> navigator.newPerson()
@@ -347,6 +350,7 @@ private val QuickAddOptions get() = listOf(
     QuickAddOption(QuickAddKind.ALARM, Icons.Rounded.Alarm, tr("Sveglia"), tr("Suona a tutto schermo, anche ogni giorno")),
     QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
     QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
+    QuickAddOption(QuickAddKind.EXPENSE, Icons.Rounded.Payments, tr("Spesa"), tr("Spese, abbonamenti, rate ed entrate")),
     QuickAddOption(QuickAddKind.CYCLE, Icons.Rounded.WaterDrop, tr("Ciclo"), tr("Previsione e cronologia, senza notifiche")),
     QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, tr("Cosa"), tr("Auto, casa, dispositivi, documenti")),
     QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, tr("Persona"), tr("A chi collegare promemoria e cose")),
@@ -380,7 +384,7 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                                 QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
                                 QuickAddKind.EVENT -> colors.lavender
                                 QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
-                                QuickAddKind.VACATION -> colors.mint
+                                QuickAddKind.VACATION, QuickAddKind.EXPENSE -> colors.mint
                                 QuickAddKind.ITEM -> colors.pear
                             },
                             index = index,
@@ -388,6 +392,7 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                             modifier = Modifier.weight(1f),
                         )
                     }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
         }

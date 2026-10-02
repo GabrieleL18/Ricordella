@@ -10,7 +10,10 @@ import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.BeachAccess
 import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Cake
+import androidx.compose.material.icons.rounded.Savings
+import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.Celebration
 import androidx.compose.material.icons.rounded.Computer
@@ -43,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.domain.model.ItemGroup
 import com.ricordella.app.domain.model.ItemKind
+import com.ricordella.app.domain.model.MoneyKind
 import com.ricordella.app.domain.model.OdometerStatus
 import com.ricordella.app.domain.model.PersonItemRole
 import com.ricordella.app.domain.model.Priority
@@ -65,10 +69,26 @@ val ReminderType.label: String
         ReminderType.BIRTHDAY -> tr("Compleanno")
         ReminderType.WARRANTY -> tr("Garanzia")
         ReminderType.MAINTENANCE -> tr("Manutenzione")
-        ReminderType.PAYMENT -> tr("Pagamento")
+        ReminderType.PAYMENT -> tr("Spesa")
         ReminderType.RENEWAL -> tr("Rinnovo")
         ReminderType.OTHER -> tr("Altro")
         ReminderType.ALARM -> tr("Allarme")
+    }
+
+val MoneyKind.label: String
+    get() = when (this) {
+        MoneyKind.EXPENSE -> tr("Spesa")
+        MoneyKind.SUBSCRIPTION -> tr("Abbonamento")
+        MoneyKind.INSTALLMENTS -> tr("A rate")
+        MoneyKind.INCOME -> tr("Entrata")
+    }
+
+val MoneyKind.icon: ImageVector
+    get() = when (this) {
+        MoneyKind.EXPENSE -> Icons.Rounded.ShoppingCart
+        MoneyKind.SUBSCRIPTION -> Icons.Rounded.Autorenew
+        MoneyKind.INSTALLMENTS -> Icons.Rounded.CalendarMonth
+        MoneyKind.INCOME -> Icons.Rounded.Savings
     }
 
 val ReminderType.icon: ImageVector

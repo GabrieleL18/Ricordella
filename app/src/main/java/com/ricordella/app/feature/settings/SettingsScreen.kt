@@ -57,6 +57,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.AlarmOn
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Save
@@ -377,6 +378,17 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
             SupportCard(loved = settings.supportLoved, onLoved = { viewModel.update { it.copy(supportLoved = true) } })
 
             SettingsGroup(Icons.Rounded.Info, tr("Informazioni"), tr("Tutorial, privacy, assistenza e versione")) {
+                val context = LocalContext.current
+                SettingRow(
+                    icon = Icons.Rounded.Public,
+                    title = tr("Seguici su Instagram"),
+                    subtitle = "@lanni.labs",
+                    onClick = {
+                        runCatching {
+                            context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.instagram.com/lanni.labs")))
+                        }
+                    },
+                )
                 SettingRow(
                     icon = Icons.Rounded.NewReleases,
                     title = tr("Novità"),

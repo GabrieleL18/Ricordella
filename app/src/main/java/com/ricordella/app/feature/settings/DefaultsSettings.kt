@@ -56,6 +56,7 @@ import com.ricordella.app.core.ui.icon
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.domain.model.AlarmSound
+import com.ricordella.app.domain.model.AlarmsInCalendar
 import com.ricordella.app.domain.model.InsistentLevel
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ReminderType
@@ -222,6 +223,20 @@ internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) 
             }
         },
         onSelected = { level -> update { it.copy(insistentLevel = level) } },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+    )
+    DropdownField(
+        label = tr("Sveglie nel calendario"),
+        options = AlarmsInCalendar.entries,
+        selected = settings.alarmsInCalendar,
+        optionLabel = {
+            when (it) {
+                AlarmsInCalendar.NEVER -> tr("Non mostrarle")
+                AlarmsInCalendar.IMPORTANT -> tr("Solo importanti o urgenti")
+                AlarmsInCalendar.ALL -> tr("Tutte")
+            }
+        },
+        onSelected = { mode -> update { it.copy(alarmsInCalendar = mode) } },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     )
     SettingRow(

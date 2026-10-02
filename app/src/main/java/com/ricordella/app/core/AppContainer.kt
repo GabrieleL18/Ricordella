@@ -44,7 +44,7 @@ private val Context.demoSettingsDataStore by preferencesDataStore(name = "settin
  */
 class AppContainer(context: Context) {
 
-    private val appContext = context.applicationContext
+    val appContext = context.applicationContext
 
     /** Scope per lavoro che deve sopravvivere alle singole schermate (es. receiver). */
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -58,6 +58,9 @@ class AppContainer(context: Context) {
     val databaseFileName = if (isDemo) "ricordella-demo.db" else "ricordella.db"
 
     private val database = RicordellaDatabase.create(appContext, databaseFileName)
+
+    /** Svuota il database (solo per rifare i dati demo). */
+    suspend fun clearAllTables() = kotlinx.coroutines.withContext(Dispatchers.IO) { database.clearAllTables() }
 
     val reminderRepository = RoomReminderRepository(database.reminderDao())
     val trash = com.ricordella.app.data.trash.Trash(appContext, database.backupDao())

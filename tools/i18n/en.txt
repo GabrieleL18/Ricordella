@@ -1424,3 +1424,87 @@ Scegli cosa condividere e come usare Drive. ||| Choose what to share and how to 
 Scegli i giorni della settimana in cui suona (es. lunedì–venerdì per lavoro). Qualche minuto prima ricevi una notifica silenziosa per saltarla solo questa volta, e puoi sospenderla fino a una data. Ogni sveglia è assegnata a una persona e, se condividi il file, suona solo sul telefono della sua persona. Nel calendario puoi nascondere le sveglie normali. ||| Choose the weekdays it rings (e.g. Monday–Friday for work). A few minutes before you get a silent notification to skip it just this once, and you can pause it until a date. Every alarm is assigned to a person and, if you share the file, it rings only on that person's phone. In the calendar you can hide normal alarms.
 Ultime 3 copie con la data, anche su Drive. ||| Last 3 dated copies, on Drive too.
 Un pagamento può essere a rate: indichi quante, l'importo e ogni quanti mesi. Se l'importo cambia, modifichi ogni rata (anche le successive). Ogni rata pagata resta registrata con data e importo; finite le rate scegli se eliminare l'evento l'anno dopo. I pagamenti ripetuti possono essere annuali, mensili, settimanali o in un giorno preciso del mese. ||| A payment can be in installments: you set how many, the amount and how many months apart. If the amount changes, you edit each installment (and the following ones). Each paid installment stays recorded with date and amount; when they're done you choose whether to delete the event the next year. Repeating payments can be yearly, monthly, weekly or on a specific day of the month.
+%1$s a testa ||| %1$s each
+%1$s rate ||| %1$s installments
+%1$s volte ||| %1$s times
+Aggiungi una spesa, un abbonamento, delle rate o un'entrata: scegli le persone e come dividere il costo. ||| Add an expense, a subscription, installments or an income: choose the people and how to split the cost.
+Arrivata %1$s giorni dopo l'inizio della precedente ||| Came %1$s days after the start of the previous one
+Chi li riceve * ||| Who receives it *
+Come si divide ||| How it is split
+Cosa stai cercando? ||| What are you looking for?
+Crea PDF ||| Create PDF
+Da 2 a 360 ||| From 2 to 360
+Durata: %1$s giorni ||| Duration: %1$s days
+Entrata ||| Income
+Entrate ||| Income
+Il PDF contiene quello che vedi: %1$s. ||| The PDF contains what you see: %1$s.
+Importi diversi ||| Different amounts
+Importo (€) * ||| Amount (€) *
+Importo per rata (€) * ||| Amount per installment (€) *
+Inserisci un importo maggiore di zero ||| Enter an amount greater than zero
+Mutuo, finanziamento, condominio: la data è quella della prima rata. ||| Mortgage, loan, building fees: the date is the first installment.
+Nessuna spesa in quest'anno ||| No expenses this year
+Non hai ancora aggiunto persone: aggiungile dalla sezione Persone. ||| You haven't added any people yet: add them from the People section.
+Non mostrarle ||| Don't show them
+Non è stato possibile creare il PDF ||| Could not create the PDF
+Nuova spesa ||| New expense
+PDF salvato ||| PDF saved
+Parti uguali ||| Equal parts
+Per chi suona * ||| Who it rings for *
+Persona eliminata ||| Deleted person
+Prima rata * ||| First installment *
+Primo ciclo registrato ||| First cycle recorded
+Quota di %1$s (€) ||| %1$s's share (€)
+Saldo ||| Balance
+Scade ||| Due
+Scegli almeno una persona. ||| Choose at least one person.
+Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni. ||| Type or say it: I search people, things, reminders, notes and maintenance.
+Se non torna con l'importo, si divide in proporzione. ||| If it doesn't match the amount, it is split proportionally.
+Senza persona ||| No person
+Si rinnova ||| Renews
+Si rinnova da solo: scegli ogni quanto. ||| Renews on its own: choose how often.
+Soldi ||| Money
+Soldi che ricevi: un bonifico, un regalo. ||| Money you receive: a transfer, a gift.
+Solo importanti o urgenti ||| Only important or urgent
+Spesa ||| Expense
+Spese e conti ||| Expenses and accounts
+Spese, abbonamenti, rate ed entrate ||| Expenses, subscriptions, installments and income
+Sveglie nel calendario ||| Alarms in the calendar
+Totale entrate ||| Total income
+Totale quote: %1$s ||| Total shares: %1$s
+Totale spese ||| Total expenses
+Tutta la cerchia ||| Whole circle
+Un pagamento, anche ripetuto (es. una bolletta). ||| A payment, even repeating (e.g. a bill).
+Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata. ||| One row per period, most recent first: when it started and ended, how many days it lasted and how many days after the start of the previous one it came.
+in corso ||| ongoing
+%1$s novità ||| %1$s updates
+Mostra il dettaglio ||| Show details
+Nascondi ||| Hide
+Più semplice ||| Simpler
+Sveglie e ciclo nel calendario ||| Alarms and cycle in the calendar
+Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF. ||| Expenses, subscriptions, installments and income, split between people, with the yearly summary and the PDF.
+Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni. ||| Icons and legend in the calendar; alarms show only if you choose so in Settings.
+Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina. ||| Search with the microphone, a clearer form, a single Edit/Delete.
+La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF. ||| An expense is a special event: choose whether it is an expense, a subscription, an installment payment or income, the amount, whose it is and how to split it. In Expenses and accounts you see the total for the whole circle or for one person over the year and create a PDF.
+Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara. ||| Alarms have their own icon and by default do not appear in the calendar: in Settings › Alarms you choose when to show them. There is a legend for the cycle too, which is now just one and has a clearer history.
+La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più. ||| Global search has the microphone. In the form you choose the type first and required people show right away. Edit, Delete and Archive appear only once; description and category are gone.
+Seguici su Instagram ||| Follow us on Instagram
+Riapri ||| Reopen
+modalità debug ||| debug mode
+Mutuo casa ||| Home mortgage
+Palestra di Marco ||| Marco's gym
+Vacanza in montagna ||| Mountain holiday
+Spese condominiali ||| Building fees
+Regalo di compleanno ||| Birthday gift
+Bonifico dalla nonna ||| Transfer from grandma
+Pagamenti ||| Payments
+Affitto studio ||| Studio rent
+Condominio ||| Building fees
+Assicurazione auto ||| Car insurance
+Corso di nuoto di Sofia ||| Sofia's swimming class
+Cena di gruppo ||| Group dinner
+Regalo per la nonna ||| Gift for grandma
+Rimborso del dentista ||| Dentist refund
+Libri e zaino di Sofia ||| Sofia's books and backpack
+Stipendio extra ||| Extra salary
+Finisce qui ||| Ends here

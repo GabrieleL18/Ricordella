@@ -17,6 +17,8 @@ import com.ricordella.app.core.i18n.trf
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.runtime.rememberUpdatedState
+import kotlinx.coroutines.launch
+import com.ricordella.app.domain.model.CycleCalendar
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -37,6 +39,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.WaterDrop
 import com.ricordella.app.domain.model.CycleDay
 import androidx.compose.foundation.layout.Column
@@ -133,7 +136,6 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
             ) {
                 ModeSelector(state.mode, viewModel::onModeChange)
-                AlarmsToggle(state.alarmsHidden, viewModel::onToggleAlarms)
                 MonthView(
                     state,
                     viewModel,
@@ -167,10 +169,7 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             item(key = "mode") {
-                Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                    ModeSelector(state.mode, viewModel::onModeChange)
-                    AlarmsToggle(state.alarmsHidden, viewModel::onToggleAlarms)
-                }
+                ModeSelector(state.mode, viewModel::onModeChange)
             }
             when (state.mode) {
                 CalendarMode.MONTH -> Unit
@@ -240,19 +239,26 @@ private fun ModeSelector(current: CalendarMode, onChange: (CalendarMode) -> Unit
 
 /** Una riga per ogni persona con il ciclo in questo giorno: goccia piena = avvenuto, chiara = previsto. Tocco = schermata del ciclo. */
 @Composable
-private fun CycleRows(days: List<CycleDay>, navigator: AppNavigator) {
+private fun CycleRows(days: List<CycleDay>, date: LocalDate, navigator: AppNavigator, onOpen: () -> Unit = {}) {
     if (days.isEmpty()) return
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val app = com.ricordella.app.core.ui.LocalAppSettings.current
     val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
     val people by container.personRepository.observePeople(archived = false).collectAsStateWithLifecycle(initialValue = emptyList())
     val tone = MaterialTheme.ricordellaColors.coral
     days.forEach { day ->
         val name = people.firstOrNull { it.id == day.personId }?.name ?: return@forEach
+        // «Finisce qui»: chiude la mestruazione in questo giorno (solo per i giorni già avvenuti).
+        val profile = app.cycleProfiles.firstOrNull { it.personId == day.personId }
+        val entry = app.cycleLog.filter { it.personId == day.personId && !it.start.isAfter(date) }.maxByOrNull { it.start }
+        val canEnd = !day.predicted && profile != null && entry != null && !date.isAfter(LocalDate.now()) &&
+            !date.isAfter(CycleCalendar.lastDay(entry, profile)) && entry.end != date
         Row(
             Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.large)
                 .background(tone.container)
-                .clickable(onClick = navigator::openCycle)
+                .clickable { onOpen(); navigator.openCycle() }
                 .padding(RicordellaDimensions.spaceM),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
@@ -262,20 +268,13 @@ private fun CycleRows(days: List<CycleDay>, navigator: AppNavigator) {
                 if (day.predicted) trf("Ciclo di %1\$s (previsto)", name) else trf("Ciclo di %1\$s", name),
                 style = MaterialTheme.typography.titleSmall,
                 color = tone.content,
+                modifier = Modifier.weight(1f),
             )
+            if (canEnd) TextButton(onClick = {
+                scope.launch { container.settingsRepository.update { it.copy(cycleLog = CycleCalendar.withEnd(it.cycleLog, day.personId, date)) } }
+            }) { Text(tr("Finisce qui"), color = tone.content) }
         }
     }
-}
-
-/** Mostra o nasconde le sveglie normali nel calendario (quelle importanti o urgenti si vedono sempre). */
-@Composable
-private fun AlarmsToggle(hidden: Boolean, onChange: (Boolean) -> Unit) {
-    androidx.compose.material3.FilterChip(
-        selected = !hidden,
-        onClick = { onChange(!hidden) },
-        label = { Text(if (hidden) tr("Sveglie nascoste (tranne le importanti)") else tr("Sveglie visibili")) },
-        leadingIcon = { androidx.compose.material3.Icon(Icons.Rounded.Alarm, contentDescription = null, modifier = Modifier.size(18.dp)) },
-    )
 }
 
 /** Gli impegni del giorno toccato, in un foglio che sale dal basso; si sfoglia ai giorni vicini trascinando. */
@@ -319,7 +318,7 @@ private fun DaySheet(
                     Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 ) {
-                    CycleRows(state.cycleDays[date].orEmpty(), navigator)
+                    CycleRows(state.cycleDays[date].orEmpty(), date, navigator, onOpen = onDismiss)
                     if (occurrences.isEmpty() && state.cycleDays[date].isNullOrEmpty()) {
                         EmptyState(
                             icon = Icons.Rounded.EventAvailable,
@@ -328,7 +327,7 @@ private fun DaySheet(
                         )
                     }
                     occurrences.forEach { occurrence ->
-                        OccurrenceCard(occurrence, state, navigator, viewModel, swipeToComplete = false)
+                        OccurrenceCard(occurrence, state, navigator, viewModel)
                     }
                 }
             }
@@ -350,7 +349,7 @@ private fun LazyListScope.dayItems(
     date: LocalDate,
     showEmpty: Boolean = true,
 ) {
-    state.cycleDays[date]?.takeIf { it.isNotEmpty() }?.let { days -> item(key = "day-cycle-$date") { CycleRows(days, navigator) } }
+    state.cycleDays[date]?.takeIf { it.isNotEmpty() }?.let { days -> item(key = "day-cycle-$date") { CycleRows(days, date, navigator) } }
     if (occurrences.isEmpty() && showEmpty && !state.isLoading && state.cycleDays[date].isNullOrEmpty()) {
         item(key = "day-empty-$date") {
             EmptyState(
@@ -363,7 +362,7 @@ private fun LazyListScope.dayItems(
         }
     }
     items(occurrences, key = { "day-$date-${it.reminder.id}" }) { occurrence ->
-        OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem(), swipeToComplete = false)
+        OccurrenceCard(occurrence, state, navigator, viewModel, Modifier.animateItem())
     }
 }
 
@@ -518,7 +517,12 @@ private fun MonthView(
               }
             }
         }
-        Legend()
+        val all = state.occurrences.values.flatten()
+        Legend(
+            showAlarms = all.any { it.reminder.type == ReminderType.ALARM },
+            showPayments = all.any { it.reminder.type == ReminderType.PAYMENT },
+            showCycle = state.cycleDays.isNotEmpty(),
+        )
     }
 }
 
@@ -550,9 +554,11 @@ private fun DayCell(
         label = "dayScale",
     )
     val single = occurrences.filterNot { it.isMultiDay }
-    val hasDeadline = single.any { it.reminder.type.isDeadlineLike }
+    val hasDeadline = single.any { it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.PAYMENT }
+    val hasPayment = single.any { it.reminder.type == ReminderType.PAYMENT }
     val hasEvent = single.any { it.reminder.type == ReminderType.EVENT || it.reminder.type == ReminderType.BIRTHDAY }
-    val hasTask = single.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY }
+    val hasAlarm = single.any { it.reminder.type == ReminderType.ALARM }
+    val hasTask = single.any { !it.reminder.type.isDeadlineLike && it.reminder.type != ReminderType.EVENT && it.reminder.type != ReminderType.BIRTHDAY && it.reminder.type != ReminderType.ALARM }
     val description = buildString {
         append(DateTexts.fullDate(date))
         if (occurrences.isNotEmpty()) append(trf(", %1\$s promemoria", occurrences.size))
@@ -591,12 +597,9 @@ private fun DayCell(
             if (hasTask) Marker(MarkerShape.DOT)
             if (hasEvent) Marker(MarkerShape.RING)
             if (hasDeadline) Marker(MarkerShape.SQUARE)
-            if (cycle.isNotEmpty()) Icon(
-                Icons.Rounded.WaterDrop,
-                contentDescription = tr("Ciclo"),
-                tint = extra.coral.solid.copy(alpha = if (cycle.all { it.predicted }) 0.45f else 1f),
-                modifier = Modifier.size(10.dp),
-            )
+            if (hasPayment) Marker(MarkerShape.PAYMENT)
+            if (hasAlarm) Marker(MarkerShape.ALARM)
+            if (cycle.isNotEmpty()) Marker(MarkerShape.CYCLE, faded = cycle.all { it.predicted })
             if (hidden > 0) Text("+$hidden", style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp), color = if (isSelected) extra.onBolt else colors.onSurfaceVariant)
         }
     }
@@ -687,29 +690,37 @@ private fun SpanBars(
     }
 }
 
-private enum class MarkerShape { DOT, RING, SQUARE }
+private enum class MarkerShape { DOT, RING, SQUARE, ALARM, CYCLE, PAYMENT }
 
 @Composable
-private fun Marker(shape: MarkerShape) {
+private fun Marker(shape: MarkerShape, faded: Boolean = false) {
     val colors = MaterialTheme.ricordellaColors
     val modifier = Modifier.size(6.dp)
     when (shape) {
+        MarkerShape.PAYMENT -> Icon(Icons.Rounded.Payments, contentDescription = tr("Pagamenti"), tint = colors.mint.solid, modifier = Modifier.size(10.dp))
+        MarkerShape.ALARM -> Icon(Icons.Rounded.Alarm, contentDescription = tr("Sveglie"), tint = ReminderType.ALARM.tone.solid, modifier = Modifier.size(10.dp))
+        MarkerShape.CYCLE -> Icon(Icons.Rounded.WaterDrop, contentDescription = tr("Ciclo"), tint = colors.coral.solid.copy(alpha = if (faded) 0.45f else 1f), modifier = Modifier.size(10.dp))
         MarkerShape.DOT -> Box(modifier.background(colors.cyan.solid, CircleShape))
         MarkerShape.RING -> Box(modifier.border(1.5.dp, colors.lavender.solid, CircleShape))
         MarkerShape.SQUARE -> Box(modifier.background(colors.coral.solid, RoundedCornerShape(1.dp)))
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun Legend() {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceS),
-        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
+private fun Legend(showAlarms: Boolean, showPayments: Boolean, showCycle: Boolean) {
+    androidx.compose.foundation.layout.FlowRow(
+        // A destra resta libero lo spazio del "+", che non deve coprire la legenda.
+        modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceS, end = 76.dp),
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM, Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         LegendEntry(MarkerShape.DOT, tr("Attività"))
         LegendEntry(MarkerShape.RING, tr("Eventi"))
         LegendEntry(MarkerShape.SQUARE, tr("Scadenze"))
+        if (showPayments) LegendEntry(MarkerShape.PAYMENT, tr("Pagamenti"))
+        if (showAlarms) LegendEntry(MarkerShape.ALARM, tr("Sveglie"))
+        if (showCycle) LegendEntry(MarkerShape.CYCLE, tr("Ciclo"))
     }
 }
 

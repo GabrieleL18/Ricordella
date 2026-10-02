@@ -168,7 +168,7 @@ Altro ||| Sonstiges
 Allarme ||| Alarm
 Normale ||| Normal
 Importante ||| Wichtig
-Urgente ||| Eilig
+Urgente ||| Dringend
 Veicoli ||| Fahrzeuge
 Casa ||| Zuhause
 Elettronica ||| Elektronik
@@ -1349,3 +1349,87 @@ Scegli cosa condividere e come usare Drive. ||| Wähle, was du teilst und wie du
 Scegli i giorni della settimana in cui suona (es. lunedì–venerdì per lavoro). Qualche minuto prima ricevi una notifica silenziosa per saltarla solo questa volta, e puoi sospenderla fino a una data. Ogni sveglia è assegnata a una persona e, se condividi il file, suona solo sul telefono della sua persona. Nel calendario puoi nascondere le sveglie normali. ||| Wähle die Wochentage, an denen er klingelt (z. B. Montag–Freitag für die Arbeit). Wenige Minuten vorher erhältst du eine stille Benachrichtigung, um ihn nur diesmal zu überspringen, und du kannst ihn bis zu einem Datum pausieren. Jeder Wecker ist einer Person zugewiesen und klingelt bei geteilter Datei nur auf deren Handy. Im Kalender kannst du normale Wecker ausblenden.
 Ultime 3 copie con la data, anche su Drive. ||| Letzte 3 Kopien mit Datum, auch in Drive.
 Un pagamento può essere a rate: indichi quante, l'importo e ogni quanti mesi. Se l'importo cambia, modifichi ogni rata (anche le successive). Ogni rata pagata resta registrata con data e importo; finite le rate scegli se eliminare l'evento l'anno dopo. I pagamenti ripetuti possono essere annuali, mensili, settimanali o in un giorno preciso del mese. ||| Eine Zahlung kann in Raten erfolgen: Du gibst Anzahl, Betrag und Abstand in Monaten an. Ändert sich der Betrag, bearbeitest du jede Rate (auch die folgenden). Jede bezahlte Rate bleibt mit Datum und Betrag gespeichert; nach der letzten Rate wählst du, ob das Ereignis im nächsten Jahr gelöscht wird. Wiederkehrende Zahlungen können jährlich, monatlich, wöchentlich oder an einem bestimmten Tag des Monats sein.
+%1$s a testa ||| %1$s pro Person
+%1$s rate ||| %1$s Raten
+%1$s volte ||| %1$s Mal
+%1$s novità ||| %1$s Neuigkeiten
+Aggiungi una spesa, un abbonamento, delle rate o un'entrata: scegli le persone e come dividere il costo. ||| Füge eine Ausgabe, ein Abo, Raten oder eine Einnahme hinzu: Wähle die Personen und wie die Kosten geteilt werden.
+Arrivata %1$s giorni dopo l'inizio della precedente ||| Kam %1$s Tage nach Beginn der vorherigen
+Chi li riceve * ||| Wer erhält es *
+Come si divide ||| Wie geteilt wird
+Cosa stai cercando? ||| Wonach suchst du?
+Crea PDF ||| PDF erstellen
+Da 2 a 360 ||| Von 2 bis 360
+Durata: %1$s giorni ||| Dauer: %1$s Tage
+Entrata ||| Einnahme
+Entrate ||| Einnahmen
+Il PDF contiene quello che vedi: %1$s. ||| Das PDF enthält, was du siehst: %1$s.
+Importi diversi ||| Unterschiedliche Beträge
+Importo (€) * ||| Betrag (€) *
+Importo per rata (€) * ||| Betrag pro Rate (€) *
+Inserisci un importo maggiore di zero ||| Gib einen Betrag über null ein
+Mutuo, finanziamento, condominio: la data è quella della prima rata. ||| Hypothek, Kredit, Hausgeld: Das Datum ist das der ersten Rate.
+Nessuna spesa in quest'anno ||| Keine Ausgaben in diesem Jahr
+Non hai ancora aggiunto persone: aggiungile dalla sezione Persone. ||| Du hast noch keine Personen hinzugefügt: Füge sie im Bereich Personen hinzu.
+Non mostrarle ||| Nicht anzeigen
+Non è stato possibile creare il PDF ||| Das PDF konnte nicht erstellt werden
+Nuova spesa ||| Neue Ausgabe
+PDF salvato ||| PDF gespeichert
+Parti uguali ||| Gleiche Teile
+Per chi suona * ||| Für wen er klingelt *
+Persona eliminata ||| Gelöschte Person
+Prima rata * ||| Erste Rate *
+Primo ciclo registrato ||| Erster erfasster Zyklus
+Quota di %1$s (€) ||| Anteil von %1$s (€)
+Saldo ||| Saldo
+Scade ||| Fällig
+Scegli almeno una persona. ||| Wähle mindestens eine Person.
+Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni. ||| Schreibe oder sprich: Ich suche in Personen, Dingen, Erinnerungen, Notizen und Wartungen.
+Se non torna con l'importo, si divide in proporzione. ||| Passt es nicht zum Betrag, wird anteilig geteilt.
+Senza persona ||| Ohne Person
+Si rinnova ||| Verlängert sich
+Si rinnova da solo: scegli ogni quanto. ||| Verlängert sich von selbst: Wähle, wie oft.
+Soldi ||| Geld
+Soldi che ricevi: un bonifico, un regalo. ||| Geld, das du erhältst: eine Überweisung, ein Geschenk.
+Solo importanti o urgenti ||| Nur wichtige oder dringende
+Spesa ||| Ausgabe
+Spese e conti ||| Ausgaben und Konten
+Spese, abbonamenti, rate ed entrate ||| Ausgaben, Abos, Raten und Einnahmen
+Sveglie nel calendario ||| Wecker im Kalender
+Totale entrate ||| Einnahmen gesamt
+Totale quote: %1$s ||| Summe der Anteile: %1$s
+Totale spese ||| Ausgaben gesamt
+Tutta la cerchia ||| Der ganze Kreis
+Un pagamento, anche ripetuto (es. una bolletta). ||| Eine Zahlung, auch wiederkehrend (z. B. eine Rechnung).
+Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata. ||| Eine Zeile pro Periode, die neueste zuerst: Beginn und Ende, Dauer in Tagen und wie viele Tage nach Beginn der vorherigen sie kam.
+in corso ||| laufend
+Mostra il dettaglio ||| Details anzeigen
+Nascondi ||| Ausblenden
+Più semplice ||| Einfacher
+Sveglie e ciclo nel calendario ||| Wecker und Zyklus im Kalender
+Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF. ||| Ausgaben, Abos, Raten und Einnahmen, zwischen den Personen geteilt, mit Jahresübersicht und PDF.
+Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni. ||| Symbole und Legende im Kalender; Wecker erscheinen nur, wenn du es in den Einstellungen wählst.
+Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina. ||| Suche per Mikrofon, klareres Formular, nur ein Bearbeiten/Löschen.
+La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF. ||| Die Ausgabe ist ein besonderer Termin: Wähle, ob es eine Ausgabe, ein Abo, eine Ratenzahlung oder eine Einnahme ist, den Betrag, wem sie gehört und wie sie geteilt wird. Unter Ausgaben und Konten siehst du die Summe des ganzen Kreises oder einer Person im Jahr und erstellst ein PDF.
+Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara. ||| Wecker haben ihr eigenes Symbol und erscheinen standardmäßig nicht im Kalender: In Einstellungen › Wecker wählst du, wann sie angezeigt werden. Auch für den Zyklus gibt es eine Legende; er ist jetzt nur einer und hat einen klareren Verlauf.
+La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più. ||| Die globale Suche hat das Mikrofon. Im Formular wählst du zuerst den Typ, und Pflichtpersonen sind sofort sichtbar. Bearbeiten, Löschen und Archivieren erscheinen nur einmal; Beschreibung und Kategorie gibt es nicht mehr.
+Seguici su Instagram ||| Folge uns auf Instagram
+Riapri ||| Wieder öffnen
+modalità debug ||| Debug-Modus
+Mutuo casa ||| Hypothek Haus
+Palestra di Marco ||| Marcos Fitnessstudio
+Vacanza in montagna ||| Urlaub in den Bergen
+Spese condominiali ||| Hausgeld
+Regalo di compleanno ||| Geburtstagsgeschenk
+Bonifico dalla nonna ||| Überweisung von Oma
+Pagamenti ||| Zahlungen
+Affitto studio ||| Miete Studio
+Condominio ||| Hausgeld
+Assicurazione auto ||| Autoversicherung
+Corso di nuoto di Sofia ||| Sofias Schwimmkurs
+Cena di gruppo ||| Gruppenessen
+Regalo per la nonna ||| Geschenk für Oma
+Rimborso del dentista ||| Zahnarzt-Erstattung
+Libri e zaino di Sofia ||| Sofias Bücher und Rucksack
+Stipendio extra ||| Zusatzgehalt
+Finisce qui ||| Endet hier

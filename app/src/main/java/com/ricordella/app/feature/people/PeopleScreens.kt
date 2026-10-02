@@ -55,6 +55,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Unarchive
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.Delete
@@ -133,6 +136,13 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
                 SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca persone"))
+            }
+            item(span = { GridItemSpan(maxLineSpan) }, key = "money") {
+                androidx.compose.material3.AssistChip(
+                    onClick = navigator::openExpenses,
+                    label = { Text(tr("Spese e conti")) },
+                    leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null) },
+                )
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "archived") {
                 FilterChipRow(
@@ -365,19 +375,13 @@ fun PersonDetailScreen(navigator: AppNavigator) {
         actions = {
             if (person != null) {
                 IconButton(onClick = { navigator.editPerson(person.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
-                Box {
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(if (person.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
-                            onClick = { menuOpen = false; viewModel.onToggleArchived() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(tr("Elimina")) },
-                            leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                            onClick = { menuOpen = false; confirmDelete = true },
-                        )
-                    }
+                IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
+                IconButton(onClick = viewModel::onToggleArchived) {
+                    val archived = person.isArchived
+                    Icon(
+                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
+                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
+                    )
                 }
             }
         },
@@ -405,7 +409,6 @@ fun PersonDetailScreen(navigator: AppNavigator) {
                 SectionHeader(tr("Cose"))
                 state.items.forEach { entry -> ItemCard(entry, onClick = { navigator.openItem(entry.item.id) }) }
             }
-            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editPerson(person.id) }, onDelete = { confirmDelete = true })
         }
     }
 
