@@ -1302,3 +1302,33 @@ Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi 
 Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| Was du ausschaltest, bleibt auf deinem Handy und in der Datei unverändert: Es wird weder gelöscht noch geändert.
 Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Wähle, was in die geteilte Datei kommt. Du kannst deine Meinung jederzeit ändern.
 Suonano solo sul telefono della persona a cui sono assegnate. ||| Sie klingeln nur auf dem Handy der Person, der sie zugewiesen sind.
+%1$s pagati su %2$s ||| %1$s von %2$s bezahlt
+A rate ||| In Raten
+Anche per le rate successive ||| Auch für die folgenden Raten
+Da pagare ||| Zu zahlen
+Elimina l'evento un anno dopo l'ultima rata ||| Ereignis ein Jahr nach der letzten Rate löschen
+Giorno del mese in cui pagare ||| Tag des Monats für die Zahlung
+Il %1$s di ogni mese ||| Am %1$s jedes Monats
+Importo (€) ||| Betrag (€)
+Importo per rata (€) ||| Betrag pro Rate (€)
+Indica da 2 a 360 rate e un importo maggiore di zero. ||| Gib 2 bis 360 Raten und einen Betrag über null an.
+L'importo cambia tra le rate ||| Der Betrag ändert sich zwischen den Raten
+La data scelta qui sopra è la prima rata. ||| Das oben gewählte Datum ist die erste Rate.
+Lo stesso giorno della data scelta ||| Derselbe Tag wie das gewählte Datum
+Mostra solo le prossime ||| Nur die nächsten anzeigen
+Mostra tutte le %1$s rate ||| Alle %1$s Raten anzeigen
+Numero di rate ||| Anzahl der Raten
+Ogni quanto scade una rata ||| Wie oft eine Rate fällig ist
+Pagata ||| Bezahlt
+Pagata il %1$s ||| Bezahlt am %1$s
+Pagate %1$s di %2$s ||| %1$s von %2$s bezahlt
+Poi cambi l'importo di ogni rata nel dettaglio. ||| Danach änderst du den Betrag jeder Rate in den Details.
+Rata %1$s di %2$s ||| Rate %1$s von %2$s
+Rata %1$s di %2$s · %3$s ||| Rate %1$s von %2$s · %3$s
+Rata %1$s · %2$s ||| Rate %1$s · %2$s
+Rate ||| Raten
+Rate finite! ||| Raten abbezahlt!
+Se spento resta nello storico. ||| Wenn aus, bleibt es im Verlauf.
+Segna da pagare ||| Als unbezahlt markieren
+Segna pagata ||| Als bezahlt markieren
+Una volta o ripetuto ||| Einmal oder wiederholt

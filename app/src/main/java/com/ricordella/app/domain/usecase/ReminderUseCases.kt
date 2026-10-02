@@ -79,6 +79,21 @@ class CompleteReminderUseCase(
         val today = time.today()
         val completion = ReminderCompletion(reminderId = reminder.id, occurrenceDate = reminder.dueDate, completedAt = now)
 
+        // Pagamento a rate: si segna pagata la rata di questa scadenza e si passa alla prossima ancora da pagare
+        // (anche se in ritardo non se ne salta nessuna). Finite le rate l'evento si completa.
+        reminder.plan?.let { plan ->
+            val index = (0 until plan.count).firstOrNull { plan.dueDate(it) == reminder.dueDate && !plan.isPaid(it) } ?: plan.nextUnpaid() ?: return
+            val paid = plan.pay(index, today)
+            val next = paid.nextUnpaid()
+            val updated = if (next != null) reminder.copy(plan = paid, dueDate = paid.dueDate(next), updatedAt = now, snoozedUntil = null)
+            else reminder.copy(plan = paid, status = ReminderStatus.COMPLETED, completedAt = now, updatedAt = now, snoozedUntil = null)
+            reminders.recordCompletion(updated, completion.copy(occurrenceDate = plan.dueDate(index)), entry.recurrenceRule?.takeIf { next != null }?.copy(startDate = paid.dueDate(next!!)))
+            scheduler.dismissNotification(reminder.id)
+            scheduler.refresh()
+            guard?.done(entry.people, reminder.title, GuardedAction.COMPLETE)
+            return
+        }
+
         // Un promemoria in ritardo salta le occorrenze ormai passate. Le regole "dall'ultima volta"
         // ripartono da oggi: fatto prima o dopo, si spostano anche tutte le occorrenze successive.
         val after = maxOf(reminder.dueDate, today.minusDays(1))
@@ -137,8 +152,11 @@ class UndoCompletionUseCase(
             lastNotifiedAt = now,
             updatedAt = now,
         )
+        val plan = entry.reminder.plan
+        val unpaid = plan?.let { p -> (0 until p.count).firstOrNull { p.dueDate(it) == occurrence && p.isPaid(it) } }
+        val restored = if (plan != null && unpaid != null) updated.copy(plan = plan.unpay(unpaid)) else updated
         val rule = entry.recurrenceRule?.takeIf { it.fromLastDone }?.copy(startDate = occurrence)
-        reminders.undoCompletion(updated, latest.id, rule)
+        reminders.undoCompletion(restored, latest.id, rule)
         scheduler.refresh()
         guard?.done(entry.people, entry.reminder.title, GuardedAction.REOPEN)
     }
@@ -157,8 +175,13 @@ class ReopenReminderUseCase(
         val reminder = entry.reminder
         if (reminder.status == ReminderStatus.ACTIVE) return
         if (guard?.allow(entry.people, reminder.title, GuardedAction.REOPEN) == false) return
+        val plan = reminder.plan?.let { p -> p.paid.maxByOrNull { it.index }?.let { p.unpay(it.index) } }
         reminders.update(
-            reminder.copy(status = ReminderStatus.ACTIVE, completedAt = null, lastNotifiedAt = time.now(), updatedAt = time.now()),
+            reminder.copy(
+                status = ReminderStatus.ACTIVE, completedAt = null, lastNotifiedAt = time.now(), updatedAt = time.now(),
+                plan = plan ?: reminder.plan,
+                dueDate = plan?.nextUnpaid()?.let(plan::dueDate) ?: reminder.dueDate,
+            ),
         )
         scheduler.refresh()
         guard?.done(entry.people, reminder.title, GuardedAction.REOPEN)

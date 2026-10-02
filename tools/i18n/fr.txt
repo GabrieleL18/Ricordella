@@ -1302,3 +1302,33 @@ Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi 
 Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| Ce que tu désactives reste tel quel sur ton téléphone et dans le fichier : ni supprimé ni modifié.
 Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Choisis ce qui va dans le fichier partagé. Tu peux changer d'avis quand tu veux.
 Suonano solo sul telefono della persona a cui sono assegnate. ||| Elles ne sonnent que sur le téléphone de la personne à qui elles sont attribuées.
+%1$s pagati su %2$s ||| %1$s payés sur %2$s
+A rate ||| À échéances
+Anche per le rate successive ||| Aussi pour les échéances suivantes
+Da pagare ||| À payer
+Elimina l'evento un anno dopo l'ultima rata ||| Supprimer l'événement un an après la dernière échéance
+Giorno del mese in cui pagare ||| Jour du mois du paiement
+Il %1$s di ogni mese ||| Le %1$s de chaque mois
+Importo (€) ||| Montant (€)
+Importo per rata (€) ||| Montant par échéance (€)
+Indica da 2 a 360 rate e un importo maggiore di zero. ||| Indique de 2 à 360 échéances et un montant supérieur à zéro.
+L'importo cambia tra le rate ||| Le montant change entre les échéances
+La data scelta qui sopra è la prima rata. ||| La date choisie ci-dessus est la première échéance.
+Lo stesso giorno della data scelta ||| Le même jour que la date choisie
+Mostra solo le prossime ||| Afficher seulement les prochaines
+Mostra tutte le %1$s rate ||| Afficher les %1$s échéances
+Numero di rate ||| Nombre d'échéances
+Ogni quanto scade una rata ||| Tous les combien une échéance tombe
+Pagata ||| Payée
+Pagata il %1$s ||| Payée le %1$s
+Pagate %1$s di %2$s ||| Payées %1$s sur %2$s
+Poi cambi l'importo di ogni rata nel dettaglio. ||| Ensuite tu changes le montant de chaque échéance dans le détail.
+Rata %1$s di %2$s ||| Échéance %1$s sur %2$s
+Rata %1$s di %2$s · %3$s ||| Échéance %1$s sur %2$s · %3$s
+Rata %1$s · %2$s ||| Échéance %1$s · %2$s
+Rate ||| Échéances
+Rate finite! ||| Échéances terminées !
+Se spento resta nello storico. ||| Si désactivé, il reste dans l'historique.
+Segna da pagare ||| Marquer comme à payer
+Segna pagata ||| Marquer comme payée
+Una volta o ripetuto ||| Une fois ou répété

@@ -230,6 +230,7 @@ abstract class ReminderDao {
         WHERE r.dueDate < :before
             AND r.type != 'HOLIDAY'
             AND NOT (r.status = 'ACTIVE' AND r.recurrenceRuleId IS NOT NULL)
+            AND (r.plan IS NULL OR r.plan LIKE '%"deleteAfter":true%')
             AND (
                 r.priority = 'NORMAL' OR (
                     NOT EXISTS (

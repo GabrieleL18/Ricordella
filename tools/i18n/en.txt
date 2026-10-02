@@ -1377,3 +1377,33 @@ Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi 
 Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| What you turn off stays as is on your phone and in the file: it isn't deleted or changed.
 Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Choose what goes into the shared file. You can change your mind anytime.
 Suonano solo sul telefono della persona a cui sono assegnate. ||| They only ring on the phone of the person they're assigned to.
+%1$s pagati su %2$s ||| %1$s paid out of %2$s
+A rate ||| In installments
+Anche per le rate successive ||| Also for the following installments
+Da pagare ||| To pay
+Elimina l'evento un anno dopo l'ultima rata ||| Delete the event a year after the last installment
+Giorno del mese in cui pagare ||| Day of the month to pay
+Il %1$s di ogni mese ||| On the %1$s of every month
+Importo (€) ||| Amount (€)
+Importo per rata (€) ||| Amount per installment (€)
+Indica da 2 a 360 rate e un importo maggiore di zero. ||| Enter 2 to 360 installments and an amount above zero.
+L'importo cambia tra le rate ||| The amount changes between installments
+La data scelta qui sopra è la prima rata. ||| The date chosen above is the first installment.
+Lo stesso giorno della data scelta ||| Same day as the chosen date
+Mostra solo le prossime ||| Show only the next ones
+Mostra tutte le %1$s rate ||| Show all %1$s installments
+Numero di rate ||| Number of installments
+Ogni quanto scade una rata ||| How often an installment is due
+Pagata ||| Paid
+Pagata il %1$s ||| Paid on %1$s
+Pagate %1$s di %2$s ||| Paid %1$s of %2$s
+Poi cambi l'importo di ogni rata nel dettaglio. ||| Then you change each installment's amount in the details.
+Rata %1$s di %2$s ||| Installment %1$s of %2$s
+Rata %1$s di %2$s · %3$s ||| Installment %1$s of %2$s · %3$s
+Rata %1$s · %2$s ||| Installment %1$s · %2$s
+Rate ||| Installments
+Rate finite! ||| Installments done!
+Se spento resta nello storico. ||| If off, it stays in the history.
+Segna da pagare ||| Mark as unpaid
+Segna pagata ||| Mark as paid
+Una volta o ripetuto ||| Once or repeating

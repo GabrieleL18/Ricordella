@@ -1,6 +1,7 @@
 package com.ricordella.app.data.local.converter
 
 import androidx.room.TypeConverter
+import com.ricordella.app.domain.model.InstallmentPlan
 import com.ricordella.app.domain.model.TripInfo
 import kotlinx.serialization.json.Json
 import java.time.DayOfWeek
@@ -39,6 +40,12 @@ class RoomConverters {
 
     @TypeConverter
     fun jsonToTrip(value: String?): TripInfo? = value?.let { runCatching { json.decodeFromString(TripInfo.serializer(), it) }.getOrNull() }
+
+    @TypeConverter
+    fun planToJson(value: InstallmentPlan?): String? = value?.let { json.encodeToString(InstallmentPlan.serializer(), it) }
+
+    @TypeConverter
+    fun jsonToPlan(value: String?): InstallmentPlan? = value?.let { runCatching { json.decodeFromString(InstallmentPlan.serializer(), it) }.getOrNull() }
 
     @TypeConverter
     fun daysOfWeekToMask(value: Set<DayOfWeek>): Int = value.fold(0) { mask, day -> mask or (1 shl day.ordinal) }

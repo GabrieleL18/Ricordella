@@ -277,7 +277,10 @@ private fun ReminderCardBody(
             if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(occurrenceDate, today)
             else DateTexts.relativeWithTime(occurrenceDate, reminder.dueTime, today)
     }
-    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel)).joinToString(" · ")
+    val installment = reminder.plan?.let { plan ->
+        plan.nextUnpaid()?.let { i -> trf("Rata %1\$s di %2\$s · %3\$s", i + 1, plan.count, DateTexts.money(plan.cents(i))) }
+    }
+    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel), installment).joinToString(" · ")
     val links = (entry.items.map { it.name } + entry.people.map { it.displayName }).joinToString(" · ")
     val titleAlpha by animateFloatAsState(if (checked) 0.55f else 1f, tween(RicordellaMotion.SHORT), label = "titleAlpha")
     val badgeContainer by animateColorAsState(tone.container, tween(RicordellaMotion.SHORT), label = "badgeContainer")

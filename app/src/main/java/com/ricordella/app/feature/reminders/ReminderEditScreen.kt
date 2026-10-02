@@ -259,8 +259,9 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
         minLines = 2,
     )
 
-    // Per le sveglie la ripetizione si sceglie coi giorni, più sopra.
-    if (!form.isAlarm) {
+    if (form.isPayment) PaymentFields(form, update)
+    // Per le sveglie la ripetizione si sceglie coi giorni, più sopra; per le rate decide il piano.
+    if (!form.isAlarm && !(form.isPayment && form.installments)) {
         SectionHeader(tr("Ricorrenza"))
         DropdownField(
             label = tr("Si ripete"),
@@ -269,6 +270,15 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
             optionLabel = { it.label },
             onSelected = { preset -> update { it.copy(recurrencePreset = preset) } },
         )
+        if (form.isPayment && form.recurrencePreset == RecurrencePreset.MONTHLY) {
+            DropdownField(
+                label = tr("Giorno del mese in cui pagare"),
+                options = listOf<Int?>(null) + (1..31).toList(),
+                selected = form.dayOfMonth,
+                optionLabel = { it?.let { d -> trf("Il %1\$s di ogni mese", d) } ?: tr("Lo stesso giorno della data scelta") },
+                onSelected = { day -> update { it.copy(dayOfMonth = day) } },
+            )
+        }
         if (form.recurrencePreset == RecurrencePreset.CUSTOM) {
             Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
@@ -452,6 +462,65 @@ private fun AssistAddChip(label: String, onClick: () -> Unit) {
         label = { Text(label) },
         leadingIcon = { Icon(Icons.Rounded.Add, contentDescription = null) },
     )
+}
+
+/** Pagamento: una volta o a rate (condominio, mutuo...), con importo, numero di rate e ogni quanti mesi. */
+@Composable
+private fun PaymentFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
+    SectionHeader(tr("Pagamento"))
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        listOf(false to tr("Una volta o ripetuto"), true to tr("A rate")).forEachIndexed { index, (value, label) ->
+            SegmentedButton(
+                selected = form.installments == value,
+                onClick = { update { it.copy(installments = value) } },
+                shape = SegmentedButtonDefaults.itemShape(index, 2),
+            ) { Text(label) }
+        }
+    }
+    if (!form.installments) return
+    Text(tr("La data scelta qui sopra è la prima rata."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        OutlinedTextField(
+            value = form.installmentCount,
+            onValueChange = { value -> update { it.copy(installmentCount = value.filter(Char::isDigit).take(3)) } },
+            label = { Text(tr("Numero di rate")) },
+            isError = form.installmentError,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            modifier = Modifier.weight(1f),
+        )
+        OutlinedTextField(
+            value = form.installmentAmount,
+            onValueChange = { value -> update { it.copy(installmentAmount = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(12)) } },
+            label = { Text(tr("Importo per rata (€)")) },
+            isError = form.installmentError,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.weight(1f),
+        )
+    }
+    if (form.installmentError) Text(tr("Indica da 2 a 360 rate e un importo maggiore di zero."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+    DropdownField(
+        label = tr("Ogni quanto scade una rata"),
+        options = listOf(1, 2, 3, 6, 12),
+        selected = form.installmentEvery,
+        optionLabel = { if (it == 1) tr("Ogni mese") else if (it == 12) tr("Ogni anno") else trf("Ogni %1\$s mesi", it) },
+        onSelected = { months -> update { it.copy(installmentEvery = months) } },
+    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(tr("L'importo cambia tra le rate"), style = MaterialTheme.typography.bodyLarge)
+            Text(tr("Poi cambi l'importo di ogni rata nel dettaglio."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = form.installmentVariable, onCheckedChange = { value -> update { it.copy(installmentVariable = value) } })
+    }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(tr("Elimina l'evento un anno dopo l'ultima rata"), style = MaterialTheme.typography.bodyLarge)
+            Text(tr("Se spento resta nello storico."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = form.installmentDeleteAfter, onCheckedChange = { value -> update { it.copy(installmentDeleteAfter = value) } })
+    }
 }
 
 /** Opzioni della sveglia: ripetizione quotidiana e controllo dei permessi che la fanno suonare. */

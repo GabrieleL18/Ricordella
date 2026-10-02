@@ -19,6 +19,8 @@ import com.ricordella.app.domain.model.ReminderDraft
 import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.TripInfo
 import com.ricordella.app.domain.text.QuickEntryParser
+import com.ricordella.app.feature.items.formatCents
+import com.ricordella.app.feature.items.parseCents
 import com.ricordella.app.domain.repository.ItemRepository
 import com.ricordella.app.domain.repository.PersonRepository
 import com.ricordella.app.domain.repository.ReminderRepository
@@ -61,6 +63,15 @@ data class ReminderForm(
     val recurrenceEnd: LocalDate? = null,
     /** Sveglia in pausa fino a questo giorno. */
     val pausedUntil: LocalDate? = null,
+    /** Pagamento a rate: numero, importo (testo del campo), ogni quanti mesi, importo variabile, eliminare un anno dopo la fine. */
+    val installments: Boolean = false,
+    val installmentCount: String = "12",
+    val installmentAmount: String = "",
+    val installmentEvery: Int = 1,
+    val installmentVariable: Boolean = false,
+    val installmentDeleteAfter: Boolean = false,
+    /** Pagamento mensile in un giorno preciso del mese (null = lo stesso giorno della data scelta). */
+    val dayOfMonth: Int? = null,
     /** Ricorrenza contata dall'ultima volta che è stato fatto (le date successive si spostano). */
     val fromLastDone: Boolean = false,
     val personIds: Set<String> = emptySet(),
@@ -81,6 +92,9 @@ data class ReminderForm(
     /** La sveglia deve avere giorno e orario. */
     val timeError: Boolean get() = showErrors && isAlarm && time == null
     /** Una sveglia è sempre di qualcuno: serve almeno una persona. */
+    val isPayment: Boolean get() = type == ReminderType.PAYMENT
+    val installmentError: Boolean get() = showErrors && isPayment && installments &&
+        (installmentCount.toIntOrNull() !in 2..360 || (parseCents(installmentAmount) ?: 0L) <= 0L)
     val personError: Boolean get() = showErrors && isAlarm && personIds.isEmpty()
     val endDateError: Boolean get() = showErrors && multiDay && (endDate == null || date == null || !endDate.isAfter(date))
     val isRecurring: Boolean get() = recurrencePreset != RecurrencePreset.NONE
@@ -187,6 +201,13 @@ class ReminderEditViewModel(
             weekDays = rule?.daysOfWeek.orEmpty(),
             recurrenceEnd = rule?.endDate,
             pausedUntil = reminder.pausedUntil?.takeIf { it.isAfter(time.today()) },
+            installments = reminder.plan != null,
+            installmentCount = (reminder.plan?.count ?: 12).toString(),
+            installmentAmount = reminder.plan?.amounts?.firstOrNull()?.let(::formatCents).orEmpty(),
+            installmentEvery = reminder.plan?.everyMonths ?: 1,
+            installmentVariable = reminder.plan?.variable == true,
+            installmentDeleteAfter = reminder.plan?.deleteAfter == true,
+            dayOfMonth = if (reminder.type == ReminderType.PAYMENT && rule?.frequency == RecurrenceFrequency.MONTHLY) rule.dayOfMonth else null,
             fromLastDone = rule?.fromLastDone == true,
             personIds = entry.people.mapTo(mutableSetOf()) { it.id },
             itemIds = entry.items.mapTo(mutableSetOf()) { it.id },
@@ -230,7 +251,7 @@ class ReminderEditViewModel(
     fun save() {
         val form = _form.value
         val date = form.date
-        val invalid = form.title.isBlank() || date == null || (form.isAlarm && (form.time == null || form.personIds.isEmpty())) ||
+        val invalid = form.title.isBlank() || date == null || (form.isPayment && form.installments && (form.installmentCount.toIntOrNull() !in 2..360 || (parseCents(form.installmentAmount) ?: 0L) <= 0L)) || (form.isAlarm && (form.time == null || form.personIds.isEmpty())) ||
             (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))
         if (invalid || date == null) {
             _form.update { it.copy(showErrors = true, showAdvanced = it.showAdvanced || (it.isAlarm && it.personIds.isEmpty())) }
@@ -263,6 +284,27 @@ class ReminderEditViewModel(
         var date = firstDate
         if (pausedUntil != null && date < pausedUntil) date = pausedUntil
         if (days.isNotEmpty()) while (date.dayOfWeek !in days) date = date.plusDays(1)
+        // Pagamento mensile in un giorno preciso: la prima scadenza è il primo di quei giorni (a fine mese si accorcia).
+        val payDay = form.dayOfMonth?.takeIf { form.isPayment && !form.installments && form.recurrencePreset == RecurrencePreset.MONTHLY }
+        if (payDay != null) {
+            fun at(m: java.time.YearMonth) = m.atDay(minOf(payDay, m.lengthOfMonth()))
+            val m = java.time.YearMonth.from(date)
+            date = at(m).takeIf { !it.isBefore(date) } ?: at(m.plusMonths(1))
+        }
+        // Pagamento a rate: le scadenze le decide il piano (la prossima rata da pagare).
+        var plan: com.ricordella.app.domain.model.InstallmentPlan? = null
+        if (form.isPayment && form.installments) {
+            val count = form.installmentCount.toIntOrNull() ?: 2
+            val cents = parseCents(form.installmentAmount) ?: 0L
+            val old = existing?.plan
+            plan = if (old != null) {
+                old.copy(everyMonths = form.installmentEvery, variable = form.installmentVariable, deleteAfter = form.installmentDeleteAfter)
+                    .resized(count, cents.takeIf { it != old.amounts.firstOrNull() })
+            } else {
+                com.ricordella.app.domain.model.InstallmentPlan.create(date, count, cents, form.installmentEvery, form.installmentVariable, form.installmentDeleteAfter)
+            }
+            date = plan.nextUnpaid()?.let(plan::dueDate) ?: plan.lastDate
+        }
         val base = existing ?: Reminder(title = "", dueDate = date, createdAt = now, updatedAt = now)
         val reminder = base.copy(
             title = form.title.trim(),
@@ -272,6 +314,7 @@ class ReminderEditViewModel(
             birthYear = form.birthYear.toIntOrNull()?.takeIf { form.type == ReminderType.BIRTHDAY && it in 1900..date.year },
             dueTime = form.time,
             pausedUntil = pausedUntil,
+            plan = plan,
             type = form.type,
             description = form.description.trim().ifEmpty { null },
             notes = form.notes.trim().ifEmpty { null },
@@ -283,7 +326,17 @@ class ReminderEditViewModel(
             notificationsEnabled = form.isAlarm || form.notificationsEnabled,
             notifyOffsetMinutes = if (form.isAlarm) 0 else form.notifyOffsetMinutes,
         )
-        return ReminderDraft(reminder, buildRule(form, date), form.personIds, form.itemIds)
+        val rule = if (plan != null) {
+            RecurrenceRule(
+                id = existingRuleId ?: com.ricordella.app.domain.model.newId(),
+                frequency = RecurrenceFrequency.MONTHLY,
+                interval = plan.everyMonths,
+                startDate = date,
+                endDate = plan.lastDate,
+                dayOfMonth = plan.firstDate.dayOfMonth,
+            )
+        } else buildRule(form, date)
+        return ReminderDraft(reminder, rule, form.personIds, form.itemIds)
     }
 
     private fun buildRule(form: ReminderForm, date: LocalDate): RecurrenceRule? {
@@ -300,6 +353,7 @@ class ReminderEditViewModel(
             startDate = date,
             endDate = if (preset == RecurrencePreset.CUSTOM) form.recurrenceEnd else null,
             daysOfWeek = if (preset == RecurrencePreset.CUSTOM && frequency == RecurrenceFrequency.WEEKLY) form.weekDays else emptySet(),
+            dayOfMonth = form.dayOfMonth?.takeIf { form.isPayment && preset == RecurrencePreset.MONTHLY },
             fromLastDone = preset == RecurrencePreset.CUSTOM && form.fromLastDone,
         )
     }

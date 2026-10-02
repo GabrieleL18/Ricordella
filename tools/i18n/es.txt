@@ -1302,3 +1302,33 @@ Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi 
 Quello che spegni resta com'è sul tuo telefono e nel file: non viene cancellato né modificato. ||| Lo que desactivas se queda como está en tu móvil y en el archivo: no se borra ni se modifica.
 Scegli cosa mettere nel file condiviso. Puoi cambiare idea quando vuoi. ||| Elige qué va en el archivo compartido. Puedes cambiar de idea cuando quieras.
 Suonano solo sul telefono della persona a cui sono assegnate. ||| Solo suenan en el móvil de la persona a la que están asignadas.
+%1$s pagati su %2$s ||| %1$s pagados de %2$s
+A rate ||| A plazos
+Anche per le rate successive ||| También para las cuotas siguientes
+Da pagare ||| Por pagar
+Elimina l'evento un anno dopo l'ultima rata ||| Eliminar el evento un año después de la última cuota
+Giorno del mese in cui pagare ||| Día del mes para pagar
+Il %1$s di ogni mese ||| El %1$s de cada mes
+Importo (€) ||| Importe (€)
+Importo per rata (€) ||| Importe por cuota (€)
+Indica da 2 a 360 rate e un importo maggiore di zero. ||| Indica de 2 a 360 cuotas y un importe mayor que cero.
+L'importo cambia tra le rate ||| El importe cambia entre cuotas
+La data scelta qui sopra è la prima rata. ||| La fecha elegida arriba es la primera cuota.
+Lo stesso giorno della data scelta ||| El mismo día que la fecha elegida
+Mostra solo le prossime ||| Mostrar solo las próximas
+Mostra tutte le %1$s rate ||| Mostrar las %1$s cuotas
+Numero di rate ||| Número de cuotas
+Ogni quanto scade una rata ||| Cada cuánto vence una cuota
+Pagata ||| Pagada
+Pagata il %1$s ||| Pagada el %1$s
+Pagate %1$s di %2$s ||| Pagadas %1$s de %2$s
+Poi cambi l'importo di ogni rata nel dettaglio. ||| Luego cambias el importe de cada cuota en el detalle.
+Rata %1$s di %2$s ||| Cuota %1$s de %2$s
+Rata %1$s di %2$s · %3$s ||| Cuota %1$s de %2$s · %3$s
+Rata %1$s · %2$s ||| Cuota %1$s · %2$s
+Rate ||| Cuotas
+Rate finite! ||| ¡Cuotas terminadas!
+Se spento resta nello storico. ||| Si está apagado, queda en el historial.
+Segna da pagare ||| Marcar como por pagar
+Segna pagata ||| Marcar como pagada
+Una volta o ripetuto ||| Una vez o repetido

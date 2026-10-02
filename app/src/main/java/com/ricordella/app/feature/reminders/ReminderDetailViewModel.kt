@@ -1,5 +1,7 @@
 package com.ricordella.app.feature.reminders
 
+import com.ricordella.app.domain.model.ReminderStatus
+import com.ricordella.app.domain.model.InstallmentPlan
 import com.ricordella.app.core.i18n.tr
 
 import androidx.lifecycle.SavedStateHandle
@@ -48,6 +50,7 @@ class ReminderDetailViewModel(
     private val snoozeReminder: SnoozeReminderUseCase,
     private val deleteReminder: DeleteReminderUseCase,
     private val time: TimeSource,
+    private val scheduler: com.ricordella.app.domain.ReminderScheduler,
 ) : ViewModel() {
 
     private val reminderId = savedStateHandle.toRoute<ReminderDetailRoute>().id
@@ -62,6 +65,33 @@ class ReminderDetailViewModel(
     ) { entry, completions, files, now, local ->
         local.copy(isLoading = false, entry = entry, completions = completions, attachments = files, now = now)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ReminderDetailUiState())
+
+    /** Cambia il piano a rate e riallinea scadenza e stato: la prossima rata da pagare, o completato se sono tutte pagate. */
+    private fun changePlan(transform: (InstallmentPlan) -> InstallmentPlan) = launchAction(null) {
+        val reminder = reminders.getReminder(reminderId)?.reminder ?: return@launchAction
+        val plan = transform(reminder.plan ?: return@launchAction)
+        val next = plan.nextUnpaid()
+        val now = time.now()
+        reminders.update(
+            reminder.copy(
+                plan = plan,
+                dueDate = next?.let(plan::dueDate) ?: reminder.dueDate,
+                status = if (next == null) ReminderStatus.COMPLETED else ReminderStatus.ACTIVE,
+                completedAt = if (next == null) reminder.completedAt ?: now else null,
+                lastNotifiedAt = if (next != null && reminder.status == ReminderStatus.COMPLETED) now else reminder.lastNotifiedAt,
+                updatedAt = now,
+            ),
+        )
+        scheduler.refresh()
+    }
+
+    fun onPayInstallment(index: Int) = changePlan { it.pay(index, time.today()) }
+
+    fun onUnpayInstallment(index: Int) = changePlan { it.unpay(index) }
+
+    fun onInstallmentAmount(index: Int, cents: Long, following: Boolean) = changePlan { it.withAmount(index, cents, following) }
+
+    fun onDeleteAfter(value: Boolean) = changePlan { it.copy(deleteAfter = value) }
 
     fun onComplete() = launchAction(tr("Completato")) { completeReminder(reminderId) }
 

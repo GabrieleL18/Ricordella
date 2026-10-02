@@ -107,7 +107,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
     val viewModel = appViewModel { c, handle ->
         ReminderDetailViewModel(
             handle, c.reminderRepository, c.attachmentRepository, c.completeReminder,
-            c.reopenReminder, c.snoozeReminder, c.deleteReminder, c.time,
+            c.reopenReminder, c.snoozeReminder, c.deleteReminder, c.time, c.reminderScheduler,
         )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -166,6 +166,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
         ) {
             Header(entry, state.now)
             Details(entry, state.now)
+            entry.reminder.plan?.let { plan -> PlanSection(entry.reminder.id, plan, viewModel) }
             Links(entry, navigator)
             AttachmentsSection(
                 title = tr("Allegati"),
