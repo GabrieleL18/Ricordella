@@ -84,7 +84,8 @@ import kotlinx.coroutines.launch
 data class CalendarImportState(
     val permissionDenied: Boolean = false,
     val accounts: List<CalendarImporter.Account>? = null,
-    val selected: CalendarImporter.Account? = null,
+    val selected: Set<CalendarImporter.Account> = emptySet(),
+    val mode: CalendarImporter.ConflictMode = CalendarImporter.ConflictMode.SKIP,
     val importing: Boolean = false,
     val imported: Int? = null,
     val error: Boolean = false,
@@ -105,17 +106,20 @@ class CalendarImportViewModel(
         }
         viewModelScope.launch {
             val accounts = runCatching { importer.accounts() }.getOrDefault(emptyList())
-            _state.update { it.copy(permissionDenied = false, accounts = accounts, selected = accounts.firstOrNull()) }
+            _state.update { it.copy(permissionDenied = false, accounts = accounts, selected = accounts.take(1).toSet()) }
         }
     }
 
-    fun select(account: CalendarImporter.Account) = _state.update { it.copy(selected = account) }
+    /** Si possono scegliere più account: tocca per aggiungere o togliere. */
+    fun toggle(account: CalendarImporter.Account) = _state.update { it.copy(selected = if (account in it.selected) it.selected - account else it.selected + account) }
+
+    fun setMode(mode: CalendarImporter.ConflictMode) = _state.update { it.copy(mode = mode) }
 
     fun import() {
-        val account = _state.value.selected ?: return
+        val accounts = _state.value.selected.toList().ifEmpty { return }
         _state.update { it.copy(importing = true, error = false) }
         viewModelScope.launch {
-            val count = runCatching { importer.import(account) }.getOrNull()
+            val count = runCatching { importer.import(accounts, _state.value.mode) }.getOrNull()
             _state.update { it.copy(importing = false, imported = count, error = count == null) }
         }
     }
@@ -242,7 +246,7 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                     Text(tr("Senza il permesso al calendario non posso importare. Puoi farlo più tardi dalle Impostazioni."), textAlign = TextAlign.Center)
                 }
                 PushButton(
-                    tr("Scegli l'account"),
+                    tr("Scegli i calendari"),
                     onClick = { permission.launch(Manifest.permission.READ_CALENDAR) },
                     icon = Icons.Rounded.CalendarMonth,
                     modifier = Modifier.fillMaxWidth(),
@@ -250,20 +254,45 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
             }
             accounts.isEmpty() -> Text(tr("Sul telefono non ci sono calendari da importare."), textAlign = TextAlign.Center)
             else -> {
+                val colors = MaterialTheme.ricordellaColors
+                Text(tr("Da quali calendari? Puoi sceglierne più di uno."), style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
                 accounts.forEach { account ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .selectable(selected = account == state.selected, role = Role.RadioButton) { viewModel.select(account) }
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(selected = account == state.selected, onClick = null)
-                        Text(account.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 8.dp))
-                    }
+                    com.ricordella.app.feature.settings.ModeTile(
+                        icon = Icons.Rounded.CalendarMonth,
+                        title = account.label,
+                        body = if (account.isGoogle) tr("Account Google") else tr("Calendario del telefono"),
+                        tone = colors.cyan,
+                        selected = account in state.selected,
+                        onClick = { viewModel.toggle(account) },
+                    )
                 }
+                Text(tr("Se un evento c'è già (stesso titolo e giorno)"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceS))
+                com.ricordella.app.feature.settings.ModeTile(
+                    icon = Icons.Rounded.Check,
+                    title = tr("Tengo il mio"),
+                    body = tr("Salto quello del calendario: niente doppioni."),
+                    tone = colors.mint,
+                    selected = state.mode == CalendarImporter.ConflictMode.SKIP,
+                    onClick = { viewModel.setMode(CalendarImporter.ConflictMode.SKIP) },
+                )
+                com.ricordella.app.feature.settings.ModeTile(
+                    icon = Icons.Rounded.Download,
+                    title = tr("Sostituisco con quello del calendario"),
+                    body = tr("Il mio finisce nel Cestino per 7 giorni, poi lo recuperi se serve."),
+                    tone = colors.lavender,
+                    selected = state.mode == CalendarImporter.ConflictMode.REPLACE,
+                    onClick = { viewModel.setMode(CalendarImporter.ConflictMode.REPLACE) },
+                )
+                com.ricordella.app.feature.settings.ModeTile(
+                    icon = Icons.Rounded.CalendarMonth,
+                    title = tr("Tengo tutti e due"),
+                    body = tr("Importo comunque: l'evento comparirà due volte."),
+                    tone = colors.pear,
+                    selected = state.mode == CalendarImporter.ConflictMode.KEEP_BOTH,
+                    onClick = { viewModel.setMode(CalendarImporter.ConflictMode.KEEP_BOTH) },
+                )
                 if (state.error) Text(tr("Import non riuscito, riprova."), color = MaterialTheme.colorScheme.error)
-                PushButton(tr("Importa eventi"), onClick = viewModel::import, icon = Icons.Rounded.Download, modifier = Modifier.fillMaxWidth())
+                PushButton(tr("Importa eventi"), onClick = viewModel::import, enabled = state.selected.isNotEmpty(), icon = Icons.Rounded.Download, modifier = Modifier.fillMaxWidth())
             }
         }
         TextButton(onClick = onDone, enabled = !state.importing) { Text(tr("Salta per ora")) }

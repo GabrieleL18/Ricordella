@@ -254,6 +254,9 @@ abstract class ReminderDao {
     @Query("SELECT COUNT(*) FROM reminder WHERE title = :title AND dueDate = :date")
     abstract suspend fun countSame(title: String, date: LocalDate): Int
 
+    @Query("SELECT id FROM reminder WHERE title = :title AND dueDate = :date")
+    abstract suspend fun findSameIds(title: String, date: LocalDate): List<String>
+
     @Transaction
     open suspend fun deleteAllWithDependencies(ids: List<String>) {
         ids.forEach { deleteWithDependencies(it) }

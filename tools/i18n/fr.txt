@@ -1270,3 +1270,20 @@ Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per 
 Scegli quale ripristinare: ti chiedo conferma prima di sostituire i dati. ||| Choisis laquelle restaurer : je demande confirmation avant de remplacer les données.
 Scegli una cartella su Drive: così non perdi i dati se cambi telefono. Se non la scegli, le copie restano sul telefono. ||| Choisis un dossier sur Drive : tu ne perds pas tes données si tu changes de téléphone. Sinon, les copies restent sur le téléphone.
 Smetti di usare la cartella ||| Ne plus utiliser le dossier
+Account Google ||| Compte Google
+Chi, quanto, ogni quanto ||| Qui, combien, tous les combien
+Da quali calendari? Puoi sceglierne più di uno. ||| Quels calendriers ? Tu peux en choisir plusieurs.
+Il mio finisce nel Cestino per 7 giorni, poi lo recuperi se serve. ||| Le mien va dans la Corbeille pendant 7 jours, tu peux le récupérer si besoin.
+Importo comunque: l'evento comparirà due volte. ||| J'importe quand même : l'événement apparaîtra deux fois.
+Inizio e fine ||| Début et fin
+La cronologia ||| L'historique
+Nel calendario ||| Dans le calendrier
+Salto quello del calendario: niente doppioni. ||| Je saute celui du calendrier : pas de doublons.
+Scegli i calendari ||| Choisir les calendriers
+Se un evento c'è già (stesso titolo e giorno) ||| Si un événement existe déjà (même titre et même jour)
+Se è in ritardo ||| En cas de retard
+Solo su questo telefono ||| Seulement sur ce téléphone
+Solo sul tuo telefono ||| Seulement sur ton téléphone
+Sostituisco con quello del calendario ||| Remplacer par celui du calendrier
+Tengo il mio ||| Garder le mien
+Tengo tutti e due ||| Garder les deux

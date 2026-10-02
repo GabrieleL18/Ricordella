@@ -276,7 +276,7 @@ private fun SyncModeTiles(automatic: Boolean, onChange: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun ModeTile(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String, tone: com.ricordella.app.core.ui.theme.Tone, selected: Boolean, onClick: () -> Unit) {
+internal fun ModeTile(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String, tone: com.ricordella.app.core.ui.theme.Tone, selected: Boolean, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()

@@ -1,5 +1,7 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Delete
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.animation.animateColorAsState
@@ -64,6 +66,23 @@ import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.Priority
+
+/** In fondo ai dettagli: «Modifica» (giallo, come le azioni principali) e «Elimina» (rosso), entrambi pulsanti push dell'app. */
+@Composable
+fun EditDeleteRow(onEdit: () -> Unit, onDelete: () -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceXl), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+        PushButton(tr("Modifica"), onClick = onEdit, icon = androidx.compose.material.icons.Icons.Rounded.Edit, modifier = Modifier.weight(1f))
+        PushButton(
+            tr("Elimina"),
+            onClick = onDelete,
+            icon = androidx.compose.material.icons.Icons.Rounded.Delete,
+            face = MaterialTheme.colorScheme.error,
+            content = MaterialTheme.colorScheme.onError,
+            edge = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
 
 @Composable
 fun SectionHeader(

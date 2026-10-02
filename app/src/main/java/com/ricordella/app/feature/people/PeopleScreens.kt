@@ -405,6 +405,7 @@ fun PersonDetailScreen(navigator: AppNavigator) {
                 SectionHeader(tr("Cose"))
                 state.items.forEach { entry -> ItemCard(entry, onClick = { navigator.openItem(entry.item.id) }) }
             }
+            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editPerson(person.id) }, onDelete = { confirmDelete = true })
         }
     }
 

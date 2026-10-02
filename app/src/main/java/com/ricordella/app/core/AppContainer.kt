@@ -119,5 +119,5 @@ class AppContainer(context: Context) {
     val potionReminders = com.ricordella.app.core.notifications.PotionReminders(appContext, settingsRepository, time)
     val cycleReminders = com.ricordella.app.core.notifications.CycleReminders(appContext, settingsRepository, personRepository, time)
     val autoBackup = com.ricordella.app.core.notifications.AutoBackup(appContext, settingsRepository, housekeeping, backupRepository, time)
-    val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time)
+    val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time, trash)
 }

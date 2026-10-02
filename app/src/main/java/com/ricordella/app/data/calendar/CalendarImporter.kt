@@ -31,7 +31,11 @@ class CalendarImporter(
     private val saveReminder: SaveReminderUseCase,
     private val reminderDao: ReminderDao,
     private val time: TimeSource,
+    private val trash: com.ricordella.app.data.trash.Trash? = null,
 ) {
+    /** Cosa fare quando un evento c'è già (stesso titolo, stesso giorno). */
+    enum class ConflictMode { SKIP, REPLACE, KEEP_BOTH }
+
     private val resolver get() = context.contentResolver
 
     /** Tipo di calendario Google, riconosciuto dall'indirizzo del proprietario. */
@@ -77,11 +81,23 @@ class CalendarImporter(
     }
 
     /** Importa i prossimi 12 mesi; restituisce quanti promemoria sono stati creati. */
-    suspend fun import(account: Account): Int {
-        val drafts = withContext(Dispatchers.IO) { readEvents(account) }
-            .filter { reminderDao.countSame(it.reminder.title, it.reminder.dueDate) == 0 }
-        drafts.forEach { saveReminder(it) }
-        return drafts.size
+    suspend fun import(accounts: List<Account>, mode: ConflictMode): Int {
+        var count = 0
+        for (draft in withContext(Dispatchers.IO) { accounts.flatMap { readEvents(it) } }) {
+            val same = reminderDao.findSameIds(draft.reminder.title, draft.reminder.dueDate)
+            when {
+                same.isEmpty() || mode == ConflictMode.KEEP_BOTH -> Unit
+                mode == ConflictMode.SKIP -> continue
+                else -> {
+                    // Sostituisce: quello che c'era finisce nel Cestino, si può recuperare.
+                    trash?.saveReminders(same)
+                    reminderDao.deleteAllWithDependencies(same)
+                }
+            }
+            saveReminder(draft)
+            count++
+        }
+        return count
     }
 
     private fun readCalendars(account: Account): Map<Long, SourceCalendar> {

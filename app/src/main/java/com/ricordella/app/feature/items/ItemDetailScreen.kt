@@ -227,6 +227,7 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 SectionHeader(tr("Note"))
                 Text(it, style = MaterialTheme.typography.bodyLarge)
             }
+            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editItem(entry.item.id) }, onDelete = { confirmDelete = true })
         }
 
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {

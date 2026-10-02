@@ -1345,3 +1345,20 @@ Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per 
 Scegli quale ripristinare: ti chiedo conferma prima di sostituire i dati. ||| Choose which one to restore: I'll ask for confirmation before replacing the data.
 Scegli una cartella su Drive: così non perdi i dati se cambi telefono. Se non la scegli, le copie restano sul telefono. ||| Choose a folder on Drive: that way you won't lose your data if you change phone. If you don't, copies stay on the phone.
 Smetti di usare la cartella ||| Stop using the folder
+Account Google ||| Google account
+Chi, quanto, ogni quanto ||| Who, how long, how often
+Da quali calendari? Puoi sceglierne più di uno. ||| Which calendars? You can pick more than one.
+Il mio finisce nel Cestino per 7 giorni, poi lo recuperi se serve. ||| Mine goes to the Trash for 7 days, then you can recover it if needed.
+Importo comunque: l'evento comparirà due volte. ||| I import anyway: the event will appear twice.
+Inizio e fine ||| Start and end
+La cronologia ||| The history
+Nel calendario ||| In the calendar
+Salto quello del calendario: niente doppioni. ||| I skip the calendar's one: no duplicates.
+Scegli i calendari ||| Choose calendars
+Se un evento c'è già (stesso titolo e giorno) ||| If an event already exists (same title and day)
+Se è in ritardo ||| If it's late
+Solo su questo telefono ||| Only on this phone
+Solo sul tuo telefono ||| Only on your phone
+Sostituisco con quello del calendario ||| Replace with the calendar's one
+Tengo il mio ||| Keep mine
+Tengo tutti e due ||| Keep both

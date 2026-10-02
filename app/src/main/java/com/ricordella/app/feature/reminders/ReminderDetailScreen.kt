@@ -175,15 +175,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             if (state.completions.isNotEmpty()) CompletionHistory(state.completions)
-            OutlinedButton(
-                onClick = { showDeleteConfirm = true },
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
-                modifier = Modifier.fillMaxWidth().padding(top = RicordellaDimensions.spaceM),
-            ) {
-                Icon(Icons.Rounded.Delete, contentDescription = null)
-                Text(tr("Elimina"), modifier = Modifier.padding(start = 8.dp))
-            }
+            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editReminder(entry.reminder.id) }, onDelete = { showDeleteConfirm = true })
         }
     }
 

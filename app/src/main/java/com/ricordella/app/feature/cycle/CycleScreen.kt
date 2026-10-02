@@ -6,6 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.rounded.Check
+import com.ricordella.app.core.ui.HappyWizard
+import com.ricordella.app.core.ui.TutorialDialog
+import com.ricordella.app.core.ui.TutorialPage
+import com.ricordella.app.core.ui.WizardScene
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -152,24 +158,37 @@ fun CycleScreen(onBack: () -> Unit) {
             onDismiss = { deleting = null },
         )
     }
-    if (help) {
-        AlertDialog(
-            onDismissRequest = { help = false },
-            title = { Text(tr("Come funziona il ciclo")) },
-            text = {
-                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(tr("Scegli la persona (il ciclo è sempre di qualcuno), quanti giorni dura la mestruazione, ogni quanti giorni torna il ciclo e quando è iniziata l'ultima."))
-                    Text(tr("Nel calendario i giorni hanno una goccia di sangue: piena se è già successo, chiara se è solo una previsione. Per i giorni previsti non arrivano notifiche."))
-                    Text(tr("Quando inizia tocca «È iniziato oggi»: la previsione riparte da quel giorno. Quando finisce tocca «È finito oggi»; se non lo fai vale la durata che hai indicato."))
-                    Text(tr("Per ogni persona tengo la cronologia degli ultimi 2 anni, con la lunghezza di ogni ciclo."))
-                    Text(tr("Se il ciclo è in ritardo ti avviso alle 9 del giorno dopo la data prevista e poi dopo una settimana. L'avviso è acceso di default solo per il ciclo di chi usa l'app (la persona «Io sono» nelle Impostazioni › Condivisione) o per il primo che crei; per gli altri lo accendi tu."))
-                    Text(tr("I dati restano su questo telefono e non vanno nel file condiviso. Sono previsioni indicative: non sostituiscono un parere medico e non sono un metodo contraccettivo."))
-                }
-            },
-            confirmButton = { TextButton(onClick = { help = false }) { Text(tr("Ho capito")) } },
-        )
-    }
+    if (help) TutorialDialog(CyclePages, onDismiss = { help = false })
 }
+
+/** Come funziona il ciclo: pagine animate come gli altri tutorial dell'app. */
+private val CyclePages: List<TutorialPage>
+    get() = listOf(
+        TutorialPage(
+            tr("Chi, quanto, ogni quanto"),
+            tr("Scegli la persona (il ciclo è sempre di qualcuno), quanti giorni dura la mestruazione, ogni quanti giorni torna il ciclo e quando è iniziata l'ultima."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.READING) },
+        TutorialPage(
+            tr("Nel calendario"),
+            tr("Nel calendario i giorni hanno una goccia di sangue: piena se è già successo, chiara se è solo una previsione. Per i giorni previsti non arrivano notifiche."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.CONJURING) },
+        TutorialPage(
+            tr("Inizio e fine"),
+            tr("Quando inizia tocca «È iniziato oggi»: la previsione riparte da quel giorno. Quando finisce tocca «È finito oggi»; se non lo fai vale la durata che hai indicato."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.WAITING_BELL) },
+        TutorialPage(
+            tr("La cronologia"),
+            tr("Per ogni persona tengo la cronologia degli ultimi 2 anni, con la lunghezza di ogni ciclo."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.SEARCHING) },
+        TutorialPage(
+            tr("Se è in ritardo"),
+            tr("Se il ciclo è in ritardo ti avviso alle 9 del giorno dopo la data prevista e poi dopo una settimana. L'avviso è acceso di default solo per il ciclo di chi usa l'app (la persona «Io sono» nelle Impostazioni › Condivisione) o per il primo che crei; per gli altri lo accendi tu."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.PHONE_CALL) },
+        TutorialPage(
+            tr("Solo sul tuo telefono"),
+            tr("I dati restano su questo telefono e non vanno nel file condiviso. Sono previsioni indicative: non sostituiscono un parere medico e non sono un metodo contraccettivo."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.TV) },
+    )
 
 @Composable
 private fun ProfileCard(
@@ -255,54 +274,72 @@ private fun SetupDialog(
     var cycleDays by remember { mutableStateOf(existing?.cycleDays ?: 28) }
     var lastStart by remember { mutableStateOf<LocalDate?>(null) }
     var notify by remember { mutableStateOf(existing?.notifyLate ?: people.firstOrNull()?.let(notifyByDefault) ?: false) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (existing == null) tr("Nuovo ciclo") else tr("Modifica il ciclo")) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                DropdownField(
-                    label = tr("Di chi è *"),
-                    options = people,
-                    selected = person ?: people.firstOrNull() ?: return@Column,
-                    optionLabel = { it.displayName },
-                    onSelected = { chosen -> person = chosen; if (existing == null) notify = notifyByDefault(chosen) },
-                )
-                DropdownField(
-                    label = tr("Quanti giorni dura la mestruazione"),
-                    options = (1..10).toList(),
-                    selected = periodDays,
-                    optionLabel = { trf("%1\$s giorni", it) },
-                    onSelected = { periodDays = it },
-                )
-                DropdownField(
-                    label = tr("Ogni quanti giorni torna il ciclo"),
-                    options = (20..45).toList(),
-                    selected = cycleDays,
-                    optionLabel = { trf("%1\$s giorni", it) },
-                    onSelected = { cycleDays = it },
-                )
-                if (existing == null) {
-                    DateField(
-                        label = tr("Quando è iniziata l'ultima *"),
-                        value = lastStart,
-                        onValueChange = { lastStart = it },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text(tr("Avvisami se è in ritardo"), style = MaterialTheme.typography.bodyLarge)
+    val tone = MaterialTheme.ricordellaColors.coral
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        androidx.compose.material3.Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surface) {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Row(
+                    Modifier.fillMaxWidth().background(tone.container).padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    androidx.compose.foundation.layout.Box(
+                        Modifier.size(48.dp).background(tone.solid, androidx.compose.foundation.shape.CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(Icons.Rounded.WaterDrop, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(26.dp))
                     }
-                    Switch(checked = notify, onCheckedChange = { notify = it })
+                    Column {
+                        Text(if (existing == null) tr("Nuovo ciclo") else tr("Modifica il ciclo"), style = MaterialTheme.typography.titleLarge, color = tone.content)
+                        Text(tr("Solo su questo telefono"), style = MaterialTheme.typography.bodySmall, color = tone.content.copy(alpha = 0.8f))
+                    }
+                }
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+                    DropdownField(
+                        label = tr("Di chi è *"),
+                        options = people,
+                        selected = person ?: people.firstOrNull() ?: return@Column,
+                        optionLabel = { it.displayName },
+                        onSelected = { chosen -> person = chosen; if (existing == null) notify = notifyByDefault(chosen) },
+                    )
+                    DropdownField(
+                        label = tr("Quanti giorni dura la mestruazione"),
+                        options = (1..10).toList(),
+                        selected = periodDays,
+                        optionLabel = { trf("%1\$s giorni", it) },
+                        onSelected = { periodDays = it },
+                    )
+                    DropdownField(
+                        label = tr("Ogni quanti giorni torna il ciclo"),
+                        options = (20..45).toList(),
+                        selected = cycleDays,
+                        optionLabel = { trf("%1\$s giorni", it) },
+                        onSelected = { cycleDays = it },
+                    )
+                    if (existing == null) {
+                        DateField(
+                            label = tr("Quando è iniziata l'ultima *"),
+                            value = lastStart,
+                            onValueChange = { lastStart = it },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(tr("Avvisami se è in ritardo"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                        Switch(checked = notify, onCheckedChange = { notify = it })
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(onClick = onDismiss) { Text(tr("Annulla")) }
+                        PushButton(
+                            text = tr("Salva"),
+                            icon = androidx.compose.material.icons.Icons.Rounded.Check,
+                            enabled = person != null && (existing != null || lastStart != null),
+                            onClick = { person?.let { onSave(CycleProfile(it.id, periodDays, cycleDays, notify), lastStart) } },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(
-                enabled = person != null && (existing != null || lastStart != null),
-                onClick = { person?.let { onSave(CycleProfile(it.id, periodDays, cycleDays, notify), lastStart) } },
-            ) { Text(tr("Salva")) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
-    )
+        }
+    }
 }
