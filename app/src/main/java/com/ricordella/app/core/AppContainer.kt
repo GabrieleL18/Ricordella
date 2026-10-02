@@ -60,9 +60,10 @@ class AppContainer(context: Context) {
     private val database = RicordellaDatabase.create(appContext, databaseFileName)
 
     val reminderRepository = RoomReminderRepository(database.reminderDao())
-    val personRepository = RoomPersonRepository(database.personDao())
+    val trash = com.ricordella.app.data.trash.Trash(appContext, database.backupDao())
+    val personRepository = RoomPersonRepository(database.personDao(), trash)
     val itemRepository = RoomItemRepository(database.itemDao(), database.personDao())
-    val maintenanceRepository = RoomMaintenanceRepository(database.maintenanceDao())
+    val maintenanceRepository = RoomMaintenanceRepository(database.maintenanceDao(), trash)
     val attachmentRepository = RoomAttachmentRepository(database.attachmentDao())
     val settingsRepository = DataStoreSettingsRepository(if (isDemo) appContext.demoSettingsDataStore else appContext.settingsDataStore)
 
@@ -83,9 +84,9 @@ class AppContainer(context: Context) {
     val reopenReminder = ReopenReminderUseCase(reminderRepository, reminderScheduler, time)
     val undoCompletion = UndoCompletionUseCase(reminderRepository, reminderScheduler, time)
     val snoozeReminder = SnoozeReminderUseCase(reminderRepository, settingsRepository, reminderScheduler, time)
-    val deleteReminder = DeleteReminderUseCase(reminderRepository, reminderScheduler)
+    val deleteReminder = DeleteReminderUseCase(reminderRepository, reminderScheduler, trash)
     val saveItem = SaveItemUseCase(itemRepository, reminderRepository, settingsRepository, saveReminder, time)
-    val deleteItem = DeleteItemUseCase(itemRepository, reminderScheduler)
+    val deleteItem = DeleteItemUseCase(itemRepository, reminderScheduler, trash)
     val addMaintenanceRecord =
         AddMaintenanceRecordUseCase(maintenanceRepository, itemRepository, settingsRepository, saveReminder, time)
     val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository)
@@ -111,7 +112,7 @@ class AppContainer(context: Context) {
         undoCompletion.guard = guard
         saveItem.guard = guard
     }
-    val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time)
+    val housekeeping = Housekeeping(backupRepository, database.reminderDao(), settingsRepository, reminderScheduler, time, trash)
     val developerTools = DeveloperTools(
         appContext, applicationScope, notifier, reminderScheduler, settingsRepository, housekeeping, saveReminder, personRepository, itemRepository, time, databaseFileName,
     )

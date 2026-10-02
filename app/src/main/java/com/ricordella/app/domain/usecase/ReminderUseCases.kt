@@ -186,8 +186,10 @@ class SnoozeReminderUseCase(
 class DeleteReminderUseCase(
     private val reminders: ReminderRepository,
     private val scheduler: ReminderScheduler,
+    private val trash: com.ricordella.app.data.trash.Trash? = null,
 ) {
     suspend operator fun invoke(reminderId: String) {
+        trash?.saveReminders(listOf(reminderId))
         reminders.delete(reminderId)
         scheduler.dismissNotification(reminderId)
         scheduler.refresh()

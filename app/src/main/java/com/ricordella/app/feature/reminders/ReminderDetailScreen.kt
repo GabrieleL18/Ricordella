@@ -190,7 +190,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
     if (showDeleteConfirm) {
         ConfirmDialog(
             title = tr("Eliminare il promemoria?"),
-            message = tr("Il promemoria e il suo storico verranno eliminati definitivamente. Le persone e le cose collegate non vengono toccate."),
+            message = tr("Il promemoria e il suo storico vanno nel Cestino per 7 giorni, poi vengono eliminati. Le persone e le cose collegate non vengono toccate."),
             confirmLabel = tr("Elimina"),
             destructive = true,
             onConfirm = viewModel::onDelete,

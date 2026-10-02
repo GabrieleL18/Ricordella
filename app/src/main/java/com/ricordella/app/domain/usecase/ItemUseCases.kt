@@ -108,8 +108,10 @@ class SaveItemUseCase(
 class DeleteItemUseCase(
     private val items: ItemRepository,
     private val scheduler: ReminderScheduler,
+    private val trash: com.ricordella.app.data.trash.Trash? = null,
 ) {
     suspend operator fun invoke(itemId: String) {
+        trash?.saveItem(itemId)
         items.delete(itemId)
         scheduler.refresh()
     }

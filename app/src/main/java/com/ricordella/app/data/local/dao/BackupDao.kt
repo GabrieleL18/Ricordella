@@ -2,6 +2,7 @@ package com.ricordella.app.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.ricordella.app.data.backup.BackupDatabaseContent
@@ -44,6 +45,38 @@ abstract class BackupDao {
     @Insert abstract suspend fun insertReminderPeople(values: List<ReminderPersonCrossRef>)
     @Insert abstract suspend fun insertReminderItems(values: List<ReminderItemCrossRef>)
     @Insert abstract suspend fun insertPersonItems(values: List<PersonItemCrossRef>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignorePeople(values: List<Person>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreItems(values: List<Item>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreRecurrenceRules(values: List<RecurrenceRule>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreReminders(values: List<Reminder>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreCompletions(values: List<ReminderCompletion>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreMaintenance(values: List<MaintenanceRecord>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreAttachments(values: List<Attachment>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreReminderPeople(values: List<ReminderPersonCrossRef>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignoreReminderItems(values: List<ReminderItemCrossRef>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) abstract suspend fun ignorePersonItems(values: List<PersonItemCrossRef>)
+
+    /**
+     * Rimette nel database una parte dei dati (dal cestino) senza toccare il resto: ciò che esiste già si salta
+     * e i collegamenti verso persone, cose o promemoria ormai spariti vengono ignorati.
+     */
+    @Transaction
+    open suspend fun restoreSubset(c: BackupDatabaseContent) {
+        ignorePeople(c.people)
+        val peopleIds = people().mapTo(HashSet()) { it.id }
+        ignoreItems(c.items)
+        val itemIds = items().mapTo(HashSet()) { it.id }
+        ignoreRecurrenceRules(c.recurrenceRules)
+        ignoreReminders(c.reminders)
+        val reminderIds = reminders().mapTo(HashSet()) { it.id }
+        ignoreCompletions(c.completions.filter { it.reminderId in reminderIds })
+        ignoreMaintenance(c.maintenance.filter { it.itemId in itemIds })
+        ignoreAttachments(c.attachments)
+        ignoreReminderPeople(c.reminderPeople.filter { it.reminderId in reminderIds && it.personId in peopleIds })
+        ignoreReminderItems(c.reminderItems.filter { it.reminderId in reminderIds && it.itemId in itemIds })
+        ignorePersonItems(c.personItems.filter { it.personId in peopleIds && it.itemId in itemIds })
+    }
 
     @Query("DELETE FROM reminder_person") abstract suspend fun clearReminderPeople()
     @Query("DELETE FROM reminder_item") abstract suspend fun clearReminderItems()

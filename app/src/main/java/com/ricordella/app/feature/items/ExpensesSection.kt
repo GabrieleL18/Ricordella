@@ -255,7 +255,7 @@ private fun RecordRow(profile: ExpenseProfile, record: MaintenanceRecord, isLast
     if (confirm) {
         ConfirmDialog(
             title = tr("Eliminare la voce?"),
-            message = trf("\"%1\$s\" verrà rimosso dallo storico.", record.title),
+            message = trf("\"%1\$s\" verrà rimosso dallo storico. ", record.title) + tr("Lo ritrovi nel Cestino (Impostazioni) per 7 giorni."),
             confirmLabel = tr("Elimina"),
             destructive = true,
             onConfirm = onDelete,

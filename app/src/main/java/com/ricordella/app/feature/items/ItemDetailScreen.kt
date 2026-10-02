@@ -296,7 +296,8 @@ fun ItemDetailScreen(navigator: AppNavigator) {
         ConfirmDialog(
             title = tr("Eliminare questa cosa?"),
             message = tr("Verranno eliminati anche lo storico delle manutenzioni e il promemoria della garanzia. ") +
-                tr("Gli altri promemoria restano. Se vuoi solo nasconderla, usa \"Archivia\"."),
+                tr("Gli altri promemoria restano. Se vuoi solo nasconderla, usa \"Archivia\". ") +
+                tr("Lo ritrovi nel Cestino (Impostazioni) per 7 giorni."),
             confirmLabel = tr("Elimina"),
             destructive = true,
             onConfirm = viewModel::onDelete,

@@ -25,6 +25,7 @@ class Housekeeping(
     private val settings: SettingsRepository,
     private val scheduler: ReminderScheduler,
     private val time: TimeSource,
+    private val trash: com.ricordella.app.data.trash.Trash,
 ) {
 
     /** Crea il backup da condividere e fa ripartire il conteggio. */
@@ -142,6 +143,7 @@ class Housekeeping(
     }
 
     suspend fun cleanup(ids: List<String>) {
+        trash.saveReminders(ids)
         reminderDao.deleteAllWithDependencies(ids)
         ids.forEach(scheduler::dismissNotification)
         scheduler.refresh()

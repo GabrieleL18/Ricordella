@@ -1302,3 +1302,22 @@ Acqua della settimana ||| Water this week
 Nelle Pozioni il recap degli ultimi 7 giorni, con media e obiettivi raggiunti. ||| In Potions, a recap of the last 7 days, with average and goals reached.
 Più comodo ||| More convenient
 I numeri della Home portano alla sezione, «Scrivi al volo» si cancella e si modifica, Elimina è ben visibile e le notifiche si aprono senza errori. ||| The Home numbers jump to their section, "Quick add" can be cleared and edited, Delete is easy to see and notifications open without errors.
+"%1$s" verrà rimosso dallo storico.  ||| "%1$s" will be removed from the history. 
+%1$s e altri %2$s ||| %1$s and %2$s more
+%1$s · eliminato il %2$s · ancora %3$s giorni ||| %1$s · deleted on %2$s · %3$s days left
+Cestino ||| Trash
+Elimina ora ||| Delete now
+Eliminare per sempre? ||| Delete forever?
+Elimino %1$s promemoria. Li ritrovi nel Cestino per 7 giorni, poi vengono eliminati. ||| I'll delete %1$s reminders. You'll find them in the Trash for 7 days, then they're deleted.
+Gli altri promemoria restano. Se vuoi solo nasconderla, usa "Archivia".  ||| Other reminders stay. If you only want to hide it, use "Archive". 
+Il cestino è vuoto ||| The trash is empty
+Il promemoria e il suo storico vanno nel Cestino per 7 giorni, poi vengono eliminati. Le persone e le cose collegate non vengono toccate. ||| The reminder and its history go to the Trash for 7 days, then they're deleted. Linked people and things aren't touched.
+Lo ritrovi nel Cestino (Impostazioni) per 7 giorni. ||| You'll find it in the Trash (Settings) for 7 days.
+Non potrai più recuperarlo. ||| You won't be able to recover it.
+Non è stato possibile recuperarlo ||| Couldn't recover it
+Promemoria, cose, persone e interventi eliminati restano qui %1$s giorni: puoi recuperarli. Poi vengono cancellati definitivamente. ||| Deleted reminders, things, people and services stay here for %1$s days: you can recover them. Then they're permanently deleted.
+Quando elimini qualcosa lo trovi qui per una settimana. ||| When you delete something you'll find it here for a week.
+Recupera ||| Recover
+Recupera ciò che hai eliminato negli ultimi 7 giorni. ||| Recover what you deleted in the last 7 days.
+Recuperato ✓ ||| Recovered ✓
+Se vuoi solo nasconderla, usa "Archivia".  ||| If you only want to hide them, use "Archive". 

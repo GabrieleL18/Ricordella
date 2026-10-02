@@ -1227,3 +1227,22 @@ Acqua della settimana ||| Wasser der Woche
 Nelle Pozioni il recap degli ultimi 7 giorni, con media e obiettivi raggiunti. ||| In den Tränken die Übersicht der letzten 7 Tage, mit Durchschnitt und erreichten Zielen.
 Più comodo ||| Praktischer
 I numeri della Home portano alla sezione, «Scrivi al volo» si cancella e si modifica, Elimina è ben visibile e le notifiche si aprono senza errori. ||| Die Zahlen auf dem Start führen zum Bereich, die Schnelleingabe lässt sich löschen und bearbeiten, Löschen ist gut sichtbar und Benachrichtigungen öffnen sich ohne Fehler.
+"%1$s" verrà rimosso dallo storico.  ||| „%1$s“ wird aus dem Verlauf entfernt. 
+%1$s e altri %2$s ||| %1$s und %2$s weitere
+%1$s · eliminato il %2$s · ancora %3$s giorni ||| %1$s · gelöscht am %2$s · noch %3$s Tage
+Cestino ||| Papierkorb
+Elimina ora ||| Jetzt löschen
+Eliminare per sempre? ||| Endgültig löschen?
+Elimino %1$s promemoria. Li ritrovi nel Cestino per 7 giorni, poi vengono eliminati. ||| Ich lösche %1$s Erinnerungen. Sie liegen 7 Tage im Papierkorb und werden dann gelöscht.
+Gli altri promemoria restano. Se vuoi solo nasconderla, usa "Archivia".  ||| Die anderen Erinnerungen bleiben. Wenn du es nur ausblenden willst, nutze „Archivieren“. 
+Il cestino è vuoto ||| Der Papierkorb ist leer
+Il promemoria e il suo storico vanno nel Cestino per 7 giorni, poi vengono eliminati. Le persone e le cose collegate non vengono toccate. ||| Die Erinnerung und ihr Verlauf liegen 7 Tage im Papierkorb und werden dann gelöscht. Verknüpfte Personen und Dinge bleiben unberührt.
+Lo ritrovi nel Cestino (Impostazioni) per 7 giorni. ||| Du findest es 7 Tage im Papierkorb (Einstellungen).
+Non potrai più recuperarlo. ||| Du kannst es nicht mehr wiederherstellen.
+Non è stato possibile recuperarlo ||| Wiederherstellen nicht möglich
+Promemoria, cose, persone e interventi eliminati restano qui %1$s giorni: puoi recuperarli. Poi vengono cancellati definitivamente. ||| Gelöschte Erinnerungen, Dinge, Personen und Eingriffe bleiben hier %1$s Tage: Du kannst sie wiederherstellen. Danach werden sie endgültig gelöscht.
+Quando elimini qualcosa lo trovi qui per una settimana. ||| Wenn du etwas löschst, findest du es hier eine Woche lang.
+Recupera ||| Wiederherstellen
+Recupera ciò che hai eliminato negli ultimi 7 giorni. ||| Stelle wieder her, was du in den letzten 7 Tagen gelöscht hast.
+Recuperato ✓ ||| Wiederhergestellt ✓
+Se vuoi solo nasconderla, usa "Archivia".  ||| Wenn du sie nur ausblenden willst, nutze „Archivieren“. 

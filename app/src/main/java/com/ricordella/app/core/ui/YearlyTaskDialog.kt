@@ -115,7 +115,7 @@ fun YearlyTaskDialog(
                         Text(
                             when (task) {
                                 YearlyTask.HOLIDAYS -> trf("Sposto %1\$s feste al %2\$s. Le date dell'anno passato non si potranno ripristinare.", count, year)
-                                YearlyTask.CLEANUP -> trf("Elimino definitivamente %1\$s promemoria. L'operazione non si può annullare: se vuoi conservarli, esporta prima un backup.", count)
+                                YearlyTask.CLEANUP -> trf("Elimino %1\$s promemoria. Li ritrovi nel Cestino per 7 giorni, poi vengono eliminati.", count)
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,

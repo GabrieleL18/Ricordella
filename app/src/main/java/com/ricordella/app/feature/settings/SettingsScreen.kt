@@ -80,6 +80,7 @@ import com.ricordella.app.core.ui.shareBackup
 import com.ricordella.app.feature.onboarding.CalendarImportStep
 import com.ricordella.app.feature.onboarding.CalendarImportViewModel
 import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
@@ -134,7 +135,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onGoHome: () -> Unit = onBack) {
+fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onOpenTrash: () -> Unit, onGoHome: () -> Unit = onBack) {
     val viewModel = appViewModel { c, _ ->
         SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
@@ -327,6 +328,12 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     title = tr("Importa da un calendario"),
                     subtitle = tr("Copia gli eventi dai calendari del telefono (Google, Samsung e altri)."),
                     onClick = { showCalendarImport = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.DeleteSweep,
+                    title = tr("Cestino"),
+                    subtitle = tr("Recupera ciò che hai eliminato negli ultimi 7 giorni."),
+                    onClick = onOpenTrash,
                 )
                 SettingRow(
                     icon = Icons.Rounded.DeleteForever,

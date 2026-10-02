@@ -273,8 +273,9 @@ fun RicordellaApp(
             composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd) }
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
             composable<SearchRoute> { SearchScreen(navigator) }
-            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onGoHome = navigator::openHome) }
+            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onOpenTrash = navigator::openTrash, onGoHome = navigator::openHome) }
             composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
+            composable<TrashRoute> { com.ricordella.app.feature.settings.TrashScreen(onBack = navigator::back) }
             composable<CycleRoute> { com.ricordella.app.feature.cycle.CycleScreen(onBack = navigator::back) }
             composable<ExpensesRoute> { com.ricordella.app.feature.items.ExpensesScreen(navigator) }
             composable<ResolutionsRoute> { entry ->

@@ -29,6 +29,7 @@ class AppNavigator(private val navController: NavController) {
     fun openResolutions(year: Int, recap: Boolean = false) = navController.navigate(ResolutionsRoute(year, recap)) { launchSingleTop = true }
     fun openReminders() = openTopLevel(RemindersRoute)
     fun openHome() = openTopLevel(HomeRoute)
+    fun openTrash() = navController.navigate(TrashRoute) { launchSingleTop = true }
     fun openCycle() = navController.navigate(CycleRoute) { launchSingleTop = true }
     fun openExpenses() = navController.navigate(ExpensesRoute) { launchSingleTop = true }
 
