@@ -1,45 +1,45 @@
 <it-IT>
-Prima versione di Remindella!
-• Promemoria, scadenze, eventi e compleanni con notifiche e sveglie
-• Scrivi al volo, anche a voce
-• Calendario a mese, giorno e agenda
-• Cose e persone con garanzie, manutenzioni e allegati
-• Backup e condivisione con un altro telefono
-• Funziona offline, senza account e senza pubblicità
+Novità:
+• Sveglie a giorni fissi, con avviso silenzioso prima e pausa fino a una data
+• Widget Sveglia
+• Ciclo con previsione, cronologia e goccia nel calendario
+• Importa da Samsung Calendar e altri calendari
+• Recap dell'acqua della settimana
+• Tanti piccoli miglioramenti e correzioni
 </it-IT>
 <en-US>
-First release of Remindella!
-• Reminders, deadlines, events and birthdays with notifications and alarms
-• Quick add, even by voice
-• Month, day and agenda calendar
-• Things and people with warranties, maintenance and attachments
-• Backup and sharing with another phone
-• Works offline, no account, no ads
+What's new:
+• Alarms on chosen weekdays, with a silent heads-up and pause until a date
+• Alarm widget
+• Cycle tracking with prediction, history and a drop in the calendar
+• Import from Samsung Calendar and other calendars
+• Weekly water recap
+• Many small improvements and fixes
 </en-US>
 <de-DE>
-Erste Version von Remindella!
-• Erinnerungen, Fristen, Termine und Geburtstage mit Benachrichtigungen und Weckern
-• Schnelleingabe, auch per Sprache
-• Kalender als Monat, Tag und Agenda
-• Dinge und Personen mit Garantien, Wartungen und Anhängen
-• Backup und Teilen mit einem anderen Handy
-• Funktioniert offline, ohne Konto und ohne Werbung
+Neu:
+• Wecker an festen Wochentagen, mit stillem Hinweis vorher und Pause bis zu einem Datum
+• Wecker-Widget
+• Zyklus mit Vorhersage, Verlauf und Tropfen im Kalender
+• Import aus Samsung Kalender und anderen Kalendern
+• Wöchentliche Wasser-Übersicht
+• Viele kleine Verbesserungen und Korrekturen
 </de-DE>
 <fr-FR>
-Première version de Remindella !
-• Rappels, échéances, événements et anniversaires avec notifications et alarmes
-• Saisie rapide, même à la voix
-• Calendrier par mois, jour et agenda
-• Objets et personnes avec garanties, entretiens et pièces jointes
-• Sauvegarde et partage avec un autre téléphone
-• Fonctionne hors ligne, sans compte et sans publicité
+Nouveautés :
+• Réveils à jours fixes, avec avis silencieux avant et pause jusqu'à une date
+• Widget Réveil
+• Cycle avec prévision, historique et goutte dans le calendrier
+• Import depuis Samsung Calendar et d'autres calendriers
+• Récap hebdomadaire de l'eau
+• Beaucoup de petites améliorations et corrections
 </fr-FR>
 <es-ES>
-¡Primera versión de Remindella!
-• Recordatorios, vencimientos, eventos y cumpleaños con notificaciones y alarmas
-• Escribe al vuelo, también por voz
-• Calendario por mes, día y agenda
-• Cosas y personas con garantías, mantenimientos y adjuntos
-• Copia de seguridad y uso compartido con otro móvil
-• Funciona sin conexión, sin cuenta y sin publicidad
+Novedades:
+• Alarmas en días fijos, con aviso silencioso antes y pausa hasta una fecha
+• Widget de alarma
+• Ciclo con previsión, historial y gota en el calendario
+• Importar desde Samsung Calendar y otros calendarios
+• Resumen semanal del agua
+• Muchas mejoras y correcciones pequeñas
 </es-ES>

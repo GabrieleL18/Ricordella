@@ -1216,3 +1216,14 @@ ciclo di %1$s giorni ||| ciclo de %1$s días
 È in ritardo di %1$s giorni. ||| Lleva %1$s días de retraso.
 È iniziato oggi ||| Ha empezado hoy
 È previsto da ieri. Se è arrivato, segnalo qui. ||| Estaba previsto desde ayer. Si ha llegado, márcalo aquí.
+Sveglie a giorni fissi ||| Alarmas en días fijos
+Scegli i giorni della settimana, ricevi un avviso silenzioso prima per saltarla e sospendila fino a una data. ||| Elige los días de la semana, recibe un aviso silencioso antes para saltarla y páusala hasta una fecha.
+Widget Sveglia ||| Widget de alarma
+La prossima sveglia sulla schermata Home, con il + per crearne una. ||| La próxima alarma en la pantalla de inicio, con + para crear una.
+Previsione, cronologia di 2 anni e goccia nel calendario, per ogni persona. Dati solo sul telefono. ||| Previsión, historial de 2 años y gota en el calendario, para cada persona. Datos solo en el móvil.
+Importa da Samsung e altri ||| Importa desde Samsung y otros
+Oltre a Google, importi i calendari Samsung e quelli locali del telefono. ||| Además de Google, importas los calendarios de Samsung y los locales del móvil.
+Acqua della settimana ||| Agua de la semana
+Nelle Pozioni il recap degli ultimi 7 giorni, con media e obiettivi raggiunti. ||| En Pociones, el resumen de los últimos 7 días, con media y objetivos alcanzados.
+Più comodo ||| Más cómodo
+I numeri della Home portano alla sezione, «Scrivi al volo» si cancella e si modifica, Elimina è ben visibile e le notifiche si aprono senza errori. ||| Los números de Inicio llevan a la sección, «Escribe al vuelo» se borra y se edita, Eliminar se ve bien y las notificaciones se abren sin errores.

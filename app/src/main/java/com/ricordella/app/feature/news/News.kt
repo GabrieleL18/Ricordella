@@ -16,7 +16,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.TouchApp
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.Euro
@@ -54,7 +57,7 @@ import com.ricordella.app.core.ui.theme.ricordellaColors
 class NewsItem(val icon: ImageVector, val tone: (RicordellaColors) -> Tone, val title: String, val body: String)
 
 /** Le novità di una versione (versionCode dell'app). */
-class NewsRelease(val versionCode: Int, val versionName: String, val items: List<NewsItem>)
+class NewsRelease(val versionCode: Int, val versionName: String, val items: List<NewsItem>, val date: java.time.LocalDate? = null)
 
 /**
  * Tutte le novità, dalla più recente. Per una nuova versione si aggiunge un [NewsRelease] in cima
@@ -62,6 +65,19 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 4,
+            versionName = "0.2.0",
+            date = java.time.LocalDate.of(2026, 10, 2),
+            items = listOf(
+                NewsItem(Icons.Rounded.Alarm, { it.coral }, tr("Sveglie a giorni fissi"), tr("Scegli i giorni della settimana, ricevi un avviso silenzioso prima per saltarla e sospendila fino a una data.")),
+                NewsItem(Icons.Rounded.Widgets, { it.lavender }, tr("Widget Sveglia"), tr("La prossima sveglia sulla schermata Home, con il + per crearne una.")),
+                NewsItem(Icons.Rounded.WaterDrop, { it.coral }, tr("Ciclo"), tr("Previsione, cronologia di 2 anni e goccia nel calendario, per ogni persona. Dati solo sul telefono.")),
+                NewsItem(Icons.Rounded.CalendarMonth, { it.pear }, tr("Importa da Samsung e altri"), tr("Oltre a Google, importi i calendari Samsung e quelli locali del telefono.")),
+                NewsItem(Icons.Rounded.WaterDrop, { it.cyan }, tr("Acqua della settimana"), tr("Nelle Pozioni il recap degli ultimi 7 giorni, con media e obiettivi raggiunti.")),
+                NewsItem(Icons.Rounded.TouchApp, { it.mint }, tr("Più comodo"), tr("I numeri della Home portano alla sezione, «Scrivi al volo» si cancella e si modifica, Elimina è ben visibile e le notifiche si aprono senza errori.")),
+            ),
+        ),
         NewsRelease(
             versionCode = 1,
             versionName = "0.1.0",
@@ -109,7 +125,7 @@ fun NewsDialog(releases: List<NewsRelease>, onDismiss: () -> Unit) {
                     var index = 0
                     releases.forEach { release ->
                         Text(
-                            trf("Versione %1\$s", release.versionName),
+                            trf("Versione %1\$s", release.versionName) + (release.date?.let { " · " + com.ricordella.app.core.date.DateTexts.date(it, com.ricordella.app.core.ui.LocalAppSettings.current.dateFormat) } ?: ""),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = RicordellaDimensions.spaceS),

@@ -1291,3 +1291,14 @@ ciclo di %1$s giorni ||| %1$s-day cycle
 È in ritardo di %1$s giorni. ||| It's %1$s days late.
 È iniziato oggi ||| Started today
 È previsto da ieri. Se è arrivato, segnalo qui. ||| It was expected yesterday. If it came, mark it here.
+Sveglie a giorni fissi ||| Alarms on chosen days
+Scegli i giorni della settimana, ricevi un avviso silenzioso prima per saltarla e sospendila fino a una data. ||| Pick the weekdays, get a silent heads-up beforehand to skip it, and pause it until a date.
+Widget Sveglia ||| Alarm widget
+La prossima sveglia sulla schermata Home, con il + per crearne una. ||| The next alarm on your Home screen, with + to create one.
+Previsione, cronologia di 2 anni e goccia nel calendario, per ogni persona. Dati solo sul telefono. ||| Prediction, 2-year history and a drop in the calendar, for each person. Data stays on the phone.
+Importa da Samsung e altri ||| Import from Samsung and others
+Oltre a Google, importi i calendari Samsung e quelli locali del telefono. ||| Besides Google, you can import Samsung calendars and the phone's local ones.
+Acqua della settimana ||| Water this week
+Nelle Pozioni il recap degli ultimi 7 giorni, con media e obiettivi raggiunti. ||| In Potions, a recap of the last 7 days, with average and goals reached.
+Più comodo ||| More convenient
+I numeri della Home portano alla sezione, «Scrivi al volo» si cancella e si modifica, Elimina è ben visibile e le notifiche si aprono senza errori. ||| The Home numbers jump to their section, "Quick add" can be cleared and edited, Delete is easy to see and notifications open without errors.
