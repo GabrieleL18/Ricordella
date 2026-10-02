@@ -82,8 +82,8 @@ import kotlinx.coroutines.launch
 
 data class CalendarImportState(
     val permissionDenied: Boolean = false,
-    val accounts: List<String>? = null,
-    val selected: String? = null,
+    val accounts: List<CalendarImporter.Account>? = null,
+    val selected: CalendarImporter.Account? = null,
     val importing: Boolean = false,
     val imported: Int? = null,
     val error: Boolean = false,
@@ -103,12 +103,12 @@ class CalendarImportViewModel(
             return
         }
         viewModelScope.launch {
-            val accounts = runCatching { importer.googleAccounts() }.getOrDefault(emptyList())
+            val accounts = runCatching { importer.accounts() }.getOrDefault(emptyList())
             _state.update { it.copy(permissionDenied = false, accounts = accounts, selected = accounts.firstOrNull()) }
         }
     }
 
-    fun select(account: String) = _state.update { it.copy(selected = account) }
+    fun select(account: CalendarImporter.Account) = _state.update { it.copy(selected = account) }
 
     fun import() {
         val account = _state.value.selected ?: return
@@ -139,7 +139,7 @@ class CalendarImportViewModel(
 
 private enum class Stage { WELCOME, TUTORIAL, PREFERENCES, CALENDAR }
 
-/** Configurazione iniziale: benvenuto, tutorial animato delle sezioni, import da Google Calendar. */
+/** Configurazione iniziale: benvenuto, tutorial animato delle sezioni, import da un calendario. */
 @Composable
 fun OnboardingScreen() {
     val viewModel = appViewModel { c, _ -> CalendarImportViewModel(c.calendarImporter, c.settingsRepository, c.housekeeping) }
@@ -194,7 +194,7 @@ private fun Welcome(onNext: () -> Unit) {
     backup?.let { OpenedBackupImport(it, onDone = { backup = null }, firstStart = true) }
 }
 
-/** Import facoltativo: permesso calendario → scelta account Google → import. */
+/** Import facoltativo: permesso calendario → scelta calendario → import. */
 @Composable
 fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = tr("Inizia a usare Remindella")) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -215,9 +215,9 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
         Surface(color = tone.container, shape = MaterialTheme.shapes.extraLarge) {
             androidx.compose.material3.Icon(Icons.Rounded.CalendarMonth, null, tint = tone.content, modifier = Modifier.padding(24.dp).height(56.dp).fillMaxWidth(0.3f))
         }
-        Text(tr("Importa da Google Calendar"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+        Text(tr("Importa da un calendario"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
         Text(
-            tr("Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi di un tuo account Google già presente sul telefono. ") +
+            tr("Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi da un calendario già presente sul telefono: Google, Samsung Calendar o altri. ") +
                 tr("Niente Internet: leggo solo il calendario del dispositivo."),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -247,7 +247,7 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
-            accounts.isEmpty() -> Text(tr("Sul telefono non ci sono account Google con un calendario."), textAlign = TextAlign.Center)
+            accounts.isEmpty() -> Text(tr("Sul telefono non ci sono calendari da importare."), textAlign = TextAlign.Center)
             else -> {
                 accounts.forEach { account ->
                     Row(
@@ -258,7 +258,7 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = account == state.selected, onClick = null)
-                        Text(account, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 8.dp))
+                        Text(account.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
                 if (state.error) Text(tr("Import non riuscito, riprova."), color = MaterialTheme.colorScheme.error)

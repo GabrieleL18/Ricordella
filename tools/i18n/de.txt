@@ -1173,3 +1173,46 @@ Avviso silenzioso prima delle sveglie ripetute ||| Stiller Hinweis vor wiederkeh
 In pausa fino al ||| Pausiert bis
 Nessuna sveglia ||| Kein Wecker
 Tocca + per crearne una ||| Tippe auf +, um einen zu erstellen
+Importa da un calendario ||| Aus einem Kalender importieren
+Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi da un calendario già presente sul telefono: Google, Samsung Calendar o altri.  ||| Ich kann Termine, Feiertage, Geburtstage und Erinnerungen der nächsten 12 Monate aus einem Kalender auf deinem Handy kopieren: Google, Samsung Kalender oder andere. 
+Sul telefono non ci sono calendari da importare. ||| Auf diesem Handy gibt es keine Kalender zum Importieren.
+Copia gli eventi dai calendari del telefono (Google, Samsung e altri). ||| Kopiert Termine aus den Kalendern des Handys (Google, Samsung und andere).
+Calendario del telefono ||| Handy-Kalender
+%1$s giorni ||| %1$s Tage
+Aggiungi un ciclo ||| Zyklus hinzufügen
+Avvisami se è in ritardo ||| Benachrichtige mich bei Verspätung
+Ciclo ||| Zyklus
+Ciclo di %1$s ||| Zyklus von %1$s
+Ciclo di %1$s (previsto) ||| Zyklus von %1$s (voraussichtlich)
+Ciclo di %1$s in ritardo ||| Zyklus von %1$s verspätet
+Come funziona il ciclo ||| So funktioniert der Zyklus
+Cronologia (ultimi 2 anni) ||| Verlauf (letzte 2 Jahre)
+Di chi è * ||| Von wem *
+Elimina il ciclo ||| Zyklus löschen
+Eliminare il ciclo? ||| Zyklus löschen?
+I dati restano su questo telefono e non vanno nel file condiviso. Sono previsioni indicative: non sostituiscono un parere medico e non sono un metodo contraccettivo. ||| Die Daten bleiben auf diesem Handy und kommen nicht in die geteilte Datei. Es sind grobe Vorhersagen: Sie ersetzen keinen ärztlichen Rat und sind keine Verhütungsmethode.
+Il ciclo va sempre assegnato a una persona: aggiungila prima nella sezione Persone. ||| Ein Zyklus gehört immer einer Person: Füge sie zuerst im Bereich Personen hinzu.
+In ritardo di %1$s giorni (previsto il %2$s) ||| %1$s Tage verspätet (erwartet am %2$s)
+Mestruazione di %1$s giorni · ciclo di %2$s giorni ||| %1$s Tage Periode · %2$s Tage Zyklus
+Modifica il ciclo ||| Zyklus bearbeiten
+Nel calendario i giorni hanno una goccia di sangue: piena se è già successo, chiara se è solo una previsione. Per i giorni previsti non arrivano notifiche. ||| Im Kalender haben die Tage einen Blutstropfen: voll, wenn es schon war, hell, wenn es nur eine Vorhersage ist. Für vorhergesagte Tage gibt es keine Benachrichtigungen.
+Nuovo ciclo ||| Neuer Zyklus
+Oggi è il giorno %1$s di %2$s ||| Heute ist Tag %1$s von %2$s
+Ogni quanti giorni torna il ciclo ||| Nach wie vielen Tagen der Zyklus wiederkehrt
+Per ogni persona tengo la cronologia degli ultimi 2 anni, con la lunghezza di ogni ciclo. ||| Für jede Person führe ich den Verlauf der letzten 2 Jahre, mit der Länge jedes Zyklus.
+Previsione e cronologia, senza notifiche ||| Vorhersage und Verlauf, ohne Benachrichtigungen
+Previsioni indicative in base ai giorni che indichi: nel calendario compare una goccia, senza notifiche per i giorni previsti. Tocca ? per sapere come funziona. ||| Grobe Vorhersagen anhand deiner Angaben: Im Kalender erscheint ein Tropfen, ohne Benachrichtigungen für vorhergesagte Tage. Tippe auf ?, um zu erfahren, wie es funktioniert.
+Prossimo ciclo previsto: %1$s (%2$s) ||| Nächster Zyklus voraussichtlich: %1$s (%2$s)
+Quando inizia tocca «È iniziato oggi»: la previsione riparte da quel giorno. Quando finisce tocca «È finito oggi»; se non lo fai vale la durata che hai indicato. ||| Wenn sie beginnt, tippe auf „Heute begonnen“: Die Vorhersage startet ab diesem Tag neu. Wenn sie endet, tippe auf „Heute zu Ende“; sonst gilt die angegebene Dauer.
+Quando è iniziata l'ultima * ||| Wann hat die letzte begonnen *
+Quanti giorni dura la mestruazione ||| Wie viele Tage die Periode dauert
+Scegli la persona (il ciclo è sempre di qualcuno), quanti giorni dura la mestruazione, ogni quanti giorni torna il ciclo e quando è iniziata l'ultima. ||| Wähle die Person (ein Zyklus gehört immer jemandem), wie viele Tage die Periode dauert, nach wie vielen Tagen der Zyklus wiederkehrt und wann die letzte begonnen hat.
+Se il ciclo è in ritardo ti avviso alle 9 del giorno dopo la data prevista e poi dopo una settimana. L'avviso è acceso di default solo per il ciclo di chi usa l'app (la persona «Io sono» nelle Impostazioni › Condivisione) o per il primo che crei; per gli altri lo accendi tu. ||| Wenn der Zyklus verspätet ist, benachrichtige ich dich um 9 Uhr am Tag nach dem erwarteten Datum und eine Woche später noch einmal. Die Benachrichtigung ist standardmäßig nur für den Zyklus der App-Nutzerin bzw. des App-Nutzers an (die Person „Ich bin“ unter Einstellungen › Teilen) oder für den ersten, den du anlegst; bei anderen schaltest du sie selbst ein.
+Segna quando inizia per avere la previsione. ||| Markiere den Beginn, um eine Vorhersage zu erhalten.
+Si cancellano le impostazioni e la cronologia di questa persona. Non si può annullare. ||| Die Einstellungen und der Verlauf dieser Person werden gelöscht. Das lässt sich nicht rückgängig machen.
+ciclo di %1$s giorni ||| %1$s Tage Zyklus
+È arrivato oggi ||| Heute gekommen
+È finito oggi ||| Heute zu Ende
+È in ritardo di %1$s giorni. ||| Sie ist %1$s Tage verspätet.
+È iniziato oggi ||| Heute begonnen
+È previsto da ieri. Se è arrivato, segnalo qui. ||| Er wurde gestern erwartet. Falls er da ist, markiere es hier.

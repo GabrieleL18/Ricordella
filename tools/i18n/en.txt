@@ -1248,3 +1248,46 @@ Avviso silenzioso prima delle sveglie ripetute ||| Silent heads-up before repeat
 In pausa fino al ||| Paused until
 Nessuna sveglia ||| No alarms
 Tocca + per crearne una ||| Tap + to create one
+Importa da un calendario ||| Import from a calendar
+Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi da un calendario già presente sul telefono: Google, Samsung Calendar o altri.  ||| I can copy events, holidays, birthdays and reminders for the next 12 months from a calendar already on your phone: Google, Samsung Calendar or others. 
+Sul telefono non ci sono calendari da importare. ||| There are no calendars to import on this phone.
+Copia gli eventi dai calendari del telefono (Google, Samsung e altri). ||| Copy events from the phone's calendars (Google, Samsung and others).
+Calendario del telefono ||| Phone calendar
+%1$s giorni ||| %1$s days
+Aggiungi un ciclo ||| Add a cycle
+Avvisami se è in ritardo ||| Notify me if it's late
+Ciclo ||| Cycle
+Ciclo di %1$s ||| %1$s's cycle
+Ciclo di %1$s (previsto) ||| %1$s's cycle (predicted)
+Ciclo di %1$s in ritardo ||| %1$s's cycle is late
+Come funziona il ciclo ||| How the cycle works
+Cronologia (ultimi 2 anni) ||| History (last 2 years)
+Di chi è * ||| Whose is it *
+Elimina il ciclo ||| Delete the cycle
+Eliminare il ciclo? ||| Delete the cycle?
+I dati restano su questo telefono e non vanno nel file condiviso. Sono previsioni indicative: non sostituiscono un parere medico e non sono un metodo contraccettivo. ||| The data stays on this phone and doesn't go into the shared file. These are rough predictions: they don't replace medical advice and are not a contraceptive method.
+Il ciclo va sempre assegnato a una persona: aggiungila prima nella sezione Persone. ||| A cycle must always be assigned to a person: add them first in the People section.
+In ritardo di %1$s giorni (previsto il %2$s) ||| %1$s days late (expected on %2$s)
+Mestruazione di %1$s giorni · ciclo di %2$s giorni ||| %1$s-day period · %2$s-day cycle
+Modifica il ciclo ||| Edit the cycle
+Nel calendario i giorni hanno una goccia di sangue: piena se è già successo, chiara se è solo una previsione. Per i giorni previsti non arrivano notifiche. ||| In the calendar the days have a blood drop: solid if it already happened, light if it's only a prediction. No notifications for predicted days.
+Nuovo ciclo ||| New cycle
+Oggi è il giorno %1$s di %2$s ||| Today is day %1$s of %2$s
+Ogni quanti giorni torna il ciclo ||| How many days between cycles
+Per ogni persona tengo la cronologia degli ultimi 2 anni, con la lunghezza di ogni ciclo. ||| For each person I keep the history of the last 2 years, with the length of each cycle.
+Previsione e cronologia, senza notifiche ||| Prediction and history, no notifications
+Previsioni indicative in base ai giorni che indichi: nel calendario compare una goccia, senza notifiche per i giorni previsti. Tocca ? per sapere come funziona. ||| Rough predictions based on the days you enter: a drop appears in the calendar, with no notifications for predicted days. Tap ? to learn how it works.
+Prossimo ciclo previsto: %1$s (%2$s) ||| Next cycle expected: %1$s (%2$s)
+Quando inizia tocca «È iniziato oggi»: la previsione riparte da quel giorno. Quando finisce tocca «È finito oggi»; se non lo fai vale la durata che hai indicato. ||| When it starts tap "Started today": the prediction restarts from that day. When it ends tap "Ended today"; if you don't, the length you set is used.
+Quando è iniziata l'ultima * ||| When did the last one start *
+Quanti giorni dura la mestruazione ||| How many days the period lasts
+Scegli la persona (il ciclo è sempre di qualcuno), quanti giorni dura la mestruazione, ogni quanti giorni torna il ciclo e quando è iniziata l'ultima. ||| Choose the person (a cycle always belongs to someone), how many days the period lasts, how many days between cycles and when the last one started.
+Se il ciclo è in ritardo ti avviso alle 9 del giorno dopo la data prevista e poi dopo una settimana. L'avviso è acceso di default solo per il ciclo di chi usa l'app (la persona «Io sono» nelle Impostazioni › Condivisione) o per il primo che crei; per gli altri lo accendi tu. ||| If the cycle is late I notify you at 9am the day after the expected date and again a week later. The alert is on by default only for the cycle of whoever uses the app (the "I am" person in Settings › Sharing) or for the first one you create; for others you turn it on yourself.
+Segna quando inizia per avere la previsione. ||| Mark when it starts to get a prediction.
+Si cancellano le impostazioni e la cronologia di questa persona. Non si può annullare. ||| This person's settings and history will be deleted. This can't be undone.
+ciclo di %1$s giorni ||| %1$s-day cycle
+È arrivato oggi ||| It started today
+È finito oggi ||| Ended today
+È in ritardo di %1$s giorni. ||| It's %1$s days late.
+È iniziato oggi ||| Started today
+È previsto da ieri. Se è arrivato, segnalo qui. ||| It was expected yesterday. If it came, mark it here.

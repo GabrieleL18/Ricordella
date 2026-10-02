@@ -1173,3 +1173,46 @@ Avviso silenzioso prima delle sveglie ripetute ||| Avis silencieux avant les ré
 In pausa fino al ||| En pause jusqu'au
 Nessuna sveglia ||| Aucun réveil
 Tocca + per crearne una ||| Touche + pour en créer un
+Importa da un calendario ||| Importer depuis un calendrier
+Posso copiare eventi, feste, compleanni e promemoria dei prossimi 12 mesi da un calendario già presente sul telefono: Google, Samsung Calendar o altri.  ||| Je peux copier les événements, jours fériés, anniversaires et rappels des 12 prochains mois depuis un calendrier déjà présent sur ton téléphone : Google, Samsung Calendar ou d'autres. 
+Sul telefono non ci sono calendari da importare. ||| Il n'y a aucun calendrier à importer sur ce téléphone.
+Copia gli eventi dai calendari del telefono (Google, Samsung e altri). ||| Copie les événements des calendriers du téléphone (Google, Samsung et autres).
+Calendario del telefono ||| Calendrier du téléphone
+%1$s giorni ||| %1$s jours
+Aggiungi un ciclo ||| Ajouter un cycle
+Avvisami se è in ritardo ||| Me prévenir en cas de retard
+Ciclo ||| Cycle
+Ciclo di %1$s ||| Cycle de %1$s
+Ciclo di %1$s (previsto) ||| Cycle de %1$s (prévu)
+Ciclo di %1$s in ritardo ||| Cycle de %1$s en retard
+Come funziona il ciclo ||| Comment fonctionne le cycle
+Cronologia (ultimi 2 anni) ||| Historique (2 dernières années)
+Di chi è * ||| À qui *
+Elimina il ciclo ||| Supprimer le cycle
+Eliminare il ciclo? ||| Supprimer le cycle ?
+I dati restano su questo telefono e non vanno nel file condiviso. Sono previsioni indicative: non sostituiscono un parere medico e non sono un metodo contraccettivo. ||| Les données restent sur ce téléphone et ne vont pas dans le fichier partagé. Ce sont des prévisions indicatives : elles ne remplacent pas un avis médical et ne constituent pas une méthode de contraception.
+Il ciclo va sempre assegnato a una persona: aggiungila prima nella sezione Persone. ||| Un cycle est toujours attribué à une personne : ajoute-la d'abord dans la section Personnes.
+In ritardo di %1$s giorni (previsto il %2$s) ||| En retard de %1$s jours (prévu le %2$s)
+Mestruazione di %1$s giorni · ciclo di %2$s giorni ||| Règles de %1$s jours · cycle de %2$s jours
+Modifica il ciclo ||| Modifier le cycle
+Nel calendario i giorni hanno una goccia di sangue: piena se è già successo, chiara se è solo una previsione. Per i giorni previsti non arrivano notifiche. ||| Dans le calendrier, les jours ont une goutte de sang : pleine si c'est déjà arrivé, claire si c'est seulement une prévision. Pas de notification pour les jours prévus.
+Nuovo ciclo ||| Nouveau cycle
+Oggi è il giorno %1$s di %2$s ||| Aujourd'hui, c'est le jour %1$s sur %2$s
+Ogni quanti giorni torna il ciclo ||| Tous les combien de jours revient le cycle
+Per ogni persona tengo la cronologia degli ultimi 2 anni, con la lunghezza di ogni ciclo. ||| Pour chaque personne je garde l'historique des 2 dernières années, avec la durée de chaque cycle.
+Previsione e cronologia, senza notifiche ||| Prévision et historique, sans notifications
+Previsioni indicative in base ai giorni che indichi: nel calendario compare una goccia, senza notifiche per i giorni previsti. Tocca ? per sapere come funziona. ||| Prévisions indicatives selon les jours que tu indiques : une goutte apparaît dans le calendrier, sans notification pour les jours prévus. Touche ? pour savoir comment ça marche.
+Prossimo ciclo previsto: %1$s (%2$s) ||| Prochain cycle prévu : %1$s (%2$s)
+Quando inizia tocca «È iniziato oggi»: la previsione riparte da quel giorno. Quando finisce tocca «È finito oggi»; se non lo fai vale la durata che hai indicato. ||| Quand elles commencent, touche « Commencé aujourd'hui » : la prévision repart de ce jour. Quand elles finissent, touche « Fini aujourd'hui » ; sinon la durée indiquée est utilisée.
+Quando è iniziata l'ultima * ||| Quand a commencé la dernière *
+Quanti giorni dura la mestruazione ||| Combien de jours durent les règles
+Scegli la persona (il ciclo è sempre di qualcuno), quanti giorni dura la mestruazione, ogni quanti giorni torna il ciclo e quando è iniziata l'ultima. ||| Choisis la personne (un cycle appartient toujours à quelqu'un), combien de jours durent les règles, tous les combien de jours revient le cycle et quand ont commencé les dernières.
+Se il ciclo è in ritardo ti avviso alle 9 del giorno dopo la data prevista e poi dopo una settimana. L'avviso è acceso di default solo per il ciclo di chi usa l'app (la persona «Io sono» nelle Impostazioni › Condivisione) o per il primo che crei; per gli altri lo accendi tu. ||| Si le cycle est en retard, je te préviens à 9 h le lendemain de la date prévue, puis une semaine plus tard. L'avis est activé par défaut seulement pour le cycle de la personne qui utilise l'app (la personne « Je suis » dans Réglages › Partage) ou pour le premier que tu crées ; pour les autres, tu l'actives toi-même.
+Segna quando inizia per avere la previsione. ||| Indique quand ça commence pour avoir la prévision.
+Si cancellano le impostazioni e la cronologia di questa persona. Non si può annullare. ||| Les réglages et l'historique de cette personne seront supprimés. Impossible d'annuler.
+ciclo di %1$s giorni ||| cycle de %1$s jours
+È arrivato oggi ||| Elles sont arrivées aujourd'hui
+È finito oggi ||| Fini aujourd'hui
+È in ritardo di %1$s giorni. ||| Il est en retard de %1$s jours.
+È iniziato oggi ||| Commencé aujourd'hui
+È previsto da ieri. Se è arrivato, segnalo qui. ||| Il était prévu hier. S'il est arrivé, indique-le ici.

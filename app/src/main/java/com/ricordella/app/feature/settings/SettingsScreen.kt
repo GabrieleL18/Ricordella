@@ -324,8 +324,8 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 )
                 SettingRow(
                     icon = Icons.Rounded.CalendarMonth,
-                    title = tr("Importa da Google Calendar"),
-                    subtitle = tr("Copia gli eventi di un account Google presente sul telefono."),
+                    title = tr("Importa da un calendario"),
+                    subtitle = tr("Copia gli eventi dai calendari del telefono (Google, Samsung e altri)."),
                     onClick = { showCalendarImport = true },
                 )
                 SettingRow(

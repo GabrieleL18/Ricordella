@@ -173,6 +173,10 @@
                 android:resource="@xml/agenda_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".core.notifications.CycleReceiver"
+            android:exported="false" />
+
         <!-- Righe delle liste scorrevoli dei widget (propositi e giornata). -->
         <service
             android:name=".core.widget.WidgetListService"

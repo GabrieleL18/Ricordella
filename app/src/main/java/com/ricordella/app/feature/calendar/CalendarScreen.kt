@@ -37,6 +37,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.WaterDrop
+import com.ricordella.app.domain.model.CycleDay
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -236,6 +238,35 @@ private fun ModeSelector(current: CalendarMode, onChange: (CalendarMode) -> Unit
     }
 }
 
+/** Una riga per ogni persona con il ciclo in questo giorno: goccia piena = avvenuto, chiara = previsto. Tocco = schermata del ciclo. */
+@Composable
+private fun CycleRows(days: List<CycleDay>, navigator: AppNavigator) {
+    if (days.isEmpty()) return
+    val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+    val people by container.personRepository.observePeople(archived = false).collectAsStateWithLifecycle(initialValue = emptyList())
+    val tone = MaterialTheme.ricordellaColors.coral
+    days.forEach { day ->
+        val name = people.firstOrNull { it.id == day.personId }?.name ?: return@forEach
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
+                .background(tone.container)
+                .clickable(onClick = navigator::openCycle)
+                .padding(RicordellaDimensions.spaceM),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+        ) {
+            Icon(Icons.Rounded.WaterDrop, contentDescription = null, tint = tone.solid.copy(alpha = if (day.predicted) 0.5f else 1f))
+            Text(
+                if (day.predicted) trf("Ciclo di %1\$s (previsto)", name) else trf("Ciclo di %1\$s", name),
+                style = MaterialTheme.typography.titleSmall,
+                color = tone.content,
+            )
+        }
+    }
+}
+
 /** Mostra o nasconde le sveglie normali nel calendario (quelle importanti o urgenti si vedono sempre). */
 @Composable
 private fun AlarmsToggle(hidden: Boolean, onChange: (Boolean) -> Unit) {
@@ -288,7 +319,8 @@ private fun DaySheet(
                     Modifier.fillMaxWidth().heightIn(max = 520.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 ) {
-                    if (occurrences.isEmpty()) {
+                    CycleRows(state.cycleDays[date].orEmpty(), navigator)
+                    if (occurrences.isEmpty() && state.cycleDays[date].isNullOrEmpty()) {
                         EmptyState(
                             icon = Icons.Rounded.EventAvailable,
                             title = tr("Nessun promemoria"),
@@ -318,7 +350,8 @@ private fun LazyListScope.dayItems(
     date: LocalDate,
     showEmpty: Boolean = true,
 ) {
-    if (occurrences.isEmpty() && showEmpty && !state.isLoading) {
+    state.cycleDays[date]?.takeIf { it.isNotEmpty() }?.let { days -> item(key = "day-cycle-$date") { CycleRows(days, navigator) } }
+    if (occurrences.isEmpty() && showEmpty && !state.isLoading && state.cycleDays[date].isNullOrEmpty()) {
         item(key = "day-empty-$date") {
             EmptyState(
                 icon = Icons.Rounded.EventAvailable,
@@ -467,6 +500,7 @@ private fun MonthView(
                             DayCell(
                                 date = day,
                                 occurrences = state.occurrences[day].orEmpty(),
+                                cycle = state.cycleDays[day].orEmpty(),
                                 lanes = lanes,
                                 laneCount = laneCount,
                                 maxLanes = maxLanes,
@@ -492,6 +526,7 @@ private fun MonthView(
 private fun DayCell(
     date: LocalDate,
     occurrences: List<ReminderOccurrence>,
+    cycle: List<CycleDay>,
     lanes: Map<String, Int>,
     laneCount: Int,
     maxLanes: Int,
@@ -556,6 +591,12 @@ private fun DayCell(
             if (hasTask) Marker(MarkerShape.DOT)
             if (hasEvent) Marker(MarkerShape.RING)
             if (hasDeadline) Marker(MarkerShape.SQUARE)
+            if (cycle.isNotEmpty()) Icon(
+                Icons.Rounded.WaterDrop,
+                contentDescription = tr("Ciclo"),
+                tint = extra.coral.solid.copy(alpha = if (cycle.all { it.predicted }) 0.45f else 1f),
+                modifier = Modifier.size(10.dp),
+            )
             if (hidden > 0) Text("+$hidden", style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp), color = if (isSelected) extra.onBolt else colors.onSurfaceVariant)
         }
     }

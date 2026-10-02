@@ -122,6 +122,9 @@ data class AppSettings(
     val alarmPreNoticeMinutes: Int = 30,
     /** Nel calendario si vedono solo le sveglie importanti o urgenti (le altre restano nelle liste). */
     val hideNormalAlarmsInCalendar: Boolean = false,
+    /** Ciclo mestruale: una voce per persona, e la cronologia delle mestruazioni (solo su questo telefono). */
+    val cycleProfiles: List<CycleProfile> = emptyList(),
+    val cycleLog: List<CycleEntry> = emptyList(),
 ) {
     fun defaultsFor(type: ReminderType): TypeDefaults =
         typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)

@@ -46,6 +46,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
@@ -128,7 +129,7 @@ private enum class TopLevelDestination(
     val label: String get() = tr(italianLabel)
 }
 
-private enum class QuickAddKind { REMINDER, EVENT, ALARM, VACATION, MEDICAL_VISIT, ITEM, PERSON }
+private enum class QuickAddKind { REMINDER, EVENT, ALARM, VACATION, MEDICAL_VISIT, CYCLE, ITEM, PERSON }
 
 /**
  * Shell dell'app: navigazione adattiva (barra in basso su schermi compatti,
@@ -198,6 +199,7 @@ fun RicordellaApp(
             CalendarWidgetProvider.ACTION_ITEM -> navigator.newItem()
             CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
             CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
+            com.ricordella.app.MainActivity.ACTION_OPEN_CYCLE -> navigator.openCycle()
             com.ricordella.app.MainActivity.ACTION_NEW_ALARM -> navigator.newReminder(type = ReminderType.ALARM)
             com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
             com.ricordella.app.MainActivity.ACTION_OPEN_RESOLUTIONS -> navigator.openResolutions(java.time.LocalDate.now().year)
@@ -273,6 +275,7 @@ fun RicordellaApp(
             composable<SearchRoute> { SearchScreen(navigator) }
             composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onGoHome = navigator::openHome) }
             composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
+            composable<CycleRoute> { com.ricordella.app.feature.cycle.CycleScreen(onBack = navigator::back) }
             composable<ExpensesRoute> { com.ricordella.app.feature.items.ExpensesScreen(navigator) }
             composable<ResolutionsRoute> { entry ->
                 val route = entry.toRoute<ResolutionsRoute>()
@@ -300,6 +303,7 @@ fun RicordellaApp(
                     QuickAddKind.ALARM -> navigator.newReminder(type = ReminderType.ALARM, date = quickAddDate)
                     QuickAddKind.VACATION -> navigator.newReminder(type = ReminderType.VACATION, date = quickAddDate)
                     QuickAddKind.MEDICAL_VISIT -> navigator.newReminder(type = ReminderType.MEDICAL_VISIT, date = quickAddDate)
+                    QuickAddKind.CYCLE -> navigator.openCycle()
                     QuickAddKind.ITEM -> navigator.newItem()
                     QuickAddKind.PERSON -> navigator.newPerson()
                 }
@@ -342,6 +346,7 @@ private val QuickAddOptions get() = listOf(
     QuickAddOption(QuickAddKind.ALARM, Icons.Rounded.Alarm, tr("Sveglia"), tr("Suona a tutto schermo, anche ogni giorno")),
     QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
     QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
+    QuickAddOption(QuickAddKind.CYCLE, Icons.Rounded.WaterDrop, tr("Ciclo"), tr("Previsione e cronologia, senza notifiche")),
     QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, tr("Cosa"), tr("Auto, casa, dispositivi, documenti")),
     QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, tr("Persona"), tr("A chi collegare promemoria e cose")),
 )
@@ -373,7 +378,7 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                             tone = when (option.kind) {
                                 QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
                                 QuickAddKind.EVENT -> colors.lavender
-                                QuickAddKind.ALARM, QuickAddKind.PERSON -> colors.coral
+                                QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
                                 QuickAddKind.VACATION -> colors.mint
                                 QuickAddKind.ITEM -> colors.pear
                             },

@@ -13,6 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SearchRoute
 @Serializable data object PotionsRoute
 @Serializable data object ExpensesRoute
+@Serializable data object CycleRoute
 
 /** Buoni propositi di un anno; [recap] = aperto dall'invito di fine anno. */
 @Serializable data class ResolutionsRoute(val year: Int, val recap: Boolean = false)

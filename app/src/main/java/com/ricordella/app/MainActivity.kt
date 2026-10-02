@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
         }
         // Tocco sulla notifica delle pozioni: si apre la loro schermata.
         if (intent?.getBooleanExtra(EXTRA_OPEN_POTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_POTIONS, null)
+        if (intent?.getBooleanExtra(EXTRA_OPEN_CYCLE, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_CYCLE, null)
         // Widget sveglia: "+" apre la creazione di una sveglia.
         if (intent?.getBooleanExtra(EXTRA_NEW_ALARM, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_ALARM, null)
         // Tocco sul widget dei buoni propositi: si apre la loro schermata.
@@ -93,6 +94,8 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_REMINDER_ID = "com.ricordella.app.extra.OPEN_REMINDER_ID"
+        const val EXTRA_OPEN_CYCLE = "com.ricordella.app.extra.OPEN_CYCLE"
+        const val ACTION_OPEN_CYCLE = "cycle"
         const val EXTRA_NEW_ALARM = "com.ricordella.app.extra.NEW_ALARM"
         const val ACTION_NEW_ALARM = "new_alarm"
         const val EXTRA_OPEN_POTIONS = "com.ricordella.app.extra.OPEN_POTIONS"

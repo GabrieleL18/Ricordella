@@ -3,6 +3,7 @@ package com.ricordella.app.data.calendar
 import android.content.ContentUris
 import android.content.Context
 import android.provider.CalendarContract
+import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.data.local.dao.ReminderDao
 import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.RecurrenceFrequency
@@ -44,36 +45,52 @@ class CalendarImporter(
     /** Evento letto, prima della conversione (serve per scartare i doppioni delle feste). */
     private class Found(val draft: ReminderDraft, val calendar: SourceCalendar)
 
-    /** Account Google con almeno un calendario sul dispositivo. */
-    suspend fun googleAccounts(): List<String> = withContext(Dispatchers.IO) {
-        val accounts = sortedSetOf<String>()
+    /** Account (Google, Samsung, calendari locali del telefono...) con almeno un calendario sul dispositivo. */
+    data class Account(val name: String, val type: String) {
+        val isGoogle get() = type == GOOGLE_ACCOUNT_TYPE
+
+        /** Come lo si mostra: Google = l'indirizzo; Samsung e calendari locali dicono da dove vengono. */
+        val label: String
+            get() = when {
+                isGoogle -> name
+                type.contains("samsung", ignoreCase = true) || type == "com.osp.app.signin" -> "Samsung · $name"
+                type.contains("local", ignoreCase = true) -> tr("Calendario del telefono") + " · $name"
+                else -> name
+            }
+    }
+
+    suspend fun accounts(): List<Account> = withContext(Dispatchers.IO) {
+        val accounts = linkedSetOf<Account>()
         resolver.query(
             CalendarContract.Calendars.CONTENT_URI,
-            arrayOf(CalendarContract.Calendars.ACCOUNT_NAME),
-            "${CalendarContract.Calendars.ACCOUNT_TYPE} = ?",
-            arrayOf(GOOGLE_ACCOUNT_TYPE),
+            arrayOf(CalendarContract.Calendars.ACCOUNT_NAME, CalendarContract.Calendars.ACCOUNT_TYPE),
             null,
+            null,
+            "${CalendarContract.Calendars.ACCOUNT_TYPE}, ${CalendarContract.Calendars.ACCOUNT_NAME}",
         )?.use { cursor ->
-            while (cursor.moveToNext()) cursor.getString(0)?.let(accounts::add)
+            while (cursor.moveToNext()) {
+                val name = cursor.getString(0) ?: continue
+                accounts += Account(name, cursor.getString(1).orEmpty())
+            }
         }
         accounts.toList()
     }
 
     /** Importa i prossimi 12 mesi; restituisce quanti promemoria sono stati creati. */
-    suspend fun import(account: String): Int {
+    suspend fun import(account: Account): Int {
         val drafts = withContext(Dispatchers.IO) { readEvents(account) }
             .filter { reminderDao.countSame(it.reminder.title, it.reminder.dueDate) == 0 }
         drafts.forEach { saveReminder(it) }
         return drafts.size
     }
 
-    private fun readCalendars(account: String): Map<Long, SourceCalendar> {
+    private fun readCalendars(account: Account): Map<Long, SourceCalendar> {
         val calendars = mutableMapOf<Long, SourceCalendar>()
         resolver.query(
             CalendarContract.Calendars.CONTENT_URI,
             arrayOf(CalendarContract.Calendars._ID, CalendarContract.Calendars.OWNER_ACCOUNT, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME),
             "${CalendarContract.Calendars.ACCOUNT_NAME} = ? AND ${CalendarContract.Calendars.ACCOUNT_TYPE} = ?",
-            arrayOf(account, GOOGLE_ACCOUNT_TYPE),
+            arrayOf(account.name, account.type),
             null,
         )?.use { cursor ->
             while (cursor.moveToNext()) {
@@ -103,7 +120,7 @@ class CalendarImporter(
         return result
     }
 
-    private fun readEvents(account: String): List<ReminderDraft> {
+    private fun readEvents(account: Account): List<ReminderDraft> {
         val calendars = readCalendars(account)
         if (calendars.isEmpty()) return emptyList()
 
@@ -161,7 +178,7 @@ class CalendarImporter(
                     dueDate = dateTime.toLocalDate(),
                     dueTime = if (allDay) null else dateTime.toLocalTime(),
                     endDate = lastDay.takeIf { it.isAfter(dateTime.toLocalDate()) },
-                    category = CATEGORY,
+                    category = if (account.isGoogle) CATEGORY else CATEGORY_OTHER,
                     // Le feste si vedono nel calendario ma non disturbano con notifiche.
                     notificationsEnabled = type != ReminderType.HOLIDAY,
                     createdAt = now,
@@ -204,6 +221,7 @@ class CalendarImporter(
     companion object {
         const val GOOGLE_ACCOUNT_TYPE = "com.google"
         const val CATEGORY = "Google Calendar"
+        const val CATEGORY_OTHER = "Calendario importato"
 
         // Italiano e inglese, più le parole più comuni di tedesco, francese e spagnolo.
         private val typeKeywords = listOf(
