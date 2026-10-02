@@ -97,9 +97,22 @@ class SettingsViewModel(
     fun readBackup(source: Uri) = runBusy { handleRead(backupRepository.read(source), fromReserve = false) }
 
     /** Ripristino dalla copia di riserva che l'app tiene sul telefono. */
-    fun readReserve() = runBusy {
+    fun readReserve(file: java.io.File? = null) = runBusy {
         local.update { it.copy(offerReserve = false) }
-        handleRead(backupRepository.readReserve(), fromReserve = true)
+        handleRead(if (file == null) backupRepository.readReserve() else backupRepository.readReserve(file), fromReserve = true)
+    }
+
+    /** Le ultime copie di riserva sul telefono, dalla più recente. */
+    fun reserveCopies(): List<java.io.File> = backupRepository.reserveCopies()
+
+    /** Sceglie la cartella (es. su Drive) dove salvare i backup con la data, ultime 3 copie. */
+    fun setBackupFolder(folder: Uri) = runBusy {
+        if (housekeeping.setBackupFolder(folder)) showMessage(tr("Cartella scelta: backup salvato."))
+        else showMessage(tr("Non riesco a scrivere in quella cartella. Prova con un'altra, oppure usa «Esporta backup»."))
+    }
+
+    fun clearBackupFolder() {
+        viewModelScope.launch { housekeeping.clearBackupFolder() }
     }
 
     fun onReserveOfferDismissed() = local.update { it.copy(offerReserve = false) }

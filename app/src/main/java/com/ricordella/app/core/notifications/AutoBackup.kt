@@ -67,7 +67,8 @@ class AutoBackup(
 
     suspend fun run() {
         if (isDue()) runCatching {
-            if (!housekeeping.overwriteBackup()) backup.createAutoTarget()?.let { housekeeping.exportToNewFile(it) }
+            // Con una cartella scelta non si ripiega su Download: se Drive non risponde si riprova al prossimo giro.
+            if (!housekeeping.overwriteBackup() && settings.current().backupFolderUri == null) backup.createAutoTarget()?.let { housekeeping.exportToNewFile(it) }
         }
         refresh(afterRun = true)
     }
@@ -75,7 +76,7 @@ class AutoBackup(
     /** Mai fatto un backup su file: il primo si fa subito, senza aspettare l'intervallo. */
     private suspend fun isDue(): Boolean {
         val app = settings.current()
-        return app.backupTargetUri == null || Housekeeping.isBackupDue(app, time.today(), time.now().toEpochMilli())
+        return (app.backupTargetUri == null && app.backupFolderUri == null) || Housekeeping.isBackupDue(app, time.today(), time.now().toEpochMilli())
     }
 
     private fun alarmIntent(): PendingIntent = PendingIntent.getBroadcast(

@@ -73,13 +73,15 @@ import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material3.Surface
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.ricordella.app.core.ui.BackupTutorialPages
+import com.ricordella.app.core.ui.BackupGuidePages
 import com.ricordella.app.core.ui.SectionTutorialPages
 import com.ricordella.app.core.ui.TutorialDialog
 import com.ricordella.app.core.ui.shareBackup
 import com.ricordella.app.feature.onboarding.CalendarImportStep
 import com.ricordella.app.feature.onboarding.CalendarImportViewModel
 import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.LinkOff
+import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
@@ -151,6 +153,11 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
     var showNews by rememberSaveable { mutableStateOf(false) }
     var showCalendarImport by rememberSaveable { mutableStateOf(false) }
 
+    var showReserveList by rememberSaveable { mutableStateOf(false) }
+    var showBackupTutorial by rememberSaveable { mutableStateOf(false) }
+    val folderLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        uri?.let(viewModel::setBackupFolder)
+    }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(viewModel::readBackup)
     }
@@ -299,15 +306,35 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
                     onClick = { backupAction(BACKUP_IMPORT) },
                 )
-                state.reserveSavedAt?.let { millis ->
-                    val at = java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(millis), java.time.ZoneId.systemDefault())
+                SettingRow(
+                    icon = Icons.Rounded.CloudSync,
+                    title = tr("Cartella dei backup (Drive)"),
+                    subtitle = if (settings.backupFolderUri != null) tr("Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per cambiare cartella.")
+                    else tr("Scegli una cartella su Drive: così non perdi i dati se cambi telefono. Se non la scegli, le copie restano sul telefono."),
+                    onClick = { folderLauncher.launch(null) },
+                )
+                if (settings.backupFolderUri != null) {
                     SettingRow(
-                        icon = Icons.Rounded.Shield,
-                        title = tr("Copia di riserva"),
-                        subtitle = trf("Dell'ultimo backup, sul telefono: %1\$s. Usala se il file di backup si rovina.", DateTexts.relativeWithTime(at.toLocalDate(), at.toLocalTime().withSecond(0).withNano(0), LocalDate.now())),
-                        onClick = viewModel::readReserve,
+                        icon = Icons.Rounded.LinkOff,
+                        title = tr("Smetti di usare la cartella"),
+                        subtitle = tr("I backup tornano nel file scelto o in Download/Remindella."),
+                        onClick = viewModel::clearBackupFolder,
                     )
                 }
+                if (state.reserveSavedAt != null) {
+                    SettingRow(
+                        icon = Icons.Rounded.Shield,
+                        title = tr("Copie di riserva"),
+                        subtitle = tr("Le ultime 3 copie, sul telefono, con la data. Usale se il file di backup si rovina."),
+                        onClick = { showReserveList = true },
+                    )
+                }
+                SettingRow(
+                    icon = Icons.AutoMirrored.Rounded.HelpOutline,
+                    title = tr("Come funzionano i backup"),
+                    subtitle = tr("Dove vanno le copie, cosa succede se cambi telefono."),
+                    onClick = { showBackupTutorial = true },
+                )
                 SettingRow(
                     icon = Icons.Rounded.Schedule,
                     title = tr("Backup automatico"),
@@ -401,6 +428,26 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
         }
     }
 
+    if (showBackupTutorial) TutorialDialog(BackupGuidePages, onDismiss = { showBackupTutorial = false })
+    if (showReserveList) {
+        val copies = remember { viewModel.reserveCopies() }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showReserveList = false },
+            title = { Text(tr("Copie di riserva")) },
+            text = {
+                Column {
+                    Text(tr("Scegli quale ripristinare: ti chiedo conferma prima di sostituire i dati."), style = MaterialTheme.typography.bodyMedium)
+                    copies.forEach { file ->
+                        val at = java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(file.lastModified()), java.time.ZoneId.systemDefault())
+                        TextButton(onClick = { showReserveList = false; viewModel.readReserve(file) }) {
+                            Text(DateTexts.date(at.toLocalDate(), settings.dateFormat) + " · " + DateTexts.time(at.toLocalTime()))
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showReserveList = false }) { Text(tr("Chiudi")) } },
+        )
+    }
     if (state.offerReserve) {
         ConfirmDialog(
             title = tr("Questo backup è rovinato"),

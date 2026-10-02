@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.onboarding
 
+import androidx.compose.foundation.background
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -283,6 +284,17 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
             .padding(RicordellaDimensions.spaceXl),
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL),
     ) {
+        Column(
+            Modifier.fillMaxWidth().background(MaterialTheme.ricordellaColors.pear.container, MaterialTheme.shapes.large).padding(RicordellaDimensions.spaceL),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(tr("Il mio consiglio"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.ricordellaColors.pear.content)
+            Text(
+                tr("Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Dati e backup."),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.ricordellaColors.pear.content,
+            )
+        }
         Text(tr("Come preferisci?"), style = MaterialTheme.typography.headlineMedium)
         Text(
             tr("Alcune cose le faccio una volta l'anno o ogni tanto. Scegli se farle da sola, chiedertelo prima o mai. Tocca ? per vedere cosa succede. Potrai cambiare idea nelle Impostazioni."),

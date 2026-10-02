@@ -62,11 +62,67 @@ class BackupRepository(
 
     private val reserveDir get() = File(context.filesDir, RESERVE_DIR).apply { mkdirs() }
 
-    /** Copia di riserva dell'ultimo backup, sul telefono: serve se il file principale si rovina. */
-    val reserveFile: File get() = File(reserveDir, "remindella-backup-riserva.zip")
+    /** Le ultime [KEEP_COPIES] copie di riserva sul telefono, con la data nel nome, dalla più recente: servono se il file principale si rovina. */
+    fun reserveCopies(): List<File> = reserveDir.listFiles { f -> f.name.startsWith("remindella-backup-riserva") && f.extension == "zip" }
+        .orEmpty().sortedByDescending { it.lastModified() }
 
-    /** Quando è stata fatta la copia di riserva (millisecondi), null se non c'è. */
-    fun reserveSavedAt(): Long? = reserveFile.takeIf { it.exists() }?.lastModified()
+    /** Quando è stata fatta l'ultima copia di riserva (millisecondi), null se non c'è. */
+    fun reserveSavedAt(): Long? = reserveCopies().firstOrNull()?.lastModified()
+
+    private fun stamp(): String = java.time.LocalDateTime.now(clock).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd-HHmm"))
+
+    /** Tiene [KEEP_COPIES] copie con la data nel nome: la nuova si aggiunge e le più vecchie spariscono. */
+    private fun addReserveCopy(fresh: File) {
+        fresh.copyTo(File(reserveDir, "remindella-backup-riserva-${stamp()}.zip"), overwrite = true)
+        reserveCopies().drop(KEEP_COPIES).forEach { it.delete() }
+    }
+
+    /** Prepara sul telefono un backup nuovo e controlla che si rilegga bene. */
+    private suspend fun prepare(): File {
+        val fresh = File(reserveDir, "in-preparazione.zip")
+        fresh.outputStream().buffered().use { writeBackup(it) }
+        if (!isReadable { fresh.inputStream() }) {
+            fresh.delete()
+            throw IOException(tr("Backup non valido"))
+        }
+        return fresh
+    }
+
+    /**
+     * Salva il backup in una cartella (es. su Drive) in un file con la data nel nome, e tiene solo le ultime
+     * [KEEP_COPIES] copie: le più vecchie vengono cancellate. Controlla che il file scritto si rilegga.
+     */
+    suspend fun exportToFolder(folder: Uri) = withContext(Dispatchers.IO) {
+        val fresh = prepare()
+        val parent = android.provider.DocumentsContract.buildDocumentUriUsingTree(folder, android.provider.DocumentsContract.getTreeDocumentId(folder))
+        val name = "remindella-backup-${stamp()}.zip"
+        val created = android.provider.DocumentsContract.createDocument(resolver, parent, "application/zip", name)
+            ?: throw IOException(tr("Destinazione non disponibile"))
+        (resolver.openOutputStream(created, "w") ?: throw IOException(tr("Destinazione non disponibile")))
+            .buffered().use { out -> fresh.inputStream().use { it.copyTo(out) } }
+        if (!isReadable { resolver.openInputStream(created) ?: throw IOException() }) {
+            runCatching { android.provider.DocumentsContract.deleteDocument(resolver, created) }
+            throw IOException(tr("Il file di backup scritto non si rilegge"))
+        }
+        addReserveCopy(fresh)
+        fresh.delete()
+        // Solo dopo aver scritto bene si tolgono le copie più vecchie.
+        val childrenUri = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(folder, android.provider.DocumentsContract.getTreeDocumentId(folder))
+        val old = mutableListOf<Pair<String, String>>()
+        resolver.query(
+            childrenUri,
+            arrayOf(android.provider.DocumentsContract.Document.COLUMN_DOCUMENT_ID, android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME),
+            null, null, null,
+        )?.use { c ->
+            while (c.moveToNext()) {
+                val display = c.getString(1).orEmpty()
+                if (display.startsWith("remindella-backup-") && display.endsWith(".zip")) old += c.getString(0) to display
+            }
+        }
+        old.sortedByDescending { it.second }.drop(KEEP_COPIES).forEach { (id, _) ->
+            runCatching { android.provider.DocumentsContract.deleteDocument(resolver, android.provider.DocumentsContract.buildDocumentUriUsingTree(folder, id)) }
+        }
+    }
 
     /**
      * Scrive il backup nel documento scelto dall'utente, sovrascrivendone il contenuto.
@@ -74,18 +130,13 @@ class BackupRepository(
      * e ricontrolla anche quello. Il backup preparato diventa la nuova copia di riserva.
      */
     suspend fun exportTo(destination: Uri) = withContext(Dispatchers.IO) {
-        val fresh = File(reserveDir, "in-preparazione.zip")
-        fresh.outputStream().buffered().use { writeBackup(it) }
-        if (!isReadable { fresh.inputStream() }) {
-            fresh.delete()
-            throw IOException(tr("Backup non valido"))
-        }
+        val fresh = prepare()
         val output = runCatching { resolver.openOutputStream(destination, "wt") }.getOrNull()
             ?: resolver.openOutputStream(destination, "w")
             ?: throw IOException(tr("Destinazione non disponibile"))
         output.buffered().use { out -> fresh.inputStream().use { it.copyTo(out) } }
         // La copia di riserva si aggiorna solo con un backup sano: quella vecchia resta finché la nuova non è pronta.
-        fresh.copyTo(reserveFile, overwrite = true)
+        addReserveCopy(fresh)
         fresh.delete()
         if (!isReadable { resolver.openInputStream(destination) ?: throw IOException() }) throw IOException(tr("Il file di backup scritto non si rilegge"))
     }
@@ -96,7 +147,8 @@ class BackupRepository(
     }.getOrDefault(false)
 
     /** Legge la copia di riserva per ripristinarla (stesso controllo e conferma di un backup scelto). */
-    suspend fun readReserve(): Pair<BackupReadResult, PendingRestore?> = read(Uri.fromFile(reserveFile))
+    suspend fun readReserve(file: File? = reserveCopies().firstOrNull()): Pair<BackupReadResult, PendingRestore?> =
+        if (file == null) BackupReadResult.NotABackup to null else read(Uri.fromFile(file))
 
     /**
      * File per il backup automatico quando l'utente non ne ha scelto uno: Download/Remindella
@@ -217,6 +269,7 @@ class BackupRepository(
         const val RESTORED_DIR = "restored"
         const val EXPORT_DIR = "exports"
         const val RESERVE_DIR = "backup-reserve"
+        const val KEEP_COPIES = 3
         const val MAX_IMAGE_SIDE = 1280
         const val IMAGE_QUALITY = 70
     }

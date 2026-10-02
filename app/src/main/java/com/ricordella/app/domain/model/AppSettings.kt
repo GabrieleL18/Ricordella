@@ -71,6 +71,8 @@ data class AppSettings(
     val backupIntervalDays: Int = 1,
     /** File del backup scelto dall'utente: ogni esportazione lo sovrascrive. */
     val backupTargetUri: String? = null,
+    /** Cartella (es. su Drive) dove il backup salva file con la data, tenendo solo le ultime 3 copie. */
+    val backupFolderUri: String? = null,
     /** Orario del backup automatico (sul file scelto o in Download/Remindella); null = spento. */
     val autoBackupTime: LocalTime? = LocalTime.of(22, 0),
     /** Backup ogni 1, 3 o 6 ore invece che a giorni (0 = si usano [backupIntervalDays] e [autoBackupTime]). */

@@ -40,6 +40,11 @@ class Housekeeping(
      * o non è più scrivibile (cancellato, permesso perso): allora va chiesto dove salvarlo.
      */
     suspend fun overwriteBackup(): Boolean {
+        settings.current().backupFolderUri?.toUri()?.let { folder ->
+            val ok = runCatching { backup.exportToFolder(folder) }.isSuccess
+            if (ok) markBackupDone()
+            return ok
+        }
         val target = settings.current().backupTargetUri?.toUri() ?: return false
         val ok = runCatching { backup.exportTo(target) }.isSuccess
         if (ok) markBackupDone() else settings.update { it.copy(backupTargetUri = null) }
@@ -53,6 +58,17 @@ class Housekeeping(
         settings.update { it.copy(backupTargetUri = uri.toString()) }
         markBackupDone()
     }
+
+    /** Sceglie la cartella dei backup (es. su Drive) e fa subito il primo salvataggio. */
+    suspend fun setBackupFolder(folder: Uri): Boolean {
+        backup.keepAccess(folder)
+        settings.update { it.copy(backupFolderUri = folder.toString()) }
+        val ok = runCatching { backup.exportToFolder(folder) }.isSuccess
+        if (ok) markBackupDone() else settings.update { it.copy(backupFolderUri = null) }
+        return ok
+    }
+
+    suspend fun clearBackupFolder() = settings.update { it.copy(backupFolderUri = null) }
 
     private suspend fun markBackupDone() {
         val today = time.today().toEpochDay()

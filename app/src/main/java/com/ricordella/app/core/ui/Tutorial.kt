@@ -950,6 +950,31 @@ val SharingTutorialPages: List<TutorialPage>
         ) { SharingIllustration(2) },
     )
 
+/** Come funzionano i backup: dove stanno le copie, Drive, cambio telefono. */
+val BackupGuidePages: List<TutorialPage>
+    get() = listOf(
+        TutorialPage(
+            tr("I tuoi dati sono sul telefono"),
+            tr("Remindella funziona senza account: promemoria, persone e cose stanno solo su questo telefono. Se lo perdi o lo cambi, senza un backup li perdi."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.READING) },
+        TutorialPage(
+            tr("Le copie sul telefono"),
+            tr("Ogni volta che fai un backup tengo sul telefono una copia di riserva con la data nel nome, le ultime 3. Servono se il file principale si rovina."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.CONJURING) },
+        TutorialPage(
+            tr("Salvale su Drive"),
+            tr("In Impostazioni › Dati e backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.BROOM) },
+        TutorialPage(
+            tr("Cambi telefono?"),
+            tr("Installa Remindella, apri Impostazioni › Importa backup e scegli l'ultimo file dalla cartella su Drive: ritrovi tutto com'era."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.PHONE_CALL) },
+        TutorialPage(
+            tr("Quando parte"),
+            tr("Il backup automatico parte da solo all'orario e con la frequenza che scegli nelle Impostazioni. Prima di un ripristino ti chiedo sempre conferma."),
+        ) { HappyWizard(size = 180.dp, scene = WizardScene.WAITING_BELL) },
+    )
+
 /* ---------- Illustrazioni di "Scrivi al volo" ---------- */
 
 /** La barra si riempie lettera per lettera, poi sotto compare l'anteprima di cosa ho capito. */
