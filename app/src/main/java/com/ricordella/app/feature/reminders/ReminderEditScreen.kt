@@ -480,7 +480,6 @@ private fun AlarmFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         val workdays = DayOfWeek.entries.take(5).toSet()
-        AssistChip(onClick = { setDays(DayOfWeek.entries.toSet()) }, label = { Text(tr("Ogni giorno")) })
         AssistChip(onClick = { setDays(workdays) }, label = { Text(tr("Lun–Ven")) })
         AssistChip(onClick = { setDays(emptySet()) }, label = { Text(tr("Una volta sola")) })
     }
