@@ -22,24 +22,24 @@ What's new:
 </en-US>
 <de-DE>
 Neu:
-• Raten und Zahlungen: Hausgeld, Hypothek und Kredite mit Fälligkeiten und Betrag je Rate
-• Wecker an festen Wochentagen, mit stillem Hinweis vorher und Pause bis zu einem Datum
-• Papierkorb: Gelöschtes 7 Tage lang wiederherstellen
+• Raten und Zahlungen: Hausgeld, Hypothek, Kredite, Betrag je Rate
+• Wecker an festen Wochentagen, stiller Hinweis vorher, Pause bis zu einem Datum
+• Papierkorb: Gelöschtes 7 Tage wiederherstellen
 • Backup: letzte 3 Kopien mit Datum, auch in Drive
 • Zyklus mit Vorhersage und Verlauf
-• Import aus mehreren Kalendern (Google, Samsung) mit Auswahl bei Konflikten
-• Wähle, was in der geteilten Datei geteilt wird
+• Import aus mehreren Kalendern (Google, Samsung)
+• Wähle, was geteilt wird
 • Wecker-Widget und wöchentliche Wasser-Übersicht
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Échéances et paiements : copropriété, prêt immobilier et crédits avec dates et montant par échéance
-• Réveils à jours fixes, avec avis silencieux avant et pause jusqu'à une date
+• Échéances et paiements : copropriété, prêts, montant par échéance
+• Réveils à jours fixes, avis silencieux avant, pause jusqu'à une date
 • Corbeille : récupère ce que tu supprimes pendant 7 jours
 • Sauvegarde : 3 dernières copies datées, aussi sur Drive
 • Cycle avec prévision et historique
-• Import depuis plusieurs calendriers (Google, Samsung) avec choix en cas de conflit
-• Choisis ce qui est partagé dans le fichier partagé
+• Import de plusieurs calendriers (Google, Samsung)
+• Choisis ce qui est partagé
 • Widget Réveil et récap hebdomadaire de l'eau
 </fr-FR>
 <es-ES>
