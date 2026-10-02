@@ -16,8 +16,8 @@ android {
         applicationId = "com.remindella.app"
         minSdk = 28
         targetSdk = 37
-        versionCode = 4
-        versionName = "0.2.0"
+        versionCode = 5
+        versionName = "0.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
