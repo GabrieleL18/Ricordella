@@ -1508,3 +1508,81 @@ Rimborso del dentista ||| Dentist refund
 Libri e zaino di Sofia ||| Sofia's books and backpack
 Stipendio extra ||| Extra salary
 Finisce qui ||| Ends here
+Aggiungi i prezzi ||| Add prices
+Aggiungi una sveglia: scegli l'ora e i giorni, poi accendila o spegnila quando vuoi. ||| Add an alarm: pick the time and days, then turn it on or off whenever you like.
+Aggiungi voce ||| Add item
+Ancora da prendere ||| Still to buy
+Apri le sveglie del telefono ||| Open the phone's alarms
+Avviso silenzioso prima di ogni sveglia ||| Silent heads-up before every alarm
+Caricatori ||| Chargers
+Costumi ||| Swimsuits
+Crema solare ||| Sunscreen
+Detersivo ||| Detergent
+Elimina voce ||| Delete item
+Eliminare la nota? ||| Delete the note?
+Eliminare la sveglia? ||| Delete the alarm?
+Fatto ✓ ||| Done ✓
+Fissa in alto ||| Pin to top
+Fissata ||| Pinned
+Google Keep non permette alle altre app di leggere le note, ma ci sono due strade.⏎⏎1. Una nota alla volta: in Keep apri la nota, tocca ⋮ › Invia e scegli Remindella.⏎⏎2. Tutte insieme: su takeout.google.com esporta solo «Keep», poi scegli qui il file .zip (o i file .json) scaricato. ||| Google Keep doesn't let other apps read your notes, but there are two ways.⏎⏎1. One note at a time: in Keep open the note, tap ⋮ › Send and choose Remindella.⏎⏎2. All at once: on takeout.google.com export only "Keep", then choose the downloaded .zip file (or the .json files) here.
+Hai già una sveglia alle %1$s ||| You already have an alarm at %1$s
+Idee regalo per Sofia ||| Gift ideas for Sofia
+Importa da Google Keep ||| Import from Google Keep
+Importa la prossima sveglia del telefono ||| Import the phone's next alarm
+Importata la sveglia delle %1$s ||| Imported the %1$s alarm
+Importate %1$s note (%2$s già presenti) ||| Imported %1$s notes (%2$s already there)
+La nota viene eliminata. Se hai un backup la ritrovi lì. ||| The note will be deleted. If you have a backup you can find it there.
+La prossima suona %1$s ||| The next one rings %1$s
+La sveglia delle %1$s viene eliminata. ||| The %1$s alarm will be deleted.
+Latte ||| Milk
+Lista ||| List
+Lista della spesa ||| Shopping list
+Mele ||| Apples
+Nel carrello (%1$s) ||| In the cart (%1$s)
+Nessuna nota ||| No notes
+Nessuna sveglia attiva ||| No active alarms
+Non ho trovato note in questi file ||| I couldn't find any notes in these files
+Non trovo l'app Orologio ||| I can't find the Clock app
+Nota ||| Note
+Nuova nota ||| New note
+Pane ||| Bread
+Parmigiano ||| Parmesan
+Passaporti ||| Passports
+Pasta ||| Pasta
+Prossima sveglia ||| Next alarm
+Scrivi qui ||| Write here
+Scrivi una nota o prepara una lista della spesa con i prezzi: il totale lo calcolo io. ||| Write a note or prepare a shopping list with prices: I'll work out the total.
+Senza titolo ||| Untitled
+Spegni ||| Turn off
+Spesa del sabato ||| Saturday shopping
+Sul telefono non c'è nessuna sveglia attiva ||| There's no active alarm on the phone
+Sveglie, note e pozioni ||| Alarms, notes and potions
+Te lo ricordo: %1$s ||| I'll remind you: %1$s
+Testo, liste e lista della spesa ||| Text, lists and shopping list
+Titolo ||| Title
+Tocca + per scrivere la prima nota ✨ ||| Tap + to write your first note ✨
+Togli i prezzi ||| Remove prices
+Togli le voci spuntate ||| Remove ticked items
+Totale ||| Total
+Totale: %1$s ||| Total: %1$s
+Tra poco suona la sveglia delle %1$s. Vuoi spegnerla? ||| The %1$s alarm rings soon. Want to turn it off?
+Trasforma in lista ||| Turn into a list
+Trasforma in testo ||| Turn into text
+Un libro di avventure, il set per i braccialetti e le cuffie per la piscina. ||| An adventure book, the bracelet-making kit and headphones for the pool.
+Valigia per la Sicilia ||| Suitcase for Sicily
+Voce ||| Item
+Weekend ||| Weekend
+tra %1$s g %2$s h ||| in %1$s d %2$s h
+tra %1$s h %2$s min ||| in %1$s h %2$s min
+tra %1$s min ||| in %1$s min
+💤 rimandato: %1$s ||| 💤 snoozed: %1$s
+Sveglie a parte ||| Alarms on their own
+Una sezione solo per le sveglie: ora e giorni, accese o spente quando vuoi, e un avviso un'ora prima. ||| A section just for alarms: time and days, on or off whenever you like, and a heads-up an hour before.
+Le sveglie non hanno più una data: scegli l'ora e i giorni e le accendi o spegni con un interruttore. Un'ora prima arriva un avviso silenzioso con il pulsante per spegnerle. Puoi importare la prossima sveglia del telefono. Le trovi dal menu in alto, accanto a Note e Pozioni. ||| Alarms no longer have a date: pick the time and days and turn them on or off with a switch. An hour before, a silent heads-up arrives with a button to turn them off. You can import the phone's next alarm. Find them in the top menu, next to Notes and Potions.
+Note e lista della spesa ||| Notes and shopping list
+Note di testo, liste e liste della spesa con prezzi e totale. ||| Text notes, lists and shopping lists with prices and total.
+Scrivi note, crea liste con le caselle o liste della spesa con prezzo e quantità: il totale e quanto è già nel carrello li calcolo io. Ci sono anche i widget Note e Sveglie, con la stessa grafica dell'app. ||| Write notes, create checklists or shopping lists with price and quantity: I work out the total and what's already in the cart. There are also Notes and Alarms widgets, styled like the app.
+Nome (facoltativo) ||| Name (optional)
+Riepilogo dell'anno e PDF ||| Year summary and PDF
+Sezioni extra in Home ||| Extra sections on Home
+Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarms, Notes and Potions one tap away on Home.

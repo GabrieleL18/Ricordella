@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.CalendarMonth
@@ -92,6 +93,16 @@ val AllNews: List<NewsRelease>
                     Icons.Rounded.Alarm, { it.coral }, tr("Sveglie e ciclo nel calendario"),
                     tr("Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni."),
                     tr("Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara."),
+                ),
+                NewsItem(
+                    Icons.Rounded.Alarm, { it.coral }, tr("Sveglie a parte"),
+                    tr("Una sezione solo per le sveglie: ora e giorni, accese o spente quando vuoi, e un avviso un'ora prima."),
+                    tr("Le sveglie non hanno più una data: scegli l'ora e i giorni e le accendi o spegni con un interruttore. Un'ora prima arriva un avviso silenzioso con il pulsante per spegnerle. Puoi importare la prossima sveglia del telefono. Le trovi dal menu in alto, accanto a Note e Pozioni."),
+                ),
+                NewsItem(
+                    Icons.Rounded.StickyNote2, { it.pear }, tr("Note e lista della spesa"),
+                    tr("Note di testo, liste e liste della spesa con prezzi e totale."),
+                    tr("Scrivi note, crea liste con le caselle o liste della spesa con prezzo e quantità: il totale e quanto è già nel carrello li calcolo io. Ci sono anche i widget Note e Sveglie, con la stessa grafica dell'app."),
                 ),
                 NewsItem(
                     Icons.Rounded.TouchApp, { it.cyan }, tr("Più semplice"),

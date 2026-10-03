@@ -70,13 +70,16 @@ class ReminderNotifier(private val context: Context) {
         val notification = NotificationCompat.Builder(context, CHANNEL_ALARM_PREVIEW)
             .setSmallIcon(R.drawable.ic_stat_reminder)
             .setContentTitle(reminder.title)
-            .setContentText(trf("Tra poco suona la sveglia delle %1\$s. Vuoi spegnerla per questa volta?", time))
+            .setContentText(
+                if (entry.recurrenceRule != null) trf("Tra poco suona la sveglia delle %1\$s. Vuoi spegnerla per questa volta?", time)
+                else trf("Tra poco suona la sveglia delle %1\$s. Vuoi spegnerla?", time),
+            )
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true)
             .setAutoCancel(true)
             .setContentIntent(openIntent(reminder.id))
-            .addAction(0, tr("Salta questa volta"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
+            .addAction(0, tr("Spegni"), actionIntent(reminder.id, NotificationActionReceiver.ACTION_COMPLETE))
             .build()
         try {
             manager.notify(reminder.id, NOTIFICATION_ID_PREVIEW, notification)
@@ -121,7 +124,10 @@ class ReminderNotifier(private val context: Context) {
         }
     }
 
-    fun dismiss(reminderId: String) = manager.cancel(reminderId, NOTIFICATION_ID)
+    fun dismiss(reminderId: String) {
+        manager.cancel(reminderId, NOTIFICATION_ID)
+        manager.cancel(reminderId, NOTIFICATION_ID_PREVIEW)
+    }
 
     fun dismissAll() = manager.cancelAll()
 
@@ -200,7 +206,7 @@ class ReminderNotifier(private val context: Context) {
             .putExtra(NotificationActionReceiver.EXTRA_REMINDER_ID, reminderId)
         return PendingIntent.getBroadcast(
             context,
-            reminderId.hashCode(),
+            (reminderId + action).hashCode(),
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )

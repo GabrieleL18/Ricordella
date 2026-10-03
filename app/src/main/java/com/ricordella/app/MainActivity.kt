@@ -18,6 +18,7 @@ import com.ricordella.app.core.ui.theme.RicordellaTheme
 import com.ricordella.app.feature.settings.OpenedBackupImport
 import com.ricordella.app.domain.model.AppSettings
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
@@ -89,6 +90,11 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(EXTRA_OPEN_CYCLE, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_CYCLE, null)
         // Widget sveglia: "+" apre la creazione di una sveglia.
         if (intent?.getBooleanExtra(EXTRA_NEW_ALARM, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_ALARM, null)
+        // Widget sveglie e note: aprono la loro sezione, la nota toccata o una nota nuova.
+        if (intent?.getBooleanExtra(EXTRA_OPEN_ALARMS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_ALARMS, null)
+        if (intent?.getBooleanExtra(EXTRA_OPEN_NOTES, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTES, null)
+        if (intent?.getBooleanExtra(EXTRA_NEW_NOTE, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_NOTE, null)
+        intent?.getStringExtra(EXTRA_NOTE_ID)?.let { widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTE, null, it) }
         // Tocco sul widget dei buoni propositi: si apre la loro schermata.
         if (intent?.getBooleanExtra(EXTRA_OPEN_RESOLUTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_RESOLUTIONS, null)
     }
@@ -101,6 +107,14 @@ class MainActivity : ComponentActivity() {
         const val ACTION_NEW_ALARM = "new_alarm"
         const val EXTRA_OPEN_POTIONS = "com.ricordella.app.extra.OPEN_POTIONS"
         const val ACTION_OPEN_POTIONS = "potions"
+        const val EXTRA_OPEN_ALARMS = "com.ricordella.app.extra.OPEN_ALARMS"
+        const val ACTION_OPEN_ALARMS = "alarms"
+        const val EXTRA_OPEN_NOTES = "com.ricordella.app.extra.OPEN_NOTES"
+        const val ACTION_OPEN_NOTES = "notes"
+        const val EXTRA_NEW_NOTE = "com.ricordella.app.extra.NEW_NOTE"
+        const val ACTION_NEW_NOTE = "new_note"
+        const val EXTRA_NOTE_ID = "com.ricordella.app.extra.NOTE_ID"
+        const val ACTION_OPEN_NOTE = "note"
         const val EXTRA_OPEN_RESOLUTIONS = "com.ricordella.app.extra.OPEN_RESOLUTIONS"
         const val ACTION_OPEN_RESOLUTIONS = "resolutions"
     }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ricordella.app.domain.date.ReminderTimeline
 import com.ricordella.app.domain.date.TimeSource
+import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.repository.ReminderRepository
 import com.ricordella.app.domain.usecase.CompleteReminderUseCase
@@ -189,7 +190,8 @@ class HomeViewModel(
         ticks,
         settings.settings,
     ) { entries, now, appSettings ->
-        buildState(entries, now).copy(
+        // Le sveglie hanno la loro sezione: qui non compaiono.
+        buildState(entries.filterNot { it.reminder.type == ReminderType.ALARM }, now).copy(
             backupDue = appSettings.autoBackupTime == null && Housekeeping.isBackupDue(appSettings, now.toLocalDate()),
             backupIntervalDays = appSettings.backupIntervalDays,
         )

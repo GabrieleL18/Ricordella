@@ -12,4 +12,6 @@
     <string name="widget_agenda_description">Plans for today, tomorrow and the days after: mark them done, browse the days</string>
     <string name="widget_alarm_label">Remindella Alarm</string>
     <string name="widget_alarm_description">The next alarm to ring: tap to open it, + to add one</string>
+    <string name="widget_notes_label">Remindella Notes</string>
+    <string name="widget_notes_description">Your notes and shopping lists: tap a note to open it, + to add one</string>
 </resources>

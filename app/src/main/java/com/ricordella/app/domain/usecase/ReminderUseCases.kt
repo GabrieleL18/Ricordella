@@ -9,6 +9,8 @@ import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.ReminderCompletion
 import com.ricordella.app.domain.model.ReminderDraft
 import com.ricordella.app.domain.model.ReminderStatus
+import com.ricordella.app.domain.model.ReminderType
+import com.ricordella.app.domain.date.nextAlarmDate
 import com.ricordella.app.domain.model.SnoozeOption
 import com.ricordella.app.domain.model.snoozeUntil
 import com.ricordella.app.domain.repository.ReminderRepository
@@ -77,6 +79,13 @@ class CompleteReminderUseCase(
         if (guard?.allow(entry.people, reminder.title, GuardedAction.COMPLETE) == false) return
         val now = time.now()
         val today = time.today()
+        // Una sveglia che non si ripete non si "completa": si spegne e resta nell'elenco, pronta da riaccendere.
+        if (reminder.type == ReminderType.ALARM && entry.recurrenceRule == null) {
+            reminders.update(reminder.copy(notificationsEnabled = false, snoozedUntil = null, lastNotifiedAt = now, updatedAt = now))
+            scheduler.dismissNotification(reminder.id)
+            scheduler.refresh()
+            return
+        }
         val completion = ReminderCompletion(reminderId = reminder.id, occurrenceDate = reminder.dueDate, completedAt = now)
 
         // Pagamento a rate: si segna pagata la rata di questa scadenza e si passa alla prossima ancora da pagare
@@ -195,14 +204,16 @@ class SnoozeReminderUseCase(
     private val scheduler: ReminderScheduler,
     private val time: TimeSource,
 ) {
-    suspend operator fun invoke(reminderId: String, option: SnoozeOption) {
-        val reminder = reminders.getReminder(reminderId)?.reminder ?: return
-        if (reminder.status != ReminderStatus.ACTIVE) return
+    /** Restituisce quando la notifica tornerà, o null se non c'era nulla da rimandare. */
+    suspend operator fun invoke(reminderId: String, option: SnoozeOption): java.time.Instant? {
+        val reminder = reminders.getReminder(reminderId)?.reminder ?: return null
+        if (reminder.status != ReminderStatus.ACTIVE) return null
         val now = time.now()
         val until = option.snoozeUntil(now, time.zone, settings.current().allDayNotificationTime)
         reminders.update(reminder.copy(snoozedUntil = until, updatedAt = now))
         scheduler.dismissNotification(reminderId)
         scheduler.refresh()
+        return until
     }
 }
 
@@ -216,5 +227,35 @@ class DeleteReminderUseCase(
         reminders.delete(reminderId)
         scheduler.dismissNotification(reminderId)
         scheduler.refresh()
+    }
+}
+
+/**
+ * Accende o spegne una sveglia. Riaccendendola si ricalcola il prossimo giorno in cui suona
+ * (una sveglia spenta per giorni non deve restare ferma a una data passata).
+ */
+class SetAlarmEnabledUseCase(
+    private val reminders: ReminderRepository,
+    private val save: SaveReminderUseCase,
+    private val scheduler: ReminderScheduler,
+    private val time: TimeSource,
+) {
+    suspend operator fun invoke(reminderId: String, enabled: Boolean) {
+        val entry = reminders.getReminder(reminderId) ?: return
+        val alarm = entry.reminder
+        if (alarm.type != ReminderType.ALARM || alarm.notificationsEnabled == enabled) return
+        if (!enabled) {
+            reminders.update(alarm.copy(notificationsEnabled = false, snoozedUntil = null, updatedAt = time.now()))
+            scheduler.dismissNotification(reminderId)
+            scheduler.refresh()
+            return
+        }
+        val at = alarm.dueTime ?: return
+        val rule = entry.recurrenceRule
+        val date = nextAlarmDate(at, rule?.daysOfWeek.orEmpty(), time.localNow(), alarm.pausedUntil)
+        save(
+            ReminderDraft(alarm.copy(notificationsEnabled = true, dueDate = date), rule, entry.people.mapTo(mutableSetOf()) { it.id }, entry.items.mapTo(mutableSetOf()) { it.id }),
+            guarded = false,
+        )
     }
 }

@@ -1,6 +1,11 @@
 package com.ricordella.app.feature.items
 
+import android.content.Context
 import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Path
+import android.graphics.Shader
+import com.ricordella.app.R
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
@@ -11,17 +16,16 @@ import com.ricordella.app.domain.model.MoneyKind
 import com.ricordella.app.domain.model.PersonRecap
 import java.io.OutputStream
 
-/** PDF semplice delle spese di un anno: il nome «Remindella», poi per ogni persona l'elenco dei pagamenti. Niente effetti. */
+/** PDF delle spese di un anno: il nome «Remindella» scritto come nell'app, poi per ogni persona l'elenco dei pagamenti. */
 object MoneyPdf {
     private const val WIDTH = 595
     private const val HEIGHT = 842
     private const val MARGIN = 48f
     private const val LINE = 18f
 
-    fun write(out: OutputStream, year: Int, scope: String, recap: List<PersonRecap>, nameOf: (String) -> String) {
+    fun write(context: Context, out: OutputStream, year: Int, scope: String, recap: List<PersonRecap>, nameOf: (String) -> String) {
         val ink = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF111111.toInt(); textSize = 11f }
         val bold = Paint(ink).apply { typeface = Typeface.DEFAULT_BOLD }
-        val title = Paint(bold).apply { textSize = 26f }
         val muted = Paint(ink).apply { color = 0xFF666666.toInt(); textSize = 10f }
         val rule = Paint().apply { color = 0xFFCCCCCC.toInt(); strokeWidth = 0.8f }
 
@@ -50,8 +54,8 @@ object MoneyPdf {
             y += LINE
         }
 
-        canvas.drawText("Remindella", MARGIN, y + 22f, title)
-        y += 44f
+        brandTitle(canvas, context, MARGIN, y + 32f, 36f)
+        y += 54f
         canvas.drawText(trf("Spese %1\$s", year) + " · " + scope, MARGIN, y, muted)
         y += 26f
 
@@ -80,5 +84,46 @@ object MoneyPdf {
         doc.finishPage(page)
         doc.writeTo(out)
         doc.close()
+    }
+
+    /** «Remindella» come l'intestazione dell'app: Fredoka dorata col bordo viola, lettere che ballano e una stella sulla i. */
+    private fun brandTitle(canvas: Canvas, context: Context, x: Float, baseline: Float, size: Float) {
+        val font = runCatching { Typeface.create(context.resources.getFont(R.font.fredoka), 600, false) }.getOrDefault(Typeface.DEFAULT_BOLD)
+        val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = font; textSize = size; color = 0xFF3B1F73.toInt()
+            style = Paint.Style.STROKE; strokeWidth = size * 0.14f; strokeJoin = Paint.Join.ROUND
+        }
+        val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            typeface = font; textSize = size
+            shader = LinearGradient(0f, baseline - size * 0.8f, 0f, baseline, intArrayOf(0xFFFFF6B0.toInt(), 0xFFFFD23D.toInt(), 0xFFFF8A00.toInt()), null, Shader.TileMode.CLAMP)
+        }
+        var cx = x + size * 0.1f
+        "Remindella".forEachIndexed { index, ch ->
+            val glyph = if (ch == 'i') "\u0131" else ch.toString()
+            val width = fill.measureText(glyph)
+            val even = index % 2 == 0
+            canvas.save()
+            canvas.rotate(if (even) -5f else 5f, cx + width / 2, baseline - size * 0.3f)
+            canvas.translate(0f, size * if (even) -0.05f else 0.05f)
+            canvas.drawText(glyph, cx, baseline, edge)
+            canvas.drawText(glyph, cx, baseline, fill)
+            if (ch == 'i') star(canvas, cx + width / 2, baseline - size * 0.72f, size * 0.13f)
+            canvas.restore()
+            cx += width
+        }
+    }
+
+    private fun star(canvas: Canvas, cx: Float, cy: Float, r: Float) {
+        val path = Path()
+        for (k in 0 until 8) {
+            val radius = if (k % 2 == 0) r else r * 0.35f
+            val angle = Math.PI / 4 * k - Math.PI / 2
+            val px = cx + (radius * Math.cos(angle)).toFloat()
+            val py = cy + (radius * Math.sin(angle)).toFloat()
+            if (k == 0) path.moveTo(px, py) else path.lineTo(px, py)
+        }
+        path.close()
+        canvas.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = r * 0.5f; strokeJoin = Paint.Join.ROUND; color = 0xFF3B1F73.toInt() })
+        canvas.drawPath(path, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFFFC400.toInt() })
     }
 }

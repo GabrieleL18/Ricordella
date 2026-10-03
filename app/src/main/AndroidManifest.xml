@@ -150,6 +150,18 @@
         </receiver>
 
         <receiver
+            android:name=".core.widget.NotesWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_notes_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/notes_widget_info" />
+        </receiver>
+
+        <receiver
             android:name=".core.widget.ResolutionsWidgetProvider"
             android:exported="false"
             android:label="@string/widget_resolutions_label">

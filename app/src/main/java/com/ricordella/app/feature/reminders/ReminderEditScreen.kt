@@ -156,7 +156,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
 @Composable
 private fun TypeChooser(current: ReminderType, onChange: (ReminderType) -> Unit) {
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        ReminderType.entries.forEach { type ->
+        ReminderType.entries.filter { it != ReminderType.ALARM || current == ReminderType.ALARM }.forEach { type ->
             val tone = type.tone
             FilterChip(
                 selected = current == type,
@@ -191,7 +191,8 @@ private fun BasicFields(
         modifier = Modifier.fillMaxWidth(),
     )
     Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        DateField(
+        // Una sveglia non ha una data: suona alla prossima ora scelta (nei giorni scelti).
+        if (!form.isAlarm) DateField(
             label = if (form.installments) tr("Prima rata *") else tr("Data *"),
             value = form.date,
             onValueChange = { value -> update { it.copy(date = value) } },
@@ -202,7 +203,7 @@ private fun BasicFields(
             label = if (form.isAlarm) tr("Ora *") else tr("Ora"),
             value = form.time,
             onValueChange = { value -> update { it.copy(time = value) } },
-            modifier = Modifier.weight(1f),
+            modifier = if (form.isAlarm) Modifier.fillMaxWidth() else Modifier.weight(1f),
             isError = form.timeError,
             // Per oggi il selettore parte dall'ora attuale, per gli altri giorni dalle 9.
             defaultTime = if (form.date == LocalDate.now()) currentMinute() else LocalTime.of(9, 0),

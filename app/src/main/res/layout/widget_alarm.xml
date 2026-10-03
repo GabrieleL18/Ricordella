@@ -1,56 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget Sveglia: la prossima sveglia che suonerà; un tocco la apre, il + ne crea una nuova. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Widget Sveglia: senza sfondo, orologio al centro con le cifre dell app, data e prossima sveglia. Un tocco apre le sveglie. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="6dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:id="@+id/alarm_open"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/alarm_time"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextClock
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_semibold"
+                android:format12Hour="HH"
+                android:format24Hour="HH"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.025"
+                android:shadowColor="#80000000"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:textColor="#FFFFFFFF"
+                android:textSize="56sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_semibold"
+                android:includeFontPadding="false"
+                android:shadowColor="#80000000"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:text=":"
+                android:textColor="@color/widget_colon"
+                android:textSize="56sp" />
+
+            <TextClock
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/plus_jakarta_semibold"
+                android:format12Hour="mm"
+                android:format24Hour="mm"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.025"
+                android:shadowColor="#80000000"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:textColor="#FFFFFFFF"
+                android:textSize="56sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/alarm_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="1"
-            android:textColor="@color/widget_text"
-            android:textSize="22sp"
+            android:shadowColor="#80000000"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:text="Sabato 3 ottobre"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/alarm_next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:shadowColor="#80000000"
+            android:shadowDy="1"
+            android:shadowRadius="4"
+            android:text="Prossima sveglia · Domani alle 06:45"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/alarm_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/widget_text"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/alarm_when"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/widget_text_muted"
-            android:textSize="10sp" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/alarm_add"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="@drawable/widget_round_button"
-        android:contentDescription="+"
-        android:padding="6dp"
-        android:src="@drawable/ic_widget_plus" />
-</LinearLayout>
+</FrameLayout>

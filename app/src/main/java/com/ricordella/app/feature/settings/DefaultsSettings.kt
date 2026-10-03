@@ -56,7 +56,6 @@ import com.ricordella.app.core.ui.icon
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.domain.model.AlarmSound
-import com.ricordella.app.domain.model.AlarmsInCalendar
 import com.ricordella.app.domain.model.InsistentLevel
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ReminderType
@@ -225,20 +224,6 @@ internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) 
         onSelected = { level -> update { it.copy(insistentLevel = level) } },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     )
-    DropdownField(
-        label = tr("Sveglie nel calendario"),
-        options = AlarmsInCalendar.entries,
-        selected = settings.alarmsInCalendar,
-        optionLabel = {
-            when (it) {
-                AlarmsInCalendar.NEVER -> tr("Non mostrarle")
-                AlarmsInCalendar.IMPORTANT -> tr("Solo importanti o urgenti")
-                AlarmsInCalendar.ALL -> tr("Tutte")
-            }
-        },
-        onSelected = { mode -> update { it.copy(alarmsInCalendar = mode) } },
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-    )
     SettingRow(
         icon = Icons.Rounded.Vibration,
         title = tr("Vibrazione"),
@@ -260,11 +245,11 @@ internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) 
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     )
     DropdownField(
-        label = tr("Avviso silenzioso prima delle sveglie ripetute"),
+        label = tr("Avviso silenzioso prima di ogni sveglia"),
         options = listOf(0, 15, 30, 60, 120),
-        selected = settings.alarmPreNoticeMinutes,
+        selected = settings.alarmPreNotice,
         optionLabel = { if (it == 0) tr("Mai") else trf("%1\$s minuti prima", it) },
-        onSelected = { minutes -> update { it.copy(alarmPreNoticeMinutes = minutes) } },
+        onSelected = { minutes -> update { it.copy(alarmPreNotice = minutes) } },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     )
     DropdownField(

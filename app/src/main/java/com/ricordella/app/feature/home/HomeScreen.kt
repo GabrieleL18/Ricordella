@@ -1,5 +1,11 @@
 package com.ricordella.app.feature.home
 
+import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.StickyNote2
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.rounded.AutoAwesome
 import com.ricordella.app.domain.model.ResolutionsPrompt
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -138,7 +144,8 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
-    val attentionAt = 4 + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
+    val showExtras = LocalAppSettings.current.showExtrasOnHome
+    val attentionAt = 4 + (if (showExtras) 1 else 0) + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
     val todayAt = attentionAt + if (state.attention.isNotEmpty()) 1 + state.attention.size else 0
     val upcomingAt = todayAt + 2
     val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
@@ -159,6 +166,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             item(key = "quick-entry") {
                 QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
             }
+            if (showExtras) item(key = "extras") { HomeExtras(navigator) }
             item(key = "permission") { NotificationPermissionCard() }
             item(key = "backup") {
                 BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
@@ -507,5 +515,34 @@ private fun NotificationPermissionCard() {
             }
             PushButton(tr("Accendi le notifiche"), onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
         }
+    }
+}
+
+/** Collegamenti alle sezioni extra: si possono nascondere da Impostazioni. */
+@Composable
+private fun HomeExtras(navigator: AppNavigator) {
+    val colors = MaterialTheme.ricordellaColors
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () -> Unit, modifier: Modifier) {
+    Column(
+        modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
+            .padding(vertical = RicordellaDimensions.spaceM),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(Modifier.size(36.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(20.dp))
+        }
+        Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content)
     }
 }

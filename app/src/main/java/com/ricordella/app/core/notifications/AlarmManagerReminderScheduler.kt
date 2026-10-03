@@ -56,7 +56,7 @@ class AlarmManagerReminderScheduler(
         val now = time.now()
         val candidates = reminders.getSchedulingCandidates()
         val plan = planner.plan(candidates, now, appSettings.allDayNotificationTime, time.zone)
-        val nextPreview = showAlarmPreviews(candidates, appSettings.alarmPreNoticeMinutes, now, appSettings.allDayNotificationTime)
+        val nextPreview = showAlarmPreviews(candidates, appSettings.alarmPreNotice, now, appSettings.allDayNotificationTime)
 
         if (plan.dueNow.isNotEmpty()) {
             val today = time.today()
@@ -84,7 +84,7 @@ class AlarmManagerReminderScheduler(
     }
 
     /**
-     * Avviso silenzioso [leadMinutes] prima di ogni sveglia ripetuta, una volta per occorrenza
+     * Avviso silenzioso [leadMinutes] prima di ogni sveglia, una volta per occorrenza
      * (se la sveglia è stata creata a ridosso dell'orario non si avvisa). Restituisce il prossimo avviso da programmare.
      */
     private suspend fun showAlarmPreviews(candidates: List<SchedulingCandidate>, leadMinutes: Int, now: Instant, allDay: LocalTime): Instant? {
@@ -92,7 +92,7 @@ class AlarmManagerReminderScheduler(
         val prefs = context.getSharedPreferences("alarm_previews", Context.MODE_PRIVATE)
         var next: Instant? = null
         for (c in candidates) {
-            if (!c.isRecurringAlarm || c.snoozedUntil != null) continue
+            if (!c.isAlarm || c.snoozedUntil != null) continue
             val trigger = planner.triggerAt(c, allDay, time.zone)
             if (!trigger.isAfter(now)) continue
             val preview = trigger.minusSeconds(leadMinutes * 60L)

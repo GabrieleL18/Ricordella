@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.ricordella.app.domain.date.RecurrenceCalculator
 import com.ricordella.app.domain.date.ReminderTimeline
 import com.ricordella.app.domain.date.TimeSource
-import com.ricordella.app.domain.model.AlarmsInCalendar
 import com.ricordella.app.domain.model.CycleCalendar
 import com.ricordella.app.domain.model.CycleDay
 import com.ricordella.app.domain.model.Priority
@@ -83,19 +82,15 @@ class CalendarViewModel(
             }
         }
 
-    private val alarmMode = settings.settings.map { it.alarmsInCalendar }.distinctUntilChanged()
     private val cycle = settings.settings.map { it.cycleProfiles to it.cycleLog }.distinctUntilChanged()
 
-    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks(), combine(alarmMode, cycle) { h, c -> h to c }) { nav, first, all, now, (alarms, cyc) ->
+    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks(), cycle) { nav, first, all, now, cyc ->
         val (profiles, log) = cyc
         val (from, to) = rangeFor(nav, first)
         val cycleDays = profiles.flatMap { CycleCalendar.days(it, log, from, to).entries }
             .groupBy({ it.key }, { it.value })
-        val byDate = if (alarms == AlarmsInCalendar.ALL) all else all.mapValues { (_, list) ->
-            list.filterNot {
-                it.reminder.type == ReminderType.ALARM && (alarms == AlarmsInCalendar.NEVER || it.reminder.priority == Priority.NORMAL)
-            }
-        }
+        // Le sveglie hanno la loro sezione: nel calendario non compaiono.
+        val byDate = all.mapValues { (_, list) -> list.filterNot { it.reminder.type == ReminderType.ALARM } }
         CalendarUiState(
             isLoading = false,
             mode = nav.mode,

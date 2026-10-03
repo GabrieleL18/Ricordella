@@ -1,5 +1,6 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
@@ -300,7 +301,11 @@ private fun ReminderCardBody(
     val installment = reminder.plan?.let { plan ->
         plan.nextUnpaid()?.let { i -> trf("Rata %1\$s di %2\$s · %3\$s", i + 1, plan.count, DateTexts.money(plan.cents(i))) }
     }
-    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel), installment).joinToString(" · ")
+    // "Domani" / "Tra 10 min" dalla notifica: nell'elenco si vede fino a quando è rimandato.
+    val snoozed = reminder.snoozedUntil?.takeIf { reminder.status == ReminderStatus.ACTIVE }
+        ?.let { java.time.LocalDateTime.ofInstant(it, java.time.ZoneId.systemDefault()) }?.takeIf { it.isAfter(now) }
+        ?.let { trf("💤 rimandato: %1\$s", DateTexts.relativeWithTime(it.toLocalDate(), it.toLocalTime(), today).lowercase()) }
+    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel), installment, snoozed).joinToString(" · ")
     val links = (entry.items.map { it.name } + entry.people.map { it.displayName }).joinToString(" · ")
     val titleAlpha by animateFloatAsState(if (checked) 0.55f else 1f, tween(RicordellaMotion.SHORT), label = "titleAlpha")
     val badgeContainer by animateColorAsState(tone.container, tween(RicordellaMotion.SHORT), label = "badgeContainer")
@@ -581,4 +586,35 @@ fun LinkChip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
             .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )
+}
+
+/** Collegamento a una sezione: riquadro colorato con icona tonda, titolo e freccia, come il riepilogo delle spese. */
+@Composable
+fun SectionLinkCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    tone: com.ricordella.app.core.ui.theme.Tone,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
+            .padding(RicordellaDimensions.spaceL),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+    ) {
+        Box(Modifier.size(40.dp).background(tone.solid, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = tone.content)
+            if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = tone.content)
+        }
+        Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = tone.content)
+    }
 }

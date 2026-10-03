@@ -120,7 +120,7 @@ fun MoneyRecap(year: Int, navigator: AppNavigator) {
         scope.launch {
             val ok = withContext(Dispatchers.IO) {
                 runCatching {
-                    context.contentResolver.openOutputStream(uri)!!.use { MoneyPdf.write(it, year, scopeLabel, shown, ::name) }
+                    context.contentResolver.openOutputStream(uri)!!.use { MoneyPdf.write(context, it, year, scopeLabel, shown, ::name) }
                 }.isSuccess
             }
             Toast.makeText(context, if (ok) tr("PDF salvato") else tr("Non è stato possibile creare il PDF"), Toast.LENGTH_LONG).show()

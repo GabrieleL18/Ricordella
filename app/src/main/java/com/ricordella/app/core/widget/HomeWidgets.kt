@@ -20,7 +20,10 @@ import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.core.ui.emoji
+import com.ricordella.app.domain.date.nextRing
 import com.ricordella.app.domain.model.Reminder
+import com.ricordella.app.domain.model.ReminderFilter
+import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.isMultiDay
 import kotlinx.coroutines.CoroutineScope
@@ -46,11 +49,12 @@ object HomeWidgets {
     fun watch(context: Context, scope: CoroutineScope) {
         scope.launch {
             context.container.settingsRepository.settings
-                .map { it.potions to it.resolutions }
+                .map { Triple(it.potions, it.resolutions, it.notes) }
                 .distinctUntilChanged()
                 .collect {
                     WaterWidgetProvider.requestUpdate(context)
                     ResolutionsWidgetProvider.requestUpdate(context)
+                    NotesWidgetProvider.requestUpdate(context)
                 }
         }
     }
@@ -61,6 +65,7 @@ object HomeWidgets {
         ResolutionsWidgetProvider.requestUpdate(context)
         AgendaWidgetProvider.requestUpdate(context)
         AlarmWidgetProvider.requestUpdate(context)
+        NotesWidgetProvider.requestUpdate(context)
     }
 }
 
@@ -167,40 +172,78 @@ class WaterWidgetProvider : AppWidgetProvider() {
 // ---------------------------------------------------------------------------------------------
 // Sveglia
 
-/** La prossima sveglia attiva (non in pausa): ora grande, titolo e giorno. Tocco = apre la sveglia, + = nuova sveglia. */
+/**
+ * Ora e data di adesso (cifre come nell'app, ora che scorre da sola) e sotto quando suona la prossima sveglia.
+ * Un tocco apre la sezione Sveglie, il + crea una sveglia.
+ */
 class AlarmWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         runAsync(context) {
             val container = context.container
-            val today = container.time.today()
             val now = container.time.localNow()
-            val next = container.reminderRepository.observeActiveUntil(today.plusDays(60), 300).first()
-                .map { it.reminder }
-                .filter { it.type == com.ricordella.app.domain.model.ReminderType.ALARM && it.dueTime != null && it.dueDate.atTime(it.dueTime).isAfter(now) }
-                .minByOrNull { it.dueDate.atTime(it.dueTime) }
+            val next = container.reminderRepository
+                .observeFiltered(ReminderFilter(type = ReminderType.ALARM, limit = 200), container.time.today()).first()
+                .mapNotNull { entry -> entry.reminder.nextRing(now, container.time.zone)?.let { it to entry.reminder } }
+                .minByOrNull { it.first }
             val views = RemoteViews(context.packageName, R.layout.widget_alarm)
-            if (next == null) {
-                views.setTextViewText(R.id.alarm_time, "⏰")
-                views.setTextViewText(R.id.alarm_title, tr("Nessuna sveglia"))
-                views.setTextViewText(R.id.alarm_when, tr("Tocca + per crearne una"))
-                views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_NEW) { putExtra(MainActivity.EXTRA_NEW_ALARM, true) })
-            } else {
-                views.setTextViewText(R.id.alarm_time, DateTexts.time(next.dueTime!!))
-                views.setTextViewText(R.id.alarm_title, next.title)
-                views.setTextViewText(R.id.alarm_when, DateTexts.relativeWithTime(next.dueDate, null, today).replaceFirstChar { it.uppercase() })
-                views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_REMINDER_ID, next.id) })
-            }
-            views.setOnClickPendingIntent(R.id.alarm_add, openApp(context, REQUEST_NEW) { putExtra(MainActivity.EXTRA_NEW_ALARM, true) })
+            views.setTextViewText(R.id.alarm_date, DateTexts.fullDate(now.toLocalDate()).replaceFirstChar { it.uppercase() })
+            views.setTextViewText(
+                R.id.alarm_next,
+                if (next == null) tr("Nessuna sveglia attiva")
+                else tr("Prossima sveglia") + " · " + DateTexts.relativeWithTime(next.first.toLocalDate(), next.first.toLocalTime(), now.toLocalDate()),
+            )
+            views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_OPEN_ALARMS, true) })
             manager.updateAppWidget(ids, views)
         }
     }
 
     companion object {
         private const val REQUEST_OPEN = 2_300
-        private const val REQUEST_NEW = 2_301
 
         fun requestUpdate(context: Context) = requestUpdate(context, AlarmWidgetProvider::class.java)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Note
+
+/** Le note recenti (fissate prima): un tocco su una nota la apre, il + ne crea una nuova, l'intestazione apre le Note. */
+class NotesWidgetProvider : AppWidgetProvider() {
+
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        ids.forEach { widgetId ->
+            val views = RemoteViews(context.packageName, R.layout.widget_notes)
+            views.setTextViewText(R.id.notes_title, tr("Note"))
+            views.setTextViewText(R.id.notes_empty, tr("Tocca + per scrivere la prima nota ✨"))
+            views.setViewVisibility(R.id.notes_sample, View.GONE)
+            views.bindList(context, R.id.notes_list, WidgetListService.KIND_NOTES, widgetId)
+            views.setEmptyView(R.id.notes_list, R.id.notes_empty)
+            // Le righe aprono l'app sulla nota scelta: il modello è un'attività, ogni riga aggiunge il suo id.
+            views.setPendingIntentTemplate(
+                R.id.notes_list,
+                PendingIntent.getActivity(
+                    context,
+                    REQUEST_ROW,
+                    Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                ),
+            )
+            val open = openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_OPEN_NOTES, true) }
+            views.setOnClickPendingIntent(R.id.notes_header, open)
+            views.setOnClickPendingIntent(R.id.notes_empty, open)
+            views.setOnClickPendingIntent(R.id.notes_add, openApp(context, REQUEST_NEW) { putExtra(MainActivity.EXTRA_NEW_NOTE, true) })
+            manager.updateAppWidget(widgetId, views)
+        }
+        manager.notifyAppWidgetViewDataChanged(ids, R.id.notes_list)
+    }
+
+    companion object {
+        private const val REQUEST_OPEN = 2_400
+        private const val REQUEST_NEW = 2_401
+        private const val REQUEST_ROW = 2_402
+
+        fun requestUpdate(context: Context) = requestUpdate(context, NotesWidgetProvider::class.java)
     }
 }
 
@@ -234,6 +277,7 @@ class ResolutionsWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.res_count, if (list.isEmpty()) View.GONE else View.VISIBLE)
                 views.setProgressBar(R.id.res_progress, 100, if (list.isEmpty()) 0 else kept * 100 / list.size, false)
                 views.setTextViewText(R.id.res_empty, tr("Tocca per scrivere i propositi di quest'anno ✨"))
+                views.setViewVisibility(R.id.res_sample, View.GONE)
                 views.bindList(context, R.id.res_list, WidgetListService.KIND_RESOLUTIONS, widgetId)
                 views.setEmptyView(R.id.res_list, R.id.res_empty)
                 views.setPendingIntentTemplate(R.id.res_list, listTemplate(context, ResolutionsWidgetProvider::class.java, ACTION_TOGGLE))
@@ -361,6 +405,7 @@ class AgendaWidgetProvider : AppWidgetProvider() {
                 R.id.agenda_title,
                 if (offset == 0) tr("La tua giornata") else DateTexts.weekdayAndDay(start).replaceFirstChar { it.uppercase() },
             )
+            views.setViewVisibility(R.id.agenda_sample, View.GONE)
             views.bindList(context, R.id.agenda_list, WidgetListService.KIND_AGENDA, widgetId)
             views.setPendingIntentTemplate(R.id.agenda_list, listTemplate(context, AgendaWidgetProvider::class.java, ACTION_TOGGLE))
             views.setOnClickPendingIntent(R.id.agenda_prev, broadcast(context, AgendaWidgetProvider::class.java, ACTION_PREVIOUS))
@@ -394,14 +439,17 @@ class AgendaWidgetProvider : AppWidgetProvider() {
 /** Fornisce le righe delle liste scorrevoli (propositi e giornata). */
 class WidgetListService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
-        if (intent.getStringExtra(EXTRA_KIND) == KIND_AGENDA) {
-            AgendaFactory(applicationContext, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID))
-        } else ResolutionsFactory(applicationContext)
+        when (intent.getStringExtra(EXTRA_KIND)) {
+            KIND_AGENDA -> AgendaFactory(applicationContext, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID))
+            KIND_NOTES -> NotesFactory(applicationContext)
+            else -> ResolutionsFactory(applicationContext)
+        }
 
     companion object {
         const val EXTRA_KIND = "com.ricordella.app.widget.LIST_KIND"
         const val KIND_RESOLUTIONS = "resolutions"
         const val KIND_AGENDA = "agenda"
+        const val KIND_NOTES = "notes"
     }
 }
 
@@ -437,6 +485,36 @@ private class ResolutionsFactory(context: Context) : SimpleFactory(context) {
             setTextViewText(R.id.row_text, struck(resolution.text, resolution.kept))
             setTextColor(R.id.row_text, context.getColor(if (resolution.kept) R.color.widget_text_muted else R.color.widget_text))
             setOnClickFillInIntent(R.id.row, Intent().putExtra(ResolutionsWidgetProvider.EXTRA_ID, resolution.id))
+        }
+    }
+}
+
+private class NotesFactory(context: Context) : SimpleFactory(context) {
+    private var rows = emptyList<com.ricordella.app.domain.model.Note>()
+
+    override fun onDataSetChanged() {
+        rows = runBlocking {
+            context.container.settingsRepository.current().notes
+                .sortedWith(compareByDescending<com.ricordella.app.domain.model.Note> { it.pinned }.thenByDescending { it.updatedAt })
+                .take(30)
+        }
+    }
+
+    override fun getCount() = rows.size
+    override fun getViewTypeCount() = 1
+
+    override fun getViewAt(position: Int): RemoteViews {
+        val note = rows[position]
+        return RemoteViews(context.packageName, R.layout.widget_note_row).apply {
+            setTextViewText(R.id.row_emoji, if (note.prices) "🛒" else if (note.isList) "☑️" else "📝")
+            setTextViewText(R.id.row_title, note.title.ifBlank { note.summary.ifBlank { tr("Senza titolo") } })
+            val subtitle = if (note.isList) {
+                val done = note.lines.count { it.done }
+                listOfNotNull(trf("%1\$s di %2\$s", done, note.lines.count { it.text.isNotBlank() }), if (note.prices && note.totalCents > 0) DateTexts.money(note.totalCents) else null).joinToString(" · ")
+            } else if (note.title.isNotBlank()) note.summary else ""
+            setTextViewText(R.id.row_subtitle, subtitle)
+            setViewVisibility(R.id.row_subtitle, if (subtitle.isEmpty()) View.GONE else View.VISIBLE)
+            setOnClickFillInIntent(R.id.row, Intent().putExtra(MainActivity.EXTRA_NOTE_ID, note.id))
         }
     }
 }

@@ -138,10 +138,12 @@ fun PersonListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 SearchField(state.query, viewModel::onQueryChange, placeholder = tr("Cerca persone"))
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "money") {
-                androidx.compose.material3.AssistChip(
+                com.ricordella.app.core.ui.SectionLinkCard(
+                    icon = Icons.Rounded.Payments,
+                    title = tr("Spese e conti"),
+                    subtitle = tr("Riepilogo dell'anno e PDF"),
+                    tone = MaterialTheme.ricordellaColors.mint,
                     onClick = navigator::openExpenses,
-                    label = { Text(tr("Spese e conti")) },
-                    leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null) },
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }, key = "archived") {

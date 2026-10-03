@@ -11,6 +11,10 @@ import com.ricordella.app.domain.model.ExpenseKind
 import com.ricordella.app.domain.model.Item
 import com.ricordella.app.domain.model.ItemKind
 import com.ricordella.app.domain.model.MaintenanceRecord
+import com.ricordella.app.domain.model.Note
+import com.ricordella.app.domain.model.NoteLine
+import com.ricordella.app.domain.date.nextAlarmDate
+import java.time.DayOfWeek
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.PersonItemRole
 import com.ricordella.app.domain.model.Priority
@@ -49,7 +53,7 @@ object DemoMode {
 }
 
 /** Versione dei dati demo: da alzare ogni volta che si aggiungono o cambiano gli esempi. */
-private const val DEMO_DATA_VERSION = 2
+private const val DEMO_DATA_VERSION = 4
 
 /** Riempie il database demo al primo avvio in modalità demo (se è già pieno non fa nulla). */
 suspend fun AppContainer.seedDemoDataIfEmpty() {
@@ -60,7 +64,6 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         clearAllTables()
         settingsRepository.update { com.ricordella.app.domain.model.AppSettings() }
     }
-    prefs.edit().putInt("seed_version", DEMO_DATA_VERSION).commit()
     // Niente notifiche vere dai dati finti, niente tutorial né invito al backup sopra gli screenshot.
     settingsRepository.update {
         it.copy(
@@ -135,6 +138,15 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         draft(at(date, trf("Compleanno di %1\$s", p.name), ReminderType.BIRTHDAY) { copy(birthYear = year) }, yearly(date), listOf(p))
 
     val trip = today.plusDays(12)
+    // Le sveglie non hanno una data: suonano alla prossima occasione nei giorni scelti.
+    fun alarm(title: String, ring: LocalTime, days: Set<DayOfWeek>, people: List<Person>, enabled: Boolean = true): ReminderDraft {
+        val date = nextAlarmDate(ring, days, time.localNow())
+        return draft(
+            at(date, title, ReminderType.ALARM, ring) { copy(notificationsEnabled = enabled) },
+            RecurrenceRule(frequency = RecurrenceFrequency.WEEKLY, startDate = date, daysOfWeek = days),
+            people,
+        )
+    }
     // Gli orari di oggi seguono l'ora attuale, così negli screenshot sono "in arrivo" e non scaduti.
     val hour = LocalTime.now().hour
     fun later(hours: Int, minute: Int = 0) = LocalTime.of((hour + hours).coerceAtMost(23), minute)
@@ -176,12 +188,40 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
             },
             people = listOf(giulia, marco, sofia),
         ),
-        draft(at(trip, tr("Sveglia per il volo"), ReminderType.ALARM, LocalTime.of(5, 45))),
+        draft(at(trip, tr("Sveglia per il volo"), ReminderType.ALARM, LocalTime.of(5, 45)), people = listOf(marco)),
+        alarm(tr("Sveglia"), LocalTime.of(6, 45), DayOfWeek.entries.take(5).toSet(), listOf(giulia)),
+        alarm(tr("Sveglia"), LocalTime.of(7, 30), DayOfWeek.entries.take(5).toSet(), listOf(marco)),
+        alarm(tr("Weekend"), LocalTime.of(9, 0), setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY), listOf(giulia), enabled = false),
         // Feste per colorare il calendario.
         draft(at(LocalDate.of(today.year, 12, 25), tr("Natale"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
         draft(at(Holidays.easter(today.year + 1), tr("Pasqua"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
         draft(at(LocalDate.of(today.year, 11, 1), tr("Ognissanti"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
     ).forEach { saveReminder(it) }
+
+    // Note: una lista della spesa coi prezzi, una lista semplice e una nota di testo.
+    fun line(text: String, cents: Long? = null, qty: Int = 1, done: Boolean = false) = NoteLine(text = text, priceCents = cents, qty = qty, done = done)
+    val nowMillis = System.currentTimeMillis()
+    settingsRepository.update {
+        it.copy(
+            notes = listOf(
+                Note(
+                    title = tr("Spesa del sabato"), isList = true, prices = true, pinned = true, updatedAt = nowMillis,
+                    lines = listOf(
+                        line(tr("Latte"), 140, 2, done = true), line(tr("Pane"), 220, done = true), line(tr("Pasta"), 110, 3),
+                        line(tr("Mele"), 290), line(tr("Parmigiano"), 780), line(tr("Detersivo"), 450),
+                    ),
+                ),
+                Note(
+                    title = tr("Valigia per la Sicilia"), isList = true, updatedAt = nowMillis - 3_600_000,
+                    lines = listOf(line(tr("Passaporti"), done = true), line(tr("Costumi"), done = true), line(tr("Crema solare")), line(tr("Caricatori"))),
+                ),
+                Note(
+                    title = tr("Idee regalo per Sofia"), updatedAt = nowMillis - 7_200_000,
+                    text = tr("Un libro di avventure, il set per i braccialetti e le cuffie per la piscina."),
+                ),
+            ),
+        )
+    }
 
     // Ciclo di Giulia: in corso da qualche giorno, con la cronologia dei mesi scorsi.
     val period = com.ricordella.app.domain.model.CycleProfile(giulia.id, periodDays = 5, cycleDays = 28, notifyLate = false)
@@ -334,4 +374,6 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         saveReminder(draft(reminder))
         completeReminder(reminder.id)
     }
+    // Solo a lavoro finito: se qualcosa si interrompe a metà, al prossimo avvio si rifà tutto.
+    prefs.edit().putInt("seed_version", DEMO_DATA_VERSION).commit()
 }

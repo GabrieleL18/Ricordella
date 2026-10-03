@@ -67,6 +67,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.NewReleases
 import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Shield
@@ -244,6 +245,14 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     selected = settings.dateFormat,
                     label = { DateTexts.date(sample, it) },
                     onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Apps,
+                    title = tr("Sezioni extra in Home"),
+                    subtitle = tr("Sveglie, Note e Pozioni a portata di tocco nella Home."),
+                    trailing = {
+                        Switch(checked = settings.showExtrasOnHome, onCheckedChange = { value -> viewModel.update { it.copy(showExtrasOnHome = value) } })
+                    },
                 )
                 SettingRow(
                     icon = Icons.Rounded.MusicNote,

@@ -1433,3 +1433,81 @@ Rimborso del dentista ||| Reembolso del dentista
 Libri e zaino di Sofia ||| Libros y mochila de Sofía
 Stipendio extra ||| Sueldo extra
 Finisce qui ||| Termina aquí
+Aggiungi i prezzi ||| Añadir precios
+Aggiungi una sveglia: scegli l'ora e i giorni, poi accendila o spegnila quando vuoi. ||| Añade una alarma: elige la hora y los días, y actívala o desactívala cuando quieras.
+Aggiungi voce ||| Añadir elemento
+Ancora da prendere ||| Falta por comprar
+Apri le sveglie del telefono ||| Abrir las alarmas del teléfono
+Avviso silenzioso prima di ogni sveglia ||| Aviso silencioso antes de cada alarma
+Caricatori ||| Cargadores
+Costumi ||| Bañadores
+Crema solare ||| Crema solar
+Detersivo ||| Detergente
+Elimina voce ||| Eliminar elemento
+Eliminare la nota? ||| ¿Eliminar la nota?
+Eliminare la sveglia? ||| ¿Eliminar la alarma?
+Fatto ✓ ||| Hecho ✓
+Fissa in alto ||| Fijar arriba
+Fissata ||| Fijada
+Google Keep non permette alle altre app di leggere le note, ma ci sono due strade.⏎⏎1. Una nota alla volta: in Keep apri la nota, tocca ⋮ › Invia e scegli Remindella.⏎⏎2. Tutte insieme: su takeout.google.com esporta solo «Keep», poi scegli qui il file .zip (o i file .json) scaricato. ||| Google Keep no permite que otras apps lean las notas, pero hay dos caminos.⏎⏎1. Una nota cada vez: en Keep abre la nota, toca ⋮ › Enviar y elige Remindella.⏎⏎2. Todas a la vez: en takeout.google.com exporta solo «Keep» y elige aquí el archivo .zip (o los archivos .json) descargado.
+Hai già una sveglia alle %1$s ||| Ya tienes una alarma a las %1$s
+Idee regalo per Sofia ||| Ideas de regalo para Sofía
+Importa da Google Keep ||| Importar desde Google Keep
+Importa la prossima sveglia del telefono ||| Importar la próxima alarma del teléfono
+Importata la sveglia delle %1$s ||| Alarma de las %1$s importada
+Importate %1$s note (%2$s già presenti) ||| %1$s notas importadas (%2$s ya estaban)
+La nota viene eliminata. Se hai un backup la ritrovi lì. ||| La nota se eliminará. Si tienes una copia de seguridad, la encontrarás allí.
+La prossima suona %1$s ||| La próxima suena %1$s
+La sveglia delle %1$s viene eliminata. ||| La alarma de las %1$s se eliminará.
+Latte ||| Leche
+Lista ||| Lista
+Lista della spesa ||| Lista de la compra
+Mele ||| Manzanas
+Nel carrello (%1$s) ||| En el carrito (%1$s)
+Nessuna nota ||| Sin notas
+Nessuna sveglia attiva ||| Ninguna alarma activa
+Non ho trovato note in questi file ||| No he encontrado notas en estos archivos
+Non trovo l'app Orologio ||| No encuentro la app Reloj
+Nota ||| Nota
+Nuova nota ||| Nueva nota
+Pane ||| Pan
+Parmigiano ||| Parmesano
+Passaporti ||| Pasaportes
+Pasta ||| Pasta
+Prossima sveglia ||| Próxima alarma
+Scrivi qui ||| Escribe aquí
+Scrivi una nota o prepara una lista della spesa con i prezzi: il totale lo calcolo io. ||| Escribe una nota o prepara una lista de la compra con precios: el total lo calculo yo.
+Senza titolo ||| Sin título
+Spegni ||| Apagar
+Spesa del sabato ||| Compra del sábado
+Sul telefono non c'è nessuna sveglia attiva ||| No hay ninguna alarma activa en el teléfono
+Sveglie, note e pozioni ||| Alarmas, notas y pociones
+Te lo ricordo: %1$s ||| Te lo recuerdo: %1$s
+Testo, liste e lista della spesa ||| Texto, listas y lista de la compra
+Titolo ||| Título
+Tocca + per scrivere la prima nota ✨ ||| Toca + para escribir tu primera nota ✨
+Togli i prezzi ||| Quitar los precios
+Togli le voci spuntate ||| Quitar los elementos marcados
+Totale ||| Total
+Totale: %1$s ||| Total: %1$s
+Tra poco suona la sveglia delle %1$s. Vuoi spegnerla? ||| La alarma de las %1$s sonará pronto. ¿Quieres apagarla?
+Trasforma in lista ||| Convertir en lista
+Trasforma in testo ||| Convertir en texto
+Un libro di avventure, il set per i braccialetti e le cuffie per la piscina. ||| Un libro de aventuras, el set de pulseras y unos auriculares para la piscina.
+Valigia per la Sicilia ||| Maleta para Sicilia
+Voce ||| Elemento
+Weekend ||| Fin de semana
+tra %1$s g %2$s h ||| en %1$s d %2$s h
+tra %1$s h %2$s min ||| en %1$s h %2$s min
+tra %1$s min ||| en %1$s min
+💤 rimandato: %1$s ||| 💤 pospuesto: %1$s
+Sveglie a parte ||| Alarmas aparte
+Una sezione solo per le sveglie: ora e giorni, accese o spente quando vuoi, e un avviso un'ora prima. ||| Una sección solo para las alarmas: hora y días, activadas o desactivadas cuando quieras, y un aviso una hora antes.
+Le sveglie non hanno più una data: scegli l'ora e i giorni e le accendi o spegni con un interruttore. Un'ora prima arriva un avviso silenzioso con il pulsante per spegnerle. Puoi importare la prossima sveglia del telefono. Le trovi dal menu in alto, accanto a Note e Pozioni. ||| Las alarmas ya no tienen fecha: elige la hora y los días y actívalas o desactívalas con un interruptor. Una hora antes llega un aviso silencioso con un botón para apagarlas. Puedes importar la próxima alarma del teléfono. Las encuentras en el menú de arriba, junto a Notas y Pociones.
+Note e lista della spesa ||| Notas y lista de la compra
+Note di testo, liste e liste della spesa con prezzi e totale. ||| Notas de texto, listas y listas de la compra con precios y total.
+Scrivi note, crea liste con le caselle o liste della spesa con prezzo e quantità: il totale e quanto è già nel carrello li calcolo io. Ci sono anche i widget Note e Sveglie, con la stessa grafica dell'app. ||| Escribe notas, crea listas con casillas o listas de la compra con precio y cantidad: el total y lo que ya está en el carrito lo calculo yo. También hay widgets de Notas y Alarmas, con el estilo de la app.
+Nome (facoltativo) ||| Nombre (opcional)
+Riepilogo dell'anno e PDF ||| Resumen del año y PDF
+Sezioni extra in Home ||| Secciones extra en Inicio
+Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarmas, Notas y Pociones a un toque en Inicio.
