@@ -1602,3 +1602,6 @@ Serve un alias ||| An alias is needed
 Testo libero ||| Free text
 Timer ||| Timer
 Voci da spuntare ||| Items to check off
+min ||| min
+Un altro timer ||| Another timer
+Suona alle %1$s ||| Rings at %1$s

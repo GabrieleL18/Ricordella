@@ -1531,4 +1531,7 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Testo libero" to "Texte libre",
     "Timer" to "Minuteur",
     "Voci da spuntare" to "Éléments à cocher",
+    "min" to "min",
+    "Un altro timer" to "Un autre minuteur",
+    "Suona alle %1\$s" to "Sonne à %1\$s",
 )

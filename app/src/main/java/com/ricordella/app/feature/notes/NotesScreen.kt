@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.navigationBarsPadding
+import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ChecklistRtl
@@ -79,29 +81,14 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
         title = tr("Note"),
         onBack = onBack,
         floatingActionButton = {
-            Box {
-                FloatingActionButton(
-                    onClick = { addMenu = true },
-                    containerColor = MaterialTheme.ricordellaColors.bolt,
-                    contentColor = MaterialTheme.ricordellaColors.onBolt,
-                ) { Icon(Icons.Rounded.Add, contentDescription = tr("Nuova nota")) }
-                DropdownMenu(expanded = addMenu, onDismissRequest = { addMenu = false }) {
-                    DropdownMenuItem(
-                        text = { Text(tr("Nota")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) },
-                        onClick = { addMenu = false; navigator.newNote() },
-                    )
-                    DropdownMenuItem(
-                        text = { Text(tr("Lista")) }, leadingIcon = { Icon(Icons.Rounded.ChecklistRtl, null) },
-                        onClick = { addMenu = false; navigator.newNote(list = true) },
-                    )
-                    DropdownMenuItem(
-                        text = { Text(tr("Lista della spesa")) }, leadingIcon = { Icon(Icons.Rounded.ShoppingCart, null) },
-                        onClick = { addMenu = false; navigator.newNote(list = true, prices = true) },
-                    )
-                }
-            }
+            FloatingActionButton(
+                onClick = { addMenu = true },
+                containerColor = MaterialTheme.ricordellaColors.bolt,
+                contentColor = MaterialTheme.ricordellaColors.onBolt,
+            ) { Icon(Icons.Rounded.Add, contentDescription = tr("Nuova nota")) }
         },
     ) { padding ->
+        if (addMenu) NewNoteChoice(onDismiss = { addMenu = false }, onChoose = { list, prices -> addMenu = false; navigator.newNote(list = list, prices = prices) })
         if (notes.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.StickyNote2,
@@ -176,39 +163,49 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
     }
 }
 
-/** "Nuova nota": prima si sceglie che tipo di nota compilare. */
+/** "Nuova nota": foglio dal basso con un tassello colorato per tipo, come il foglio "Aggiungi". */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boolean) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
-    AlertDialog(
+    androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
-        title = { Text(tr("Che nota vuoi scrivere?")) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(
-                    Triple(Triple(false, false, Icons.Rounded.StickyNote2), tr("Nota") to tr("Testo libero"), colors.pear),
-                    Triple(Triple(true, false, Icons.Rounded.ChecklistRtl), tr("Lista") to tr("Voci da spuntare"), colors.cyan),
-                    Triple(Triple(true, true, Icons.Rounded.ShoppingCart), tr("Lista della spesa") to tr("Con prezzi e totale"), colors.mint),
-                ).forEach { (kind, text, tone) ->
-                    Row(
-                        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).background(tone.container).clickable { onChoose(kind.first, kind.second) }.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        androidx.compose.foundation.layout.Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-                            Icon(kind.third, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
-                        }
-                        Column {
-                            Text(text.first, style = MaterialTheme.typography.titleMedium, color = tone.content)
-                            Text(text.second, style = MaterialTheme.typography.bodySmall, color = tone.content)
-                        }
+        sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        containerColor = MaterialTheme.colorScheme.background,
+    ) {
+        Column(
+            Modifier.navigationBarsPadding().padding(horizontal = 20.dp).padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(tr("Che nota vuoi scrivere?"), style = MaterialTheme.typography.headlineSmall)
+            listOf(
+                Triple(Triple(false, false, Icons.Rounded.StickyNote2), tr("Nota") to tr("Testo libero"), colors.pear),
+                Triple(Triple(true, false, Icons.Rounded.ChecklistRtl), tr("Lista") to tr("Voci da spuntare"), colors.cyan),
+                Triple(Triple(true, true, Icons.Rounded.ShoppingCart), tr("Lista della spesa") to tr("Con prezzi e totale"), colors.mint),
+            ).forEach { (kind, text, tone) ->
+                val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .pressScale(interaction, pressedScale = 0.97f)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(tone.container)
+                        .clickable(interactionSource = interaction, indication = null) { onChoose(kind.first, kind.second) }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    androidx.compose.foundation.layout.Box(Modifier.size(52.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+                        Icon(kind.third, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(28.dp))
+                    }
+                    Column {
+                        Text(text.first, style = MaterialTheme.typography.titleLarge, color = tone.content)
+                        Text(text.second, style = MaterialTheme.typography.bodyMedium, color = tone.content)
                     }
                 }
             }
-        },
-        confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
-    )
+        }
+    }
 }
 
 /** Condivide la nota come testo: elenco con caselle e, se ci sono i prezzi, il totale. */

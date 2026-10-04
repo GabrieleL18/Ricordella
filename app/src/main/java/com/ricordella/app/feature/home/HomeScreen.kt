@@ -1,6 +1,7 @@
 package com.ricordella.app.feature.home
 
 import androidx.compose.material.icons.rounded.Timer
+import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.Alarm
@@ -533,18 +534,20 @@ private fun HomeExtras(navigator: AppNavigator) {
 
 @Composable
 private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () -> Unit, modifier: Modifier) {
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Column(
         modifier
-            .clip(MaterialTheme.shapes.large)
+            .pressScale(interaction, pressedScale = 0.92f)
+            .clip(MaterialTheme.shapes.extraLarge)
             .background(tone.container)
-            .clickable(onClick = onClick)
-            .padding(vertical = RicordellaDimensions.spaceM),
+            .clickable(interactionSource = interaction, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
+            .padding(vertical = RicordellaDimensions.spaceL),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(Modifier.size(36.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(20.dp))
+        Box(Modifier.size(48.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(26.dp))
         }
-        Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content)
+        Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content, maxLines = 1)
     }
 }

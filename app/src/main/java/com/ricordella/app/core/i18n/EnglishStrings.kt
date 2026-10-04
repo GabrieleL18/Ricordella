@@ -1566,4 +1566,6 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Serve un alias" to "An alias is needed",
     "Testo libero" to "Free text",
     "Voci da spuntare" to "Items to check off",
+    "Un altro timer" to "Another timer",
+    "Suona alle %1\$s" to "Rings at %1\$s",
 )

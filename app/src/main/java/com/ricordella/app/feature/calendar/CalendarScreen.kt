@@ -144,7 +144,9 @@ fun CalendarScreen(navigator: AppNavigator, onAddOn: (LocalDate) -> Unit) {
                     modifier = Modifier.weight(1f),
                 )
             }
-            if (dayOpen) {
+            // Il foglio vive in una sua finestra: se resta aperto sotto il dettaglio ruba l'"indietro" di Android.
+            val resumed by androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
+            if (dayOpen && resumed.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
                 DaySheet(state, navigator, viewModel, today, onAdd = { onAddOn(state.selectedDate) }, onDismiss = { dayOpen = false })
             }
             return@TopLevelScaffold

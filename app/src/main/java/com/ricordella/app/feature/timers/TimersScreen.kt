@@ -15,11 +15,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -107,19 +115,70 @@ fun TimersScreen(onBack: () -> Unit) {
     }
 
     DetailScaffold(title = tr("Timer"), onBack = onBack) { padding ->
+        val tone = MaterialTheme.ricordellaColors.mint
         Column(
             Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).contentWidth()
                 .padding(horizontal = RicordellaDimensions.screenPadding).padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
-            val tone = MaterialTheme.ricordellaColors.cyan
-            Text(tr("Scegli quanto dura: allo scadere suona come una sveglia."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(1, 5, 10, 15, 30, 60).forEach { m ->
-                    AssistChip(onClick = { start(m) }, label = { Text(trf("%1\$s min", m)) })
+            val running = timers.filter { it.reminder.notificationsEnabled }
+            running.forEach { entry ->
+                val ring = entry.reminder.dueTime?.let { entry.reminder.dueDate.atTime(it) }?.atZone(container.time.zone)?.toInstant()?.toEpochMilli() ?: return@forEach
+                val total = (ring - entry.reminder.createdAt.toEpochMilli()).coerceAtLeast(1)
+                val leftMs = (ring - nowMs).coerceAtLeast(0)
+                val left = Duration.ofMillis(leftMs)
+                Column(
+                    Modifier.fillMaxWidth().background(tone.container, MaterialTheme.shapes.extraLarge).padding(RicordellaDimensions.spaceL),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            progress = { (leftMs.toFloat() / total).coerceIn(0f, 1f) },
+                            modifier = Modifier.size(200.dp),
+                            strokeWidth = 12.dp,
+                            color = tone.solid,
+                            trackColor = tone.solid.copy(alpha = 0.2f),
+                            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                        )
+                        Text(
+                            if (left.toHours() > 0) "%d:%02d:%02d".format(left.toHours(), left.toMinutesPart(), left.toSecondsPart()) else "%02d:%02d".format(left.toMinutesPart(), left.toSecondsPart()),
+                            style = MaterialTheme.typography.displayMedium, color = tone.content,
+                        )
+                    }
+                    Text(
+                        trf("Suona alle %1\$s", com.ricordella.app.core.date.DateTexts.time(entry.reminder.dueTime!!)),
+                        style = MaterialTheme.typography.bodyMedium, color = tone.content,
+                    )
+                    TextButton(onClick = { scope.launch { remove(entry.reminder.id) } }) {
+                        Icon(Icons.Rounded.Close, contentDescription = null, tint = tone.content)
+                        Text(tr("Annulla"), color = tone.content, modifier = Modifier.padding(start = 6.dp))
+                    }
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Text(
+                if (running.isEmpty()) tr("Scegli quanto dura: allo scadere suona come una sveglia.") else tr("Un altro timer"),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                listOf(1, 5, 10, 15, 30, 60).forEach { m ->
+                    val interaction = remember { MutableInteractionSource() }
+                    Column(
+                        Modifier
+                            .width(100.dp)
+                            .pressScale(interaction, pressedScale = 0.94f)
+                            .clip(MaterialTheme.shapes.large)
+                            .background(tone.container)
+                            .clickable(interactionSource = interaction, indication = null, role = Role.Button) { start(m) }
+                            .padding(vertical = 14.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("$m", style = MaterialTheme.typography.headlineMedium, color = tone.content)
+                        Text(tr("min"), style = MaterialTheme.typography.labelMedium, color = tone.content)
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = custom,
                     onValueChange = { v -> custom = v.filter(Char::isDigit).take(4) },
@@ -129,21 +188,6 @@ fun TimersScreen(onBack: () -> Unit) {
                     modifier = Modifier.weight(1f),
                 )
                 PushButton(text = tr("Avvia"), icon = Icons.Rounded.PlayArrow, onClick = { start(custom.toIntOrNull() ?: 0) })
-            }
-            timers.filter { it.reminder.notificationsEnabled }.forEach { entry ->
-                val ring = entry.reminder.dueTime?.let { entry.reminder.dueDate.atTime(it) }?.atZone(container.time.zone)?.toInstant()?.toEpochMilli() ?: return@forEach
-                val left = Duration.ofMillis((ring - nowMs).coerceAtLeast(0))
-                Card(shape = MaterialTheme.shapes.large, colors = CardDefaults.cardColors(containerColor = tone.container), modifier = Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(RicordellaDimensions.spaceM), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                        Text(
-                            "%d:%02d:%02d".format(left.toHours(), left.toMinutesPart(), left.toSecondsPart()),
-                            style = MaterialTheme.typography.displaySmall, color = tone.content, modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = { scope.launch { remove(entry.reminder.id) } }) {
-                            Icon(Icons.Rounded.Close, contentDescription = tr("Annulla"), tint = tone.content)
-                        }
-                    }
-                }
             }
         }
     }
