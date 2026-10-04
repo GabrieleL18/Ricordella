@@ -104,8 +104,8 @@ fun TimersScreen(onBack: () -> Unit) {
                 return@launch
             }
             val now = container.time.now()
-            // Al minuto più vicino, come le sveglie.
-            val ring = container.time.localNow().plusMinutes(minutes.toLong()).plusSeconds(30).withSecond(0).withNano(0)
+            // Al secondo esatto: due timer uguali avviati insieme non devono coincidere.
+            val ring = container.time.localNow().plusMinutes(minutes.toLong()).withNano(0)
             val timer = Reminder(
                 title = TIMER_PREFIX + tr("Timer"), type = ReminderType.ALARM, dueDate = ring.toLocalDate(), dueTime = ring.toLocalTime(),
                 notificationsEnabled = true, notifyOffsetMinutes = 0, createdAt = now, updatedAt = now,
