@@ -86,6 +86,7 @@ fun TimersScreen(onBack: () -> Unit) {
     var custom by remember { mutableStateOf("") }
     // Senza passare dal Cestino: un timer non serve ritrovarlo.
     suspend fun remove(id: String) {
+        if (com.ricordella.app.core.alarm.AlarmRingService.ringing.value?.reminderId == id) com.ricordella.app.core.alarm.AlarmRingService.stop(context)
         container.reminderRepository.delete(id)
         container.reminderScheduler.dismissNotification(id)
         container.reminderScheduler.refresh()

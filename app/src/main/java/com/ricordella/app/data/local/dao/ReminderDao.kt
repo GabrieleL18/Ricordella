@@ -127,7 +127,7 @@ abstract class ReminderDao {
     @Query(
         """
         SELECT id, dueDate, dueTime, notifyOffsetMinutes, snoozedUntil, lastNotifiedAt,
-            (type = 'ALARM') AS isAlarm FROM reminder
+            (type = 'ALARM' AND title NOT LIKE '⏱%') AS isAlarm FROM reminder
         WHERE status = 'ACTIVE' AND isArchived = 0 AND notificationsEnabled = 1
         """,
     )
