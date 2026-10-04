@@ -556,6 +556,22 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
     ) { WidgetIllustration() },
 )
 
+/**
+ * Tutorial di una sezione: compare da solo la prima volta che ci si entra (se i tutorial sono accesi e il profilo
+ * principale è già scelto), poi si riapre dalle Impostazioni. [page] è la posizione in [SectionTutorialPages].
+ */
+@Composable
+fun SectionTutorialOnce(key: String, page: Int) {
+    val app = LocalAppSettings.current
+    if (!app.tutorialsEnabled || app.sharedMeId == null || key in app.sectionTutorialsSeen) return
+    val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+    val scope = rememberCoroutineScope()
+    TutorialDialog(
+        listOf(SectionTutorialPages[page]),
+        onDismiss = { scope.launch { container.settingsRepository.update { it.copy(sectionTutorialsSeen = it.sectionTutorialsSeen + key) } } },
+    )
+}
+
 /** Pozioni: la boccetta si riempie a ogni goccia che cade, poi compare "+250 ml". */
 @Composable
 fun PotionsIllustration() {

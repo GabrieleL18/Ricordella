@@ -1586,3 +1586,19 @@ Nome (facoltativo) ||| Name (optional)
 Riepilogo dell'anno e PDF ||| Year summary and PDF
 Sezioni extra in Home ||| Extra sections on Home
 Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarms, Notes and Potions one tap away on Home.
+Aggiungi prima una persona nella sezione Persone. ||| Add a person first in the People section.
+Alias ||| Alias
+Avvia ||| Start
+Che nota vuoi scrivere? ||| Which note do you want to write?
+Con prezzi e totale ||| With prices and total
+Il tuo nome ||| Your name
+In questa cartella c'è già un backup con il nome «%1$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali). ||| This folder already has a backup named «%1$s». Write an alias to tell yours apart (for example your initials).
+Minuti ||| Minutes
+Oppure scrivi il tuo nome ||| Or write your name
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose. ||| I remember deadlines, events, appointments, maintenance and birthdays for you. First, let’s set up two things.
+Scegli il tuo profilo principale: non si può eliminare e dà il nome ai tuoi backup. ||| Choose your main profile: it cannot be deleted and gives its name to your backups.
+Scegli quanto dura: allo scadere suona come una sveglia. ||| Choose how long it lasts: when time is up it rings like an alarm.
+Serve un alias ||| An alias is needed
+Testo libero ||| Free text
+Timer ||| Timer
+Voci da spuntare ||| Items to check off

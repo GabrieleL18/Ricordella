@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.home
 
+import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.Alarm
@@ -524,6 +525,7 @@ private fun HomeExtras(navigator: AppNavigator) {
     val colors = MaterialTheme.ricordellaColors
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
         ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
         ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
     }

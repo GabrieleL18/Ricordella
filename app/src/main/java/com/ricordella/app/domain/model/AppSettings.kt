@@ -149,6 +149,10 @@ data class AppSettings(
     val showExtrasOnHome: Boolean = true,
     /** Note e liste della spesa. */
     val notes: List<Note> = emptyList(),
+    /** Nome in più per il backup in cartella condivisa, per distinguere due persone con lo stesso nome. */
+    val backupAlias: String = "",
+    /** Sezioni di cui si è già visto il tutorial: compare la prima volta che si entra. */
+    val sectionTutorialsSeen: Set<String> = emptySet(),
 ) {
     fun defaultsFor(type: ReminderType): TypeDefaults =
         typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)

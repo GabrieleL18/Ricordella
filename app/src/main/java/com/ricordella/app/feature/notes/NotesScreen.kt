@@ -13,8 +13,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Surface
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ChecklistRtl
@@ -105,15 +112,17 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
                 modifier = Modifier.padding(padding),
             )
         } else {
-            LazyColumn(
-                Modifier.fillMaxSize().contentWidth(),
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Adaptive(160.dp),
+                modifier = Modifier.fillMaxSize().contentWidth(),
                 contentPadding = PaddingValues(
                     start = RicordellaDimensions.screenPadding,
                     end = RicordellaDimensions.screenPadding,
                     top = padding.calculateTopPadding() + RicordellaDimensions.spaceS,
                     bottom = 112.dp,
                 ),
-                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                verticalItemSpacing = RicordellaDimensions.spaceS,
             ) {
                 items(notes, key = { it.id }) { note -> NoteCard(note) { navigator.openNote(note.id) } }
             }
@@ -121,29 +130,38 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
     }
 }
 
+/** Colore e icona di una nota secondo il tipo: testo (pera), lista (azzurro), spesa (menta). */
+internal val Note.tone: com.ricordella.app.core.ui.theme.Tone
+    @Composable get() = MaterialTheme.ricordellaColors.let { if (prices) it.mint else if (isList) it.cyan else it.pear }
+
+internal val Note.icon get() = if (prices) Icons.Rounded.ShoppingCart else if (isList) Icons.Rounded.ChecklistRtl else Icons.Rounded.StickyNote2
+
+/** Biglietto della nota: pallino colorato con l'icona del tipo, titolo, anteprima e avanzamento. */
 @Composable
 private fun NoteCard(note: Note, onClick: () -> Unit) {
-    val colors = MaterialTheme.ricordellaColors
-    val tone = if (note.prices) colors.mint else if (note.isList) colors.cyan else colors.pear
+    val tone = note.tone
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = tone.container),
     ) {
-        Column(Modifier.padding(RicordellaDimensions.spaceM), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.padding(RicordellaDimensions.spaceM), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    note.title.ifBlank { note.summary.ifBlank { tr("Senza titolo") } },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = tone.content,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                if (note.pinned) Icon(Icons.Rounded.PushPin, contentDescription = tr("Fissata"), tint = tone.content, modifier = Modifier.padding(start = 6.dp))
+                androidx.compose.foundation.layout.Box(Modifier.size(32.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(note.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(18.dp))
+                }
+                androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                if (note.pinned) Icon(Icons.Rounded.PushPin, contentDescription = tr("Fissata"), tint = tone.content, modifier = Modifier.size(18.dp))
             }
+            Text(
+                note.title.ifBlank { note.summary.ifBlank { tr("Senza titolo") } },
+                style = MaterialTheme.typography.titleMedium,
+                color = tone.content,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
             if (note.title.isNotBlank() && note.summary.isNotBlank()) {
-                Text(note.summary, style = MaterialTheme.typography.bodyMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(note.summary, style = MaterialTheme.typography.bodyMedium, color = tone.content.copy(alpha = 0.8f), maxLines = 4, overflow = TextOverflow.Ellipsis)
             }
             if (note.isList) {
                 val done = note.lines.count { it.done }
@@ -156,6 +174,41 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
             }
         }
     }
+}
+
+/** "Nuova nota": prima si sceglie che tipo di nota compilare. */
+@Composable
+fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boolean) -> Unit) {
+    val colors = MaterialTheme.ricordellaColors
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(tr("Che nota vuoi scrivere?")) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
+                    Triple(Triple(false, false, Icons.Rounded.StickyNote2), tr("Nota") to tr("Testo libero"), colors.pear),
+                    Triple(Triple(true, false, Icons.Rounded.ChecklistRtl), tr("Lista") to tr("Voci da spuntare"), colors.cyan),
+                    Triple(Triple(true, true, Icons.Rounded.ShoppingCart), tr("Lista della spesa") to tr("Con prezzi e totale"), colors.mint),
+                ).forEach { (kind, text, tone) ->
+                    Row(
+                        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.medium).background(tone.container).clickable { onChoose(kind.first, kind.second) }.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        androidx.compose.foundation.layout.Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+                            Icon(kind.third, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+                        }
+                        Column {
+                            Text(text.first, style = MaterialTheme.typography.titleMedium, color = tone.content)
+                            Text(text.second, style = MaterialTheme.typography.bodySmall, color = tone.content)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Annulla")) } },
+    )
 }
 
 /** Condivide la nota come testo: elenco con caselle e, se ci sono i prezzi, il totale. */

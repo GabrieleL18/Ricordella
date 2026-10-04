@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object CycleRoute
 @Serializable data object TrashRoute
 @Serializable data object AlarmsRoute
+@Serializable data object TimersRoute
 
 /** Creazione (id null) o modifica di una sveglia. */
 @Serializable data class AlarmEditRoute(val id: String? = null)

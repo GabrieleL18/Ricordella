@@ -1511,3 +1511,19 @@ Nome (facoltativo) ||| Nombre (opcional)
 Riepilogo dell'anno e PDF ||| Resumen del año y PDF
 Sezioni extra in Home ||| Secciones extra en Inicio
 Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarmas, Notas y Pociones a un toque en Inicio.
+Aggiungi prima una persona nella sezione Persone. ||| Añade primero una persona en la sección Personas.
+Alias ||| Alias
+Avvia ||| Iniciar
+Che nota vuoi scrivere? ||| ¿Qué nota quieres escribir?
+Con prezzi e totale ||| Con precios y total
+Il tuo nome ||| Tu nombre
+In questa cartella c'è già un backup con il nome «%1$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali). ||| Esta carpeta ya tiene una copia con el nombre «%1$s». Escribe un alias para distinguir la tuya (por ejemplo tus iniciales).
+Minuti ||| Minutos
+Oppure scrivi il tuo nome ||| O escribe tu nombre
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose. ||| Recuerdo por ti plazos, eventos, visitas, mantenimientos y cumpleaños. Primero configuremos dos cosas.
+Scegli il tuo profilo principale: non si può eliminare e dà il nome ai tuoi backup. ||| Elige tu perfil principal: no se puede eliminar y da nombre a tus copias.
+Scegli quanto dura: allo scadere suona come una sveglia. ||| Elige cuánto dura: al terminar suena como una alarma.
+Serve un alias ||| Hace falta un alias
+Testo libero ||| Texto libre
+Timer ||| Temporizador
+Voci da spuntare ||| Elementos para marcar

@@ -55,6 +55,7 @@ import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.date.nextRing
+import com.ricordella.app.feature.timers.isTimer
 import com.ricordella.app.domain.model.RecurrenceFrequency
 import com.ricordella.app.domain.model.ReminderFilter
 import com.ricordella.app.domain.model.ReminderListScope
@@ -84,7 +85,7 @@ fun AlarmsScreen(navigator: AppNavigator, onBack: () -> Unit) {
     val alarms by remember {
         container.reminderRepository
             .observeFiltered(ReminderFilter(scope = ReminderListScope.ALL, type = ReminderType.ALARM, sortOrder = ReminderSortOrder.DATE_ASC, limit = 200), container.time.today())
-            .map { list -> list.filter { it.reminder.status == ReminderStatus.ACTIVE && it.reminder.dueTime != null }.sortedBy { it.reminder.dueTime } }
+            .map { list -> list.filter { it.reminder.status == ReminderStatus.ACTIVE && it.reminder.dueTime != null && !it.reminder.isTimer() }.sortedBy { it.reminder.dueTime } }
     }.collectAsStateWithLifecycle(initialValue = emptyList())
     val now by remember { container.time.minuteTicks() }.collectAsStateWithLifecycle(initialValue = container.time.localNow())
     var menu by remember { mutableStateOf(false) }

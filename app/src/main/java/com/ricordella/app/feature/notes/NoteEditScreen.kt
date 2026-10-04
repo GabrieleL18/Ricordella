@@ -58,6 +58,7 @@ import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.ricordellaColors
+import androidx.compose.foundation.background
 import com.ricordella.app.domain.model.Note
 import com.ricordella.app.domain.model.NoteLine
 import com.ricordella.app.domain.model.toList
@@ -158,40 +159,52 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                 .padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            OutlinedTextField(
-                value = note.title,
-                onValueChange = { v -> edit { it.copy(title = v) } },
-                label = { Text(tr("Titolo")) },
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            if (!note.isList) {
-                OutlinedTextField(
-                    value = note.text,
-                    onValueChange = { v -> edit { it.copy(text = v) } },
-                    label = { Text(tr("Scrivi qui")) },
+            val tone = note.tone
+            val fieldColors = noteFieldColors(tone)
+            // Un foglio colorato come il tipo di nota: titolo grande, poi testo o voci, tutto senza bordi.
+            Column(
+                Modifier.fillMaxWidth().background(tone.container, MaterialTheme.shapes.extraLarge).padding(RicordellaDimensions.spaceS),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                TextField(
+                    value = note.title,
+                    onValueChange = { v -> edit { it.copy(title = v) } },
+                    placeholder = { Text(tr("Titolo")) },
+                    textStyle = MaterialTheme.typography.headlineSmall,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                    minLines = 8,
+                    singleLine = true,
+                    colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
-            } else {
-                note.lines.forEach { line ->
-                    androidx.compose.runtime.key(line.id) {
-                        LineRow(
-                            line = line,
-                            prices = note.prices,
-                            focused = focusLine == line.id,
-                            onFocused = { focusLine = null },
-                            onChange = { transform -> editLine(line.id, transform) },
-                            onNext = { addLineAfter(line.id) },
-                            onRemove = { edit { n -> n.copy(lines = n.lines.filterNot { it.id == line.id }.ifEmpty { listOf(NoteLine()) }) } },
-                        )
+                if (!note.isList) {
+                    TextField(
+                        value = note.text,
+                        onValueChange = { v -> edit { it.copy(text = v) } },
+                        placeholder = { Text(tr("Scrivi qui")) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                        minLines = 10,
+                        colors = fieldColors,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    note.lines.forEach { line ->
+                        androidx.compose.runtime.key(line.id) {
+                            LineRow(
+                                line = line,
+                                prices = note.prices,
+                                tone = tone,
+                                focused = focusLine == line.id,
+                                onFocused = { focusLine = null },
+                                onChange = { transform -> editLine(line.id, transform) },
+                                onNext = { addLineAfter(line.id) },
+                                onRemove = { edit { n -> n.copy(lines = n.lines.filterNot { it.id == line.id }.ifEmpty { listOf(NoteLine()) }) } },
+                            )
+                        }
                     }
-                }
-                TextButton(onClick = { addLineAfter(note.lines.lastOrNull()?.id) }) {
-                    Icon(Icons.Rounded.Add, contentDescription = null)
-                    Text(tr("Aggiungi voce"), modifier = Modifier.padding(start = 6.dp))
+                    TextButton(onClick = { addLineAfter(note.lines.lastOrNull()?.id) }) {
+                        Icon(Icons.Rounded.Add, contentDescription = null, tint = tone.content)
+                        Text(tr("Aggiungi voce"), color = tone.content, modifier = Modifier.padding(start = 6.dp))
+                    }
                 }
             }
         }
@@ -218,6 +231,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
 private fun LineRow(
     line: NoteLine,
     prices: Boolean,
+    tone: com.ricordella.app.core.ui.theme.Tone,
     focused: Boolean,
     onFocused: () -> Unit,
     onChange: ((NoteLine) -> NoteLine) -> Unit,
@@ -229,7 +243,11 @@ private fun LineRow(
     var price by remember { mutableStateOf(line.priceCents?.let(::formatCents).orEmpty()) }
     var qty by remember { mutableStateOf(if (line.qty > 1) line.qty.toString() else "") }
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Checkbox(checked = line.done, onCheckedChange = { v -> onChange { it.copy(done = v) } })
+        Checkbox(
+            checked = line.done,
+            onCheckedChange = { v -> onChange { it.copy(done = v) } },
+            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = tone.solid, uncheckedColor = tone.content),
+        )
         TextField(
             value = line.text,
             onValueChange = { v -> onChange { it.copy(text = v) } },
@@ -238,7 +256,7 @@ private fun LineRow(
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { onNext() }),
             singleLine = true,
-            colors = TextFieldDefaults.colors(focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent, unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent),
+            colors = noteFieldColors(tone),
             modifier = Modifier.weight(1f).focusRequester(requester),
         )
         if (prices) {
@@ -248,7 +266,7 @@ private fun LineRow(
                 placeholder = { Text("×1") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
-                colors = TextFieldDefaults.colors(focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent, unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent),
+                colors = noteFieldColors(tone),
                 modifier = Modifier.width(60.dp),
             )
             TextField(
@@ -257,13 +275,27 @@ private fun LineRow(
                 placeholder = { Text("€") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
-                colors = TextFieldDefaults.colors(focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent, unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent),
+                colors = noteFieldColors(tone),
                 modifier = Modifier.width(86.dp),
             )
         }
-        IconButton(onClick = onRemove) { Icon(Icons.Rounded.Close, contentDescription = tr("Elimina voce")) }
+        IconButton(onClick = onRemove) { Icon(Icons.Rounded.Close, contentDescription = tr("Elimina voce"), tint = tone.content) }
     }
 }
+
+/** Campi senza bordo né sfondo, con il testo del colore del tipo di nota. */
+@Composable
+private fun noteFieldColors(tone: com.ricordella.app.core.ui.theme.Tone) = TextFieldDefaults.colors(
+    focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+    unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+    focusedTextColor = tone.content,
+    unfocusedTextColor = tone.content,
+    focusedPlaceholderColor = tone.content.copy(alpha = 0.5f),
+    unfocusedPlaceholderColor = tone.content.copy(alpha = 0.5f),
+    cursorColor = tone.solid,
+)
 
 /** Il calcolo: totale della lista, quanto è già nel carrello e quanto manca. */
 @Composable

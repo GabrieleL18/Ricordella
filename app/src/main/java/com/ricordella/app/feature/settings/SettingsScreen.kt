@@ -186,6 +186,22 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
         state.shareUri?.let { shareBackup(context, it); viewModel.onShared() }
     }
 
+    state.needAlias?.let { folder ->
+        var alias by rememberSaveable { mutableStateOf(settings.backupAlias) }
+        AlertDialog(
+            onDismissRequest = viewModel::cancelAlias,
+            title = { Text(tr("Serve un alias")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(trf("In questa cartella c'è già un backup con il nome «%1\$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali).", settings.sharedMeName.orEmpty()))
+                    androidx.compose.material3.OutlinedTextField(value = alias, onValueChange = { alias = it }, label = { Text(tr("Alias")) }, singleLine = true)
+                }
+            },
+            confirmButton = { TextButton(enabled = alias.isNotBlank(), onClick = { viewModel.confirmAlias(folder, alias) }) { Text(tr("Salva")) } },
+            dismissButton = { TextButton(onClick = viewModel::cancelAlias) { Text(tr("Annulla")) } },
+        )
+    }
+
     LaunchedEffect(state.message) {
         state.message?.let { snackbar.showSnackbar(it); viewModel.onMessageShown() }
     }

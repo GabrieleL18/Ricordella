@@ -154,6 +154,9 @@ private fun AddFab(onAdd: () -> Unit) {
     }
 }
 
+/** Il "indietro" della barra in alto: chi lo gestisce (es. tornare al foglio "Aggiungi") restituisce true. */
+val LocalBackHook = androidx.compose.runtime.compositionLocalOf<() -> Boolean> { { false } }
+
 /** Scaffold delle schermate secondarie (dettaglio, modifica) con freccia indietro. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,6 +170,7 @@ fun DetailScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val backHook = LocalBackHook.current
     Scaffold(
         // imePadding: con la tastiera aperta il contenuto si restringe e il campo in uso resta visibile.
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).imePadding(),
@@ -174,7 +178,7 @@ fun DetailScaffold(
             TopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { if (!backHook()) onBack() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = tr("Indietro"))
                     }
                 },

@@ -53,7 +53,7 @@ object DemoMode {
 }
 
 /** Versione dei dati demo: da alzare ogni volta che si aggiungono o cambiano gli esempi. */
-private const val DEMO_DATA_VERSION = 4
+private const val DEMO_DATA_VERSION = 5
 
 /** Riempie il database demo al primo avvio in modalità demo (se è già pieno non fa nulla). */
 suspend fun AppContainer.seedDemoDataIfEmpty() {
@@ -89,6 +89,14 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
     val nonna = person(tr("Nonna Rosa"), "Ferri")
     val luca = person("Luca", "Martini")
     listOf(giulia, marco, sofia, nonna, luca).forEach { personRepository.save(it) }
+    // Profilo principale già scelto e tutorial delle sezioni già visti: niente finestre sopra gli screenshot (si riaprono da Sviluppatore › tutorial).
+    settingsRepository.update {
+        it.copy(
+            sharedMeId = giulia.id,
+            sharedMeName = giulia.name,
+            sectionTutorialsSeen = setOf("home", "calendar", "reminders", "items", "people", "potions", "resolutions"),
+        )
+    }
 
     fun item(name: String, kind: ItemKind, build: Item.() -> Item = { this }) =
         Item(name = name, categoryId = BuiltInCategories.idFor(kind), createdAt = now, updatedAt = now).build()

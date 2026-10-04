@@ -125,7 +125,7 @@ class DeveloperTools(
     suspend fun showNewsAgain() = settings.update { it.copy(newsSeenVersion = 0) }
 
     /** I tutorial che compaiono da soli ricompaiono (e si riaccendono se erano nascosti). */
-    suspend fun resetTutorials() = settings.update { it.copy(tutorialsEnabled = true, quickEntryTutorialSeen = false, backupTutorialSeen = false) }
+    suspend fun resetTutorials() = settings.update { it.copy(tutorialsEnabled = true, quickEntryTutorialSeen = false, backupTutorialSeen = false, sectionTutorialsSeen = emptySet()) }
 
     /**
      * Giorno finto usato dalla Home per gli inviti dei buoni propositi: permette di provarli

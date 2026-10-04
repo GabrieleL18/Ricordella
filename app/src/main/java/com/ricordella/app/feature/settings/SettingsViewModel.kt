@@ -38,6 +38,8 @@ data class SettingsUiState(
     val offerReserve: Boolean = false,
     /** Quando è stata fatta la copia di riserva (millisecondi). */
     val reserveSavedAt: Long? = null,
+    /** Cartella scelta dove c'è già un backup con questo nome: va compilato l'alias. */
+    val needAlias: Uri? = null,
 )
 
 class SettingsViewModel(
@@ -107,8 +109,23 @@ class SettingsViewModel(
 
     /** Sceglie la cartella (es. su Drive) dove salvare i backup con la data, ultime 3 copie. */
     fun setBackupFolder(folder: Uri) = runBusy {
+        if (housekeeping.backupNameTaken(folder)) {
+            local.update { it.copy(needAlias = folder) }
+            return@runBusy
+        }
         if (housekeeping.setBackupFolder(folder)) showMessage(tr("Cartella scelta: backup salvato."))
         else showMessage(tr("Non riesco a scrivere in quella cartella. Prova con un'altra, oppure usa «Esporta backup»."))
+    }
+
+    fun cancelAlias() = local.update { it.copy(needAlias = null) }
+
+    /** Salva l'alias e riprova con la cartella: se il nome è ancora uguale a uno già presente lo richiede. */
+    fun confirmAlias(folder: Uri, alias: String) {
+        local.update { it.copy(needAlias = null) }
+        viewModelScope.launch {
+            housekeeping.setBackupAlias(alias)
+            setBackupFolder(folder)
+        }
     }
 
     fun clearBackupFolder() {

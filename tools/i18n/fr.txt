@@ -1511,3 +1511,19 @@ Nome (facoltativo) ||| Nom (facultatif)
 Riepilogo dell'anno e PDF ||| Récapitulatif de l'année et PDF
 Sezioni extra in Home ||| Sections en plus sur l'accueil
 Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Réveils, Notes et Potions à portée de main sur l'accueil.
+Aggiungi prima una persona nella sezione Persone. ||| Ajoute d'abord une personne dans la section Personnes.
+Alias ||| Alias
+Avvia ||| Démarrer
+Che nota vuoi scrivere? ||| Quelle note veux-tu écrire ?
+Con prezzi e totale ||| Avec prix et total
+Il tuo nome ||| Ton nom
+In questa cartella c'è già un backup con il nome «%1$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali). ||| Ce dossier contient déjà une sauvegarde nommée «%1$s». Écris un alias pour distinguer la tienne (par exemple tes initiales).
+Minuti ||| Minutes
+Oppure scrivi il tuo nome ||| Ou écris ton nom
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose. ||| Je me souviens à ta place des échéances, événements, visites, entretiens et anniversaires. D’abord, réglons deux choses.
+Scegli il tuo profilo principale: non si può eliminare e dà il nome ai tuoi backup. ||| Choisis ton profil principal : il ne peut pas être supprimé et donne son nom à tes sauvegardes.
+Scegli quanto dura: allo scadere suona come una sveglia. ||| Choisis la durée : à la fin, ça sonne comme un réveil.
+Serve un alias ||| Un alias est nécessaire
+Testo libero ||| Texte libre
+Timer ||| Minuteur
+Voci da spuntare ||| Éléments à cocher
