@@ -23,6 +23,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
@@ -34,6 +36,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.navigation.NavDestination
 import com.ricordella.app.core.ui.LocalAppSettings
 import com.ricordella.app.core.ui.LocalQuickAddOpen
+import com.ricordella.app.core.ui.SectionTutorialOnce
 import com.ricordella.app.core.widget.CalendarWidgetProvider
 import com.ricordella.app.feature.onboarding.OnboardingScreen
 import com.ricordella.app.core.ui.RicordellaMotion
@@ -46,6 +49,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
@@ -129,7 +133,7 @@ private enum class TopLevelDestination(
     val label: String get() = tr(italianLabel)
 }
 
-private enum class QuickAddKind { REMINDER, EVENT, ALARM, VACATION, MEDICAL_VISIT, CYCLE, ITEM, PERSON }
+private enum class QuickAddKind { REMINDER, EVENT, ALARM, NOTE, VACATION, MEDICAL_VISIT, EXPENSE, CYCLE, ITEM, PERSON }
 
 /**
  * Shell dell'app: navigazione adattiva (barra in basso su schermi compatti,
@@ -200,7 +204,11 @@ fun RicordellaApp(
             CalendarWidgetProvider.ACTION_PERSON -> navigator.newPerson()
             CalendarWidgetProvider.ACTION_REMINDER -> navigator.newReminder(date = request.date)
             com.ricordella.app.MainActivity.ACTION_OPEN_CYCLE -> navigator.openCycle()
-            com.ricordella.app.MainActivity.ACTION_NEW_ALARM -> navigator.newReminder(type = ReminderType.ALARM)
+            com.ricordella.app.MainActivity.ACTION_NEW_ALARM -> navigator.newAlarm()
+            com.ricordella.app.MainActivity.ACTION_OPEN_ALARMS -> navigator.openAlarms()
+            com.ricordella.app.MainActivity.ACTION_OPEN_NOTES -> navigator.openNotes()
+            com.ricordella.app.MainActivity.ACTION_NEW_NOTE -> navigator.newNote()
+            com.ricordella.app.MainActivity.ACTION_OPEN_NOTE -> request.id?.let(navigator::openNote)
             com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
             com.ricordella.app.MainActivity.ACTION_OPEN_RESOLUTIONS -> navigator.openResolutions(java.time.LocalDate.now().year)
         }
@@ -208,8 +216,15 @@ fun RicordellaApp(
     }
 
     com.ricordella.app.feature.settings.OwnershipQuestionHost()
+    com.ricordella.app.feature.settings.MainProfileHost()
+    // Creazione aperta dal "+": "indietro" riporta al foglio "Aggiungi" invece che alle sezioni.
+    var returnToAdd by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(currentTopLevel) { if (currentTopLevel != null) returnToAdd = false }
+    val backToAdd = { if (returnToAdd) { returnToAdd = false; navigator.back(); showQuickAdd = true; true } else false }
+    androidx.activity.compose.BackHandler(enabled = returnToAdd) { backToAdd() }
+    var chooseNote by rememberSaveable { mutableStateOf(false) }
     val adaptiveType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfoV2())
-    CompositionLocalProvider(LocalQuickAddOpen provides showQuickAdd) {
+    CompositionLocalProvider(LocalQuickAddOpen provides showQuickAdd, com.ricordella.app.core.ui.LocalBackHook provides backToAdd) {
     NavigationSuiteScaffold(
         layoutType = if (currentTopLevel != null) adaptiveType else NavigationSuiteType.None,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
@@ -267,20 +282,26 @@ fun RicordellaApp(
                     fadeOut(tween(RicordellaMotion.SHORT))
             },
         ) {
-            composable<HomeRoute> { HomeScreen(navigator, openQuickAdd) }
-            composable<CalendarRoute> { CalendarScreen(navigator, openQuickAddOn) }
-            composable<RemindersRoute> { ReminderListScreen(navigator, openQuickAdd) }
-            composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd) }
-            composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd) }
+            composable<HomeRoute> { HomeScreen(navigator, openQuickAdd); SectionTutorialOnce("home", 0) }
+            composable<CalendarRoute> { CalendarScreen(navigator, openQuickAddOn); SectionTutorialOnce("calendar", 1) }
+            composable<RemindersRoute> { ReminderListScreen(navigator, openQuickAdd); SectionTutorialOnce("reminders", 2) }
+            composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd); SectionTutorialOnce("items", 3) }
+            composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd); SectionTutorialOnce("people", 4) }
             composable<SearchRoute> { SearchScreen(navigator) }
             composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onOpenTrash = navigator::openTrash, onGoHome = navigator::openHome) }
-            composable<PotionsRoute> { PotionsScreen(onBack = navigator::back) }
+            composable<PotionsRoute> { PotionsScreen(onBack = navigator::back); SectionTutorialOnce("potions", 5) }
+            composable<AlarmsRoute> { com.ricordella.app.feature.alarms.AlarmsScreen(navigator, onBack = navigator::back) }
+            composable<AlarmEditRoute> { entry -> com.ricordella.app.feature.alarms.AlarmEditScreen(entry.toRoute<AlarmEditRoute>().id, onBack = navigator::back) }
+            composable<TimersRoute> { com.ricordella.app.feature.timers.TimersScreen(onBack = navigator::back) }
+            composable<NotesRoute> { com.ricordella.app.feature.notes.NotesScreen(navigator, onBack = navigator::back) }
+            composable<NoteRoute> { entry -> com.ricordella.app.feature.notes.NoteEditScreen(entry.toRoute<NoteRoute>(), onBack = navigator::back) }
             composable<TrashRoute> { com.ricordella.app.feature.settings.TrashScreen(onBack = navigator::back) }
             composable<CycleRoute> { com.ricordella.app.feature.cycle.CycleScreen(onBack = navigator::back) }
             composable<ExpensesRoute> { com.ricordella.app.feature.items.ExpensesScreen(navigator) }
             composable<ResolutionsRoute> { entry ->
                 val route = entry.toRoute<ResolutionsRoute>()
                 ResolutionsScreen(route.year, route.recap, onBack = navigator::back)
+                SectionTutorialOnce("resolutions", 6)
             }
             composable<ReminderDetailRoute> { ReminderDetailScreen(navigator) }
             composable<ReminderEditRoute> { ReminderEditScreen(onBack = navigator::back) }
@@ -298,17 +319,26 @@ fun RicordellaApp(
             onDismiss = { showQuickAdd = false },
             onSelected = { kind ->
                 showQuickAdd = false
+                returnToAdd = kind != QuickAddKind.CYCLE
                 when (kind) {
                     QuickAddKind.REMINDER -> navigator.newReminder(date = quickAddDate)
                     QuickAddKind.EVENT -> navigator.newReminder(type = ReminderType.EVENT, date = quickAddDate)
-                    QuickAddKind.ALARM -> navigator.newReminder(type = ReminderType.ALARM, date = quickAddDate)
+                    QuickAddKind.ALARM -> navigator.newAlarm()
+                    QuickAddKind.NOTE -> chooseNote = true
                     QuickAddKind.VACATION -> navigator.newReminder(type = ReminderType.VACATION, date = quickAddDate)
                     QuickAddKind.MEDICAL_VISIT -> navigator.newReminder(type = ReminderType.MEDICAL_VISIT, date = quickAddDate)
+                    QuickAddKind.EXPENSE -> navigator.newReminder(type = ReminderType.PAYMENT, date = quickAddDate)
                     QuickAddKind.CYCLE -> navigator.openCycle()
                     QuickAddKind.ITEM -> navigator.newItem()
                     QuickAddKind.PERSON -> navigator.newPerson()
                 }
             },
+        )
+    }
+    if (chooseNote) {
+        com.ricordella.app.feature.notes.NewNoteChoice(
+            onDismiss = { chooseNote = false; returnToAdd = false; showQuickAdd = true },
+            onChoose = { list, prices -> chooseNote = false; navigator.newNote(list = list, prices = prices) },
         )
     }
 }
@@ -345,8 +375,10 @@ private val QuickAddOptions get() = listOf(
     QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Da fare o da non dimenticare")),
     QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Appuntamento o ricorrenza")),
     QuickAddOption(QuickAddKind.ALARM, Icons.Rounded.Alarm, tr("Sveglia"), tr("Suona a tutto schermo, anche ogni giorno")),
+    QuickAddOption(QuickAddKind.NOTE, Icons.Rounded.StickyNote2, tr("Nota"), tr("Testo, liste e lista della spesa")),
     QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
     QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
+    QuickAddOption(QuickAddKind.EXPENSE, Icons.Rounded.Payments, tr("Spesa"), tr("Spese, abbonamenti, rate ed entrate")),
     QuickAddOption(QuickAddKind.CYCLE, Icons.Rounded.WaterDrop, tr("Ciclo"), tr("Previsione e cronologia, senza notifiche")),
     QuickAddOption(QuickAddKind.ITEM, Icons.Rounded.Inventory2, tr("Cosa"), tr("Auto, casa, dispositivi, documenti")),
     QuickAddOption(QuickAddKind.PERSON, Icons.Rounded.PersonAdd, tr("Persona"), tr("A chi collegare promemoria e cose")),
@@ -380,14 +412,15 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                                 QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
                                 QuickAddKind.EVENT -> colors.lavender
                                 QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
-                                QuickAddKind.VACATION -> colors.mint
-                                QuickAddKind.ITEM -> colors.pear
+                                QuickAddKind.VACATION, QuickAddKind.EXPENSE -> colors.mint
+                                QuickAddKind.ITEM, QuickAddKind.NOTE -> colors.pear
                             },
                             index = index,
                             onClick = { onSelected(option.kind) },
                             modifier = Modifier.weight(1f),
                         )
                     }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
         }

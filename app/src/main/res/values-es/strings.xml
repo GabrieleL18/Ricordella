@@ -12,4 +12,6 @@
     <string name="widget_agenda_description">Los planes de hoy, mañana y los días siguientes: márcalos, recorre los días</string>
     <string name="widget_alarm_label">Despertador Remindella</string>
     <string name="widget_alarm_description">La próxima alarma que sonará: toca para abrirla, + para añadir una</string>
+    <string name="widget_notes_label">Notas de Remindella</string>
+    <string name="widget_notes_description">Tus notas y listas de la compra: toca una nota para abrirla, + para crear una</string>
 </resources>

@@ -75,6 +75,11 @@ abstract class ReminderDao {
     )
     abstract fun observeFiltered(query: SupportSQLiteQuery): Flow<List<ReminderWithLinks>>
 
+    /** Tutti i pagamenti, di qualunque anno: servono al riepilogo delle spese. */
+    @Transaction
+    @Query("SELECT * FROM reminder WHERE type = 'PAYMENT' AND isArchived = 0 AND status != 'CANCELLED'")
+    abstract fun observePayments(): Flow<List<ReminderWithLinks>>
+
     @Transaction
     @Query(
         """
@@ -122,7 +127,7 @@ abstract class ReminderDao {
     @Query(
         """
         SELECT id, dueDate, dueTime, notifyOffsetMinutes, snoozedUntil, lastNotifiedAt,
-            (type = 'ALARM' AND recurrenceRuleId IS NOT NULL) AS isRecurringAlarm FROM reminder
+            (type = 'ALARM' AND title NOT LIKE '⏱%') AS isAlarm FROM reminder
         WHERE status = 'ACTIVE' AND isArchived = 0 AND notificationsEnabled = 1
         """,
     )

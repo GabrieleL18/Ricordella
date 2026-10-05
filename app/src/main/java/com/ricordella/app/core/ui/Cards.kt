@@ -1,5 +1,6 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import com.ricordella.app.domain.model.ageOn
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
@@ -40,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -133,6 +135,19 @@ fun ReminderCard(
         callback?.invoke()
     }
 
+    // Eliminazione con lo swipe verso sinistra: chiede conferma, poi va nel Cestino come dal dettaglio.
+    var confirmDelete by remember { mutableStateOf(false) }
+    val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+    if (confirmDelete) {
+        ConfirmDialog(
+            title = tr("Eliminare il promemoria?"),
+            message = tr("Il promemoria e il suo storico vanno nel Cestino per 7 giorni, poi vengono eliminati. Le persone e le cose collegate non vengono toccate."),
+            confirmLabel = tr("Elimina"),
+            destructive = true,
+            onConfirm = { container.applicationScope.launch { container.deleteReminder(reminder.id) } },
+            onDismiss = { confirmDelete = false },
+        )
+    }
     // Le feste non hanno la spunta (né lo swipe per completare).
     val sounds = rememberUiSounds()
     // Completamento con lo swipe: per UNDO_MS si può annullare, poi viene salvato.
@@ -203,19 +218,22 @@ fun ReminderCard(
             exit = fadeOut(tween(CLOSE_MS.toInt())) + shrinkVertically(tween(CLOSE_MS.toInt(), easing = RicordellaMotion.EaseInOut)),
         ) { body() }
     }
-    if (swipeToComplete && toggle != null && !isDone) {
+    if (swipeToComplete) {
         val swipeState = rememberSwipeToDismissBoxState()
+        // Verso destra si completa, verso sinistra si elimina (dopo la conferma).
         SwipeToDismissBox(
             state = swipeState,
             modifier = modifier,
-            enableDismissFromEndToStart = false,
+            enableDismissFromStartToEnd = toggle != null && !isDone,
             onDismiss = { value ->
                 if (value == SwipeToDismissBoxValue.StartToEnd) swipeComplete()
+                else if (value == SwipeToDismissBoxValue.EndToStart) confirmDelete = true
                 // La card torna al suo posto: la festa della spunta fa il resto.
                 scope.launch { swipeState.reset() }
             },
             backgroundContent = {
-                val tone = MaterialTheme.ricordellaColors.mint
+                val delete = swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart
+                val tone = if (delete) MaterialTheme.ricordellaColors.coral else MaterialTheme.ricordellaColors.mint
                 val progress = swipeState.progress.coerceIn(0f, 1f)
                 Row(
                     modifier = Modifier
@@ -224,19 +242,22 @@ fun ReminderCard(
                         .background(tone.container)
                         .padding(horizontal = RicordellaDimensions.spaceXl),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS, if (delete) Alignment.End else Alignment.Start),
                 ) {
-                    Icon(
-                        Icons.Rounded.Check,
-                        contentDescription = null,
-                        tint = tone.content,
-                        modifier = Modifier.graphicsLayer {
-                            val scale = 0.6f + 0.8f * progress
-                            scaleX = scale
-                            scaleY = scale
-                        },
-                    )
-                    Text(tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content)
+                    val icon = @Composable {
+                        Icon(
+                            if (delete) Icons.Rounded.Delete else Icons.Rounded.Check,
+                            contentDescription = null,
+                            tint = tone.content,
+                            modifier = Modifier.graphicsLayer {
+                                val scale = 0.6f + 0.8f * progress
+                                scaleX = scale
+                                scaleY = scale
+                            },
+                        )
+                    }
+                    val label = @Composable { Text(if (delete) tr("Elimina") else tr("Completa"), style = MaterialTheme.typography.titleMedium, color = tone.content) }
+                    if (delete) { label(); icon() } else { icon(); label() }
                 }
             },
         ) { closable() }
@@ -280,7 +301,11 @@ private fun ReminderCardBody(
     val installment = reminder.plan?.let { plan ->
         plan.nextUnpaid()?.let { i -> trf("Rata %1\$s di %2\$s · %3\$s", i + 1, plan.count, DateTexts.money(plan.cents(i))) }
     }
-    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel), installment).joinToString(" · ")
+    // "Domani" / "Tra 10 min" dalla notifica: nell'elenco si vede fino a quando è rimandato.
+    val snoozed = reminder.snoozedUntil?.takeIf { reminder.status == ReminderStatus.ACTIVE }
+        ?.let { java.time.LocalDateTime.ofInstant(it, java.time.ZoneId.systemDefault()) }?.takeIf { it.isAfter(now) }
+        ?.let { trf("💤 rimandato: %1\$s", DateTexts.relativeWithTime(it.toLocalDate(), it.toLocalTime(), today).lowercase()) }
+    val shownDate = listOfNotNull(dateText, reminder.ageOn(occurrenceDate)?.let(::birthdayAgeLabel), installment, snoozed).joinToString(" · ")
     val links = (entry.items.map { it.name } + entry.people.map { it.displayName }).joinToString(" · ")
     val titleAlpha by animateFloatAsState(if (checked) 0.55f else 1f, tween(RicordellaMotion.SHORT), label = "titleAlpha")
     val badgeContainer by animateColorAsState(tone.container, tween(RicordellaMotion.SHORT), label = "badgeContainer")
@@ -439,12 +464,17 @@ private fun CompleteToggle(checked: Boolean, burst: Int, onClick: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun ReminderBadges(entry: ReminderWithLinks, overdue: Boolean) {
     val odometer = entry.odometerStatus?.takeIf { it != OdometerStatus.FAR }
     if (!overdue && odometer == null && entry.reminder.priority.icon == null) return
     val colors = MaterialTheme.ricordellaColors
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 4.dp)) {
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.padding(top = 4.dp),
+    ) {
         if (overdue) {
             StatusBadge(tr("Scaduto"), colors.coral.container, colors.coral.content)
         }
@@ -556,4 +586,35 @@ fun LinkChip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
             .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )
+}
+
+/** Collegamento a una sezione: riquadro colorato con icona tonda, titolo e freccia, come il riepilogo delle spese. */
+@Composable
+fun SectionLinkCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    tone: com.ricordella.app.core.ui.theme.Tone,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
+            .padding(RicordellaDimensions.spaceL),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+    ) {
+        Box(Modifier.size(40.dp).background(tone.solid, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = tone.content)
+            if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = tone.content)
+        }
+        Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = tone.content)
+    }
 }

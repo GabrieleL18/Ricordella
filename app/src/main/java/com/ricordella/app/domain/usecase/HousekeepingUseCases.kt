@@ -68,6 +68,12 @@ class Housekeeping(
         return ok
     }
 
+    /** Nella cartella c'è già un backup con il mio nome (e non è la cartella che uso già): serve un alias. */
+    suspend fun backupNameTaken(folder: Uri): Boolean =
+        settings.current().backupFolderUri != folder.toString() && backup.folderHasMyName(folder)
+
+    suspend fun setBackupAlias(alias: String) = settings.update { it.copy(backupAlias = alias.trim()) }
+
     suspend fun clearBackupFolder() = settings.update { it.copy(backupFolderUri = null) }
 
     private suspend fun markBackupDone() {

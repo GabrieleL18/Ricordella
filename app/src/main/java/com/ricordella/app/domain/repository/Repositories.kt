@@ -29,6 +29,8 @@ interface ReminderRepository {
     fun observeForRange(from: LocalDate, to: LocalDate): Flow<List<ReminderWithLinks>>
     fun observeFiltered(filter: ReminderFilter, today: LocalDate): Flow<List<ReminderWithLinks>>
     fun observeForPerson(personId: String): Flow<List<ReminderWithLinks>>
+    /** Tutti i pagamenti (spese, abbonamenti, rate, entrate), di qualunque anno. */
+    fun observePayments(): Flow<List<ReminderWithLinks>>
     fun observeForItem(itemId: String): Flow<List<ReminderWithLinks>>
     fun observeCompletions(reminderId: String): Flow<List<ReminderCompletion>>
     fun observeCategories(): Flow<List<String>>

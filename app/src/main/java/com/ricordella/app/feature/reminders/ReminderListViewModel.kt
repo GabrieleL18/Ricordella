@@ -81,7 +81,9 @@ class ReminderListViewModel(
     val uiState: StateFlow<ReminderListUiState> = combine(results, lookups, query, filter, ticks) { list, lookup, text, options, now ->
         val range = options.period.range
         val occurrenceDates = mutableMapOf<String, LocalDate>()
-        val visible = if (range == null) list else list.filter { entry ->
+        // Le sveglie hanno la loro sezione: qui solo se le si cerca con il filtro del tipo.
+        val all = if (options.type == ReminderType.ALARM) list else list.filterNot { it.reminder.type == ReminderType.ALARM }
+        val visible = if (range == null) all else all.filter { entry ->
             val reminder = entry.reminder
             if (reminder.dueDate in range) return@filter true
             val first = recurrence.daysCoveredInRange(reminder, entry.recurrenceRule, range.start, range.endInclusive).firstOrNull()?.second

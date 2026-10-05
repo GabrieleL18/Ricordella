@@ -53,7 +53,7 @@ abstract class RicordellaDatabase : RoomDatabase() {
     abstract fun backupDao(): BackupDao
 
     companion object {
-        const val VERSION = 8
+        const val VERSION = 9
         private const val FILE_NAME = "ricordella.db"
 
         /**
@@ -96,6 +96,12 @@ abstract class RicordellaDatabase : RoomDatabase() {
             object : Migration(7, 8) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("ALTER TABLE reminder ADD COLUMN plan TEXT")
+                }
+            },
+            // 8 → 9: denaro dei pagamenti (importo e quote per persona).
+            object : Migration(8, 9) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE reminder ADD COLUMN money TEXT")
                 }
             },
             // 3 → 4: anno di nascita dei compleanni.

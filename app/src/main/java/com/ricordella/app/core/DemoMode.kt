@@ -11,6 +11,10 @@ import com.ricordella.app.domain.model.ExpenseKind
 import com.ricordella.app.domain.model.Item
 import com.ricordella.app.domain.model.ItemKind
 import com.ricordella.app.domain.model.MaintenanceRecord
+import com.ricordella.app.domain.model.Note
+import com.ricordella.app.domain.model.NoteLine
+import com.ricordella.app.domain.date.nextAlarmDate
+import java.time.DayOfWeek
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.PersonItemRole
 import com.ricordella.app.domain.model.Priority
@@ -48,9 +52,18 @@ object DemoMode {
     }
 }
 
+/** Versione dei dati demo: da alzare ogni volta che si aggiungono o cambiano gli esempi. */
+private const val DEMO_DATA_VERSION = 5
+
 /** Riempie il database demo al primo avvio in modalità demo (se è già pieno non fa nulla). */
 suspend fun AppContainer.seedDemoDataIfEmpty() {
-    if (personRepository.observePeople(archived = false).first().isNotEmpty()) return
+    // Quando i dati demo cambiano si alza DEMO_DATA_VERSION: al prossimo avvio demo si svuota e si rifà tutto.
+    val prefs = appContext.getSharedPreferences("demo_mode", Context.MODE_PRIVATE)
+    if (personRepository.observePeople(archived = false).first().isNotEmpty()) {
+        if (prefs.getInt("seed_version", 0) == DEMO_DATA_VERSION) return
+        clearAllTables()
+        settingsRepository.update { com.ricordella.app.domain.model.AppSettings() }
+    }
     // Niente notifiche vere dai dati finti, niente tutorial né invito al backup sopra gli screenshot.
     settingsRepository.update {
         it.copy(
@@ -76,6 +89,14 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
     val nonna = person(tr("Nonna Rosa"), "Ferri")
     val luca = person("Luca", "Martini")
     listOf(giulia, marco, sofia, nonna, luca).forEach { personRepository.save(it) }
+    // Profilo principale già scelto e tutorial delle sezioni già visti: niente finestre sopra gli screenshot (si riaprono da Sviluppatore › tutorial).
+    settingsRepository.update {
+        it.copy(
+            sharedMeId = giulia.id,
+            sharedMeName = giulia.name,
+            sectionTutorialsSeen = setOf("home", "calendar", "reminders", "items", "people", "potions", "resolutions"),
+        )
+    }
 
     fun item(name: String, kind: ItemKind, build: Item.() -> Item = { this }) =
         Item(name = name, categoryId = BuiltInCategories.idFor(kind), createdAt = now, updatedAt = now).build()
@@ -125,6 +146,15 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         draft(at(date, trf("Compleanno di %1\$s", p.name), ReminderType.BIRTHDAY) { copy(birthYear = year) }, yearly(date), listOf(p))
 
     val trip = today.plusDays(12)
+    // Le sveglie non hanno una data: suonano alla prossima occasione nei giorni scelti.
+    fun alarm(title: String, ring: LocalTime, days: Set<DayOfWeek>, people: List<Person>, enabled: Boolean = true): ReminderDraft {
+        val date = nextAlarmDate(ring, days, time.localNow())
+        return draft(
+            at(date, title, ReminderType.ALARM, ring) { copy(notificationsEnabled = enabled) },
+            RecurrenceRule(frequency = RecurrenceFrequency.WEEKLY, startDate = date, daysOfWeek = days),
+            people,
+        )
+    }
     // Gli orari di oggi seguono l'ora attuale, così negli screenshot sono "in arrivo" e non scaduti.
     val hour = LocalTime.now().hour
     fun later(hours: Int, minute: Int = 0) = LocalTime.of((hour + hours).coerceAtMost(23), minute)
@@ -166,12 +196,183 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
             },
             people = listOf(giulia, marco, sofia),
         ),
-        draft(at(trip, tr("Sveglia per il volo"), ReminderType.ALARM, LocalTime.of(5, 45))),
+        draft(at(trip, tr("Sveglia per il volo"), ReminderType.ALARM, LocalTime.of(5, 45)), people = listOf(marco)),
+        alarm(tr("Sveglia"), LocalTime.of(6, 45), DayOfWeek.entries.take(5).toSet(), listOf(giulia)),
+        alarm(tr("Sveglia"), LocalTime.of(7, 30), DayOfWeek.entries.take(5).toSet(), listOf(marco)),
+        alarm(tr("Weekend"), LocalTime.of(9, 0), setOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY), listOf(giulia), enabled = false),
         // Feste per colorare il calendario.
         draft(at(LocalDate.of(today.year, 12, 25), tr("Natale"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
         draft(at(Holidays.easter(today.year + 1), tr("Pasqua"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
         draft(at(LocalDate.of(today.year, 11, 1), tr("Ognissanti"), ReminderType.HOLIDAY) { copy(notificationsEnabled = false) }),
     ).forEach { saveReminder(it) }
+
+    // Note: una lista della spesa coi prezzi, una lista semplice e una nota di testo.
+    fun line(text: String, cents: Long? = null, qty: Int = 1, done: Boolean = false) = NoteLine(text = text, priceCents = cents, qty = qty, done = done)
+    val nowMillis = System.currentTimeMillis()
+    settingsRepository.update {
+        it.copy(
+            notes = listOf(
+                Note(
+                    title = tr("Spesa del sabato"), isList = true, prices = true, pinned = true, updatedAt = nowMillis,
+                    lines = listOf(
+                        line(tr("Latte"), 140, 2, done = true), line(tr("Pane"), 220, done = true), line(tr("Pasta"), 110, 3),
+                        line(tr("Mele"), 290), line(tr("Parmigiano"), 780), line(tr("Detersivo"), 450),
+                    ),
+                ),
+                Note(
+                    title = tr("Valigia per la Sicilia"), isList = true, updatedAt = nowMillis - 3_600_000,
+                    lines = listOf(line(tr("Passaporti"), done = true), line(tr("Costumi"), done = true), line(tr("Crema solare")), line(tr("Caricatori"))),
+                ),
+                Note(
+                    title = tr("Idee regalo per Sofia"), updatedAt = nowMillis - 7_200_000,
+                    text = tr("Un libro di avventure, il set per i braccialetti e le cuffie per la piscina."),
+                ),
+            ),
+        )
+    }
+
+    // Ciclo di Giulia: in corso da qualche giorno, con la cronologia dei mesi scorsi.
+    val period = com.ricordella.app.domain.model.CycleProfile(giulia.id, periodDays = 5, cycleDays = 28, notifyLate = false)
+    settingsRepository.update {
+        it.copy(
+            cycleProfiles = listOf(period),
+            // Un anno di storia con cicli e durate che variano un po', fino a quello in corso.
+            cycleLog = run {
+                val gaps = listOf(28, 30, 27, 29, 28, 31, 27, 28, 29, 30, 28)
+                val lengths = listOf(5, 4, 5, 6, 5, 4, 5, 5, 6, 4, 5)
+                var start = today.minusDays(3)
+                listOf(com.ricordella.app.domain.model.CycleEntry(giulia.id, start)) + gaps.indices.map { i ->
+                    start = start.minusDays(gaps[i].toLong())
+                    com.ricordella.app.domain.model.CycleEntry(giulia.id, start, start.plusDays(lengths[i] - 1L))
+                }
+            },
+        )
+    }
+
+    // Spese: mutuo a rate, abbonamento, spese divise e qualche entrata.
+    val couple = listOf(giulia, marco)
+    val mortgageFirst = today.minusMonths(6).withDayOfMonth(5)
+    var mortgage = com.ricordella.app.domain.model.InstallmentPlan.create(mortgageFirst, 240, 65_000, 1, false, false)
+    (0 until 6).forEach { mortgage = mortgage.pay(it, mortgage.dueDate(it)) }
+    val netflixStart = today.minusMonths(7).withDayOfMonth(14)
+    val netflixNext = generateSequence(netflixStart) { it.plusMonths(1) }.first { !it.isBefore(today) }
+    listOf(
+        draft(
+            at(mortgage.dueDate(mortgage.nextUnpaid() ?: 0), tr("Mutuo casa"), ReminderType.PAYMENT) {
+                copy(plan = mortgage, money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.INSTALLMENTS))
+            },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, startDate = mortgage.dueDate(mortgage.nextUnpaid() ?: 0), endDate = mortgage.lastDate, dayOfMonth = 5),
+            couple,
+        ),
+        draft(
+            at(netflixNext, "Netflix", ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.SUBSCRIPTION, 1_399))
+            },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, startDate = netflixStart),
+            couple,
+        ),
+        draft(
+            at(today.plusDays(10), tr("Palestra di Marco"), ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.SUBSCRIPTION, 4_500))
+            },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, startDate = today.plusDays(10).minusMonths(5)),
+            listOf(marco),
+        ),
+    ).forEach { saveReminder(it) }
+    // Casi più complessi: più persone, quote diverse, rate trimestrali variabili, abbonamento annuale.
+    fun next(start: LocalDate, months: Long) = generateSequence(start) { it.plusMonths(months) }.first { !it.isBefore(today) }
+    fun info(kind: com.ricordella.app.domain.model.MoneyKind, cents: Long, shares: Map<String, Long> = emptyMap()) =
+        com.ricordella.app.domain.model.MoneyInfo(kind, cents, shares)
+    val expense = com.ricordella.app.domain.model.MoneyKind.EXPENSE
+    val subscription = com.ricordella.app.domain.model.MoneyKind.SUBSCRIPTION
+    val income = com.ricordella.app.domain.model.MoneyKind.INCOME
+    val yearStart = LocalDate.of(today.year, 1, 1)
+    // Affitto dello studio diviso in tre con quote diverse (50% / 30% / 20%).
+    val studioStart = yearStart.withDayOfMonth(3)
+    // Condominio a rate trimestrali con importi che cambiano: le prime 3 pagate, le altre da pagare.
+    var condo = com.ricordella.app.domain.model.InstallmentPlan.create(yearStart.withDayOfMonth(20), 8, 28_000, 3, true, false)
+    condo = condo.withAmount(2, 31_500, following = true).withAmount(5, 29_000, following = false)
+    (0 until 3).forEach { condo = condo.pay(it, condo.dueDate(it)) }
+    val condoDue = condo.dueDate(condo.nextUnpaid() ?: 0)
+    val insuranceStart = yearStart.withDayOfMonth(22).plusMonths(4)
+    listOf(
+        draft(
+            at(next(studioStart, 1), tr("Affitto studio"), ReminderType.PAYMENT) { copy(money = info(subscription, 60_000, mapOf(marco.id to 50L, giulia.id to 30L, luca.id to 20L))) },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, startDate = studioStart),
+            listOf(marco, giulia, luca),
+        ),
+        draft(
+            at(condoDue, tr("Condominio"), ReminderType.PAYMENT) { copy(plan = condo, money = info(com.ricordella.app.domain.model.MoneyKind.INSTALLMENTS, 0)) },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, interval = 3, startDate = condoDue, endDate = condo.lastDate, dayOfMonth = 20),
+            couple,
+        ),
+        draft(
+            at(next(insuranceStart, 12), tr("Assicurazione auto"), ReminderType.PAYMENT) { copy(money = info(subscription, 48_000)) },
+            RecurrenceRule(frequency = RecurrenceFrequency.YEARLY, startDate = insuranceStart),
+            listOf(giulia),
+        ),
+        draft(
+            at(next(yearStart.withDayOfMonth(8), 1), tr("Corso di nuoto di Sofia"), ReminderType.PAYMENT) { copy(money = info(subscription, 4_000)) },
+            RecurrenceRule(frequency = RecurrenceFrequency.MONTHLY, startDate = yearStart.withDayOfMonth(8)),
+            listOf(sofia),
+        ),
+    ).forEach { saveReminder(it) }
+    listOf(
+        // Cena di gruppo in quattro con quote diverse.
+        draft(
+            at(today.minusDays(14), tr("Cena di gruppo"), ReminderType.PAYMENT) { copy(money = info(expense, 18_700, mapOf(giulia.id to 5_000L, marco.id to 5_000L, luca.id to 5_000L, nonna.id to 3_700L))) },
+            people = listOf(giulia, marco, luca, nonna),
+        ),
+        draft(
+            at(today.minusMonths(1).minusDays(5), tr("Regalo per la nonna"), ReminderType.PAYMENT) { copy(money = info(expense, 12_000)) },
+            people = listOf(giulia, marco, luca),
+        ),
+        draft(
+            at(today.minusMonths(4), tr("Rimborso del dentista"), ReminderType.PAYMENT) { copy(money = info(income, 24_000, mapOf(giulia.id to 1L, marco.id to 1L))) },
+            people = couple,
+        ),
+        draft(
+            at(today.minusMonths(5).withDayOfMonth(10), tr("Libri e zaino di Sofia"), ReminderType.PAYMENT) { copy(money = info(expense, 15_650)) },
+            people = listOf(sofia, giulia),
+        ),
+        draft(
+            at(today.minusMonths(2).minusDays(8), tr("Stipendio extra"), ReminderType.PAYMENT) { copy(money = info(income, 120_000)) },
+            people = listOf(marco),
+        ),
+    ).forEach { entry ->
+        saveReminder(entry)
+        completeReminder(entry.reminder.id)
+    }
+    // Già pagate o incassate, così il riepilogo dell'anno ha qualcosa da mostrare.
+    listOf(
+        draft(
+            at(today.minusDays(20), tr("Vacanza in montagna"), ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.EXPENSE, 90_000, mapOf(giulia.id to 60L, marco.id to 40L)))
+            },
+            people = couple,
+        ),
+        draft(
+            at(today.minusMonths(2), tr("Spese condominiali"), ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.EXPENSE, 31_000))
+            },
+            people = couple,
+        ),
+        draft(
+            at(today.minusMonths(3), tr("Regalo di compleanno"), ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.INCOME, 10_000))
+            },
+            people = listOf(sofia),
+        ),
+        draft(
+            at(today.minusDays(9), tr("Bonifico dalla nonna"), ReminderType.PAYMENT) {
+                copy(money = com.ricordella.app.domain.model.MoneyInfo(com.ricordella.app.domain.model.MoneyKind.INCOME, 5_000))
+            },
+            people = listOf(sofia),
+        ),
+    ).forEach { entry ->
+        saveReminder(entry)
+        completeReminder(entry.reminder.id)
+    }
 
     // Qualcosa di già fatto, così la cronologia non è vuota.
     listOf(
@@ -181,4 +382,6 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         saveReminder(draft(reminder))
         completeReminder(reminder.id)
     }
+    // Solo a lavoro finito: se qualcosa si interrompe a metà, al prossimo avvio si rifà tutto.
+    prefs.edit().putInt("seed_version", DEMO_DATA_VERSION).commit()
 }

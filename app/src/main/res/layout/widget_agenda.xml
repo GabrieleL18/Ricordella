@@ -25,6 +25,7 @@
 
         <TextView
             android:id="@+id/agenda_title"
+            android:text="La tua giornata"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -54,6 +55,41 @@
             android:src="@drawable/ic_widget_chevron_right" />
     </LinearLayout>
 
+    <!-- Dati di esempio per l'anteprima nella scelta dei widget: a runtime si nascondono. -->
+    <LinearLayout
+        android:id="@+id/agenda_sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="🩺  09:30  Visita dal dentista"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="🍽️  20:30  Cena da Luca"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="🎂  Compleanno di Sofia"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+    </LinearLayout>
     <ListView
         android:id="@+id/agenda_list"
         android:layout_width="match_parent"

@@ -20,4 +20,5 @@
     <color name="widget_mint_solid">#FF2FAE67</color>
     <color name="widget_lavender_content">#FF2C0B55</color>
     <color name="widget_track">#1F000000</color>
+    <color name="widget_colon">#FFFF7A86</color>
 </resources>

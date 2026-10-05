@@ -44,7 +44,7 @@ private val Context.demoSettingsDataStore by preferencesDataStore(name = "settin
  */
 class AppContainer(context: Context) {
 
-    private val appContext = context.applicationContext
+    val appContext = context.applicationContext
 
     /** Scope per lavoro che deve sopravvivere alle singole schermate (es. receiver). */
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -58,6 +58,13 @@ class AppContainer(context: Context) {
     val databaseFileName = if (isDemo) "ricordella-demo.db" else "ricordella.db"
 
     private val database = RicordellaDatabase.create(appContext, databaseFileName)
+
+    /** Svuota il database (solo per rifare i dati demo). */
+    suspend fun clearAllTables() = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        database.clearAllTables()
+        // Le categorie predefinite si creano solo alla nascita del database: senza, cose e promemoria non si salvano.
+        database.backupDao().insertCategories(com.ricordella.app.data.local.database.BuiltInCategories.all)
+    }
 
     val reminderRepository = RoomReminderRepository(database.reminderDao())
     val trash = com.ricordella.app.data.trash.Trash(appContext, database.backupDao())
@@ -83,6 +90,7 @@ class AppContainer(context: Context) {
     val completeReminder = CompleteReminderUseCase(reminderRepository, reminderScheduler, recurrenceCalculator, time)
     val reopenReminder = ReopenReminderUseCase(reminderRepository, reminderScheduler, time)
     val undoCompletion = UndoCompletionUseCase(reminderRepository, reminderScheduler, time)
+    val setAlarmEnabled = com.ricordella.app.domain.usecase.SetAlarmEnabledUseCase(reminderRepository, saveReminder, reminderScheduler, time)
     val snoozeReminder = SnoozeReminderUseCase(reminderRepository, settingsRepository, reminderScheduler, time)
     val deleteReminder = DeleteReminderUseCase(reminderRepository, reminderScheduler, trash)
     val saveItem = SaveItemUseCase(itemRepository, reminderRepository, settingsRepository, saveReminder, time)
@@ -119,5 +127,13 @@ class AppContainer(context: Context) {
     val potionReminders = com.ricordella.app.core.notifications.PotionReminders(appContext, settingsRepository, time)
     val cycleReminders = com.ricordella.app.core.notifications.CycleReminders(appContext, settingsRepository, personRepository, time)
     val autoBackup = com.ricordella.app.core.notifications.AutoBackup(appContext, settingsRepository, housekeeping, backupRepository, time)
+    /** Crea una sveglia da un'ora (importata dal telefono): suona alla prossima occasione, una volta. */
+    suspend fun importPhoneAlarm(at: java.time.LocalTime, title: String) {
+        val me = settingsRepository.current().sharedMeId?.takeIf { personRepository.getPerson(it) != null }
+        val now = time.now()
+        val date = com.ricordella.app.domain.date.nextAlarmDate(at, emptySet(), time.localNow())
+        val alarm = com.ricordella.app.domain.model.Reminder(title = title, type = com.ricordella.app.domain.model.ReminderType.ALARM, dueDate = date, dueTime = at, createdAt = now, updatedAt = now)
+        saveReminder(com.ricordella.app.domain.model.ReminderDraft(alarm, null, setOfNotNull(me), emptySet()))
+    }
     val calendarImporter = CalendarImporter(appContext, saveReminder, database.reminderDao(), time, trash)
 }

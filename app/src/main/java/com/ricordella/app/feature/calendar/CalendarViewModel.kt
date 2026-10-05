@@ -41,8 +41,6 @@ data class CalendarUiState(
     val now: LocalDateTime = LocalDateTime.now(),
     /** Occorrenze per giorno nel periodo caricato (griglia del mese, giorno o agenda). */
     val occurrences: Map<LocalDate, List<ReminderOccurrence>> = emptyMap(),
-    /** Le sveglie normali non si mostrano (restano quelle importanti o urgenti). */
-    val alarmsHidden: Boolean = false,
     /** Giorni di ciclo (veri e previsti) nel periodo caricato. */
     val cycleDays: Map<LocalDate, List<CycleDay>> = emptyMap(),
 ) {
@@ -84,21 +82,15 @@ class CalendarViewModel(
             }
         }
 
-    private val hideAlarms = settings.settings.map { it.hideNormalAlarmsInCalendar }.distinctUntilChanged()
     private val cycle = settings.settings.map { it.cycleProfiles to it.cycleLog }.distinctUntilChanged()
 
-    fun onToggleAlarms(hidden: Boolean) {
-        viewModelScope.launch { settings.update { it.copy(hideNormalAlarmsInCalendar = hidden) } }
-    }
-
-    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks(), combine(hideAlarms, cycle) { h, c -> h to c }) { nav, first, all, now, (hidden, cyc) ->
+    val uiState: StateFlow<CalendarUiState> = combine(navigation, firstDay, occurrences, time.minuteTicks(), cycle) { nav, first, all, now, cyc ->
         val (profiles, log) = cyc
         val (from, to) = rangeFor(nav, first)
         val cycleDays = profiles.flatMap { CycleCalendar.days(it, log, from, to).entries }
             .groupBy({ it.key }, { it.value })
-        val byDate = if (!hidden) all else all.mapValues { (_, list) ->
-            list.filterNot { it.reminder.type == ReminderType.ALARM && it.reminder.priority == Priority.NORMAL }
-        }
+        // Le sveglie hanno la loro sezione: nel calendario non compaiono.
+        val byDate = all.mapValues { (_, list) -> list.filterNot { it.reminder.type == ReminderType.ALARM } }
         CalendarUiState(
             isLoading = false,
             mode = nav.mode,
@@ -107,7 +99,6 @@ class CalendarViewModel(
             firstDayOfWeek = first,
             now = now,
             occurrences = byDate,
-            alarmsHidden = hidden,
             cycleDays = cycleDays,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())

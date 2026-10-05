@@ -15,8 +15,9 @@ class SettingsRoundTripTest {
             potions = PotionSettings().drink(20_000, 250).drink(20_001, 500),
             cycleProfiles = listOf(CycleProfile("anna", 5, 28, true)),
             cycleLog = listOf(CycleEntry("anna", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 5))),
-            alarmPreNoticeMinutes = 60,
-            hideNormalAlarmsInCalendar = true,
+            alarmPreNotice = 30,
+            notes = listOf(Note(title = "Spesa", isList = true, prices = true, lines = listOf(NoteLine(text = "Latte", priceCents = 150, qty = 2)))),
+            alarmsInCalendar = AlarmsInCalendar.ALL,
             backupFolderUri = "content://folder",
         )
         assertEquals(settings, json.decodeFromString(AppSettings.serializer(), json.encodeToString(AppSettings.serializer(), settings)))
@@ -26,6 +27,7 @@ class SettingsRoundTripTest {
     fun oldSettingsWithoutNewFieldsStillLoad() {
         val loaded = json.decodeFromString(AppSettings.serializer(), "{}")
         assertEquals(emptyList<CycleProfile>(), loaded.cycleProfiles)
-        assertEquals(30, loaded.alarmPreNoticeMinutes)
+        assertEquals(60, loaded.alarmPreNotice)
+        assertEquals(emptyList<Note>(), loaded.notes)
     }
 }

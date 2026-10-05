@@ -57,6 +57,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.AlarmOn
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Save
@@ -66,6 +67,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.NewReleases
 import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Shield
@@ -184,6 +186,22 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
         state.shareUri?.let { shareBackup(context, it); viewModel.onShared() }
     }
 
+    state.needAlias?.let { folder ->
+        var alias by rememberSaveable { mutableStateOf(settings.backupAlias) }
+        AlertDialog(
+            onDismissRequest = viewModel::cancelAlias,
+            title = { Text(tr("Serve un alias")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(trf("In questa cartella c'è già un backup con il nome «%1\$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali).", settings.sharedMeName.orEmpty()))
+                    androidx.compose.material3.OutlinedTextField(value = alias, onValueChange = { alias = it }, label = { Text(tr("Alias")) }, singleLine = true)
+                }
+            },
+            confirmButton = { TextButton(enabled = alias.isNotBlank(), onClick = { viewModel.confirmAlias(folder, alias) }) { Text(tr("Salva")) } },
+            dismissButton = { TextButton(onClick = viewModel::cancelAlias) { Text(tr("Annulla")) } },
+        )
+    }
+
     LaunchedEffect(state.message) {
         state.message?.let { snackbar.showSnackbar(it); viewModel.onMessageShown() }
     }
@@ -243,6 +261,14 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     selected = settings.dateFormat,
                     label = { DateTexts.date(sample, it) },
                     onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Apps,
+                    title = tr("Sezioni extra in Home"),
+                    subtitle = tr("Sveglie, Note e Pozioni a portata di tocco nella Home."),
+                    trailing = {
+                        Switch(checked = settings.showExtrasOnHome, onCheckedChange = { value -> viewModel.update { it.copy(showExtrasOnHome = value) } })
+                    },
                 )
                 SettingRow(
                     icon = Icons.Rounded.MusicNote,
@@ -377,6 +403,17 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
             SupportCard(loved = settings.supportLoved, onLoved = { viewModel.update { it.copy(supportLoved = true) } })
 
             SettingsGroup(Icons.Rounded.Info, tr("Informazioni"), tr("Tutorial, privacy, assistenza e versione")) {
+                val context = LocalContext.current
+                SettingRow(
+                    icon = Icons.Rounded.Public,
+                    title = tr("Seguici su Instagram"),
+                    subtitle = "@lanni.labs",
+                    onClick = {
+                        runCatching {
+                            context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.instagram.com/lanni.labs")))
+                        }
+                    },
+                )
                 SettingRow(
                     icon = Icons.Rounded.NewReleases,
                     title = tr("Novità"),

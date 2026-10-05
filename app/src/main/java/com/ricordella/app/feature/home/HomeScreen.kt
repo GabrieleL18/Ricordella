@@ -1,5 +1,13 @@
 package com.ricordella.app.feature.home
 
+import androidx.compose.material.icons.rounded.Timer
+import com.ricordella.app.core.ui.pressScale
+import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.StickyNote2
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.rounded.AutoAwesome
 import com.ricordella.app.domain.model.ResolutionsPrompt
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -138,7 +146,8 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
-    val attentionAt = 4 + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
+    val showExtras = LocalAppSettings.current.showExtrasOnHome
+    val attentionAt = 4 + (if (showExtras) 1 else 0) + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
     val todayAt = attentionAt + if (state.attention.isNotEmpty()) 1 + state.attention.size else 0
     val upcomingAt = todayAt + 2
     val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
@@ -159,6 +168,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             item(key = "quick-entry") {
                 QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
             }
+            if (showExtras) item(key = "extras") { HomeExtras(navigator) }
             item(key = "permission") { NotificationPermissionCard() }
             item(key = "backup") {
                 BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
@@ -279,6 +289,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier, onAttention: () -> Unit, onToday: () -> Unit, onUpcoming: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
@@ -302,8 +313,10 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
             else HappyWizard(size = 92.dp, waving = true, magic = mascot.sparks)
         }
         if (!state.isLoading && !state.isEmpty) {
-            Row(
+            // A capo se, in una lingua con parole lunghe, le pillole non entrano in una riga.
+            androidx.compose.foundation.layout.FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
             ) {
                 CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral, onClick = onAttention)
@@ -504,5 +517,37 @@ private fun NotificationPermissionCard() {
             }
             PushButton(tr("Accendi le notifiche"), onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
         }
+    }
+}
+
+/** Collegamenti alle sezioni extra: si possono nascondere da Impostazioni. */
+@Composable
+private fun HomeExtras(navigator: AppNavigator) {
+    val colors = MaterialTheme.ricordellaColors
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () -> Unit, modifier: Modifier) {
+    val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    Column(
+        modifier
+            .pressScale(interaction, pressedScale = 0.92f)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(tone.container)
+            .clickable(interactionSource = interaction, indication = null, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick)
+            .padding(vertical = RicordellaDimensions.spaceL),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Box(Modifier.size(48.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(26.dp))
+        }
+        Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content, maxLines = 1)
     }
 }

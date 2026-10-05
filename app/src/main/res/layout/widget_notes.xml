@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget Note: le note recenti (fissate prima); un tocco su una nota la apre, il + ne crea una nuova. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:id="@+id/notes_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/notes_logo"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/widget_logo_background"
+            android:contentDescription="@string/app_name"
+            android:padding="3dp"
+            android:src="@drawable/ic_widget_bolt" />
+
+        <TextView
+            android:id="@+id/notes_title"
+            android:text="Note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_text"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/notes_add"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_round_button"
+            android:contentDescription="+"
+            android:padding="6dp"
+            android:src="@drawable/ic_widget_plus" />
+    </LinearLayout>
+
+    <!-- Dati di esempio per l'anteprima nella scelta dei widget: a runtime si nascondono. -->
+    <LinearLayout
+        android:id="@+id/notes_sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="🛒  Spesa del sabato"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="☑️  Valigia per la Sicilia"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingVertical="6dp"
+            android:text="📝  Idee regalo per Sofia"
+            android:textColor="@color/widget_text"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <ListView
+        android:id="@+id/notes_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/notes_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="@color/widget_text_muted"
+        android:textSize="13sp" />
+</LinearLayout>

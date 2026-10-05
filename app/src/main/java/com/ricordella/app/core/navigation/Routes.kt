@@ -15,6 +15,15 @@ import kotlinx.serialization.Serializable
 @Serializable data object ExpensesRoute
 @Serializable data object CycleRoute
 @Serializable data object TrashRoute
+@Serializable data object AlarmsRoute
+@Serializable data object TimersRoute
+
+/** Creazione (id null) o modifica di una sveglia. */
+@Serializable data class AlarmEditRoute(val id: String? = null)
+@Serializable data object NotesRoute
+
+/** Una nota (nuova o esistente); [id] è già deciso alla creazione, [list]/[prices] dicono che tipo di nota è nuova. */
+@Serializable data class NoteRoute(val id: String, val list: Boolean = false, val prices: Boolean = false)
 
 /** Buoni propositi di un anno; [recap] = aperto dall'invito di fine anno. */
 @Serializable data class ResolutionsRoute(val year: Int, val recap: Boolean = false)
@@ -45,4 +54,4 @@ data class ReminderEditRoute(
 @Serializable data class ViewerRoute(val uri: String, val mimeType: String? = null, val name: String)
 
 /** Richiesta arrivata dal widget del calendario (cosa aggiungere, eventuale giorno) o da una notifica delle pozioni. */
-data class WidgetRequest(val action: String, val date: java.time.LocalDate?)
+data class WidgetRequest(val action: String, val date: java.time.LocalDate?, val id: String? = null)

@@ -34,6 +34,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Unarchive
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Delete
@@ -137,19 +139,13 @@ fun ItemDetailScreen(navigator: AppNavigator) {
         actions = {
             if (entry != null) {
                 IconButton(onClick = { navigator.editItem(entry.item.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
-                Box {
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(if (entry.item.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
-                            onClick = { menuOpen = false; viewModel.onToggleArchived() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(tr("Elimina")) },
-                            leadingIcon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
-                            onClick = { menuOpen = false; confirmDelete = true },
-                        )
-                    }
+                IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
+                IconButton(onClick = viewModel::onToggleArchived) {
+                    val archived = entry.item.isArchived
+                    Icon(
+                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
+                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
+                    )
                 }
             }
         },
@@ -227,7 +223,6 @@ fun ItemDetailScreen(navigator: AppNavigator) {
                 SectionHeader(tr("Note"))
                 Text(it, style = MaterialTheme.typography.bodyLarge)
             }
-            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editItem(entry.item.id) }, onDelete = { confirmDelete = true })
         }
 
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {

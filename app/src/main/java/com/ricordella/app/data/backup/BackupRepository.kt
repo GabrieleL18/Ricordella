@@ -95,7 +95,8 @@ class BackupRepository(
     suspend fun exportToFolder(folder: Uri) = withContext(Dispatchers.IO) {
         val fresh = prepare()
         val parent = android.provider.DocumentsContract.buildDocumentUriUsingTree(folder, android.provider.DocumentsContract.getTreeDocumentId(folder))
-        val name = "remindella-backup-${stamp()}.zip"
+        val label = backupLabel()
+        val name = "remindella-backup-${if (label.isEmpty()) "" else "$label-"}${stamp()}.zip"
         val created = android.provider.DocumentsContract.createDocument(resolver, parent, "application/zip", name)
             ?: throw IOException(tr("Destinazione non disponibile"))
         (resolver.openOutputStream(created, "w") ?: throw IOException(tr("Destinazione non disponibile")))
@@ -116,12 +117,32 @@ class BackupRepository(
         )?.use { c ->
             while (c.moveToNext()) {
                 val display = c.getString(1).orEmpty()
-                if (display.startsWith("remindella-backup-") && display.endsWith(".zip")) old += c.getString(0) to display
+                if (isMine(label, display)) old += c.getString(0) to display
             }
         }
         old.sortedByDescending { it.second }.drop(KEEP_COPIES).forEach { (id, _) ->
             runCatching { android.provider.DocumentsContract.deleteDocument(resolver, android.provider.DocumentsContract.buildDocumentUriUsingTree(folder, id)) }
         }
+    }
+
+    /**
+     * Nome di chi salva (profilo principale + alias, solo lettere e cifre): nella cartella condivisa ogni persona
+     * ha i suoi file e ne tiene solo le ultime copie, senza toccare quelli degli altri.
+     */
+    private suspend fun backupLabel(): String = settingsRepository.current().let { app ->
+        listOf(app.sharedMeName, app.backupAlias).joinToString("-") { part -> part.orEmpty().filter(Char::isLetterOrDigit) }.trim('-').replace("--", "-")
+    }
+
+    private fun isMine(label: String, display: String): Boolean =
+        Regex("remindella-backup-" + (if (label.isEmpty()) "" else Regex.escape(label) + "-") + "\\d{4}-\\d{2}-\\d{2}-\\d{4}\\.zip").matches(display)
+
+    /** True se nella cartella c'è già un backup con il mio stesso nome (di un'altra persona con lo stesso nome): serve un alias. */
+    suspend fun folderHasMyName(folder: Uri): Boolean = withContext(Dispatchers.IO) {
+        val label = backupLabel()
+        val children = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(folder, android.provider.DocumentsContract.getTreeDocumentId(folder))
+        resolver.query(children, arrayOf(android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)?.use { c ->
+            generateSequence { if (c.moveToNext()) c.getString(0).orEmpty() else null }.any { isMine(label, it) }
+        } ?: false
     }
 
     /**

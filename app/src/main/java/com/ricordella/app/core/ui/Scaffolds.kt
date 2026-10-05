@@ -1,5 +1,13 @@
 package com.ricordella.app.core.ui
 
+import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.StickyNote2
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.animation.core.Animatable
@@ -8,6 +16,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
@@ -87,9 +97,15 @@ fun TopLevelScaffold(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
-                    // Le pozioni (acqua da bere) vivono a parte: si aprono da qui, in ogni sezione.
-                    IconButton(onClick = navigator::openPotions) {
-                        Icon(Icons.Rounded.WaterDrop, contentDescription = tr("Pozioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
+                    // Sveglie, note e pozioni (acqua da bere) vivono a parte: si aprono da qui, in ogni sezione.
+                    var sections by remember { mutableStateOf(false) }
+                    IconButton(onClick = { sections = true }) {
+                        Icon(Icons.Rounded.Apps, contentDescription = tr("Sveglie, note e pozioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
+                    }
+                    DropdownMenu(expanded = sections, onDismissRequest = { sections = false }) {
+                        DropdownMenuItem(text = { Text(tr("Sveglie")) }, leadingIcon = { Icon(Icons.Rounded.Alarm, null) }, onClick = { sections = false; navigator.openAlarms() })
+                        DropdownMenuItem(text = { Text(tr("Note")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) }, onClick = { sections = false; navigator.openNotes() })
+                        DropdownMenuItem(text = { Text(tr("Pozioni")) }, leadingIcon = { Icon(Icons.Rounded.WaterDrop, null) }, onClick = { sections = false; navigator.openPotions() })
                     }
                     IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }
                     IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = tr("Impostazioni")) }
@@ -138,6 +154,9 @@ private fun AddFab(onAdd: () -> Unit) {
     }
 }
 
+/** Il "indietro" della barra in alto: chi lo gestisce (es. tornare al foglio "Aggiungi") restituisce true. */
+val LocalBackHook = androidx.compose.runtime.compositionLocalOf<() -> Boolean> { { false } }
+
 /** Scaffold delle schermate secondarie (dettaglio, modifica) con freccia indietro. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,6 +170,7 @@ fun DetailScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val backHook = LocalBackHook.current
     Scaffold(
         // imePadding: con la tastiera aperta il contenuto si restringe e il campo in uso resta visibile.
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).imePadding(),
@@ -158,7 +178,7 @@ fun DetailScaffold(
             TopAppBar(
                 title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = { if (!backHook()) onBack() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = tr("Indietro"))
                     }
                 },

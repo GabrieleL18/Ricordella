@@ -29,6 +29,8 @@ class RoomReminderRepository(private val dao: ReminderDao) : ReminderRepository 
 
     override fun observeForPerson(personId: String) = dao.observeForPerson(personId)
 
+    override fun observePayments() = dao.observePayments()
+
     override fun observeForItem(itemId: String) = dao.observeForItem(itemId)
 
     override fun observeCompletions(reminderId: String) = dao.observeCompletions(reminderId)

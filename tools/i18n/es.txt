@@ -1349,3 +1349,184 @@ Scegli cosa condividere e come usare Drive. ||| Elige qué compartir y cómo usa
 Scegli i giorni della settimana in cui suona (es. lunedì–venerdì per lavoro). Qualche minuto prima ricevi una notifica silenziosa per saltarla solo questa volta, e puoi sospenderla fino a una data. Ogni sveglia è assegnata a una persona e, se condividi il file, suona solo sul telefono della sua persona. Nel calendario puoi nascondere le sveglie normali. ||| Elige los días de la semana en que suena (p. ej. lunes–viernes para el trabajo). Unos minutos antes recibes una notificación silenciosa para saltarla solo esta vez y puedes pausarla hasta una fecha. Cada alarma se asigna a una persona y, si compartes el archivo, suena solo en el móvil de esa persona. En el calendario puedes ocultar las alarmas normales.
 Ultime 3 copie con la data, anche su Drive. ||| Últimas 3 copias con fecha, también en Drive.
 Un pagamento può essere a rate: indichi quante, l'importo e ogni quanti mesi. Se l'importo cambia, modifichi ogni rata (anche le successive). Ogni rata pagata resta registrata con data e importo; finite le rate scegli se eliminare l'evento l'anno dopo. I pagamenti ripetuti possono essere annuali, mensili, settimanali o in un giorno preciso del mese. ||| Un pago puede ser a plazos: indicas cuántas cuotas, el importe y cada cuántos meses. Si el importe cambia, editas cada cuota (y las siguientes). Cada cuota pagada queda registrada con fecha e importe; al terminar eliges si eliminar el evento al año siguiente. Los pagos repetidos pueden ser anuales, mensuales, semanales o en un día concreto del mes.
+%1$s a testa ||| %1$s por persona
+%1$s rate ||| %1$s cuotas
+%1$s volte ||| %1$s veces
+%1$s novità ||| %1$s novedades
+Aggiungi una spesa, un abbonamento, delle rate o un'entrata: scegli le persone e come dividere il costo. ||| Añade un gasto, una suscripción, cuotas o un ingreso: elige las personas y cómo dividir el coste.
+Arrivata %1$s giorni dopo l'inizio della precedente ||| Llegó %1$s días después del inicio del anterior
+Chi li riceve * ||| Quién lo recibe *
+Come si divide ||| Cómo se divide
+Cosa stai cercando? ||| ¿Qué buscas?
+Crea PDF ||| Crear PDF
+Da 2 a 360 ||| De 2 a 360
+Durata: %1$s giorni ||| Duración: %1$s días
+Entrata ||| Ingreso
+Entrate ||| Ingresos
+Il PDF contiene quello che vedi: %1$s. ||| El PDF contiene lo que ves: %1$s.
+Importi diversi ||| Importes distintos
+Importo (€) * ||| Importe (€) *
+Importo per rata (€) * ||| Importe por cuota (€) *
+Inserisci un importo maggiore di zero ||| Introduce un importe mayor que cero
+Mutuo, finanziamento, condominio: la data è quella della prima rata. ||| Hipoteca, préstamo, comunidad: la fecha es la de la primera cuota.
+Nessuna spesa in quest'anno ||| Ningún gasto este año
+Non hai ancora aggiunto persone: aggiungile dalla sezione Persone. ||| Aún no has añadido personas: añádelas en la sección Personas.
+Non mostrarle ||| No mostrarlas
+Non è stato possibile creare il PDF ||| No se pudo crear el PDF
+Nuova spesa ||| Nuevo gasto
+PDF salvato ||| PDF guardado
+Parti uguali ||| Partes iguales
+Per chi suona * ||| Para quién suena *
+Persona eliminata ||| Persona eliminada
+Prima rata * ||| Primera cuota *
+Primo ciclo registrato ||| Primer ciclo registrado
+Quota di %1$s (€) ||| Parte de %1$s (€)
+Saldo ||| Saldo
+Scade ||| Vence
+Scegli almeno una persona. ||| Elige al menos una persona.
+Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni. ||| Escribe o dilo en voz alta: busco entre personas, cosas, recordatorios, notas y mantenimientos.
+Se non torna con l'importo, si divide in proporzione. ||| Si no coincide con el importe, se divide en proporción.
+Senza persona ||| Sin persona
+Si rinnova ||| Se renueva
+Si rinnova da solo: scegli ogni quanto. ||| Se renueva solo: elige cada cuánto.
+Soldi ||| Dinero
+Soldi che ricevi: un bonifico, un regalo. ||| Dinero que recibes: una transferencia, un regalo.
+Solo importanti o urgenti ||| Solo importantes o urgentes
+Spesa ||| Gasto
+Spese e conti ||| Gastos y cuentas
+Spese, abbonamenti, rate ed entrate ||| Gastos, suscripciones, cuotas e ingresos
+Sveglie nel calendario ||| Alarmas en el calendario
+Totale entrate ||| Total de ingresos
+Totale quote: %1$s ||| Total de partes: %1$s
+Totale spese ||| Total de gastos
+Tutta la cerchia ||| Todo el círculo
+Un pagamento, anche ripetuto (es. una bolletta). ||| Un pago, también repetido (p. ej. una factura).
+Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata. ||| Una fila por menstruación, la más reciente primero: cuándo empezó y terminó, cuántos días duró y a cuántos días del inicio de la anterior llegó.
+in corso ||| en curso
+Mostra il dettaglio ||| Mostrar el detalle
+Nascondi ||| Ocultar
+Più semplice ||| Más simple
+Sveglie e ciclo nel calendario ||| Alarmas y ciclo en el calendario
+Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF. ||| Gastos, suscripciones, cuotas e ingresos, divididos entre las personas, con el resumen del año y el PDF.
+Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni. ||| Iconos y leyenda en el calendario; las alarmas solo se muestran si lo eliges en Ajustes.
+Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina. ||| Búsqueda con micrófono, formulario más claro, un solo Editar/Eliminar.
+La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF. ||| El gasto es un evento especial: elige si es un gasto, una suscripción, un pago en cuotas o un ingreso, el importe, de quién es y cómo dividirlo. En Gastos y cuentas ves el total de todo el círculo o de una persona durante el año y creas un PDF.
+Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara. ||| Las alarmas tienen su propio icono y por defecto no aparecen en el calendario: en Ajustes › Alarmas eliges cuándo mostrarlas. También hay leyenda para el ciclo, que ahora es uno solo y tiene un historial más claro.
+La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più. ||| La búsqueda global tiene micrófono. En el formulario eliges primero el tipo y las personas obligatorias se ven enseguida. Editar, Eliminar y Archivar aparecen una sola vez; la descripción y la categoría ya no están.
+Seguici su Instagram ||| Síguenos en Instagram
+Riapri ||| Reabrir
+modalità debug ||| modo depuración
+Mutuo casa ||| Hipoteca de la casa
+Palestra di Marco ||| Gimnasio de Marco
+Vacanza in montagna ||| Vacaciones en la montaña
+Spese condominiali ||| Gastos de comunidad
+Regalo di compleanno ||| Regalo de cumpleaños
+Bonifico dalla nonna ||| Transferencia de la abuela
+Pagamenti ||| Pagos
+Affitto studio ||| Alquiler del estudio
+Condominio ||| Comunidad
+Assicurazione auto ||| Seguro del coche
+Corso di nuoto di Sofia ||| Curso de natación de Sofía
+Cena di gruppo ||| Cena de grupo
+Regalo per la nonna ||| Regalo para la abuela
+Rimborso del dentista ||| Reembolso del dentista
+Libri e zaino di Sofia ||| Libros y mochila de Sofía
+Stipendio extra ||| Sueldo extra
+Finisce qui ||| Termina aquí
+Aggiungi i prezzi ||| Añadir precios
+Aggiungi una sveglia: scegli l'ora e i giorni, poi accendila o spegnila quando vuoi. ||| Añade una alarma: elige la hora y los días, y actívala o desactívala cuando quieras.
+Aggiungi voce ||| Añadir elemento
+Ancora da prendere ||| Falta por comprar
+Apri le sveglie del telefono ||| Abrir las alarmas del teléfono
+Avviso silenzioso prima di ogni sveglia ||| Aviso silencioso antes de cada alarma
+Caricatori ||| Cargadores
+Costumi ||| Bañadores
+Crema solare ||| Crema solar
+Detersivo ||| Detergente
+Elimina voce ||| Eliminar elemento
+Eliminare la nota? ||| ¿Eliminar la nota?
+Eliminare la sveglia? ||| ¿Eliminar la alarma?
+Fatto ✓ ||| Hecho ✓
+Fissa in alto ||| Fijar arriba
+Fissata ||| Fijada
+Google Keep non permette alle altre app di leggere le note, ma ci sono due strade.⏎⏎1. Una nota alla volta: in Keep apri la nota, tocca ⋮ › Invia e scegli Remindella.⏎⏎2. Tutte insieme: su takeout.google.com esporta solo «Keep», poi scegli qui il file .zip (o i file .json) scaricato. ||| Google Keep no permite que otras apps lean las notas, pero hay dos caminos.⏎⏎1. Una nota cada vez: en Keep abre la nota, toca ⋮ › Enviar y elige Remindella.⏎⏎2. Todas a la vez: en takeout.google.com exporta solo «Keep» y elige aquí el archivo .zip (o los archivos .json) descargado.
+Hai già una sveglia alle %1$s ||| Ya tienes una alarma a las %1$s
+Idee regalo per Sofia ||| Ideas de regalo para Sofía
+Importa da Google Keep ||| Importar desde Google Keep
+Importa la prossima sveglia del telefono ||| Importar la próxima alarma del teléfono
+Importata la sveglia delle %1$s ||| Alarma de las %1$s importada
+Importate %1$s note (%2$s già presenti) ||| %1$s notas importadas (%2$s ya estaban)
+La nota viene eliminata. Se hai un backup la ritrovi lì. ||| La nota se eliminará. Si tienes una copia de seguridad, la encontrarás allí.
+La prossima suona %1$s ||| La próxima suena %1$s
+La sveglia delle %1$s viene eliminata. ||| La alarma de las %1$s se eliminará.
+Latte ||| Leche
+Lista ||| Lista
+Lista della spesa ||| Lista de la compra
+Mele ||| Manzanas
+Nel carrello (%1$s) ||| En el carrito (%1$s)
+Nessuna nota ||| Sin notas
+Nessuna sveglia attiva ||| Ninguna alarma activa
+Non ho trovato note in questi file ||| No he encontrado notas en estos archivos
+Non trovo l'app Orologio ||| No encuentro la app Reloj
+Nota ||| Nota
+Nuova nota ||| Nueva nota
+Pane ||| Pan
+Parmigiano ||| Parmesano
+Passaporti ||| Pasaportes
+Pasta ||| Pasta
+Prossima sveglia ||| Próxima alarma
+Scrivi qui ||| Escribe aquí
+Scrivi una nota o prepara una lista della spesa con i prezzi: il totale lo calcolo io. ||| Escribe una nota o prepara una lista de la compra con precios: el total lo calculo yo.
+Senza titolo ||| Sin título
+Spegni ||| Apagar
+Spesa del sabato ||| Compra del sábado
+Sul telefono non c'è nessuna sveglia attiva ||| No hay ninguna alarma activa en el teléfono
+Sveglie, note e pozioni ||| Alarmas, notas y pociones
+Te lo ricordo: %1$s ||| Te lo recuerdo: %1$s
+Testo, liste e lista della spesa ||| Texto, listas y lista de la compra
+Titolo ||| Título
+Tocca + per scrivere la prima nota ✨ ||| Toca + para escribir tu primera nota ✨
+Togli i prezzi ||| Quitar los precios
+Togli le voci spuntate ||| Quitar los elementos marcados
+Totale ||| Total
+Totale: %1$s ||| Total: %1$s
+Tra poco suona la sveglia delle %1$s. Vuoi spegnerla? ||| La alarma de las %1$s sonará pronto. ¿Quieres apagarla?
+Trasforma in lista ||| Convertir en lista
+Trasforma in testo ||| Convertir en texto
+Un libro di avventure, il set per i braccialetti e le cuffie per la piscina. ||| Un libro de aventuras, el set de pulseras y unos auriculares para la piscina.
+Valigia per la Sicilia ||| Maleta para Sicilia
+Voce ||| Elemento
+Weekend ||| Fin de semana
+tra %1$s g %2$s h ||| en %1$s d %2$s h
+tra %1$s h %2$s min ||| en %1$s h %2$s min
+tra %1$s min ||| en %1$s min
+💤 rimandato: %1$s ||| 💤 pospuesto: %1$s
+Sveglie a parte ||| Alarmas aparte
+Una sezione solo per le sveglie: ora e giorni, accese o spente quando vuoi, e un avviso un'ora prima. ||| Una sección solo para las alarmas: hora y días, activadas o desactivadas cuando quieras, y un aviso una hora antes.
+Le sveglie non hanno più una data: scegli l'ora e i giorni e le accendi o spegni con un interruttore. Un'ora prima arriva un avviso silenzioso con il pulsante per spegnerle. Puoi importare la prossima sveglia del telefono. Le trovi dal menu in alto, accanto a Note e Pozioni. ||| Las alarmas ya no tienen fecha: elige la hora y los días y actívalas o desactívalas con un interruptor. Una hora antes llega un aviso silencioso con un botón para apagarlas. Puedes importar la próxima alarma del teléfono. Las encuentras en el menú de arriba, junto a Notas y Pociones.
+Note e lista della spesa ||| Notas y lista de la compra
+Note di testo, liste e liste della spesa con prezzi e totale. ||| Notas de texto, listas y listas de la compra con precios y total.
+Scrivi note, crea liste con le caselle o liste della spesa con prezzo e quantità: il totale e quanto è già nel carrello li calcolo io. Ci sono anche i widget Note e Sveglie, con la stessa grafica dell'app. ||| Escribe notas, crea listas con casillas o listas de la compra con precio y cantidad: el total y lo que ya está en el carrito lo calculo yo. También hay widgets de Notas y Alarmas, con el estilo de la app.
+Nome (facoltativo) ||| Nombre (opcional)
+Riepilogo dell'anno e PDF ||| Resumen del año y PDF
+Sezioni extra in Home ||| Secciones extra en Inicio
+Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarmas, Notas y Pociones a un toque en Inicio.
+Aggiungi prima una persona nella sezione Persone. ||| Añade primero una persona en la sección Personas.
+Alias ||| Alias
+Avvia ||| Iniciar
+Che nota vuoi scrivere? ||| ¿Qué nota quieres escribir?
+Con prezzi e totale ||| Con precios y total
+Il tuo nome ||| Tu nombre
+In questa cartella c'è già un backup con il nome «%1$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali). ||| Esta carpeta ya tiene una copia con el nombre «%1$s». Escribe un alias para distinguir la tuya (por ejemplo tus iniciales).
+Minuti ||| Minutos
+Oppure scrivi il tuo nome ||| O escribe tu nombre
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose. ||| Recuerdo por ti plazos, eventos, visitas, mantenimientos y cumpleaños. Primero configuremos dos cosas.
+Scegli il tuo profilo principale: non si può eliminare e dà il nome ai tuoi backup. ||| Elige tu perfil principal: no se puede eliminar y da nombre a tus copias.
+Scegli quanto dura: allo scadere suona come una sveglia. ||| Elige cuánto dura: al terminar suena como una alarma.
+Serve un alias ||| Hace falta un alias
+Testo libero ||| Texto libre
+Timer ||| Temporizador
+Voci da spuntare ||| Elementos para marcar
+min ||| min
+Un altro timer ||| Otro temporizador
+Suona alle %1$s ||| Suena a las %1$s

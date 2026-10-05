@@ -94,7 +94,14 @@ fun PushButton(
                 loading -> CircularProgressIndicator(color = content, strokeWidth = 2.5.dp, modifier = Modifier.size(18.dp))
                 icon != null -> Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
             }
-            Text(text, style = MaterialTheme.typography.titleMedium, color = content, maxLines = 1)
+            Text(
+                text,
+                style = if (text.length > 16) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
+                color = content,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
+            )
         }
     }
 }

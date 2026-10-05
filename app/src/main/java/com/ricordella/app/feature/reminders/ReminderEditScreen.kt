@@ -1,5 +1,9 @@
 package com.ricordella.app.feature.reminders
 
+import androidx.compose.foundation.horizontalScroll
+import com.ricordella.app.domain.model.MoneyKind
+import com.ricordella.app.domain.model.Person
+import com.ricordella.app.feature.items.parseCents
 import java.time.LocalTime
 import java.time.LocalDate
 import com.ricordella.app.core.ui.currentMinute
@@ -76,6 +80,7 @@ import com.ricordella.app.core.ui.birthdayAgeLabel
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
+import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.Priority
 import com.ricordella.app.domain.model.RecurrenceFrequency
 import com.ricordella.app.domain.model.ReminderType
@@ -88,6 +93,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
         ReminderEditViewModel(handle, c.reminderRepository, c.personRepository, c.itemRepository, c.settingsRepository, c.saveReminder, c.time)
     }
     val form by viewModel.form.collectAsStateWithLifecycle()
+    val people by viewModel.people.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
 
     LaunchedEffect(form.saved) { if (form.saved) onBack() }
@@ -103,6 +109,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
             !form.isNew -> tr("Modifica")
             form.type == ReminderType.EVENT -> tr("Nuovo evento")
             form.type == ReminderType.ALARM -> tr("Nuova sveglia")
+            form.type == ReminderType.PAYMENT -> tr("Nuova spesa")
             else -> tr("Nuovo promemoria")
         },
         onBack = onBack,
@@ -122,7 +129,8 @@ fun ReminderEditScreen(onBack: () -> Unit) {
                 .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceS),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
-            BasicFields(form, viewModel::update, viewModel::onTypeChange)
+            TypeChooser(form.type, viewModel::onTypeChange)
+            BasicFields(form, people, viewModel::update, viewModel::onMoneyKind)
             if (form.type == ReminderType.VACATION) {
                 TripFields(form.trip, onChange = { trip -> viewModel.update { it.copy(trip = trip) } })
             }
@@ -131,7 +139,7 @@ fun ReminderEditScreen(onBack: () -> Unit) {
                 Text(if (form.showAdvanced) tr("Nascondi opzioni") else tr("Altre opzioni"), modifier = Modifier.padding(start = 8.dp))
             }
             if (form.showAdvanced) {
-                AdvancedFields(form, viewModel)
+                AdvancedFields(form, people, viewModel)
             }
             PushButton(
                 text = tr("Salva"),
@@ -144,9 +152,34 @@ fun ReminderEditScreen(onBack: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+/** Il tipo si sceglie per primo, in una sola riga che scorre. */
 @Composable
-private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit, onTypeChange: (ReminderType) -> Unit) {
+private fun TypeChooser(current: ReminderType, onChange: (ReminderType) -> Unit) {
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        ReminderType.entries.filter { it != ReminderType.ALARM || current == ReminderType.ALARM }.forEach { type ->
+            val tone = type.tone
+            FilterChip(
+                selected = current == type,
+                onClick = { onChange(type) },
+                label = { Text(type.label) },
+                leadingIcon = { Icon(type.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = tone.container,
+                    selectedLabelColor = tone.content,
+                    selectedLeadingIconColor = tone.content,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun BasicFields(
+    form: ReminderForm,
+    people: List<Person>,
+    update: ((ReminderForm) -> ReminderForm) -> Unit,
+    onMoneyKind: (MoneyKind) -> Unit,
+) {
     OutlinedTextField(
         value = form.title,
         onValueChange = { value -> update { it.copy(title = value) } },
@@ -158,8 +191,9 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
         modifier = Modifier.fillMaxWidth(),
     )
     Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        DateField(
-            label = tr("Data *"),
+        // Una sveglia non ha una data: suona alla prossima ora scelta (nei giorni scelti).
+        if (!form.isAlarm) DateField(
+            label = if (form.installments) tr("Prima rata *") else tr("Data *"),
             value = form.date,
             onValueChange = { value -> update { it.copy(date = value) } },
             isError = form.dateError,
@@ -169,7 +203,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             label = if (form.isAlarm) tr("Ora *") else tr("Ora"),
             value = form.time,
             onValueChange = { value -> update { it.copy(time = value) } },
-            modifier = Modifier.weight(1f),
+            modifier = if (form.isAlarm) Modifier.fillMaxWidth() else Modifier.weight(1f),
             isError = form.timeError,
             // Per oggi il selettore parte dall'ora attuale, per gli altri giorni dalle 9.
             defaultTime = if (form.date == LocalDate.now()) currentMinute() else LocalTime.of(9, 0),
@@ -180,10 +214,9 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     }
     if (form.isAlarm) {
         AlarmFields(form, update)
-        if (form.personError) {
-            Text(tr("La sveglia va assegnata a una persona: scegline una in «Altre opzioni › Collegamenti»."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-        }
+        PeopleChooser(tr("Per chi suona *"), people, form.personIds, form.personError) { ids -> update { it.copy(personIds = ids) } }
     }
+    if (form.isPayment) PaymentFields(form, people, update, onMoneyKind)
     if (form.type == ReminderType.BIRTHDAY) {
         val age = form.birthYear.toIntOrNull()?.let { year -> form.date?.year?.minus(year) }?.takeIf { it in 1..150 }
         OutlinedTextField(
@@ -197,7 +230,7 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
         )
     }
     // Eventi di più giorni: vacanze, viaggi, ricoveri... Nel calendario appaiono come una barra continua.
-    if (!form.isAlarm) Row(verticalAlignment = Alignment.CenterVertically) {
+    if (!form.isAlarm && !form.isPayment) Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(tr("Dura più giorni"), style = MaterialTheme.typography.bodyLarge)
             Text(tr("Es. una vacanza o un viaggio"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -221,152 +254,66 @@ private fun BasicFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
     if (form.time == null && !form.isAlarm) {
         Text(tr("Senza orario il promemoria vale per tutto il giorno."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    Text(tr("Tipo"), style = MaterialTheme.typography.labelLarge)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        ReminderType.entries.forEach { type ->
-            val tone = type.tone
-            FilterChip(
-                selected = form.type == type,
-                onClick = { onTypeChange(type) },
-                label = { Text(type.label) },
-                leadingIcon = { Icon(type.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = tone.container,
-                    selectedLabelColor = tone.content,
-                    selectedLeadingIconColor = tone.content,
-                ),
-            )
+}
+
+/** Persone da scegliere con un tocco (chip): sempre visibili nei moduli dove una persona è obbligatoria. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PeopleChooser(title: String, people: List<Person>, selected: Set<String>, error: Boolean, onChange: (Set<String>) -> Unit) {
+    Text(title, style = MaterialTheme.typography.labelLarge)
+    if (people.isEmpty()) {
+        Text(tr("Non hai ancora aggiunto persone: aggiungile dalla sezione Persone."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        return
+    }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        people.forEach { person ->
+            val on = person.id in selected
+            FilterChip(selected = on, onClick = { onChange(if (on) selected - person.id else selected + person.id) }, label = { Text(person.displayName) })
         }
     }
+    if (error) Text(tr("Scegli almeno una persona."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel) {
+private fun AdvancedFields(form: ReminderForm, people: List<Person>, viewModel: ReminderEditViewModel) {
     val update = viewModel::update
-    val people by viewModel.people.collectAsStateWithLifecycle()
     val items by viewModel.items.collectAsStateWithLifecycle()
-    val categories by viewModel.categories.collectAsStateWithLifecycle()
     var showPeoplePicker by rememberSaveable { mutableStateOf(false) }
     var showItemPicker by rememberSaveable { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = form.description,
-        onValueChange = { value -> update { it.copy(description = value) } },
-        label = { Text(tr("Descrizione")) },
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-        modifier = Modifier.fillMaxWidth(),
-        minLines = 2,
-    )
-
-    if (form.isPayment) PaymentFields(form, update)
-    // Per le sveglie la ripetizione si sceglie coi giorni, più sopra; per le rate decide il piano.
-    if (!form.isAlarm && !(form.isPayment && form.installments)) {
+    // Per le sveglie la ripetizione si sceglie coi giorni; per i pagamenti sta nella loro sezione.
+    if (!form.isAlarm && !form.isPayment) {
         SectionHeader(tr("Ricorrenza"))
-        DropdownField(
-            label = tr("Si ripete"),
-            options = RecurrencePreset.entries,
-            selected = form.recurrencePreset,
-            optionLabel = { it.label },
-            onSelected = { preset -> update { it.copy(recurrencePreset = preset) } },
-        )
-        if (form.isPayment && form.recurrencePreset == RecurrencePreset.MONTHLY) {
-            DropdownField(
-                label = tr("Giorno del mese in cui pagare"),
-                options = listOf<Int?>(null) + (1..31).toList(),
-                selected = form.dayOfMonth,
-                optionLabel = { it?.let { d -> trf("Il %1\$s di ogni mese", d) } ?: tr("Lo stesso giorno della data scelta") },
-                onSelected = { day -> update { it.copy(dayOfMonth = day) } },
-            )
-        }
-        if (form.recurrencePreset == RecurrencePreset.CUSTOM) {
-            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = form.customInterval,
-                    onValueChange = { value -> update { it.copy(customInterval = value.filter(Char::isDigit).take(3)) } },
-                    label = { Text(tr("Ogni")) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(0.4f),
-                )
-                DropdownField(
-                    label = tr("Unità"),
-                    options = RecurrenceFrequency.entries,
-                    selected = form.customFrequency,
-                    optionLabel = { it.unitLabel },
-                    onSelected = { frequency -> update { it.copy(customFrequency = frequency) } },
-                    modifier = Modifier.weight(0.6f),
-                )
-            }
-            if (form.customFrequency == RecurrenceFrequency.WEEKLY) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    DayOfWeek.entries.forEach { day ->
-                        val selected = day in form.weekDays
-                        FilterChip(
-                            selected = selected,
-                            onClick = { update { it.copy(weekDays = if (selected) it.weekDays - day else it.weekDays + day) } },
-                            label = { Text(DateTexts.weekdayFull(day).take(3)) },
-                        )
-                    }
-                }
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(tr("Conta dall'ultima volta"), style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        tr("Se lo fai prima o dopo, anche le date successive si spostano."),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(checked = form.fromLastDone, onCheckedChange = { value -> update { it.copy(fromLastDone = value) } })
-            }
-            DateField(
-                label = tr("Fino al (opzionale)"),
-                value = form.recurrenceEnd,
-                onValueChange = { value -> update { it.copy(recurrenceEnd = value) } },
-                clearable = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+        RecurrenceFields(form, update)
     }
 
     SectionHeader(tr("Priorità"))
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
         Priority.entries.forEachIndexed { index, priority ->
+            val tone = MaterialTheme.ricordellaColors.let { c -> when (priority) { Priority.NORMAL -> c.mint; Priority.IMPORTANT -> c.pear; Priority.URGENT -> c.coral } }
             SegmentedButton(
                 selected = form.priority == priority,
                 onClick = { update { it.copy(priority = priority) } },
                 shape = SegmentedButtonDefaults.itemShape(index, Priority.entries.size),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = tone.container,
+                    activeContentColor = tone.content,
+                    activeBorderColor = tone.solid,
+                ),
             ) { Text(priority.label) }
         }
     }
 
-    SectionHeader(tr("Categoria"))
-    OutlinedTextField(
-        value = form.category,
-        onValueChange = { value -> update { it.copy(category = value) } },
-        label = { Text(tr("Categoria (es. Casa, Lavoro)")) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-        modifier = Modifier.fillMaxWidth(),
-    )
-    val suggestions = categories.filter { it != form.category && it.contains(form.category, ignoreCase = true) }.take(6)
-    if (suggestions.isNotEmpty()) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            suggestions.forEach { suggestion ->
-                FilterChip(selected = false, onClick = { update { it.copy(category = suggestion) } }, label = { Text(suggestion) })
-            }
-        }
-    }
-
     SectionHeader(tr("Collegamenti"))
-    Text(tr("Persone"), style = MaterialTheme.typography.labelLarge)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        people.filter { it.id in form.personIds }.forEach { person ->
-            InputChip(selected = true, onClick = { update { it.copy(personIds = it.personIds - person.id) } }, label = { Text(person.displayName) })
+    if (!form.isAlarm && !form.isPayment) {
+        Text(tr("Persone"), style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            people.filter { it.id in form.personIds }.forEach { person ->
+                InputChip(selected = true, onClick = { update { it.copy(personIds = it.personIds - person.id) } }, label = { Text(person.displayName) })
+            }
+            AssistAddChip(tr("Persona")) { showPeoplePicker = true }
         }
-        AssistAddChip(tr("Persona")) { showPeoplePicker = true }
     }
     Text(tr("Cose"), style = MaterialTheme.typography.labelLarge)
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -454,6 +401,78 @@ private fun AdvancedFields(form: ReminderForm, viewModel: ReminderEditViewModel)
     }
 }
 
+/** Ogni quanto si ripete: ripetizioni pronte, giorno del mese per i pagamenti, e intervallo personalizzato. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RecurrenceFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit, label: String = tr("Si ripete")) {
+    DropdownField(
+        label = label,
+        options = RecurrencePreset.entries,
+        selected = form.recurrencePreset,
+        optionLabel = { it.label },
+        onSelected = { preset -> update { it.copy(recurrencePreset = preset) } },
+    )
+    if (form.isPayment && form.recurrencePreset == RecurrencePreset.MONTHLY) {
+        DropdownField(
+            label = tr("Giorno del mese in cui pagare"),
+            options = listOf<Int?>(null) + (1..31).toList(),
+            selected = form.dayOfMonth,
+            optionLabel = { it?.let { d -> trf("Il %1\$s di ogni mese", d) } ?: tr("Lo stesso giorno della data scelta") },
+            onSelected = { day -> update { it.copy(dayOfMonth = day) } },
+        )
+    }
+    if (form.recurrencePreset == RecurrencePreset.CUSTOM) {
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = form.customInterval,
+                onValueChange = { value -> update { it.copy(customInterval = value.filter(Char::isDigit).take(3)) } },
+                label = { Text(tr("Ogni")) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(0.4f),
+            )
+            DropdownField(
+                label = tr("Unità"),
+                options = RecurrenceFrequency.entries,
+                selected = form.customFrequency,
+                optionLabel = { it.unitLabel },
+                onSelected = { frequency -> update { it.copy(customFrequency = frequency) } },
+                modifier = Modifier.weight(0.6f),
+            )
+        }
+        if (form.customFrequency == RecurrenceFrequency.WEEKLY) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                DayOfWeek.entries.forEach { day ->
+                    val selected = day in form.weekDays
+                    FilterChip(
+                        selected = selected,
+                        onClick = { update { it.copy(weekDays = if (selected) it.weekDays - day else it.weekDays + day) } },
+                        label = { Text(DateTexts.weekdayFull(day).take(3)) },
+                    )
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(tr("Conta dall'ultima volta"), style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    tr("Se lo fai prima o dopo, anche le date successive si spostano."),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Switch(checked = form.fromLastDone, onCheckedChange = { value -> update { it.copy(fromLastDone = value) } })
+        }
+        DateField(
+            label = tr("Fino al (opzionale)"),
+            value = form.recurrenceEnd,
+            onValueChange = { value -> update { it.copy(recurrenceEnd = value) } },
+            clearable = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
 @Composable
 private fun AssistAddChip(label: String, onClick: () -> Unit) {
     FilterChip(
@@ -464,63 +483,129 @@ private fun AssistAddChip(label: String, onClick: () -> Unit) {
     )
 }
 
-/** Pagamento: una volta o a rate (condominio, mutuo...), con importo, numero di rate e ogni quanti mesi. */
+private val MoneyKind.hint: String
+    get() = when (this) {
+        MoneyKind.EXPENSE -> tr("Un pagamento, anche ripetuto (es. una bolletta).")
+        MoneyKind.SUBSCRIPTION -> tr("Si rinnova da solo: scegli ogni quanto.")
+        MoneyKind.INSTALLMENTS -> tr("Mutuo, finanziamento, condominio: la data è quella della prima rata.")
+        MoneyKind.INCOME -> tr("Soldi che ricevi: un bonifico, un regalo.")
+    }
+
+/** Spese: che cosa è, quanto, di chi e come si divide; poi, se serve, ogni quanto si ripete o le rate. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PaymentFields(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
-    SectionHeader(tr("Pagamento"))
+private fun PaymentFields(
+    form: ReminderForm,
+    people: List<Person>,
+    update: ((ReminderForm) -> ReminderForm) -> Unit,
+    onKind: (MoneyKind) -> Unit,
+) {
+    SectionHeader(tr("Soldi"))
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        MoneyKind.entries.forEach { kind ->
+            FilterChip(
+                selected = form.moneyKind == kind,
+                onClick = { onKind(kind) },
+                label = { Text(kind.label) },
+                leadingIcon = { Icon(kind.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
+            )
+        }
+    }
+    Text(form.moneyKind.hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    OutlinedTextField(
+        value = form.amount,
+        onValueChange = { value -> update { it.copy(amount = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(12)) } },
+        label = { Text(if (form.installments) tr("Importo per rata (€) *") else tr("Importo (€) *")) },
+        isError = form.amountError,
+        supportingText = if (form.amountError) ({ Text(tr("Inserisci un importo maggiore di zero")) }) else null,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    if (form.installments) {
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+            OutlinedTextField(
+                value = form.installmentCount,
+                onValueChange = { value -> update { it.copy(installmentCount = value.filter(Char::isDigit).take(3)) } },
+                label = { Text(tr("Numero di rate")) },
+                isError = form.installmentError,
+                supportingText = if (form.installmentError) ({ Text(tr("Da 2 a 360")) }) else null,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(1f),
+            )
+            DropdownField(
+                label = tr("Scade"),
+                options = listOf(1, 2, 3, 6, 12),
+                selected = form.installmentEvery,
+                optionLabel = { if (it == 1) tr("Ogni mese") else if (it == 12) tr("Ogni anno") else trf("Ogni %1\$s mesi", it) },
+                onSelected = { months -> update { it.copy(installmentEvery = months) } },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(tr("L'importo cambia tra le rate"), style = MaterialTheme.typography.bodyLarge)
+                Text(tr("Poi cambi l'importo di ogni rata nel dettaglio."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = form.installmentVariable, onCheckedChange = { value -> update { it.copy(installmentVariable = value) } })
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(tr("Elimina l'evento un anno dopo l'ultima rata"), style = MaterialTheme.typography.bodyLarge)
+                Text(tr("Se spento resta nello storico."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = form.installmentDeleteAfter, onCheckedChange = { value -> update { it.copy(installmentDeleteAfter = value) } })
+        }
+    } else {
+        RecurrenceFields(form, update, label = if (form.moneyKind == MoneyKind.SUBSCRIPTION) tr("Si rinnova") else tr("Si ripete"))
+    }
+
+    PeopleChooser(
+        title = if (form.moneyKind == MoneyKind.INCOME) tr("Chi li riceve *") else tr("Di chi è *"),
+        people = people,
+        selected = form.personIds,
+        error = form.personError,
+    ) { ids -> update { it.copy(personIds = ids) } }
+    if (form.personIds.size >= 2) SplitFields(form, people, update)
+}
+
+/** Divisione tra più persone: parti uguali o un importo per ciascuna (il totale si divide in proporzione). */
+@Composable
+private fun SplitFields(form: ReminderForm, people: List<Person>, update: ((ReminderForm) -> ReminderForm) -> Unit) {
+    Text(tr("Come si divide"), style = MaterialTheme.typography.labelLarge)
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-        listOf(false to tr("Una volta o ripetuto"), true to tr("A rate")).forEachIndexed { index, (value, label) ->
+        listOf(false to tr("Parti uguali"), true to tr("Importi diversi")).forEachIndexed { index, (custom, label) ->
             SegmentedButton(
-                selected = form.installments == value,
-                onClick = { update { it.copy(installments = value) } },
+                selected = form.splitCustom == custom,
+                onClick = { update { it.copy(splitCustom = custom) } },
                 shape = SegmentedButtonDefaults.itemShape(index, 2),
             ) { Text(label) }
         }
     }
-    if (!form.installments) return
-    Text(tr("La data scelta qui sopra è la prima rata."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+    if (!form.splitCustom) {
+        val each = (parseCents(form.amount) ?: 0L) / form.personIds.size
+        if (each > 0) Text(trf("%1\$s a testa", DateTexts.money(each)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        return
+    }
+    people.filter { it.id in form.personIds }.forEach { person ->
         OutlinedTextField(
-            value = form.installmentCount,
-            onValueChange = { value -> update { it.copy(installmentCount = value.filter(Char::isDigit).take(3)) } },
-            label = { Text(tr("Numero di rate")) },
-            isError = form.installmentError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.weight(1f),
-        )
-        OutlinedTextField(
-            value = form.installmentAmount,
-            onValueChange = { value -> update { it.copy(installmentAmount = value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(12)) } },
-            label = { Text(tr("Importo per rata (€)")) },
-            isError = form.installmentError,
+            value = form.shareAmounts[person.id].orEmpty(),
+            onValueChange = { value ->
+                update { it.copy(shareAmounts = it.shareAmounts + (person.id to value.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(12))) }
+            },
+            label = { Text(trf("Quota di %1\$s (€)", person.displayName)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             singleLine = true,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
-    if (form.installmentError) Text(tr("Indica da 2 a 360 rate e un importo maggiore di zero."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-    DropdownField(
-        label = tr("Ogni quanto scade una rata"),
-        options = listOf(1, 2, 3, 6, 12),
-        selected = form.installmentEvery,
-        optionLabel = { if (it == 1) tr("Ogni mese") else if (it == 12) tr("Ogni anno") else trf("Ogni %1\$s mesi", it) },
-        onSelected = { months -> update { it.copy(installmentEvery = months) } },
+    val sum = form.personIds.sumOf { parseCents(form.shareAmounts[it].orEmpty()) ?: 0L }
+    Text(
+        trf("Totale quote: %1\$s", DateTexts.money(sum)) + " · " + tr("Se non torna con l'importo, si divide in proporzione."),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(tr("L'importo cambia tra le rate"), style = MaterialTheme.typography.bodyLarge)
-            Text(tr("Poi cambi l'importo di ogni rata nel dettaglio."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Switch(checked = form.installmentVariable, onCheckedChange = { value -> update { it.copy(installmentVariable = value) } })
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(tr("Elimina l'evento un anno dopo l'ultima rata"), style = MaterialTheme.typography.bodyLarge)
-            Text(tr("Se spento resta nello storico."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Switch(checked = form.installmentDeleteAfter, onCheckedChange = { value -> update { it.copy(installmentDeleteAfter = value) } })
-    }
 }
 
 /** Opzioni della sveglia: ripetizione quotidiana e controllo dei permessi che la fanno suonare. */

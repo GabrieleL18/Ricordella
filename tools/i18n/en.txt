@@ -1424,3 +1424,184 @@ Scegli cosa condividere e come usare Drive. ||| Choose what to share and how to 
 Scegli i giorni della settimana in cui suona (es. lunedì–venerdì per lavoro). Qualche minuto prima ricevi una notifica silenziosa per saltarla solo questa volta, e puoi sospenderla fino a una data. Ogni sveglia è assegnata a una persona e, se condividi il file, suona solo sul telefono della sua persona. Nel calendario puoi nascondere le sveglie normali. ||| Choose the weekdays it rings (e.g. Monday–Friday for work). A few minutes before you get a silent notification to skip it just this once, and you can pause it until a date. Every alarm is assigned to a person and, if you share the file, it rings only on that person's phone. In the calendar you can hide normal alarms.
 Ultime 3 copie con la data, anche su Drive. ||| Last 3 dated copies, on Drive too.
 Un pagamento può essere a rate: indichi quante, l'importo e ogni quanti mesi. Se l'importo cambia, modifichi ogni rata (anche le successive). Ogni rata pagata resta registrata con data e importo; finite le rate scegli se eliminare l'evento l'anno dopo. I pagamenti ripetuti possono essere annuali, mensili, settimanali o in un giorno preciso del mese. ||| A payment can be in installments: you set how many, the amount and how many months apart. If the amount changes, you edit each installment (and the following ones). Each paid installment stays recorded with date and amount; when they're done you choose whether to delete the event the next year. Repeating payments can be yearly, monthly, weekly or on a specific day of the month.
+%1$s a testa ||| %1$s each
+%1$s rate ||| %1$s installments
+%1$s volte ||| %1$s times
+Aggiungi una spesa, un abbonamento, delle rate o un'entrata: scegli le persone e come dividere il costo. ||| Add an expense, a subscription, installments or an income: choose the people and how to split the cost.
+Arrivata %1$s giorni dopo l'inizio della precedente ||| Came %1$s days after the start of the previous one
+Chi li riceve * ||| Who receives it *
+Come si divide ||| How it is split
+Cosa stai cercando? ||| What are you looking for?
+Crea PDF ||| Create PDF
+Da 2 a 360 ||| From 2 to 360
+Durata: %1$s giorni ||| Duration: %1$s days
+Entrata ||| Income
+Entrate ||| Income
+Il PDF contiene quello che vedi: %1$s. ||| The PDF contains what you see: %1$s.
+Importi diversi ||| Different amounts
+Importo (€) * ||| Amount (€) *
+Importo per rata (€) * ||| Amount per installment (€) *
+Inserisci un importo maggiore di zero ||| Enter an amount greater than zero
+Mutuo, finanziamento, condominio: la data è quella della prima rata. ||| Mortgage, loan, building fees: the date is the first installment.
+Nessuna spesa in quest'anno ||| No expenses this year
+Non hai ancora aggiunto persone: aggiungile dalla sezione Persone. ||| You haven't added any people yet: add them from the People section.
+Non mostrarle ||| Don't show them
+Non è stato possibile creare il PDF ||| Could not create the PDF
+Nuova spesa ||| New expense
+PDF salvato ||| PDF saved
+Parti uguali ||| Equal parts
+Per chi suona * ||| Who it rings for *
+Persona eliminata ||| Deleted person
+Prima rata * ||| First installment *
+Primo ciclo registrato ||| First cycle recorded
+Quota di %1$s (€) ||| %1$s's share (€)
+Saldo ||| Balance
+Scade ||| Due
+Scegli almeno una persona. ||| Choose at least one person.
+Scrivi o dillo a voce: cerco tra persone, cose, promemoria, note e manutenzioni. ||| Type or say it: I search people, things, reminders, notes and maintenance.
+Se non torna con l'importo, si divide in proporzione. ||| If it doesn't match the amount, it is split proportionally.
+Senza persona ||| No person
+Si rinnova ||| Renews
+Si rinnova da solo: scegli ogni quanto. ||| Renews on its own: choose how often.
+Soldi ||| Money
+Soldi che ricevi: un bonifico, un regalo. ||| Money you receive: a transfer, a gift.
+Solo importanti o urgenti ||| Only important or urgent
+Spesa ||| Expense
+Spese e conti ||| Expenses and accounts
+Spese, abbonamenti, rate ed entrate ||| Expenses, subscriptions, installments and income
+Sveglie nel calendario ||| Alarms in the calendar
+Totale entrate ||| Total income
+Totale quote: %1$s ||| Total shares: %1$s
+Totale spese ||| Total expenses
+Tutta la cerchia ||| Whole circle
+Un pagamento, anche ripetuto (es. una bolletta). ||| A payment, even repeating (e.g. a bill).
+Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata. ||| One row per period, most recent first: when it started and ended, how many days it lasted and how many days after the start of the previous one it came.
+in corso ||| ongoing
+%1$s novità ||| %1$s updates
+Mostra il dettaglio ||| Show details
+Nascondi ||| Hide
+Più semplice ||| Simpler
+Sveglie e ciclo nel calendario ||| Alarms and cycle in the calendar
+Spese, abbonamenti, rate ed entrate, divise tra le persone, con il riepilogo dell'anno e il PDF. ||| Expenses, subscriptions, installments and income, split between people, with the yearly summary and the PDF.
+Icone e legenda nel calendario; le sveglie si mostrano solo se lo scegli nelle Impostazioni. ||| Icons and legend in the calendar; alarms show only if you choose so in Settings.
+Ricerca con il microfono, form più chiaro, un solo Modifica/Elimina. ||| Search with the microphone, a clearer form, a single Edit/Delete.
+La spesa è un evento speciale: scegli se è una spesa, un abbonamento, un pagamento a rate o un'entrata, l'importo, di chi è e come dividerla. In Spese e conti vedi il totale di tutta la cerchia o di una persona durante l'anno e crei un PDF. ||| An expense is a special event: choose whether it is an expense, a subscription, an installment payment or income, the amount, whose it is and how to split it. In Expenses and accounts you see the total for the whole circle or for one person over the year and create a PDF.
+Le sveglie hanno la loro icona e di default non compaiono nel calendario: in Impostazioni › Sveglie scegli quando mostrarle. C'è la legenda anche per il ciclo, che ora è uno solo e ha una cronologia più chiara. ||| Alarms have their own icon and by default do not appear in the calendar: in Settings › Alarms you choose when to show them. There is a legend for the cycle too, which is now just one and has a clearer history.
+La ricerca globale ha il microfono. Nel form scegli per prima cosa il tipo e le persone obbligatorie si vedono subito. Modifica, Elimina e Archivia compaiono una volta sola; descrizione e categoria non ci sono più. ||| Global search has the microphone. In the form you choose the type first and required people show right away. Edit, Delete and Archive appear only once; description and category are gone.
+Seguici su Instagram ||| Follow us on Instagram
+Riapri ||| Reopen
+modalità debug ||| debug mode
+Mutuo casa ||| Home mortgage
+Palestra di Marco ||| Marco's gym
+Vacanza in montagna ||| Mountain holiday
+Spese condominiali ||| Building fees
+Regalo di compleanno ||| Birthday gift
+Bonifico dalla nonna ||| Transfer from grandma
+Pagamenti ||| Payments
+Affitto studio ||| Studio rent
+Condominio ||| Building fees
+Assicurazione auto ||| Car insurance
+Corso di nuoto di Sofia ||| Sofia's swimming class
+Cena di gruppo ||| Group dinner
+Regalo per la nonna ||| Gift for grandma
+Rimborso del dentista ||| Dentist refund
+Libri e zaino di Sofia ||| Sofia's books and backpack
+Stipendio extra ||| Extra salary
+Finisce qui ||| Ends here
+Aggiungi i prezzi ||| Add prices
+Aggiungi una sveglia: scegli l'ora e i giorni, poi accendila o spegnila quando vuoi. ||| Add an alarm: pick the time and days, then turn it on or off whenever you like.
+Aggiungi voce ||| Add item
+Ancora da prendere ||| Still to buy
+Apri le sveglie del telefono ||| Open the phone's alarms
+Avviso silenzioso prima di ogni sveglia ||| Silent heads-up before every alarm
+Caricatori ||| Chargers
+Costumi ||| Swimsuits
+Crema solare ||| Sunscreen
+Detersivo ||| Detergent
+Elimina voce ||| Delete item
+Eliminare la nota? ||| Delete the note?
+Eliminare la sveglia? ||| Delete the alarm?
+Fatto ✓ ||| Done ✓
+Fissa in alto ||| Pin to top
+Fissata ||| Pinned
+Google Keep non permette alle altre app di leggere le note, ma ci sono due strade.⏎⏎1. Una nota alla volta: in Keep apri la nota, tocca ⋮ › Invia e scegli Remindella.⏎⏎2. Tutte insieme: su takeout.google.com esporta solo «Keep», poi scegli qui il file .zip (o i file .json) scaricato. ||| Google Keep doesn't let other apps read your notes, but there are two ways.⏎⏎1. One note at a time: in Keep open the note, tap ⋮ › Send and choose Remindella.⏎⏎2. All at once: on takeout.google.com export only "Keep", then choose the downloaded .zip file (or the .json files) here.
+Hai già una sveglia alle %1$s ||| You already have an alarm at %1$s
+Idee regalo per Sofia ||| Gift ideas for Sofia
+Importa da Google Keep ||| Import from Google Keep
+Importa la prossima sveglia del telefono ||| Import the phone's next alarm
+Importata la sveglia delle %1$s ||| Imported the %1$s alarm
+Importate %1$s note (%2$s già presenti) ||| Imported %1$s notes (%2$s already there)
+La nota viene eliminata. Se hai un backup la ritrovi lì. ||| The note will be deleted. If you have a backup you can find it there.
+La prossima suona %1$s ||| The next one rings %1$s
+La sveglia delle %1$s viene eliminata. ||| The %1$s alarm will be deleted.
+Latte ||| Milk
+Lista ||| List
+Lista della spesa ||| Shopping list
+Mele ||| Apples
+Nel carrello (%1$s) ||| In the cart (%1$s)
+Nessuna nota ||| No notes
+Nessuna sveglia attiva ||| No active alarms
+Non ho trovato note in questi file ||| I couldn't find any notes in these files
+Non trovo l'app Orologio ||| I can't find the Clock app
+Nota ||| Note
+Nuova nota ||| New note
+Pane ||| Bread
+Parmigiano ||| Parmesan
+Passaporti ||| Passports
+Pasta ||| Pasta
+Prossima sveglia ||| Next alarm
+Scrivi qui ||| Write here
+Scrivi una nota o prepara una lista della spesa con i prezzi: il totale lo calcolo io. ||| Write a note or prepare a shopping list with prices: I'll work out the total.
+Senza titolo ||| Untitled
+Spegni ||| Turn off
+Spesa del sabato ||| Saturday shopping
+Sul telefono non c'è nessuna sveglia attiva ||| There's no active alarm on the phone
+Sveglie, note e pozioni ||| Alarms, notes and potions
+Te lo ricordo: %1$s ||| I'll remind you: %1$s
+Testo, liste e lista della spesa ||| Text, lists and shopping list
+Titolo ||| Title
+Tocca + per scrivere la prima nota ✨ ||| Tap + to write your first note ✨
+Togli i prezzi ||| Remove prices
+Togli le voci spuntate ||| Remove ticked items
+Totale ||| Total
+Totale: %1$s ||| Total: %1$s
+Tra poco suona la sveglia delle %1$s. Vuoi spegnerla? ||| The %1$s alarm rings soon. Want to turn it off?
+Trasforma in lista ||| Turn into a list
+Trasforma in testo ||| Turn into text
+Un libro di avventure, il set per i braccialetti e le cuffie per la piscina. ||| An adventure book, the bracelet-making kit and headphones for the pool.
+Valigia per la Sicilia ||| Suitcase for Sicily
+Voce ||| Item
+Weekend ||| Weekend
+tra %1$s g %2$s h ||| in %1$s d %2$s h
+tra %1$s h %2$s min ||| in %1$s h %2$s min
+tra %1$s min ||| in %1$s min
+💤 rimandato: %1$s ||| 💤 snoozed: %1$s
+Sveglie a parte ||| Alarms on their own
+Una sezione solo per le sveglie: ora e giorni, accese o spente quando vuoi, e un avviso un'ora prima. ||| A section just for alarms: time and days, on or off whenever you like, and a heads-up an hour before.
+Le sveglie non hanno più una data: scegli l'ora e i giorni e le accendi o spegni con un interruttore. Un'ora prima arriva un avviso silenzioso con il pulsante per spegnerle. Puoi importare la prossima sveglia del telefono. Le trovi dal menu in alto, accanto a Note e Pozioni. ||| Alarms no longer have a date: pick the time and days and turn them on or off with a switch. An hour before, a silent heads-up arrives with a button to turn them off. You can import the phone's next alarm. Find them in the top menu, next to Notes and Potions.
+Note e lista della spesa ||| Notes and shopping list
+Note di testo, liste e liste della spesa con prezzi e totale. ||| Text notes, lists and shopping lists with prices and total.
+Scrivi note, crea liste con le caselle o liste della spesa con prezzo e quantità: il totale e quanto è già nel carrello li calcolo io. Ci sono anche i widget Note e Sveglie, con la stessa grafica dell'app. ||| Write notes, create checklists or shopping lists with price and quantity: I work out the total and what's already in the cart. There are also Notes and Alarms widgets, styled like the app.
+Nome (facoltativo) ||| Name (optional)
+Riepilogo dell'anno e PDF ||| Year summary and PDF
+Sezioni extra in Home ||| Extra sections on Home
+Sveglie, Note e Pozioni a portata di tocco nella Home. ||| Alarms, Notes and Potions one tap away on Home.
+Aggiungi prima una persona nella sezione Persone. ||| Add a person first in the People section.
+Alias ||| Alias
+Avvia ||| Start
+Che nota vuoi scrivere? ||| Which note do you want to write?
+Con prezzi e totale ||| With prices and total
+Il tuo nome ||| Your name
+In questa cartella c'è già un backup con il nome «%1$s». Scrivi un alias per distinguere il tuo (ad esempio le tue iniziali). ||| This folder already has a backup named «%1$s». Write an alias to tell yours apart (for example your initials).
+Minuti ||| Minutes
+Oppure scrivi il tuo nome ||| Or write your name
+Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose. ||| I remember deadlines, events, appointments, maintenance and birthdays for you. First, let’s set up two things.
+Scegli il tuo profilo principale: non si può eliminare e dà il nome ai tuoi backup. ||| Choose your main profile: it cannot be deleted and gives its name to your backups.
+Scegli quanto dura: allo scadere suona come una sveglia. ||| Choose how long it lasts: when time is up it rings like an alarm.
+Serve un alias ||| An alias is needed
+Testo libero ||| Free text
+Timer ||| Timer
+Voci da spuntare ||| Items to check off
+min ||| min
+Un altro timer ||| Another timer
+Suona alle %1$s ||| Rings at %1$s

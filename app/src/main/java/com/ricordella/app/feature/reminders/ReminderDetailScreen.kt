@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Unarchive
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -91,6 +93,7 @@ import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.date.RelativeDateDescriber
 import com.ricordella.app.domain.date.ReminderTimeline
+import com.ricordella.app.domain.model.MoneyLedger
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.ReminderTimeStatus
 import com.ricordella.app.domain.model.ReminderWithLinks
@@ -130,20 +133,14 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
         snackbarHostState = snackbar,
         actions = {
             if (entry != null) {
-                IconButton(onClick = { navigator.editReminder(entry.reminder.id) }) {
-                    Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica"))
-                }
-                IconButton(onClick = { showDeleteConfirm = true }) {
-                    Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error)
-                }
-                Box {
-                    IconButton(onClick = { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni")) }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(if (entry.reminder.isArchived) tr("Ripristina dall'archivio") else tr("Archivia")) },
-                            onClick = { menuOpen = false; viewModel.onToggleArchived() },
-                        )
-                    }
+                IconButton(onClick = { navigator.editReminder(entry.reminder.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
+                IconButton(onClick = { showDeleteConfirm = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
+                IconButton(onClick = viewModel::onToggleArchived) {
+                    val archived = entry.reminder.isArchived
+                    Icon(
+                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
+                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
+                    )
                 }
             }
         },
@@ -176,7 +173,6 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
                 onOpen = { navigator.openViewer(it.uri, it.mimeType, it.displayName) },
             )
             if (state.completions.isNotEmpty()) CompletionHistory(state.completions)
-            com.ricordella.app.core.ui.EditDeleteRow(onEdit = { navigator.editReminder(entry.reminder.id) }, onDelete = { showDeleteConfirm = true })
         }
     }
 
@@ -192,6 +188,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
     }
 }
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
     val reminder = entry.reminder
@@ -231,7 +228,7 @@ private fun Header(entry: ReminderWithLinks, now: LocalDateTime) {
         }
         HappyWizard(size = 88.dp, holding = reminder.type.wizardProp)
     }
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         when (status) {
             ReminderTimeStatus.OVERDUE ->
                 StatusBadge(tr("Scaduto"), MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer)
@@ -267,7 +264,6 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
                 else RelativeDateDescriber.describe(reminder.dueDate, today).replaceFirstChar { it.uppercase() },
             )
             entry.recurrenceRule?.let { InfoRow(tr("Ricorrenza"), it.describe()) }
-            reminder.category?.let { InfoRow(tr("Categoria"), it) }
             reminder.dueOdometerKm?.let { dueKm ->
                 val current = entry.odometerItem?.odometerKm
                 InfoRow(tr("Scadenza km"), DateTexts.kilometers(dueKm) + (reminder.odometerIntervalKm?.let { trf(" (ogni %1\$s)", DateTexts.kilometers(it)) } ?: ""))
@@ -287,13 +283,39 @@ private fun Details(entry: ReminderWithLinks, now: LocalDateTime) {
         }
     }
     reminder.trip?.takeIf { !it.isEmpty }?.let { TripSection(it) }
-    reminder.description?.let {
-        SectionHeader(tr("Descrizione"))
-        Text(it, style = MaterialTheme.typography.bodyLarge)
-    }
+    MoneySection(entry)
     reminder.notes?.let {
         SectionHeader(tr("Note"))
         Text(it, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+/** Quanto è, che cosa è e come si divide tra le persone. */
+@Composable
+private fun MoneySection(entry: ReminderWithLinks) {
+    val reminder = entry.reminder
+    val info = reminder.money ?: return
+    val total = reminder.plan?.totalCents ?: info.amountCents
+    val tone = MaterialTheme.ricordellaColors.mint
+    val split = MoneyLedger.split(info, total, entry.people.map { it.id })
+    Column(
+        Modifier.fillMaxWidth().background(tone.container, MaterialTheme.shapes.large).padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceXs),
+    ) {
+        Text(
+            info.kind.label + (reminder.plan?.let { " · " + trf("%1\$s rate", it.count) } ?: ""),
+            style = MaterialTheme.typography.labelLarge,
+            color = tone.content,
+        )
+        Text(DateTexts.money(total), style = MaterialTheme.typography.headlineSmall, color = tone.content)
+        if (entry.people.isNotEmpty()) {
+            entry.people.forEach { person ->
+                Row {
+                    Text(person.displayName, style = MaterialTheme.typography.bodyMedium, color = tone.content, modifier = Modifier.weight(1f))
+                    Text(DateTexts.money(split[person.id] ?: 0), style = MaterialTheme.typography.titleSmall, color = tone.content)
+                }
+            }
+        }
     }
 }
 
@@ -371,7 +393,7 @@ private fun ActionBar(entry: ReminderWithLinks, viewModel: ReminderDetailViewMod
             } else {
                 OutlinedButton(onClick = viewModel::onReopen, modifier = Modifier.weight(1f)) {
                     Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = null)
-                    Text(tr("Segna come da fare"), modifier = Modifier.padding(start = 8.dp))
+                    Text(tr("Riapri"), modifier = Modifier.padding(start = 8.dp))
                 }
             }
         }

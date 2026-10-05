@@ -10,6 +10,8 @@ import com.ricordella.app.core.navigation.ReminderEditRoute
 import com.ricordella.app.domain.date.TimeSource
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ItemWithCategory
+import com.ricordella.app.domain.model.MoneyInfo
+import com.ricordella.app.domain.model.MoneyKind
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.domain.model.Priority
 import com.ricordella.app.domain.model.RecurrenceFrequency
@@ -36,6 +38,7 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
+import com.ricordella.app.domain.date.nextAlarmDate
 
 /** Stato del modulo di creazione/modifica. Solo titolo e data sono obbligatori. */
 data class ReminderForm(
@@ -63,10 +66,14 @@ data class ReminderForm(
     val recurrenceEnd: LocalDate? = null,
     /** Sveglia in pausa fino a questo giorno. */
     val pausedUntil: LocalDate? = null,
-    /** Pagamento a rate: numero, importo (testo del campo), ogni quanti mesi, importo variabile, eliminare un anno dopo la fine. */
-    val installments: Boolean = false,
+    /** Pagamento: che cosa è, importo (testo del campo; per le rate è quello di ogni rata) e come si divide tra le persone. */
+    val moneyKind: MoneyKind = MoneyKind.EXPENSE,
+    val amount: String = "",
+    val splitCustom: Boolean = false,
+    /** Quota di ogni persona (testo del campo), usata solo con [splitCustom]. */
+    val shareAmounts: Map<String, String> = emptyMap(),
+    /** Pagamento a rate: numero, ogni quanti mesi, importo variabile, eliminare un anno dopo la fine. */
     val installmentCount: String = "12",
-    val installmentAmount: String = "",
     val installmentEvery: Int = 1,
     val installmentVariable: Boolean = false,
     val installmentDeleteAfter: Boolean = false,
@@ -91,11 +98,12 @@ data class ReminderForm(
     val isAlarm: Boolean get() = type == ReminderType.ALARM
     /** La sveglia deve avere giorno e orario. */
     val timeError: Boolean get() = showErrors && isAlarm && time == null
-    /** Una sveglia è sempre di qualcuno: serve almeno una persona. */
     val isPayment: Boolean get() = type == ReminderType.PAYMENT
-    val installmentError: Boolean get() = showErrors && isPayment && installments &&
-        (installmentCount.toIntOrNull() !in 2..360 || (parseCents(installmentAmount) ?: 0L) <= 0L)
-    val personError: Boolean get() = showErrors && isAlarm && personIds.isEmpty()
+    val installments: Boolean get() = isPayment && moneyKind == MoneyKind.INSTALLMENTS
+    val installmentError: Boolean get() = showErrors && installments && installmentCount.toIntOrNull() !in 2..360
+    val amountError: Boolean get() = showErrors && isPayment && (parseCents(amount) ?: 0L) <= 0L
+    /** Sveglie e pagamenti sono sempre di qualcuno: serve almeno una persona. */
+    val personError: Boolean get() = showErrors && (isAlarm || isPayment) && personIds.isEmpty()
     val endDateError: Boolean get() = showErrors && multiDay && (endDate == null || date == null || !endDate.isAfter(date))
     val isRecurring: Boolean get() = recurrencePreset != RecurrencePreset.NONE
 }
@@ -173,7 +181,7 @@ class ReminderEditViewModel(
                 itemIds = setOfNotNull(route.itemId),
                 notifyOffsetMinutes = defaults.notifyOffsetMinutes,
                 showAdvanced = route.itemId != null || route.personId != null,
-            )
+            ).withMe()
             return
         }
         val reminder = entry.reminder
@@ -201,9 +209,11 @@ class ReminderEditViewModel(
             weekDays = rule?.daysOfWeek.orEmpty(),
             recurrenceEnd = rule?.endDate,
             pausedUntil = reminder.pausedUntil?.takeIf { it.isAfter(time.today()) },
-            installments = reminder.plan != null,
+            moneyKind = reminder.money?.kind ?: if (reminder.plan != null) MoneyKind.INSTALLMENTS else MoneyKind.EXPENSE,
+            amount = (reminder.plan?.amounts?.firstOrNull() ?: reminder.money?.amountCents?.takeIf { it > 0 })?.let(::formatCents).orEmpty(),
+            splitCustom = reminder.money?.shares?.isNotEmpty() == true,
+            shareAmounts = reminder.money?.shares.orEmpty().mapValues { formatCents(it.value) },
             installmentCount = (reminder.plan?.count ?: 12).toString(),
-            installmentAmount = reminder.plan?.amounts?.firstOrNull()?.let(::formatCents).orEmpty(),
             installmentEvery = reminder.plan?.everyMonths ?: 1,
             installmentVariable = reminder.plan?.variable == true,
             installmentDeleteAfter = reminder.plan?.deleteAfter == true,
@@ -220,6 +230,12 @@ class ReminderEditViewModel(
     }
 
     fun update(transform: (ReminderForm) -> ReminderForm) = _form.update(transform)
+
+    /** Sveglie e pagamenti sono sempre di qualcuno: se non si sceglie nessuno vale "io" (se so chi sono). */
+    private fun ReminderForm.withMe(): ReminderForm {
+        val me = appSettings.sharedMeId?.takeIf { id -> people.value.isEmpty() || people.value.any { it.id == id } }
+        return if ((isAlarm || isPayment) && personIds.isEmpty() && me != null) copy(personIds = setOf(me)) else this
+    }
 
     /** I compleanni si ripetono ogni anno di default; tornando a un altro tipo la ripetizione automatica si toglie. */
     fun onTypeChange(type: ReminderType) = _form.update { form ->
@@ -243,18 +259,31 @@ class ReminderEditViewModel(
             // Una sveglia suona in un momento preciso: niente eventi di più giorni.
             multiDay = type != ReminderType.ALARM && (form.multiDay || vacation),
             endDate = if (vacation) form.endDate ?: form.date?.plusDays(7) else form.endDate,
-        )
+        ).withMe()
+    }
+
+    /** Un abbonamento si rinnova ogni mese di default; cambiando tipo la ripetizione automatica si toglie. */
+    fun onMoneyKind(kind: MoneyKind) = _form.update { form ->
+        val preset = when {
+            kind == MoneyKind.SUBSCRIPTION && form.recurrencePreset == RecurrencePreset.NONE -> RecurrencePreset.MONTHLY
+            kind == MoneyKind.INSTALLMENTS -> RecurrencePreset.NONE
+            form.moneyKind == MoneyKind.SUBSCRIPTION && form.recurrencePreset == RecurrencePreset.MONTHLY -> RecurrencePreset.NONE
+            else -> form.recurrencePreset
+        }
+        form.copy(moneyKind = kind, recurrencePreset = preset)
     }
 
     fun onErrorShown() = _form.update { it.copy(errorMessage = null) }
 
     fun save() {
-        val form = _form.value
+        val form = _form.value.withMe()
         val date = form.date
-        val invalid = form.title.isBlank() || date == null || (form.isPayment && form.installments && (form.installmentCount.toIntOrNull() !in 2..360 || (parseCents(form.installmentAmount) ?: 0L) <= 0L)) || (form.isAlarm && (form.time == null || form.personIds.isEmpty())) ||
+        val invalid = form.title.isBlank() || date == null || (form.installments && form.installmentCount.toIntOrNull() !in 2..360) ||
+            (form.isPayment && ((parseCents(form.amount) ?: 0L) <= 0L || form.personIds.isEmpty())) ||
+            (form.isAlarm && (form.time == null || form.personIds.isEmpty())) ||
             (form.multiDay && (form.endDate == null || !form.endDate.isAfter(date)))
         if (invalid || date == null) {
-            _form.update { it.copy(showErrors = true, showAdvanced = it.showAdvanced || (it.isAlarm && it.personIds.isEmpty())) }
+            _form.update { it.copy(showErrors = true) }
             return
         }
         _form.update { it.copy(isSaving = true) }
@@ -281,7 +310,7 @@ class ReminderEditViewModel(
         // Una sveglia a giorni fissi parte dal primo giorno scelto; se è in pausa, dal primo giorno dopo la pausa.
         val days = alarmDays(form)
         val pausedUntil = form.pausedUntil?.takeIf { form.isAlarm && it.isAfter(time.today()) }
-        var date = firstDate
+        var date = if (form.isAlarm && form.time != null) nextAlarmDate(form.time, days, time.localNow(), pausedUntil) else firstDate
         if (pausedUntil != null && date < pausedUntil) date = pausedUntil
         if (days.isNotEmpty()) while (date.dayOfWeek !in days) date = date.plusDays(1)
         // Pagamento mensile in un giorno preciso: la prima scadenza è il primo di quei giorni (a fine mese si accorcia).
@@ -295,7 +324,7 @@ class ReminderEditViewModel(
         var plan: com.ricordella.app.domain.model.InstallmentPlan? = null
         if (form.isPayment && form.installments) {
             val count = form.installmentCount.toIntOrNull() ?: 2
-            val cents = parseCents(form.installmentAmount) ?: 0L
+            val cents = parseCents(form.amount) ?: 0L
             val old = existing?.plan
             plan = if (old != null) {
                 old.copy(everyMonths = form.installmentEvery, variable = form.installmentVariable, deleteAfter = form.installmentDeleteAfter)
@@ -315,11 +344,14 @@ class ReminderEditViewModel(
             dueTime = form.time,
             pausedUntil = pausedUntil,
             plan = plan,
+            money = if (form.isPayment) MoneyInfo(
+                kind = form.moneyKind,
+                amountCents = if (form.installments) 0L else parseCents(form.amount) ?: 0L,
+                shares = if (form.splitCustom && form.personIds.size > 1) form.personIds.associateWith { parseCents(form.shareAmounts[it].orEmpty()) ?: 0L } else emptyMap(),
+            ) else null,
             type = form.type,
-            description = form.description.trim().ifEmpty { null },
             notes = form.notes.trim().ifEmpty { null },
             priority = form.priority,
-            category = form.category.trim().ifEmpty { null },
             dueOdometerKm = form.dueOdometerKm.toIntOrNull(),
             odometerIntervalKm = form.odometerIntervalKm.toIntOrNull(),
             // La sveglia suona sempre, esattamente all'orario.

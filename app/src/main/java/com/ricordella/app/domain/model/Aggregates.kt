@@ -58,8 +58,8 @@ data class SchedulingCandidate(
     val notifyOffsetMinutes: Int,
     val snoozedUntil: java.time.Instant?,
     val lastNotifiedAt: java.time.Instant?,
-    /** Sveglia che si ripete: ha l'avviso silenzioso un po' prima. */
-    val isRecurringAlarm: Boolean = false,
+    /** Sveglia: ha l'avviso silenzioso un po' prima, per poterla spegnere. */
+    val isAlarm: Boolean = false,
 )
 
 /** Un'occorrenza (reale o calcolata dalla ricorrenza) di un promemoria in una data. */

@@ -62,8 +62,6 @@ import androidx.lifecycle.viewModelScope
 import com.ricordella.app.core.ui.CrystalBallMascot
 import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.core.ui.RicordellaMotion
-import com.ricordella.app.core.ui.SectionTutorialPages
-import com.ricordella.app.core.ui.TutorialPager
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.MagicTitle
@@ -142,7 +140,7 @@ class CalendarImportViewModel(
     }
 }
 
-private enum class Stage { WELCOME, TUTORIAL, PREFERENCES, CALENDAR }
+private enum class Stage { WELCOME, PREFERENCES, CALENDAR }
 
 /** Configurazione iniziale: benvenuto, tutorial animato delle sezioni, import da un calendario. */
 @Composable
@@ -160,8 +158,7 @@ fun OnboardingScreen() {
         ) { current ->
             when (current) {
                 Stage.WELCOME -> Welcome(onNext = { stage = 1 })
-                Stage.TUTORIAL -> TutorialPager(SectionTutorialPages, onDone = { stage = 2 }, doneLabel = tr("Avanti"))
-                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onBackupFile = viewModel::saveBackupTo, onNext = { stage = 3 })
+                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onBackupFile = viewModel::saveBackupTo, onNext = { stage = 2 })
                 Stage.CALENDAR -> CalendarImportStep(viewModel, onDone = viewModel::finishOnboarding)
             }
         }
@@ -183,7 +180,7 @@ private fun Welcome(onNext: () -> Unit) {
         MagicTitle(fontSize = 44.sp)
         Spacer(Modifier.height(RicordellaDimensions.spaceS))
         Text(
-            tr("Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Ti faccio fare un giro veloce?"),
+            tr("Ricordo al posto tuo scadenze, eventi, visite, manutenzioni e compleanni. Prima impostiamo due cose."),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
