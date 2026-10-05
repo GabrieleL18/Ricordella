@@ -31,3 +31,13 @@ if ($LASTEXITCODE -ne 0) { throw 'Build fallita.' }
 Write-Host ''
 Write-Host 'APK: app\build\outputs\apk\release\app-release.apk'
 Write-Host 'AAB (per Play Console): app\build\outputs\bundle\release\app-release.aab'
+
+# File simboli di questa versione (mapping R8 + simboli nativi) per leggere i crash. L'AAB li contiene già:
+# la copia in simboli\<versione> serve se vuoi caricarli a mano o conservarli.
+$ver = [regex]::Match((Get-Content $file -Raw -Encoding UTF8), 'versionName = "([^"]+)"').Groups[1].Value
+$dir = "simboli\$ver"
+New-Item -ItemType Directory -Force $dir | Out-Null
+Copy-Item 'app\build\outputs\mapping\release\mapping.txt' $dir -Force
+$native = Get-ChildItem 'app\build\outputs\native-debug-symbols\release' -Filter *.zip -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($native) { Copy-Item $native.FullName (Join-Path $dir 'native-debug-symbols.zip') -Force }
+Write-Host "Simboli: $dir"

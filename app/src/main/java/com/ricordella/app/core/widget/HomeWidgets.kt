@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.SystemClock
 import android.text.SpannableString
 import android.text.style.StrikethroughSpan
 import android.view.View
@@ -21,8 +22,10 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.core.ui.emoji
 import com.ricordella.app.domain.date.nextRing
+import com.ricordella.app.feature.timers.isTimer
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderFilter
+import com.ricordella.app.domain.model.ReminderListScope
 import com.ricordella.app.domain.model.ReminderType
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.isMultiDay
@@ -65,6 +68,7 @@ object HomeWidgets {
         ResolutionsWidgetProvider.requestUpdate(context)
         AgendaWidgetProvider.requestUpdate(context)
         AlarmWidgetProvider.requestUpdate(context)
+        TimerWidgetProvider.requestUpdate(context)
         NotesWidgetProvider.requestUpdate(context)
     }
 }
@@ -184,6 +188,7 @@ class AlarmWidgetProvider : AppWidgetProvider() {
             val now = container.time.localNow()
             val next = container.reminderRepository
                 .observeFiltered(ReminderFilter(type = ReminderType.ALARM, limit = 200), container.time.today()).first()
+                .filter { !it.reminder.isTimer() }
                 .mapNotNull { entry -> entry.reminder.nextRing(now, container.time.zone)?.let { it to entry.reminder } }
                 .minByOrNull { it.first }
             val views = RemoteViews(context.packageName, R.layout.widget_alarm)
@@ -191,7 +196,7 @@ class AlarmWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(
                 R.id.alarm_next,
                 if (next == null) tr("Nessuna sveglia attiva")
-                else tr("Prossima sveglia") + " · " + DateTexts.relativeWithTime(next.first.toLocalDate(), next.first.toLocalTime(), now.toLocalDate()),
+                else DateTexts.relativeWithTime(next.first.toLocalDate(), next.first.toLocalTime(), now.toLocalDate()),
             )
             views.setOnClickPendingIntent(R.id.alarm_open, openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_OPEN_ALARMS, true) })
             manager.updateAppWidget(ids, views)
@@ -202,6 +207,44 @@ class AlarmWidgetProvider : AppWidgetProvider() {
         private const val REQUEST_OPEN = 2_300
 
         fun requestUpdate(context: Context) = requestUpdate(context, AlarmWidgetProvider::class.java)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Timer
+
+/** Conto alla rovescia del timer che scade per primo (il Chronometer scorre da solo); un tocco apre i Timer. */
+class TimerWidgetProvider : AppWidgetProvider() {
+
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        runAsync(context) {
+            val container = context.container
+            val next = container.reminderRepository
+                .observeFiltered(ReminderFilter(scope = ReminderListScope.ALL, type = ReminderType.ALARM, limit = 200), container.time.today()).first()
+                .map { it.reminder }
+                .filter { it.isTimer() && it.notificationsEnabled && it.dueTime != null }
+                .map { it.dueDate.atTime(it.dueTime).atZone(container.time.zone).toInstant().toEpochMilli() }
+                .filter { it > System.currentTimeMillis() }
+                .minOrNull()
+            val views = RemoteViews(context.packageName, R.layout.widget_timer)
+            if (next == null) {
+                views.setViewVisibility(R.id.timer_count, View.GONE)
+                views.setTextViewText(R.id.timer_label, "⏱ " + tr("Nessun timer attivo"))
+            } else {
+                views.setViewVisibility(R.id.timer_count, View.VISIBLE)
+                views.setChronometerCountDown(R.id.timer_count, true)
+                views.setChronometer(R.id.timer_count, SystemClock.elapsedRealtime() + (next - System.currentTimeMillis()), null, true)
+                views.setTextViewText(R.id.timer_label, "⏱ " + tr("Timer"))
+            }
+            views.setOnClickPendingIntent(R.id.timer_open, openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_OPEN_TIMERS, true) })
+            manager.updateAppWidget(ids, views)
+        }
+    }
+
+    companion object {
+        private const val REQUEST_OPEN = 2_400
+
+        fun requestUpdate(context: Context) = requestUpdate(context, TimerWidgetProvider::class.java)
     }
 }
 

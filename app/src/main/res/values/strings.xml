@@ -15,4 +15,6 @@
     <string name="widget_alarm_description">La prossima sveglia che suonerà: un tocco la apre, il + ne crea una</string>
     <string name="widget_notes_label">Note Remindella</string>
     <string name="widget_notes_description">Le tue note e liste della spesa: un tocco apre la nota, il + ne crea una</string>
+    <string name="widget_timer_label">Timer Remindella</string>
+    <string name="widget_timer_description">Il conto alla rovescia del prossimo timer: un tocco apre i timer</string>
 </resources>

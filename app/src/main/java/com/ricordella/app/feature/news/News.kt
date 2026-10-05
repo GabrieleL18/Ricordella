@@ -26,6 +26,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Payments
@@ -54,7 +56,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
@@ -79,6 +84,18 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 7,
+            versionName = "0.5.0",
+            date = java.time.LocalDate.of(2026, 10, 5),
+            items = listOf(
+                NewsItem(Icons.Rounded.Timer, { it.mint }, tr("Timer con anello"), tr("Scegli quanto dura e guarda l'anello svuotarsi, preciso al secondo. Nuovo widget Timer sulla Home.")),
+                NewsItem(Icons.Rounded.Alarm, { it.coral }, tr("Widget Sveglia più pulito"), tr("Al posto di «Prossima sveglia» ora c'è l'icona della sveglia.")),
+                NewsItem(Icons.Rounded.Person, { it.cyan }, tr("Profilo e backup"), tr("Scegli il tuo profilo principale e dai un nome ai backup.")),
+                NewsItem(Icons.Rounded.StickyNote2, { it.pear }, tr("Note a tema"), tr("Scegli il tipo di nota, personalizza il tema e vedile a tasselli.")),
+                NewsItem(Icons.Rounded.School, { it.lavender }, tr("Home più ricca"), tr("Tasselli extra, un tutorial per ogni sezione e «Indietro» che torna al foglio del giorno.")),
+            ),
+        ),
         NewsRelease(
             versionCode = 6,
             versionName = "0.4.0",
@@ -182,45 +199,73 @@ val AllNews: List<NewsRelease>
 fun newsSince(seenVersion: Int): List<NewsRelease> = AllNews.filter { it.versionCode > seenVersion }
 
 /**
- * Finestra delle novità, semplice: una riga per versione che si apre toccandola, e sotto le novità
- * con icona, titolo e testo. Con una sola versione (dopo un aggiornamento) è già aperta.
+ * Finestra delle novità in stile "news" da gioco: striscione colorato con titolo grosso, una riga chunky per versione
+ * (la più recente col bollino NUOVO!) e card con spessore, icona nel badge inclinato e titolo in grassetto.
+ * Con una sola versione (dopo un aggiornamento) è già aperta.
  */
 @Composable
 fun NewsDialog(releases: List<NewsRelease>, onDismiss: () -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     var expanded by remember { mutableStateOf(releases.singleOrNull()?.versionCode) }
+    val newest = releases.maxOfOrNull { it.versionCode }
     Dialog(onDismissRequest = onDismiss) {
         Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 520.dp)) {
-            Column(Modifier.padding(RicordellaDimensions.spaceXl)) {
-                Text(tr("Novità"), style = MaterialTheme.typography.headlineSmall)
+            Column {
+                Box(Modifier.fillMaxWidth().background(colors.bolt).padding(vertical = RicordellaDimensions.spaceL), contentAlignment = Alignment.Center) {
+                    Text(
+                        tr("Novità").uppercase() + "!",
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black, letterSpacing = 2.sp),
+                        color = colors.onBolt,
+                    )
+                }
                 Column(
-                    Modifier.weight(1f, fill = false).padding(top = RicordellaDimensions.spaceS).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+                    Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(RicordellaDimensions.spaceL),
+                    verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
                 ) {
                     releases.forEach { release ->
                         val open = expanded == release.versionCode
-                        Row(
-                            Modifier.fillMaxWidth().clickable { expanded = if (open) null else release.versionCode }.padding(vertical = RicordellaDimensions.spaceS),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(release.heading, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                            Icon(if (open) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = if (open) tr("Nascondi") else tr("Mostra il dettaglio"))
+                        ChunkyBox(colors.bolt, MaterialTheme.colorScheme.surface, Modifier.clickable { expanded = if (open) null else release.versionCode }) {
+                            Row(Modifier.padding(RicordellaDimensions.spaceM), verticalAlignment = Alignment.CenterVertically) {
+                                Text(release.heading, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), modifier = Modifier.weight(1f))
+                                if (release.versionCode == newest) {
+                                    Text(
+                                        tr("Nuovo!").uppercase(),
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Black),
+                                        color = colors.onBolt,
+                                        modifier = Modifier.padding(end = RicordellaDimensions.spaceS).clip(CircleShape).background(colors.bolt).padding(horizontal = 10.dp, vertical = 3.dp),
+                                    )
+                                }
+                                Icon(if (open) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = if (open) tr("Nascondi") else tr("Mostra il dettaglio"))
+                            }
                         }
                         if (open) release.items.forEach { item ->
                             val tone = item.tone(colors)
-                            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-                                Icon(item.icon, contentDescription = null, tint = tone.solid, modifier = Modifier.size(24.dp))
-                                Column {
-                                    Text(item.title, style = MaterialTheme.typography.titleSmall)
-                                    Text(item.body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            ChunkyBox(tone.solid, tone.container) {
+                                Row(Modifier.padding(RicordellaDimensions.spaceM), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM), verticalAlignment = Alignment.CenterVertically) {
+                                    Box(Modifier.size(52.dp).graphicsLayer { rotationZ = -6f }.clip(RoundedCornerShape(16.dp)).background(tone.solid), contentAlignment = Alignment.Center) {
+                                        Icon(item.icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(30.dp))
+                                    }
+                                    Column {
+                                        Text(item.title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black), color = tone.content)
+                                        Text(item.body, style = MaterialTheme.typography.bodyMedium, color = tone.content)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                PushButton(tr("Fantastico!"), onClick = onDismiss, modifier = Modifier.align(Alignment.End).padding(top = RicordellaDimensions.spaceM))
+                PushButton(tr("Fantastico!"), onClick = onDismiss, modifier = Modifier.fillMaxWidth().padding(RicordellaDimensions.spaceL))
             }
         }
+    }
+}
+
+/** Card "a rilievo": bordo spesso del colore [edge] e uno spessore più marcato sotto, come i pulsanti. */
+@Composable
+private fun ChunkyBox(edge: Color, face: Color, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    val shape = RoundedCornerShape(20.dp)
+    Box(modifier.fillMaxWidth().clip(shape).background(edge).padding(start = 2.dp, top = 2.dp, end = 2.dp, bottom = 5.dp)) {
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(face)) { content() }
     }
 }
 

@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(EXTRA_NEW_ALARM, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_ALARM, null)
         // Widget sveglie e note: aprono la loro sezione, la nota toccata o una nota nuova.
         if (intent?.getBooleanExtra(EXTRA_OPEN_ALARMS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_ALARMS, null)
+        if (intent?.getBooleanExtra(EXTRA_OPEN_TIMERS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_TIMERS, null)
         if (intent?.getBooleanExtra(EXTRA_OPEN_NOTES, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTES, null)
         if (intent?.getBooleanExtra(EXTRA_NEW_NOTE, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_NOTE, null)
         intent?.getStringExtra(EXTRA_NOTE_ID)?.let { widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTE, null, it) }
@@ -109,6 +110,8 @@ class MainActivity : ComponentActivity() {
         const val ACTION_OPEN_POTIONS = "potions"
         const val EXTRA_OPEN_ALARMS = "com.ricordella.app.extra.OPEN_ALARMS"
         const val ACTION_OPEN_ALARMS = "alarms"
+        const val EXTRA_OPEN_TIMERS = "com.ricordella.app.extra.OPEN_TIMERS"
+        const val ACTION_OPEN_TIMERS = "timers"
         const val EXTRA_OPEN_NOTES = "com.ricordella.app.extra.OPEN_NOTES"
         const val ACTION_OPEN_NOTES = "notes"
         const val EXTRA_NEW_NOTE = "com.ricordella.app.extra.NEW_NOTE"

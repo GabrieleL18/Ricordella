@@ -14,4 +14,6 @@
     <string name="widget_alarm_description">Der nächste Wecker: Tippen zum Öffnen, + zum Hinzufügen</string>
     <string name="widget_notes_label">Remindella Notizen</string>
     <string name="widget_notes_description">Deine Notizen und Einkaufslisten: Tippen öffnet die Notiz, + legt eine neue an</string>
+    <string name="widget_timer_label">Remindella Timer</string>
+    <string name="widget_timer_description">Countdown des nächsten Timers: Tippen öffnet die Timer</string>
 </resources>

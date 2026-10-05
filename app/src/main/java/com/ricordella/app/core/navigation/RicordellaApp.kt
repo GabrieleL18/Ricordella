@@ -206,6 +206,7 @@ fun RicordellaApp(
             com.ricordella.app.MainActivity.ACTION_OPEN_CYCLE -> navigator.openCycle()
             com.ricordella.app.MainActivity.ACTION_NEW_ALARM -> navigator.newAlarm()
             com.ricordella.app.MainActivity.ACTION_OPEN_ALARMS -> navigator.openAlarms()
+            com.ricordella.app.MainActivity.ACTION_OPEN_TIMERS -> navigator.openTimers()
             com.ricordella.app.MainActivity.ACTION_OPEN_NOTES -> navigator.openNotes()
             com.ricordella.app.MainActivity.ACTION_NEW_NOTE -> navigator.newNote()
             com.ricordella.app.MainActivity.ACTION_OPEN_NOTE -> request.id?.let(navigator::openNote)

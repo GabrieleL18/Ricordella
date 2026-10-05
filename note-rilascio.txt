@@ -1,55 +1,50 @@
 <it-IT>
 Novità:
-• Rate e pagamenti: condominio, mutuo e finanziamenti con scadenze e importi per ogni rata
-• Sveglie a giorni fissi, con avviso silenzioso prima e pausa fino a una data
-• Cestino: recuperi ciò che elimini per 7 giorni
-• Backup: ultime 3 copie con la data, anche su Drive
-• Ciclo con previsione e cronologia
-• Importa da più calendari (Google, Samsung) con scelta sui conflitti
-• Scegli cosa condividere nel file condiviso
-• Widget Sveglia e recap dell'acqua della settimana
+• Timer con anello, preciso al secondo, e nuovo widget Timer
+• Profilo principale
+• Backup con nome
+• Scegli il tipo di nota e personalizzane il tema
+• Note a tasselli e tasselli extra in Home
+• Tutorial per ogni sezione
+• Dal dettaglio, "Indietro" torna al foglio del giorno in Calendario
 </it-IT>
 <en-US>
 What's new:
-• Installments and payments: condo fees, mortgage and loans with due dates and an amount for each installment
-• Alarms on chosen weekdays, with a silent heads-up and pause until a date
-• Trash: recover what you delete for 7 days
-• Backup: last 3 dated copies, also on Drive
-• Cycle tracking with prediction and history
-• Import from several calendars (Google, Samsung) with a choice on conflicts
-• Choose what to share in the shared file
-• Alarm widget and weekly water recap
+• Timer with a ring, accurate to the second, and a new Timer widget
+• Main profile
+• Named backups
+• Pick the note type and customize its theme
+• Tiled notes and extra tiles on Home
+• A tutorial for each section
+• From a detail screen, Back returns to the day sheet in Calendar
 </en-US>
 <de-DE>
 Neu:
-• Raten und Zahlungen: Hausgeld, Hypothek, Kredite, Betrag je Rate
-• Wecker an festen Wochentagen, stiller Hinweis vorher, Pause bis zu einem Datum
-• Papierkorb: Gelöschtes 7 Tage wiederherstellen
-• Backup: letzte 3 Kopien mit Datum, auch in Drive
-• Zyklus mit Vorhersage und Verlauf
-• Import aus mehreren Kalendern (Google, Samsung)
-• Wähle, was geteilt wird
-• Wecker-Widget und wöchentliche Wasser-Übersicht
+• Timer mit Ring, sekundengenau, und neues Timer-Widget
+• Hauptprofil
+• Backups mit Namen
+• Notiztyp wählen und Design anpassen
+• Notizen als Kacheln und zusätzliche Kacheln im Start
+• Anleitung für jeden Bereich
+• Zurück aus den Details führt zum Tagesblatt im Kalender
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Échéances et paiements : copropriété, prêts, montant par échéance
-• Réveils à jours fixes, avis silencieux avant, pause jusqu'à une date
-• Corbeille : récupère ce que tu supprimes pendant 7 jours
-• Sauvegarde : 3 dernières copies datées, aussi sur Drive
-• Cycle avec prévision et historique
-• Import de plusieurs calendriers (Google, Samsung)
-• Choisis ce qui est partagé
-• Widget Réveil et récap hebdomadaire de l'eau
+• Minuteur avec anneau, précis à la seconde, et nouveau widget Minuteur
+• Profil principal
+• Sauvegardes nommées
+• Choisis le type de note et personnalise son thème
+• Notes en tuiles et tuiles en plus sur l'accueil
+• Un tutoriel pour chaque section
+• Depuis un détail, Retour revient à la feuille du jour dans Calendrier
 </fr-FR>
 <es-ES>
 Novedades:
-• Cuotas y pagos: comunidad, hipoteca y préstamos con vencimientos e importe por cuota
-• Alarmas en días fijos, con aviso silencioso antes y pausa hasta una fecha
-• Papelera: recupera lo que eliminas durante 7 días
-• Copias: últimas 3 con fecha, también en Drive
-• Ciclo con previsión e historial
-• Importar desde varios calendarios (Google, Samsung) con elección ante conflictos
-• Elige qué compartir en el archivo compartido
-• Widget de alarma y resumen semanal del agua
+• Temporizador con anillo, preciso al segundo, y nuevo widget Temporizador
+• Perfil principal
+• Copias con nombre
+• Elige el tipo de nota y personaliza su tema
+• Notas en mosaico y mosaicos extra en Inicio
+• Un tutorial por cada sección
+• Desde el detalle, Atrás vuelve a la hoja del día en Calendario
 </es-ES>
