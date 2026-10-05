@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ricordella.app.core.navigation.ReminderEditRoute
 import com.ricordella.app.domain.date.TimeSource
+import com.ricordella.app.domain.model.AlarmStyle
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ItemWithCategory
 import com.ricordella.app.domain.model.MoneyInfo
@@ -66,6 +67,8 @@ data class ReminderForm(
     val recurrenceEnd: LocalDate? = null,
     /** Sveglia in pausa fino a questo giorno. */
     val pausedUntil: LocalDate? = null,
+    /** Stile della schermata della sveglia; null = quello delle Impostazioni. */
+    val alarmStyle: AlarmStyle? = null,
     /** Pagamento: che cosa è, importo (testo del campo; per le rate è quello di ogni rata) e come si divide tra le persone. */
     val moneyKind: MoneyKind = MoneyKind.EXPENSE,
     val amount: String = "",
@@ -209,6 +212,7 @@ class ReminderEditViewModel(
             weekDays = rule?.daysOfWeek.orEmpty(),
             recurrenceEnd = rule?.endDate,
             pausedUntil = reminder.pausedUntil?.takeIf { it.isAfter(time.today()) },
+            alarmStyle = reminder.alarmStyle,
             moneyKind = reminder.money?.kind ?: if (reminder.plan != null) MoneyKind.INSTALLMENTS else MoneyKind.EXPENSE,
             amount = (reminder.plan?.amounts?.firstOrNull() ?: reminder.money?.amountCents?.takeIf { it > 0 })?.let(::formatCents).orEmpty(),
             splitCustom = reminder.money?.shares?.isNotEmpty() == true,
@@ -343,6 +347,7 @@ class ReminderEditViewModel(
             birthYear = form.birthYear.toIntOrNull()?.takeIf { form.type == ReminderType.BIRTHDAY && it in 1900..date.year },
             dueTime = form.time,
             pausedUntil = pausedUntil,
+            alarmStyle = form.alarmStyle.takeIf { form.isAlarm },
             plan = plan,
             money = if (form.isPayment) MoneyInfo(
                 kind = form.moneyKind,

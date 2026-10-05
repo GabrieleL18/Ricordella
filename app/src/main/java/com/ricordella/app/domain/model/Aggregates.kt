@@ -83,6 +83,7 @@ data class SearchResults(
     val items: List<ItemWithCategory> = emptyList(),
     val reminders: List<ReminderWithLinks> = emptyList(),
     val maintenance: List<MaintenanceRecord> = emptyList(),
+    val notes: List<Note> = emptyList(),
 ) {
-    val isEmpty: Boolean get() = people.isEmpty() && items.isEmpty() && reminders.isEmpty() && maintenance.isEmpty()
+    val isEmpty: Boolean get() = people.isEmpty() && items.isEmpty() && reminders.isEmpty() && maintenance.isEmpty() && notes.isEmpty()
 }

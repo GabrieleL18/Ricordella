@@ -70,6 +70,8 @@ import com.ricordella.app.core.date.DateTexts
 import com.ricordella.app.core.ui.DateField
 import com.ricordella.app.core.ui.DetailScaffold
 import com.ricordella.app.core.ui.DropdownField
+import com.ricordella.app.core.ui.alarmStyleLabel
+import com.ricordella.app.domain.model.AlarmStyle
 import com.ricordella.app.core.ui.MultiSelectDialog
 import com.ricordella.app.core.ui.NotifyOffsetPresets
 import com.ricordella.app.core.ui.SectionHeader
@@ -654,6 +656,12 @@ private fun AlarmFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+    com.ricordella.app.core.alarm.AlarmStylePicker(
+        selected = form.alarmStyle,
+        defaultStyle = com.ricordella.app.core.ui.LocalAppSettings.current.alarmStyle,
+        allowDefault = true,
+        onSelected = { style -> update { it.copy(alarmStyle = style) } },
+    )
     // Da Android 14 la schermata a tutto schermo può essere disattivata: si invita a riattivarla.
     val canFullScreen = Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
         context.getSystemService(NotificationManager::class.java).canUseFullScreenIntent()

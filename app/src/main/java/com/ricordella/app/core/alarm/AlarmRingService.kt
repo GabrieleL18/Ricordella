@@ -29,6 +29,7 @@ import androidx.core.net.toUri
 import com.ricordella.app.R
 import com.ricordella.app.RicordellaApplication
 import com.ricordella.app.domain.model.AlarmSound
+import com.ricordella.app.domain.model.AlarmStyle
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.SnoozeOption
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +47,7 @@ import java.time.LocalTime
 class AlarmRingService : Service() {
 
     /** La sveglia che suona. [night] sceglie la scena: notte (maghetto) o giorno (maghetto e orso). */
-    data class Ringing(val reminderId: String, val title: String, val night: Boolean, val snoozeMinutes: Int)
+    data class Ringing(val reminderId: String, val title: String, val night: Boolean, val snoozeMinutes: Int, val classic: Boolean = false)
 
     private var player: MediaPlayer? = null
     private var vibrator: Vibrator? = null
@@ -82,6 +83,7 @@ class AlarmRingService : Service() {
                 else -> hour < DAY_STARTS || hour >= NIGHT_STARTS
             },
             snoozeMinutes = intent.getIntExtra(EXTRA_SNOOZE, 10),
+            classic = intent.getStringExtra(EXTRA_STYLE) != AlarmStyle.MAGIC.name,
         )
         _ringing.value = alarm
         createChannel(this)
@@ -220,6 +222,7 @@ class AlarmRingService : Service() {
         private const val EXTRA_VIBRATE = "com.ricordella.app.alarm.VIBRATE"
         private const val EXTRA_CRESCENDO = "com.ricordella.app.alarm.CRESCENDO"
         private const val EXTRA_SOUND = "com.ricordella.app.alarm.SOUND"
+        private const val EXTRA_STYLE = "com.ricordella.app.alarm.STYLE"
 
         private val _ringing = MutableStateFlow<Ringing?>(null)
         /** La sveglia che sta suonando, osservata dalla schermata a tutto schermo. */
@@ -230,7 +233,7 @@ class AlarmRingService : Service() {
         var endedBySnooze: Boolean = false
             private set
 
-        private fun ringIntent(context: Context, reminderId: String, title: String, settings: AppSettings, scene: Int) =
+        private fun ringIntent(context: Context, reminderId: String, title: String, settings: AppSettings, scene: Int, style: AlarmStyle) =
             Intent(context, AlarmRingService::class.java)
                 .setAction(ACTION_RING)
                 .putExtra(EXTRA_REMINDER_ID, reminderId)
@@ -240,17 +243,18 @@ class AlarmRingService : Service() {
                 .putExtra(EXTRA_VIBRATE, settings.alarmVibration)
                 .putExtra(EXTRA_CRESCENDO, settings.alarmCrescendo)
                 .putExtra(EXTRA_SOUND, settings.alarmSound.name)
+                .putExtra(EXTRA_STYLE, style.name)
 
         /** Avvia la sveglia. False se Android non lo permette: si ripiega sulla notifica normale. */
-        fun start(context: Context, reminderId: String, title: String, settings: AppSettings): Boolean = runCatching {
-            ContextCompat.startForegroundService(context, ringIntent(context, reminderId, title, settings, SCENE_AUTO))
+        fun start(context: Context, reminderId: String, title: String, settings: AppSettings, style: AlarmStyle = settings.alarmStyle): Boolean = runCatching {
+            ContextCompat.startForegroundService(context, ringIntent(context, reminderId, title, settings, SCENE_AUTO, style))
         }.isSuccess
 
         /** Sveglia finta tra [delaySeconds], con la scena scelta: passa da un allarme esatto come quelle vere. */
-        fun scheduleTest(context: Context, settings: AppSettings, scene: Int, delaySeconds: Long = 10) {
+        fun scheduleTest(context: Context, settings: AppSettings, scene: Int, delaySeconds: Long = 10, style: AlarmStyle = AlarmStyle.MAGIC) {
             // In modalità demo un titolo credibile, per gli screenshot.
             val title = if (com.ricordella.app.core.DemoMode.isOn(context)) tr("Sveglia per il volo") else tr("Sveglia di prova")
-            val intent = ringIntent(context, "developer-alarm", title, settings, scene).setClass(context, TestReceiver::class.java)
+            val intent = ringIntent(context, "developer-alarm", title, settings, scene, style).setClass(context, TestReceiver::class.java)
             val pending = PendingIntent.getBroadcast(context, 7_002, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             val manager = context.getSystemService(AlarmManager::class.java)
             val at = System.currentTimeMillis() + delaySeconds * 1000

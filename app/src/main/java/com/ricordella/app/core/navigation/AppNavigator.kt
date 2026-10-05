@@ -37,8 +37,8 @@ class AppNavigator(private val navController: NavController) {
     fun openTimers() = navController.navigate(TimersRoute) { launchSingleTop = true }
     fun openNotes() = navController.navigate(NotesRoute) { launchSingleTop = true }
     fun openNote(id: String) = navController.navigate(NoteRoute(id)) { launchSingleTop = true }
-    fun newNote(list: Boolean = false, prices: Boolean = false) =
-        navController.navigate(NoteRoute(com.ricordella.app.domain.model.newId(), list, prices)) { launchSingleTop = true }
+    fun newNote(list: Boolean = false, prices: Boolean = false, drawing: Boolean = false) =
+        navController.navigate(NoteRoute(com.ricordella.app.domain.model.newId(), list, prices, drawing)) { launchSingleTop = true }
     fun openExpenses() = navController.navigate(ExpensesRoute) { launchSingleTop = true }
 
     fun openReminder(id: String) = navController.navigate(ReminderDetailRoute(id))

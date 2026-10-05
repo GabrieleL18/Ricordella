@@ -78,7 +78,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
     val container = remember { (context.applicationContext as RicordellaApplication).container }
     val saved = LocalAppSettings.current.notes
     var note by remember(route.id) {
-        mutableStateOf(saved.firstOrNull { it.id == route.id } ?: Note(id = route.id, isList = route.list, prices = route.prices).let { if (it.isList) it.copy(lines = listOf(NoteLine())) else it })
+        mutableStateOf(saved.firstOrNull { it.id == route.id } ?: Note(id = route.id, isList = route.list, prices = route.prices, isDrawing = route.drawing, createdAt = System.currentTimeMillis()).let { if (it.isList) it.copy(lines = listOf(NoteLine())) else it })
     }
     var menu by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -113,7 +113,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
     }
 
     DetailScaffold(
-        title = if (note.isList) (if (note.prices) tr("Lista della spesa") else tr("Lista")) else tr("Nota"),
+        title = if (note.isDrawing) tr("Disegno") else if (note.isList) (if (note.prices) tr("Lista della spesa") else tr("Lista")) else tr("Nota"),
         onBack = onBack,
         actions = {
             IconButton(onClick = { edit { it.copy(pinned = !it.pinned) } }) {
@@ -137,7 +137,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                             onClick = { menu = false; edit { n -> n.copy(lines = n.lines.filterNot { it.done }.ifEmpty { listOf(NoteLine()) }) } },
                         )
                     }
-                } else {
+                } else if (!note.isDrawing) {
                     DropdownMenuItem(text = { Text(tr("Trasforma in lista")) }, onClick = { menu = false; edit { it.toList().let { n -> if (n.lines.isEmpty()) n.copy(lines = listOf(NoteLine())) else n } } })
                 }
                 DropdownMenuItem(
@@ -153,7 +153,8 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
             Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                // Sulla tela il trascinamento disegna: la pagina non scorre.
+                .then(if (note.isDrawing) Modifier else Modifier.verticalScroll(rememberScrollState()))
                 .contentWidth()
                 .padding(horizontal = RicordellaDimensions.screenPadding)
                 .padding(bottom = 32.dp),
@@ -176,7 +177,9 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                     colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                if (!note.isList) {
+                if (note.isDrawing) {
+                    DrawingPad(note.id, note.drawing, tone) { uri -> edit { it.copy(drawing = uri, updatedAt = System.currentTimeMillis()) } }
+                } else if (!note.isList) {
                     TextField(
                         value = note.text,
                         onValueChange = { v -> edit { it.copy(text = v) } },
@@ -206,6 +209,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                         Text(tr("Aggiungi voce"), color = tone.content, modifier = Modifier.padding(start = 6.dp))
                     }
                 }
+                if (!note.isDrawing) NoteMediaSection(note, tone, edit = ::edit)
             }
         }
     }
@@ -219,6 +223,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
             onConfirm = {
                 confirmDelete = false
                 gone[0] = true
+                note.fileUris.forEach { com.ricordella.app.data.media.MediaStorage.delete(context, it) }
                 container.applicationScope.launch { container.settingsRepository.update { app -> app.copy(notes = app.notes.filterNot { it.id == route.id }) } }
                 onBack()
             },

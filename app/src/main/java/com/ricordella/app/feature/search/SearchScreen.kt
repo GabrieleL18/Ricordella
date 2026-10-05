@@ -47,6 +47,8 @@ import com.ricordella.app.core.ui.PersonCard
 import com.ricordella.app.core.ui.ReminderCard
 import com.ricordella.app.core.ui.SearchField
 import com.ricordella.app.core.ui.SectionHeader
+import com.ricordella.app.feature.notes.icon
+import com.ricordella.app.feature.notes.tone
 import com.ricordella.app.core.ui.appViewModel
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
@@ -159,6 +161,17 @@ fun SearchScreen(navigator: AppNavigator) {
                 item(key = "reminders") { SectionHeader(tr("Promemoria ed eventi")) }
                 items(results.reminders, key = { "r-" + it.reminder.id }) { entry ->
                     ReminderCard(entry, now = state.now, onClick = { navigator.openReminder(entry.reminder.id) })
+                }
+            }
+            if (results.notes.isNotEmpty()) {
+                item(key = "notes") { SectionHeader(tr("Note")) }
+                items(results.notes, key = { "n-" + it.id }) { note ->
+                    ListItem(
+                        headlineContent = { Text(note.title.ifBlank { note.summary.ifBlank { tr("Senza titolo") } }, maxLines = 1) },
+                        supportingContent = if (note.title.isNotBlank() && note.summary.isNotBlank()) ({ Text(note.summary, maxLines = 2) }) else null,
+                        leadingContent = { Icon(note.icon, contentDescription = null, tint = note.tone.solid) },
+                        modifier = Modifier.fillMaxWidth().clickable { navigator.openNote(note.id) },
+                    )
                 }
             }
             if (results.maintenance.isNotEmpty()) {

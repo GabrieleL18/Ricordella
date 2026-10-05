@@ -16,6 +16,15 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import com.ricordella.app.domain.model.AlarmStyle
+import com.ricordella.app.core.ui.alarmStyleLabel
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -111,8 +120,14 @@ class AlarmActivity : ComponentActivity() {
                 return@setContent
             }
             val alarm = shown!!
-            RicordellaTheme(themeMode = if (alarm.night) ThemeMode.DARK else ThemeMode.LIGHT) {
-                AlarmScreen(
+            RicordellaTheme(themeMode = if (alarm.night || alarm.classic) ThemeMode.DARK else ThemeMode.LIGHT) {
+                if (alarm.classic) ClassicAlarmScreen(
+                    alarm = alarm,
+                    ringing = ringing != null,
+                    onStop = { AlarmRingService.stop(this) },
+                    onSnooze = { AlarmRingService.snooze(this) },
+                    onDone = ::finish,
+                ) else AlarmScreen(
                     alarm = alarm,
                     ringing = ringing != null,
                     onStop = { AlarmRingService.stop(this) },
@@ -125,6 +140,77 @@ class AlarmActivity : ComponentActivity() {
 }
 
 private val DayInk = Color(0xFF1F2340)
+
+/** L'arancio del titolo dell'app (la fine della sfumatura dorata di MagicTitle). */
+private val BrandOrange = Color(0xFFFF8A00)
+
+/**
+ * Sveglia "classica": solo l'ora. Una sfumatura dell'arancio del titolo dell'app parte dal centro e svanisce nel nero
+ * ai bordi; mentre suona si espande e si comprime, come un respiro.
+ */
+@Composable
+private fun ClassicAlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean, onStop: () -> Unit, onSnooze: () -> Unit, onDone: () -> Unit) {
+    val reduced = rememberReducedMotion()
+    val breath = if (reduced) 0.5f else rememberInfiniteTransition(label = "classic").animateFloat(
+        0f, 1f, infiniteRepeatable(tween(1800, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse), label = "breath",
+    ).value
+    val fade = remember { Animatable(1f) }
+    // Fermata o posticipata: il bagliore si spegne e la schermata si chiude.
+    LaunchedEffect(ringing) {
+        if (ringing) return@LaunchedEffect
+        fade.animateTo(0f, tween(500))
+        onDone()
+    }
+    var now by remember { mutableStateOf(LocalDateTime.now()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            now = LocalDateTime.now()
+            delay(1_000)
+        }
+    }
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        Canvas(Modifier.fillMaxSize().graphicsLayer { alpha = fade.value }) {
+            val radius = minOf(size.width, size.height) * (0.62f + 0.38f * breath) + size.height * 0.1f
+            drawRect(
+                Brush.radialGradient(
+                    0f to BrandOrange,
+                    0.3f to BrandOrange.copy(alpha = 0.7f),
+                    0.65f to BrandOrange.copy(alpha = 0.18f),
+                    1f to Color.Transparent,
+                    center = center,
+                    radius = radius,
+                ),
+            )
+        }
+        Column(
+            Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                LiveTime(now, MaterialTheme.typography.displayLarge.copy(fontSize = 92.sp, fontWeight = FontWeight.SemiBold), Color.White)
+                Text(
+                    DateTexts.weekdayAndDay(now.toLocalDate()).replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.85f),
+                )
+                if (alarm.title.isNotBlank()) Text(
+                    alarm.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 16.dp),
+                )
+            }
+            OutlinedButton(onClick = onSnooze, enabled = ringing, modifier = Modifier.padding(bottom = 16.dp)) {
+                Icon(Icons.Rounded.Snooze, contentDescription = null, tint = Color.White)
+                Text(trf("Posticipa %1\$s min", alarm.snoozeMinutes), color = Color.White, modifier = Modifier.padding(start = 8.dp))
+            }
+            SwipeToStop(enabled = ringing, ink = Color.White, onStop = onStop)
+        }
+    }
+}
 
 @Composable
 private fun AlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean, onStop: () -> Unit, onSnooze: () -> Unit, onDone: () -> Unit) {
@@ -214,6 +300,87 @@ private fun AlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean, onSto
                     .background(Color.White.copy(alpha = 0.85f), CircleShape)
                     .padding(horizontal = 24.dp, vertical = 14.dp),
             )
+        }
+    }
+}
+
+/** Anteprima animata di uno stile di sveglia, nella stessa proporzione della schermata vera. */
+@Composable
+private fun AlarmStylePreview(style: AlarmStyle, modifier: Modifier = Modifier) {
+    Box(modifier.clip(RoundedCornerShape(16.dp)).background(Color.Black)) {
+        when (style) {
+            AlarmStyle.CLASSIC -> {
+                val reduced = rememberReducedMotion()
+                val breath = if (reduced) 0.5f else rememberInfiniteTransition(label = "previewBreath").animateFloat(
+                    0f, 1f, infiniteRepeatable(tween(1800, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse), label = "previewBreathT",
+                ).value
+                Canvas(Modifier.fillMaxSize()) {
+                    val radius = minOf(size.width, size.height) * (0.62f + 0.38f * breath) + size.height * 0.1f
+                    drawRect(
+                        Brush.radialGradient(
+                            0f to BrandOrange, 0.3f to BrandOrange.copy(alpha = 0.7f), 0.65f to BrandOrange.copy(alpha = 0.18f), 1f to Color.Transparent,
+                            center = center, radius = radius,
+                        ),
+                    )
+                }
+                Box(Modifier.align(Alignment.Center)) {
+                    LiveTime(remember { LocalDateTime.now() }, MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold), Color.White)
+                }
+            }
+            AlarmStyle.MAGIC -> {
+                val hour = LocalDateTime.now().hour
+                val night = hour < AlarmRingService.DAY_STARTS || hour >= AlarmRingService.NIGHT_STARTS
+                if (night) NightSky() else DaySky()
+                if (night) NightScene(0f, 0f, Modifier.fillMaxSize()) else DayScene(0f, 0f, Modifier.fillMaxSize())
+            }
+        }
+    }
+}
+
+/**
+ * Scelta dello stile con le anteprime. Con [allowDefault] c'è anche "Come nelle Impostazioni": [selected] null
+ * segue [defaultStyle]; toccando un'anteprima si sceglie quello stile.
+ */
+@Composable
+fun AlarmStylePicker(
+    selected: AlarmStyle?,
+    defaultStyle: AlarmStyle,
+    allowDefault: Boolean,
+    onSelected: (AlarmStyle?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MaterialTheme.ricordellaColors
+    val effective = selected ?: defaultStyle
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(tr("Schermata della sveglia"), style = MaterialTheme.typography.bodyLarge)
+        if (allowDefault) {
+            FilterChip(
+                selected = selected == null,
+                onClick = { onSelected(if (selected == null) defaultStyle else null) },
+                label = { Text(trf("Come nelle Impostazioni (%1\$s)", alarmStyleLabel(defaultStyle))) },
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            AlarmStyle.entries.forEach { style ->
+                val chosen = effective == style
+                Column(
+                    Modifier.weight(1f).clickable { onSelected(style) },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    AlarmStylePreview(
+                        style,
+                        Modifier.fillMaxWidth().aspectRatio(0.62f)
+                            .border(if (chosen) 3.dp else 1.dp, if (chosen) colors.bolt else MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                            .graphicsLayer { alpha = if (selected == null && allowDefault) 0.6f else 1f },
+                    )
+                    Text(
+                        alarmStyleLabel(style),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = if (chosen) FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
+            }
         }
     }
 }

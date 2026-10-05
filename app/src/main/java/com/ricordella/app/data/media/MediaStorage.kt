@@ -30,6 +30,20 @@ object MediaStorage {
         FileProvider.getUriForFile(context, "${context.packageName}.files", file).toString()
     }.getOrNull()
 
+    /** Nuovo file vuoto nella cartella dei media (per audio e disegni) e il suo URI. */
+    fun newFile(context: Context, name: String): Pair<File, String> {
+        val file = File(File(context.filesDir, DIR).apply { mkdirs() }, name)
+        return file to FileProvider.getUriForFile(context, "${context.packageName}.files", file).toString()
+    }
+
+    /** Elimina un file dell'app (media o ripristinato) dato il suo URI; gli altri URI non si toccano. */
+    fun delete(context: Context, uri: String) {
+        val u = Uri.parse(uri)
+        if (u.authority != "${context.packageName}.files") return
+        val name = u.lastPathSegment ?: return
+        listOf(DIR, "restored").forEach { File(File(context.filesDir, it), name).takeIf(File::isFile)?.delete() }
+    }
+
     /**
      * Ridimensiona e ricomprime un'immagine in WebP. ImageDecoder applica l'orientamento EXIF,
      * che altrimenti andrebbe perso. Restituisce null se i byte non sono un'immagine.

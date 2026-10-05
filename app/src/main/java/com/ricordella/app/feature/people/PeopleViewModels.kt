@@ -52,7 +52,7 @@ class PersonListViewModel(people: PersonRepository, reminders: ReminderRepositor
 
     private val today = time.today()
     private val next = reminders.observeActiveUntil(today.plusDays(NEXT_WITH_PEOPLE_DAYS), 300).map { list ->
-        list.filter { it.people.isNotEmpty() && !it.reminder.dueDate.isBefore(today) }
+        list.filter { it.people.isNotEmpty() && it.reminder.type != ReminderType.ALARM && !it.reminder.dueDate.isBefore(today) }
             .minWithOrNull(compareBy({ it.reminder.dueDate }, { it.reminder.dueTime }))
     }
 
@@ -187,7 +187,7 @@ class PersonDetailViewModel(
         deleted,
     ) { person, linked, ownedItems, now, isDeleted ->
         val today = now.toLocalDate()
-        val active = linked.filter { it.reminder.status == ReminderStatus.ACTIVE }
+        val active = linked.filter { it.reminder.status == ReminderStatus.ACTIVE && it.reminder.type != ReminderType.ALARM }
         val (todayList, later) = active.partition { !it.reminder.dueDate.isAfter(today) }
         val (events, others) = later.partition { it.reminder.type == ReminderType.EVENT || it.reminder.type == ReminderType.BIRTHDAY }
         PersonDetailUiState(

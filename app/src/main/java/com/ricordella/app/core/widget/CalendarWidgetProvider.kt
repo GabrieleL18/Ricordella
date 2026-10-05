@@ -80,7 +80,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 var next: Pair<String, LocalDate>? = null
                 container.reminderRepository.observeForRange(rangeStart, rangeEnd).first().forEach { entry ->
                     val reminder = entry.reminder
-                    if (reminder.status == ReminderStatus.CANCELLED) return@forEach
+                    if (reminder.status == ReminderStatus.CANCELLED || reminder.type == com.ricordella.app.domain.model.ReminderType.ALARM) return@forEach
                     container.recurrenceCalculator.daysCoveredInRange(reminder, entry.recurrenceRule, rangeStart, rangeEnd).forEach { (date, start) ->
                         val overdue = start == reminder.dueDate && ReminderTimeline.isOverdue(reminder, now)
                         busy[date] = (busy[date] ?: false) || overdue

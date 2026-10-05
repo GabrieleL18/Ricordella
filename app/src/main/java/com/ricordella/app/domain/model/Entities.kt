@@ -159,6 +159,8 @@ data class Reminder(
     val birthYear: Int? = null,
     /** Sveglia in pausa: non suona prima di questo giorno (la prossima data è già spostata). */
     val pausedUntil: LocalDate? = null,
+    /** Stile della schermata della sveglia; null = quello predefinito nelle Impostazioni. */
+    val alarmStyle: AlarmStyle? = null,
     /** Pagamento a rate (condominio, mutuo...): scadenze, importi e rate già pagate. */
     val plan: InstallmentPlan? = null,
     /** Denaro (spesa, abbonamento, rate, entrata): importo e quote per persona. Solo per i pagamenti. */

@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object NotesRoute
 
 /** Una nota (nuova o esistente); [id] è già deciso alla creazione, [list]/[prices] dicono che tipo di nota è nuova. */
-@Serializable data class NoteRoute(val id: String, val list: Boolean = false, val prices: Boolean = false)
+@Serializable data class NoteRoute(val id: String, val list: Boolean = false, val prices: Boolean = false, val drawing: Boolean = false)
 
 /** Buoni propositi di un anno; [recap] = aperto dall'invito di fine anno. */
 @Serializable data class ResolutionsRoute(val year: Int, val recap: Boolean = false)

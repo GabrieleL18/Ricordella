@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -26,7 +28,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Brush
 import androidx.compose.material.icons.rounded.ChecklistRtl
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.SwapVert
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.ricordella.app.core.ui.UriImage
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -75,11 +83,24 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
     val context = LocalContext.current
     val container = remember { (context.applicationContext as RicordellaApplication).container }
     val scope = rememberCoroutineScope()
-    val notes = LocalAppSettings.current.notes.sortedWith(compareByDescending<Note> { it.pinned }.thenByDescending { it.updatedAt })
+    var sort by rememberSaveable { mutableStateOf(NoteSort.MODIFIED) }
+    var sortMenu by remember { mutableStateOf(false) }
+    val notes = LocalAppSettings.current.notes.sortedWith(compareByDescending<Note> { it.pinned }.then(sort.order))
     var addMenu by remember { mutableStateOf(false) }
     DetailScaffold(
         title = tr("Note"),
         onBack = onBack,
+        actions = {
+            IconButton(onClick = { sortMenu = true }) { Icon(Icons.Rounded.SwapVert, contentDescription = tr("Ordina")) }
+            DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
+                NoteSort.entries.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option.label, color = if (option == sort) MaterialTheme.ricordellaColors.bolt else MaterialTheme.colorScheme.onSurface) },
+                        onClick = { sortMenu = false; sort = option },
+                    )
+                }
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { addMenu = true },
@@ -88,7 +109,7 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
             ) { Icon(Icons.Rounded.Add, contentDescription = tr("Nuova nota")) }
         },
     ) { padding ->
-        if (addMenu) NewNoteChoice(onDismiss = { addMenu = false }, onChoose = { list, prices -> addMenu = false; navigator.newNote(list = list, prices = prices) })
+        if (addMenu) NewNoteChoice(onDismiss = { addMenu = false }, onChoose = { list, prices, drawing -> addMenu = false; navigator.newNote(list = list, prices = prices, drawing = drawing) })
         if (notes.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.StickyNote2,
@@ -119,9 +140,25 @@ fun NotesScreen(navigator: AppNavigator, onBack: () -> Unit) {
 
 /** Colore e icona di una nota secondo il tipo: testo (pera), lista (azzurro), spesa (menta). */
 internal val Note.tone: com.ricordella.app.core.ui.theme.Tone
-    @Composable get() = MaterialTheme.ricordellaColors.let { if (prices) it.mint else if (isList) it.cyan else it.pear }
+    @Composable get() = MaterialTheme.ricordellaColors.let { if (isDrawing) it.lavender else if (prices) it.mint else if (isList) it.cyan else it.pear }
 
-internal val Note.icon get() = if (prices) Icons.Rounded.ShoppingCart else if (isList) Icons.Rounded.ChecklistRtl else Icons.Rounded.StickyNote2
+internal val Note.icon get() = if (isDrawing) Icons.Rounded.Brush else if (prices) Icons.Rounded.ShoppingCart else if (isList) Icons.Rounded.ChecklistRtl else Icons.Rounded.StickyNote2
+
+/** Modi per ordinare le note (le fissate restano sempre in cima). */
+internal enum class NoteSort(val order: Comparator<Note>) {
+    MODIFIED(compareByDescending<Note> { it.updatedAt }),
+    TITLE(compareBy<Note, String>(String.CASE_INSENSITIVE_ORDER) { it.title.ifBlank { it.summary } }),
+    CREATED(compareByDescending<Note> { it.createdAt.takeIf { c -> c > 0 } ?: it.updatedAt }),
+    TYPE(compareBy<Note> { if (it.isDrawing) 3 else if (it.prices) 2 else if (it.isList) 1 else 0 }.thenByDescending { it.updatedAt });
+
+    val label: String
+        get() = when (this) {
+            MODIFIED -> tr("Ultima modifica")
+            TITLE -> tr("Titolo A–Z")
+            CREATED -> tr("Data di creazione")
+            TYPE -> tr("Tipo")
+        }
+}
 
 /** Biglietto della nota: pallino colorato con l'icona del tipo, titolo, anteprima e avanzamento. */
 @Composable
@@ -133,6 +170,9 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = tone.container),
     ) {
         Column(Modifier.padding(RicordellaDimensions.spaceM), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            (note.drawing ?: note.images.firstOrNull())?.let { cover ->
+                UriImage(cover, contentDescription = null, maxSizePx = 400, modifier = Modifier.fillMaxWidth().aspectRatio(if (note.isDrawing) 0.75f else 1.4f).clip(RoundedCornerShape(12.dp)))
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 androidx.compose.foundation.layout.Box(Modifier.size(32.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
                     Icon(note.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(18.dp))
@@ -150,6 +190,18 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
             if (note.title.isNotBlank() && note.summary.isNotBlank()) {
                 Text(note.summary, style = MaterialTheme.typography.bodyMedium, color = tone.content.copy(alpha = 0.8f), maxLines = 4, overflow = TextOverflow.Ellipsis)
             }
+            if (note.images.isNotEmpty() || note.audios.isNotEmpty()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (note.images.isNotEmpty()) {
+                        Icon(Icons.Rounded.Image, contentDescription = tr("Immagine"), tint = tone.content, modifier = Modifier.size(16.dp))
+                        Text(note.images.size.toString(), style = MaterialTheme.typography.labelLarge, color = tone.content)
+                    }
+                    if (note.audios.isNotEmpty()) {
+                        Icon(Icons.Rounded.Mic, contentDescription = tr("Audio"), tint = tone.content, modifier = Modifier.size(16.dp))
+                        Text(note.audios.size.toString(), style = MaterialTheme.typography.labelLarge, color = tone.content)
+                    }
+                }
+            }
             if (note.isList) {
                 val done = note.lines.count { it.done }
                 val total = note.lines.count { it.text.isNotBlank() }
@@ -166,7 +218,7 @@ private fun NoteCard(note: Note, onClick: () -> Unit) {
 /** "Nuova nota": foglio dal basso con un tassello colorato per tipo, come il foglio "Aggiungi". */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boolean) -> Unit) {
+fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boolean, drawing: Boolean) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     androidx.compose.material3.ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -179,9 +231,10 @@ fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boole
         ) {
             Text(tr("Che nota vuoi scrivere?"), style = MaterialTheme.typography.headlineSmall)
             listOf(
-                Triple(Triple(false, false, Icons.Rounded.StickyNote2), tr("Nota") to tr("Testo libero"), colors.pear),
+                Triple(Triple(false, false, Icons.Rounded.StickyNote2), tr("Nota") to tr("Testo, immagini e audio"), colors.pear),
                 Triple(Triple(true, false, Icons.Rounded.ChecklistRtl), tr("Lista") to tr("Voci da spuntare"), colors.cyan),
                 Triple(Triple(true, true, Icons.Rounded.ShoppingCart), tr("Lista della spesa") to tr("Con prezzi e totale"), colors.mint),
+                Triple(Triple(false, false, Icons.Rounded.Brush), tr("Disegno") to tr("Penna, colori e gomma"), colors.lavender),
             ).forEach { (kind, text, tone) ->
                 val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
                 Row(
@@ -190,7 +243,7 @@ fun NewNoteChoice(onDismiss: () -> Unit, onChoose: (list: Boolean, prices: Boole
                         .pressScale(interaction, pressedScale = 0.97f)
                         .clip(MaterialTheme.shapes.large)
                         .background(tone.container)
-                        .clickable(interactionSource = interaction, indication = null) { onChoose(kind.first, kind.second) }
+                        .clickable(interactionSource = interaction, indication = null) { onChoose(kind.first, kind.second, kind.third == Icons.Rounded.Brush) }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp),

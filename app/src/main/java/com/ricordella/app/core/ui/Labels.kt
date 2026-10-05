@@ -239,3 +239,10 @@ fun notifyOffsetLabel(minutes: Int): String = when (minutes) {
 fun birthdayAgeLabel(age: Int): String = if (age == 1) tr("compie 1 anno") else trf("compie %1\$s anni", age)
 
 val NotifyOffsetPresets = listOf(0, 10, 60, 1440, 2 * 1440, 10080, 30 * 1440)
+
+/** Nome dello stile della schermata della sveglia; null = quello predefinito delle Impostazioni. */
+fun alarmStyleLabel(style: com.ricordella.app.domain.model.AlarmStyle?): String = when (style) {
+    null -> tr("Predefinita")
+    com.ricordella.app.domain.model.AlarmStyle.CLASSIC -> tr("Classica")
+    com.ricordella.app.domain.model.AlarmStyle.MAGIC -> tr("Magica")
+}

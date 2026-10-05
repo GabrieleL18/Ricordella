@@ -1,9 +1,10 @@
 <it-IT>
 Novità:
 • Timer con anello, preciso al secondo, e nuovo widget Timer
+• Sveglia classica con sfumatura arancione, da scegliere nelle Impostazioni
 • Profilo principale
 • Backup con nome
-• Scegli il tipo di nota e personalizzane il tema
+• Note con audio, immagini e disegni, ordinabili e nella ricerca
 • Note a tasselli e tasselli extra in Home
 • Tutorial per ogni sezione
 • Dal dettaglio, "Indietro" torna al foglio del giorno in Calendario
@@ -11,9 +12,10 @@ Novità:
 <en-US>
 What's new:
 • Timer with a ring, accurate to the second, and a new Timer widget
+• Classic alarm with an orange glow, selectable in Settings
 • Main profile
 • Named backups
-• Pick the note type and customize its theme
+• Notes with audio, images and drawings, sortable and searchable
 • Tiled notes and extra tiles on Home
 • A tutorial for each section
 • From a detail screen, Back returns to the day sheet in Calendar
@@ -21,9 +23,10 @@ What's new:
 <de-DE>
 Neu:
 • Timer mit Ring, sekundengenau, und neues Timer-Widget
+• Klassischer Wecker mit orangefarbenem Leuchten, in den Einstellungen wählbar
 • Hauptprofil
 • Backups mit Namen
-• Notiztyp wählen und Design anpassen
+• Notizen mit Audio, Bildern und Zeichnungen, sortierbar und durchsuchbar
 • Notizen als Kacheln und zusätzliche Kacheln im Start
 • Anleitung für jeden Bereich
 • Zurück aus den Details führt zum Tagesblatt im Kalender
@@ -31,9 +34,10 @@ Neu:
 <fr-FR>
 Nouveautés :
 • Minuteur avec anneau, précis à la seconde, et nouveau widget Minuteur
+• Réveil classique à lueur orange, à choisir dans les Réglages
 • Profil principal
 • Sauvegardes nommées
-• Choisis le type de note et personnalise son thème
+• Notes avec audio, images et dessins, triables et dans la recherche
 • Notes en tuiles et tuiles en plus sur l'accueil
 • Un tutoriel pour chaque section
 • Depuis un détail, Retour revient à la feuille du jour dans Calendrier
@@ -41,9 +45,10 @@ Nouveautés :
 <es-ES>
 Novedades:
 • Temporizador con anillo, preciso al segundo, y nuevo widget Temporizador
+• Alarma clásica con resplandor naranja, elegible en Ajustes
 • Perfil principal
 • Copias con nombre
-• Elige el tipo de nota y personaliza su tema
+• Notas con audio, imágenes y dibujos, ordenables y en la búsqueda
 • Notas en mosaico y mosaicos extra en Inicio
 • Un tutorial por cada sección
 • Desde el detalle, Atrás vuelve a la hoja del día en Calendario

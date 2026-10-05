@@ -339,7 +339,7 @@ fun RicordellaApp(
     if (chooseNote) {
         com.ricordella.app.feature.notes.NewNoteChoice(
             onDismiss = { chooseNote = false; returnToAdd = false; showQuickAdd = true },
-            onChoose = { list, prices -> chooseNote = false; navigator.newNote(list = list, prices = prices) },
+            onChoose = { list, prices, drawing -> chooseNote = false; navigator.newNote(list = list, prices = prices, drawing = drawing) },
         )
     }
 }

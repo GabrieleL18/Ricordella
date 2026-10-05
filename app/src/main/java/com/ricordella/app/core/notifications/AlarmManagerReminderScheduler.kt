@@ -68,7 +68,7 @@ class AlarmManagerReminderScheduler(
                 // finché non si risponde; se Android non lo consente, notifica normale.
                 val insistent = entry.reminder.type == ReminderType.ALARM ||
                     (entry.reminder.type.isCompletable && appSettings.insistentLevel.applies(entry.reminder.priority))
-                val rang = insistent && AlarmRingService.start(context, id, entry.reminder.title, appSettings)
+                val rang = insistent && AlarmRingService.start(context, id, entry.reminder.title, appSettings, entry.reminder.alarmStyle ?: appSettings.alarmStyle)
                 if (!rang) notifier.show(entry, today)
             }
             reminders.markNotified(plan.dueNow, now)

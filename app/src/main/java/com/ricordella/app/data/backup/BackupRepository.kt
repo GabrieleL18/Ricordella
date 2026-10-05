@@ -206,14 +206,16 @@ class BackupRepository(
         }
         try {
             val database = backupDao.readAll()
+            val settings = settingsRepository.current()
             var index = 0
-            val compacted = database.fileUris().associateWith { uri -> runCatching { compact(uri, File(staging, "${index++}")) }.getOrNull() }
+            // Anche i file delle note (immagini, audio, disegni) entrano nel backup.
+            val compacted = (database.fileUris() + settings.notes.flatMap { it.fileUris }).associateWith { uri -> runCatching { compact(uri, File(staging, "${index++}")) }.getOrNull() }
             val webp = compacted.filterValues { it?.second == true }.keys
             val content = database.copy(
                 attachments = database.attachments.map { if (it.uri in webp) it.copy(mimeType = "image/webp") else it },
             )
             val files = compacted.mapNotNull { (uri, result) -> result?.let { BackupArchiveCodec.FileSource(uri) { it.first.inputStream() } } }
-            codec.write(output, content, settingsRepository.current(), files, BuildConfig.VERSION_NAME, Instant.now(clock).toString())
+            codec.write(output, content, settings, files, BuildConfig.VERSION_NAME, Instant.now(clock).toString())
         } finally {
             staging.deleteRecursively()
         }
@@ -267,7 +269,11 @@ class BackupRepository(
         // L'accettazione dei termini è di chi usa questo telefono: il backup (magari di prima) non la tocca.
         contents.settings?.let { restored ->
             settingsRepository.update { current ->
-                restored.copy(termsAcceptedVersion = current.termsAcceptedVersion, termsAcceptedEpochDay = current.termsAcceptedEpochDay)
+                restored.copy(
+                    notes = restored.notes.map { it.withFileUris(mapping) },
+                    termsAcceptedVersion = current.termsAcceptedVersion,
+                    termsAcceptedEpochDay = current.termsAcceptedEpochDay,
+                )
             }
         }
         // I file ripristinati in precedenza e non più referenziati vengono rimossi.

@@ -56,6 +56,8 @@ import com.ricordella.app.core.ui.icon
 import com.ricordella.app.core.ui.label
 import com.ricordella.app.core.ui.notifyOffsetLabel
 import com.ricordella.app.domain.model.AlarmSound
+import com.ricordella.app.domain.model.AlarmStyle
+import com.ricordella.app.core.ui.alarmStyleLabel
 import com.ricordella.app.domain.model.InsistentLevel
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.ReminderType
@@ -251,6 +253,13 @@ internal fun AlarmSettingsSection(settings: AppSettings, update: ((AppSettings) 
         optionLabel = { if (it == 0) tr("Mai") else trf("%1\$s minuti prima", it) },
         onSelected = { minutes -> update { it.copy(alarmPreNotice = minutes) } },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+    )
+    com.ricordella.app.core.alarm.AlarmStylePicker(
+        selected = settings.alarmStyle,
+        defaultStyle = settings.alarmStyle,
+        allowDefault = false,
+        onSelected = { style -> style?.let { chosen -> update { it.copy(alarmStyle = chosen) } } },
+        modifier = Modifier.padding(vertical = 8.dp),
     )
     DropdownField(
         label = tr("Suono"),

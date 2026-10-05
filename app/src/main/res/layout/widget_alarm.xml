@@ -31,7 +31,7 @@
                 android:shadowDy="2"
                 android:shadowRadius="6"
                 android:textColor="#FFFFFFFF"
-                android:textSize="56sp" />
+                android:textSize="76sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
                 android:shadowRadius="6"
                 android:text=":"
                 android:textColor="@color/widget_colon"
-                android:textSize="56sp" />
+                android:textSize="76sp" />
 
             <TextClock
                 android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
                 android:shadowDy="2"
                 android:shadowRadius="6"
                 android:textColor="#FFFFFFFF"
-                android:textSize="56sp" />
+                android:textSize="76sp" />
         </LinearLayout>
 
         <TextView

@@ -53,7 +53,7 @@ abstract class RicordellaDatabase : RoomDatabase() {
     abstract fun backupDao(): BackupDao
 
     companion object {
-        const val VERSION = 9
+        const val VERSION = 10
         private const val FILE_NAME = "ricordella.db"
 
         /**
@@ -102,6 +102,12 @@ abstract class RicordellaDatabase : RoomDatabase() {
             object : Migration(8, 9) {
                 override fun migrate(db: SupportSQLiteDatabase) {
                     db.execSQL("ALTER TABLE reminder ADD COLUMN money TEXT")
+                }
+            },
+            // 9 → 10: stile della schermata della sveglia.
+            object : Migration(9, 10) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE reminder ADD COLUMN alarmStyle TEXT")
                 }
             },
             // 3 → 4: anno di nascita dei compleanni.

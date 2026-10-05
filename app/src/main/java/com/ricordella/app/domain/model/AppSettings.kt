@@ -18,6 +18,10 @@ enum class DateFormatStyle { NUMERIC, EXTENDED }
 @Serializable
 enum class AlarmSound { MAGIC, SYSTEM }
 
+/** Schermata della sveglia che suona: la sfumatura arancione "classica" o la scena magica con maghetto e orso. */
+@Serializable
+enum class AlarmStyle { CLASSIC, MAGIC }
+
 /** Quali promemoria, oltre alle sveglie, suonano a tutto schermo finché non si risponde. */
 @Serializable
 enum class InsistentLevel {
@@ -120,6 +124,8 @@ data class AppSettings(
     /** La sveglia parte piano e alza il volume in mezzo minuto. */
     val alarmCrescendo: Boolean = false,
     val alarmSound: AlarmSound = AlarmSound.MAGIC,
+    /** Stile predefinito della schermata delle sveglie; ogni sveglia può sceglierne un altro. */
+    val alarmStyle: AlarmStyle = AlarmStyle.CLASSIC,
     /** I promemoria importanti/urgenti suonano come la sveglia, insistenti, finché non si risponde. */
     val insistentLevel: InsistentLevel = InsistentLevel.NONE,
     /** Si è tornati nell'app dopo aver aperto PayPal: il maghetto del riquadro "supporto" resta innamorato. */

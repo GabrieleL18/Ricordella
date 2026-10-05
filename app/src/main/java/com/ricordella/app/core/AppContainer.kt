@@ -97,7 +97,7 @@ class AppContainer(context: Context) {
     val deleteItem = DeleteItemUseCase(itemRepository, reminderScheduler, trash)
     val addMaintenanceRecord =
         AddMaintenanceRecordUseCase(maintenanceRepository, itemRepository, settingsRepository, saveReminder, time)
-    val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository)
+    val globalSearch = GlobalSearchUseCase(personRepository, itemRepository, reminderRepository, maintenanceRepository, settingsRepository)
     val restoreBackup = RestoreBackupUseCase(backupRepository, reminderScheduler)
     val deleteAllData = DeleteAllDataUseCase(backupRepository, reminderScheduler)
     val sharedSpace = com.ricordella.app.data.share.SharedSpace(

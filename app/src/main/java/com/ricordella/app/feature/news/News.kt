@@ -85,6 +85,15 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
 val AllNews: List<NewsRelease>
     get() = listOf(
         NewsRelease(
+            versionCode = 8,
+            versionName = "0.5.1",
+            date = java.time.LocalDate.of(2026, 10, 5),
+            items = listOf(
+                NewsItem(Icons.Rounded.Alarm, { it.coral }, tr("Sveglia classica"), tr("Una sfumatura arancione che respira, solo l'ora al centro. È la sveglia di default: la cambi nelle Impostazioni o per ogni sveglia.")),
+                NewsItem(Icons.Rounded.Mic, { it.lavender }, tr("Note con audio e disegni"), tr("Registra la voce, carica immagini o disegna con penna e colori. Ordina le note e trovale dalla ricerca.")),
+            ),
+        ),
+        NewsRelease(
             versionCode = 7,
             versionName = "0.5.0",
             date = java.time.LocalDate.of(2026, 10, 5),
