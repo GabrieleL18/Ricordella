@@ -1,65 +1,45 @@
 <it-IT>
 Novità:
 • Sveglia classica più magica, con stelline e grafica in linea con l'app
-• Disegno delle note ora a tutto schermo in orizzontale
-• Timer con anello, preciso al secondo, e nuovo widget Timer
-• Sveglia classica con sfumatura arancione, da scegliere nelle Impostazioni
-• Profilo principale
-• Backup con nome
-• Note con audio, immagini e disegni, ordinabili e nella ricerca
-• Note a tasselli e tasselli extra in Home
+• Disegno delle note a tutto schermo in orizzontale
+• Timer con anello e nuovo widget Timer
+• Note con audio, immagini e disegni
+• Profilo principale e backup con nome
 • Tutorial per ogni sezione
-• Dal dettaglio, "Indietro" torna al foglio del giorno in Calendario
 </it-IT>
 <en-US>
 What's new:
 • Classic alarm with a magic touch: sparkles and a look that matches the app
-• Note drawings now use the full screen in landscape
-• Timer with a ring, accurate to the second, and a new Timer widget
-• Classic alarm with an orange glow, selectable in Settings
-• Main profile
-• Named backups
-• Notes with audio, images and drawings, sortable and searchable
-• Tiled notes and extra tiles on Home
+• Note drawings use the full screen in landscape
+• Timer with a ring and a new Timer widget
+• Notes with audio, images and drawings
+• Main profile and named backups
 • A tutorial for each section
-• From a detail screen, Back returns to the day sheet in Calendar
 </en-US>
 <de-DE>
 Neu:
 • Klassischer Wecker mit Zauber: Funkeln und ein Look passend zur App
 • Notizzeichnungen nutzen im Querformat den ganzen Bildschirm
-• Timer mit Ring, sekundengenau, und neues Timer-Widget
-• Klassischer Wecker mit orangefarbenem Leuchten, in den Einstellungen wählbar
-• Hauptprofil
-• Backups mit Namen
-• Notizen mit Audio, Bildern und Zeichnungen, sortierbar und durchsuchbar
-• Notizen als Kacheln und zusätzliche Kacheln im Start
+• Timer mit Ring und neues Timer-Widget
+• Notizen mit Audio, Bildern und Zeichnungen
+• Hauptprofil und Backups mit Namen
 • Anleitung für jeden Bereich
-• Zurück aus den Details führt zum Tagesblatt im Kalender
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Réveil classique plus magique : étincelles et un look cohérent avec l'appli
+• Réveil classique plus magique : étincelles et look cohérent avec l'appli
 • Les dessins de notes occupent tout l'écran en paysage
-• Minuteur avec anneau, précis à la seconde, et nouveau widget Minuteur
-• Réveil classique à lueur orange, à choisir dans les Réglages
-• Profil principal
-• Sauvegardes nommées
-• Notes avec audio, images et dessins, triables et dans la recherche
-• Notes en tuiles et tuiles en plus sur l'accueil
+• Minuteur avec anneau et nouveau widget Minuteur
+• Notes avec audio, images et dessins
+• Profil principal et sauvegardes nommées
 • Un tutoriel pour chaque section
-• Depuis un détail, Retour revient à la feuille du jour dans Calendrier
 </fr-FR>
 <es-ES>
 Novedades:
-• Alarma clásica más mágica: destellos y un aspecto acorde con la app
+• Alarma clásica más mágica: destellos y aspecto acorde con la app
 • Los dibujos de las notas ocupan toda la pantalla en horizontal
-• Temporizador con anillo, preciso al segundo, y nuevo widget Temporizador
-• Alarma clásica con resplandor naranja, elegible en Ajustes
-• Perfil principal
-• Copias con nombre
-• Notas con audio, imágenes y dibujos, ordenables y en la búsqueda
-• Notas en mosaico y mosaicos extra en Inicio
+• Temporizador con anillo y nuevo widget Temporizador
+• Notas con audio, imágenes y dibujos
+• Perfil principal y copias con nombre
 • Un tutorial por cada sección
-• Desde el detalle, Atrás vuelve a la hoja del día en Calendario
 </es-ES>
