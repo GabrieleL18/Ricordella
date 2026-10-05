@@ -44,6 +44,7 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Snooze
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -154,6 +155,9 @@ private fun ClassicAlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean
     val breath = if (reduced) 0.5f else rememberInfiniteTransition(label = "classic").animateFloat(
         0f, 1f, infiniteRepeatable(tween(1800, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse), label = "breath",
     ).value
+    val sparkle = if (reduced) 0.5f else rememberInfiniteTransition(label = "classicSparkle").animateFloat(
+        0f, 1f, infiniteRepeatable(tween(7000, easing = LinearEasing)), label = "sparkleT",
+    ).value
     val fade = remember { Animatable(1f) }
     // Fermata o posticipata: il bagliore si spegne e la schermata si chiude.
     LaunchedEffect(ringing) {
@@ -168,46 +172,77 @@ private fun ClassicAlarmScreen(alarm: AlarmRingService.Ringing, ringing: Boolean
             delay(1_000)
         }
     }
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
+    val colors = MaterialTheme.ricordellaColors
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Canvas(Modifier.fillMaxSize().graphicsLayer { alpha = fade.value }) {
             val radius = minOf(size.width, size.height) * (0.62f + 0.38f * breath) + size.height * 0.1f
             drawRect(
                 Brush.radialGradient(
-                    0f to BrandOrange,
-                    0.3f to BrandOrange.copy(alpha = 0.7f),
-                    0.65f to BrandOrange.copy(alpha = 0.18f),
+                    0f to BrandOrange.copy(alpha = 0.85f),
+                    0.3f to BrandOrange.copy(alpha = 0.55f),
+                    0.65f to BrandOrange.copy(alpha = 0.14f),
                     1f to Color.Transparent,
                     center = center,
                     radius = radius,
                 ),
             )
+            // Polvere magica: stelline a quattro punte che salgono piano e brillano ognuna col suo ritmo.
+            val random = java.util.Random(5)
+            repeat(32) {
+                val x = random.nextFloat() * size.width
+                val y0 = random.nextFloat()
+                val phase = random.nextFloat()
+                val big = random.nextFloat() < 0.3f
+                val rise = (y0 - sparkle * (0.3f + phase * 0.4f) + 1f) % 1f
+                val glow = 0.25f + 0.75f * (0.5f + 0.5f * sin((sparkle * 2f + phase) * 2 * PI).toFloat())
+                val tint = if (it % 3 == 0) Color(0xFFFFF6B0) else Color.White
+                drawFourPointStar(Offset(x, rise * size.height), size.width * (if (big) 0.022f else 0.012f), tint.copy(alpha = glow), rotation = sparkle * 90f)
+            }
         }
-        Column(
-            Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Column(Modifier.weight(1f).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                LiveTime(now, MaterialTheme.typography.displayLarge.copy(fontSize = 92.sp, fontWeight = FontWeight.SemiBold), Color.White)
-                Text(
-                    DateTexts.weekdayAndDay(now.toLocalDate()).replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White.copy(alpha = 0.85f),
-                )
-                if (alarm.title.isNotBlank()) Text(
-                    alarm.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 16.dp),
-                )
+        BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp, vertical = 16.dp)) {
+            val landscape = maxWidth > maxHeight
+            // Come i fogli delle note: un riquadro arrotondato e scuro che tiene l'ora leggibile sopra il bagliore.
+            val clock: @Composable (Modifier) -> Unit = { modifier ->
+                Column(
+                    modifier
+                        .background(Color.Black.copy(alpha = 0.45f), MaterialTheme.shapes.extraLarge)
+                        .padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    LiveTime(now, MaterialTheme.typography.displayLarge.copy(fontSize = if (landscape) 72.sp else 88.sp, fontWeight = FontWeight.SemiBold), Color.White)
+                    Text(
+                        DateTexts.weekdayAndDay(now.toLocalDate()).replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White.copy(alpha = 0.85f),
+                    )
+                    if (alarm.title.isNotBlank()) Text(
+                        alarm.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = colors.bolt,
+                        textAlign = TextAlign.Center,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 12.dp),
+                    )
+                }
             }
-            OutlinedButton(onClick = onSnooze, enabled = ringing, modifier = Modifier.padding(bottom = 16.dp)) {
-                Icon(Icons.Rounded.Snooze, contentDescription = null, tint = Color.White)
-                Text(trf("Posticipa %1\$s min", alarm.snoozeMinutes), color = Color.White, modifier = Modifier.padding(start = 8.dp))
+            val controls: @Composable (Modifier) -> Unit = { modifier ->
+                Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    FilledTonalButton(onClick = onSnooze, enabled = ringing) {
+                        Icon(Icons.Rounded.Snooze, contentDescription = null)
+                        Text(trf("Posticipa %1\$s min", alarm.snoozeMinutes), modifier = Modifier.padding(start = 8.dp))
+                    }
+                    SwipeToStop(enabled = ringing, ink = Color.White, onStop = onStop)
+                }
             }
-            SwipeToStop(enabled = ringing, ink = Color.White, onStop = onStop)
+            if (landscape) Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                clock(Modifier.weight(1f))
+                controls(Modifier.weight(1f))
+            } else Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) { clock(Modifier) }
+                controls(Modifier.fillMaxWidth().padding(top = 16.dp))
+            }
         }
     }
 }
@@ -314,17 +349,32 @@ private fun AlarmStylePreview(style: AlarmStyle, modifier: Modifier = Modifier) 
                 val breath = if (reduced) 0.5f else rememberInfiniteTransition(label = "previewBreath").animateFloat(
                     0f, 1f, infiniteRepeatable(tween(1800, easing = RicordellaMotion.EaseInOut), RepeatMode.Reverse), label = "previewBreathT",
                 ).value
+                val sparkle = if (reduced) 0.5f else rememberInfiniteTransition(label = "previewSparkle").animateFloat(
+                    0f, 1f, infiniteRepeatable(tween(7000, easing = LinearEasing)), label = "previewSparkleT",
+                ).value
+                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
                 Canvas(Modifier.fillMaxSize()) {
                     val radius = minOf(size.width, size.height) * (0.62f + 0.38f * breath) + size.height * 0.1f
                     drawRect(
                         Brush.radialGradient(
-                            0f to BrandOrange, 0.3f to BrandOrange.copy(alpha = 0.7f), 0.65f to BrandOrange.copy(alpha = 0.18f), 1f to Color.Transparent,
+                            0f to BrandOrange.copy(alpha = 0.85f), 0.3f to BrandOrange.copy(alpha = 0.55f), 0.65f to BrandOrange.copy(alpha = 0.14f), 1f to Color.Transparent,
                             center = center, radius = radius,
                         ),
                     )
+                    val random = java.util.Random(5)
+                    repeat(14) {
+                        val x = random.nextFloat() * size.width
+                        val y0 = random.nextFloat()
+                        val phase = random.nextFloat()
+                        val rise = (y0 - sparkle * (0.3f + phase * 0.4f) + 1f) % 1f
+                        val glow = 0.25f + 0.75f * (0.5f + 0.5f * sin((sparkle * 2f + phase) * 2 * PI).toFloat())
+                        drawFourPointStar(Offset(x, rise * size.height), size.width * 0.03f, (if (it % 3 == 0) Color(0xFFFFF6B0) else Color.White).copy(alpha = glow), rotation = sparkle * 90f)
+                    }
                 }
-                Box(Modifier.align(Alignment.Center)) {
-                    LiveTime(remember { LocalDateTime.now() }, MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold), Color.White)
+                Box(
+                    Modifier.align(Alignment.Center).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(16.dp)).padding(horizontal = 10.dp, vertical = 8.dp),
+                ) {
+                    LiveTime(remember { LocalDateTime.now() }, MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold), Color.White)
                 }
             }
             AlarmStyle.MAGIC -> {

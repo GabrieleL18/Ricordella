@@ -41,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -112,6 +114,7 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
         focusLine = fresh.id
     }
 
+    val landscapeDrawing = note.isDrawing && LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     DetailScaffold(
         title = if (note.isDrawing) tr("Disegno") else if (note.isList) (if (note.prices) tr("Lista della spesa") else tr("Lista")) else tr("Nota"),
         onBack = onBack,
@@ -157,16 +160,12 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                 .then(if (note.isDrawing) Modifier else Modifier.verticalScroll(rememberScrollState()))
                 .contentWidth()
                 .padding(horizontal = RicordellaDimensions.screenPadding)
-                .padding(bottom = 32.dp),
+                .padding(bottom = if (landscapeDrawing) 8.dp else 32.dp),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             val tone = note.tone
             val fieldColors = noteFieldColors(tone)
-            // Un foglio colorato come il tipo di nota: titolo grande, poi testo o voci, tutto senza bordi.
-            Column(
-                Modifier.fillMaxWidth().background(tone.container, MaterialTheme.shapes.extraLarge).padding(RicordellaDimensions.spaceS),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
+            val titleField: @Composable () -> Unit = {
                 TextField(
                     value = note.title,
                     onValueChange = { v -> edit { it.copy(title = v) } },
@@ -177,8 +176,15 @@ fun NoteEditScreen(route: NoteRoute, onBack: () -> Unit) {
                     colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                 )
+            }
+            // Un foglio colorato come il tipo di nota: titolo grande, poi testo o voci, tutto senza bordi.
+            Column(
+                Modifier.fillMaxWidth().background(tone.container, MaterialTheme.shapes.extraLarge).padding(RicordellaDimensions.spaceS),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                if (!landscapeDrawing) titleField()
                 if (note.isDrawing) {
-                    DrawingPad(note.id, note.drawing, tone) { uri -> edit { it.copy(drawing = uri, updatedAt = System.currentTimeMillis()) } }
+                    DrawingPad(note.id, note.drawing, tone, header = if (landscapeDrawing) titleField else null) { uri -> edit { it.copy(drawing = uri, updatedAt = System.currentTimeMillis()) } }
                 } else if (!note.isList) {
                     TextField(
                         value = note.text,

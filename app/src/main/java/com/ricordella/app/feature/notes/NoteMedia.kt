@@ -25,6 +25,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -324,7 +328,8 @@ private fun inkPath(points: List<Offset>, w: Float, h: Float): Path = Path().app
  * Si salva da sola come PNG (un attimo dopo ogni tratto); [onSaved] riceve l'URI del file.
  */
 @Composable
-fun DrawingPad(noteId: String, existing: String?, tone: Tone, onSaved: (String) -> Unit) {
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+fun DrawingPad(noteId: String, existing: String?, tone: Tone, header: (@Composable () -> Unit)? = null, onSaved: (String) -> Unit) {
     val context = LocalContext.current
     val strokes = remember { mutableStateListOf<InkStroke>() }
     val current = remember { mutableStateListOf<Offset>() }
@@ -381,9 +386,35 @@ fun DrawingPad(noteId: String, existing: String?, tone: Tone, onSaved: (String) 
         revision++
     }
 
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        // In orizzontale il foglio prende tutta l'altezza disponibile e gli strumenti stanno di fianco.
+        val landscape = maxWidth > maxHeight && maxHeight != androidx.compose.ui.unit.Dp.Infinity
+        val tools: @Composable () -> Unit = {
+            Pens.forEachIndexed { i, color ->
+                Box(
+                    Modifier.size(32.dp).background(color, CircleShape)
+                        .border(BorderStroke(if (!eraser && pen == i) 3.dp else 1.dp, if (!eraser && pen == i) tone.content else tone.content.copy(alpha = 0.3f)), CircleShape)
+                        .clickable { pen = i; eraser = false },
+                )
+            }
+            Widths.forEachIndexed { i, _ ->
+                Box(Modifier.size(32.dp).clip(CircleShape).background(if (width == i) tone.solid.copy(alpha = 0.25f) else Color.Transparent).clickable { width = i }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.size((6 + i * 6).dp).background(tone.content, CircleShape))
+                }
+            }
+            IconButton(onClick = { eraser = !eraser }) {
+                Icon(Icons.Rounded.AutoFixNormal, contentDescription = tr("Gomma"), tint = if (eraser) tone.solid else tone.content)
+            }
+            IconButton(onClick = { if (strokes.isNotEmpty()) { strokes.removeAt(strokes.lastIndex); revision++ } }, enabled = strokes.isNotEmpty()) {
+                Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = tr("Annulla"), tint = tone.content.copy(alpha = if (strokes.isNotEmpty()) 1f else 0.3f))
+            }
+            IconButton(onClick = { strokes.clear(); base = null; revision++ }) {
+                Icon(Icons.Rounded.DeleteSweep, contentDescription = tr("Cancella tutto"), tint = tone.content)
+            }
+        }
+        val paper: @Composable (Modifier) -> Unit = { modifier ->
         Box(
-            Modifier.fillMaxWidth().aspectRatio(PAPER_W.toFloat() / PAPER_H).clip(RoundedCornerShape(20.dp)).background(Color.White).onSizeChanged { size = it },
+            modifier.aspectRatio(PAPER_W.toFloat() / PAPER_H).clip(RoundedCornerShape(20.dp)).background(Color.White).onSizeChanged { size = it },
         ) {
             Canvas(
                 Modifier.fillMaxSize()
@@ -408,28 +439,16 @@ fun DrawingPad(noteId: String, existing: String?, tone: Tone, onSaved: (String) 
                 if (current.isNotEmpty()) ink(current.toList(), if (eraser) Color.White else Pens[pen], Widths[width] * if (eraser) 3 else 1)
             }
         }
-        Row(Modifier.horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pens.forEachIndexed { i, color ->
-                Box(
-                    Modifier.size(32.dp).background(color, CircleShape)
-                        .border(BorderStroke(if (!eraser && pen == i) 3.dp else 1.dp, if (!eraser && pen == i) tone.content else tone.content.copy(alpha = 0.3f)), CircleShape)
-                        .clickable { pen = i; eraser = false },
-                )
+        }
+        if (landscape) Row(Modifier.fillMaxWidth().height(maxHeight), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+            paper(Modifier.fillMaxHeight())
+            Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                header?.invoke()
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { tools() }
             }
-            Widths.forEachIndexed { i, _ ->
-                Box(Modifier.size(32.dp).clip(CircleShape).background(if (width == i) tone.solid.copy(alpha = 0.25f) else Color.Transparent).clickable { width = i }, contentAlignment = Alignment.Center) {
-                    Box(Modifier.size((6 + i * 6).dp).background(tone.content, CircleShape))
-                }
-            }
-            IconButton(onClick = { eraser = !eraser }) {
-                Icon(Icons.Rounded.AutoFixNormal, contentDescription = tr("Gomma"), tint = if (eraser) tone.solid else tone.content)
-            }
-            IconButton(onClick = { if (strokes.isNotEmpty()) { strokes.removeAt(strokes.lastIndex); revision++ } }, enabled = strokes.isNotEmpty()) {
-                Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = tr("Annulla"), tint = tone.content.copy(alpha = if (strokes.isNotEmpty()) 1f else 0.3f))
-            }
-            IconButton(onClick = { strokes.clear(); base = null; revision++ }) {
-                Icon(Icons.Rounded.DeleteSweep, contentDescription = tr("Cancella tutto"), tint = tone.content)
-            }
+        } else Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+            paper(Modifier.fillMaxWidth())
+            Row(Modifier.horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { tools() }
         }
     }
 }
