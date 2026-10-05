@@ -85,6 +85,15 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
 val AllNews: List<NewsRelease>
     get() = listOf(
         NewsRelease(
+            versionCode = 9,
+            versionName = "0.5.2",
+            date = java.time.LocalDate.of(2026, 10, 5),
+            items = listOf(
+                NewsItem(Icons.Rounded.Alarm, { it.coral }, tr("Sveglia classica più magica"), tr("Stelline di polvere magica sopra il bagliore arancione e una grafica in linea con il resto dell'app, anche in orizzontale.")),
+                NewsItem(Icons.Rounded.Mic, { it.lavender }, tr("Disegno in orizzontale"), tr("Con il telefono girato il foglio occupa tutto lo spazio e gli strumenti stanno di fianco.")),
+            ),
+        ),
+        NewsRelease(
             versionCode = 8,
             versionName = "0.5.1",
             date = java.time.LocalDate.of(2026, 10, 5),

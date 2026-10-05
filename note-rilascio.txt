@@ -1,5 +1,7 @@
 <it-IT>
 Novità:
+• Sveglia classica più magica, con stelline e grafica in linea con l'app
+• Disegno delle note ora a tutto schermo in orizzontale
 • Timer con anello, preciso al secondo, e nuovo widget Timer
 • Sveglia classica con sfumatura arancione, da scegliere nelle Impostazioni
 • Profilo principale
@@ -11,6 +13,8 @@ Novità:
 </it-IT>
 <en-US>
 What's new:
+• Classic alarm with a magic touch: sparkles and a look that matches the app
+• Note drawings now use the full screen in landscape
 • Timer with a ring, accurate to the second, and a new Timer widget
 • Classic alarm with an orange glow, selectable in Settings
 • Main profile
@@ -22,6 +26,8 @@ What's new:
 </en-US>
 <de-DE>
 Neu:
+• Klassischer Wecker mit Zauber: Funkeln und ein Look passend zur App
+• Notizzeichnungen nutzen im Querformat den ganzen Bildschirm
 • Timer mit Ring, sekundengenau, und neues Timer-Widget
 • Klassischer Wecker mit orangefarbenem Leuchten, in den Einstellungen wählbar
 • Hauptprofil
@@ -33,6 +39,8 @@ Neu:
 </de-DE>
 <fr-FR>
 Nouveautés :
+• Réveil classique plus magique : étincelles et un look cohérent avec l'appli
+• Les dessins de notes occupent tout l'écran en paysage
 • Minuteur avec anneau, précis à la seconde, et nouveau widget Minuteur
 • Réveil classique à lueur orange, à choisir dans les Réglages
 • Profil principal
@@ -44,6 +52,8 @@ Nouveautés :
 </fr-FR>
 <es-ES>
 Novedades:
+• Alarma clásica más mágica: destellos y un aspecto acorde con la app
+• Los dibujos de las notas ocupan toda la pantalla en horizontal
 • Temporizador con anillo, preciso al segundo, y nuevo widget Temporizador
 • Alarma clásica con resplandor naranja, elegible en Ajustes
 • Perfil principal
