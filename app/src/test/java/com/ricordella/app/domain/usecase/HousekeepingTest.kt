@@ -41,6 +41,27 @@ class HousekeepingTest {
     }
 
     @Test
+    fun parsesIcsEvents() {
+        val ics = "BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nSUMMARY:Visita dal dentista\r\nDTSTART:20261001T080000Z\r\n" +
+            "DESCRIPTION:Portare\\, la tessera\r\n  sanitaria\r\nBEGIN:VALARM\r\nTRIGGER:-PT30M\r\nEND:VALARM\r\nEND:VEVENT\r\n" +
+            "BEGIN:VEVENT\r\nSUMMARY:Ferie\r\nDTSTART;VALUE=DATE:20261220\r\nDTEND;VALUE=DATE:20261223\r\nEND:VEVENT\r\n" +
+            "BEGIN:VEVENT\r\nSUMMARY:Passato\r\nDTSTART;VALUE=DATE:20200101\r\nEND:VEVENT\r\n" +
+            "BEGIN:VEVENT\r\nSUMMARY:Settimanale\r\nDTSTART:20200105T090000\r\nRRULE:FREQ=WEEKLY\r\nEND:VEVENT\r\nEND:VCALENDAR"
+        val rome = java.time.ZoneId.of("Europe/Rome")
+        val drafts = CalendarImporter.parseIcs(ics, rome, today, java.time.Instant.EPOCH)
+        assertEquals(listOf("Visita dal dentista", "Ferie", "Settimanale"), drafts.map { it.reminder.title })
+        val visit = drafts[0].reminder
+        assertEquals(LocalDate.of(2026, 10, 1), visit.dueDate)
+        assertEquals(java.time.LocalTime.of(10, 0), visit.dueTime)
+        assertEquals(30, visit.notifyOffsetMinutes)
+        assertEquals("Portare, la tessera sanitaria", visit.description)
+        assertEquals(ReminderType.MEDICAL_VISIT, visit.type)
+        assertNull(drafts[1].reminder.dueTime)
+        assertEquals(LocalDate.of(2026, 12, 22), drafts[1].reminder.endDate)
+        assertEquals(RecurrenceFrequency.WEEKLY, drafts[2].recurrence!!.frequency)
+    }
+
+    @Test
     fun backupIntervalIsConfigurable() {
         val weekly = AppSettings(backupIntervalDays = 7, backupCheckEpochDay = today.minusDays(7).toEpochDay())
         assertTrue(Housekeeping.isBackupDue(weekly, today))

@@ -1530,3 +1530,4 @@ Voci da spuntare ||| Éléments à cocher
 min ||| min
 Un altro timer ||| Un autre minuteur
 Suona alle %1$s ||| Sonne à %1$s
+Importa da un file .ics ||| Importer depuis un fichier .ics

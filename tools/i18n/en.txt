@@ -1605,3 +1605,4 @@ Voci da spuntare ||| Items to check off
 min ||| min
 Un altro timer ||| Another timer
 Suona alle %1$s ||| Rings at %1$s
+Importa da un file .ics ||| Import from a .ics file

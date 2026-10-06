@@ -2,6 +2,7 @@ package com.ricordella.app.data.calendar
 
 import android.content.ContentUris
 import android.content.Context
+import android.net.Uri
 import android.provider.CalendarContract
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.data.local.dao.ReminderDao
@@ -18,6 +19,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -81,9 +83,21 @@ class CalendarImporter(
     }
 
     /** Importa i prossimi 12 mesi; restituisce quanti promemoria sono stati creati. */
-    suspend fun import(accounts: List<Account>, mode: ConflictMode): Int {
+    suspend fun import(accounts: List<Account>, mode: ConflictMode): Int =
+        save(withContext(Dispatchers.IO) { accounts.flatMap { readEvents(it) } }, mode)
+
+    /** Importa gli eventi di un file .ics (esportato da qualsiasi calendario); niente permessi. */
+    suspend fun importIcs(uri: Uri, mode: ConflictMode): Int {
+        val drafts = withContext(Dispatchers.IO) {
+            val text = resolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } ?: error("file illeggibile")
+            parseIcs(text, time.zone, time.today(), time.now())
+        }
+        return save(drafts, mode)
+    }
+
+    private suspend fun save(drafts: List<ReminderDraft>, mode: ConflictMode): Int {
         var count = 0
-        for (draft in withContext(Dispatchers.IO) { accounts.flatMap { readEvents(it) } }) {
+        for (draft in drafts) {
             val same = reminderDao.findSameIds(draft.reminder.title, draft.reminder.dueDate)
             when {
                 same.isEmpty() || mode == ConflictMode.KEEP_BOTH -> Unit
@@ -262,6 +276,87 @@ class CalendarImporter(
             val text = (title + " " + description.orEmpty()).lowercase()
             return typeKeywords.firstOrNull { (_, words) -> words.any { it in text } }?.first ?: ReminderType.EVENT
         }
+
+        /**
+         * Legge i VEVENT di un file iCalendar. Si tengono gli eventi futuri e quelli ricorrenti;
+         * gli eventi singoli già passati si scartano (come l'import dal telefono, che parte da oggi).
+         * ponytail: niente VTIMEZONE (si usa il TZID se è un fuso Java valido, altrimenti il fuso
+         * del telefono), niente EXDATE/RDATE; estendere se serve.
+         */
+        fun parseIcs(text: String, zone: ZoneId, today: LocalDate, now: Instant): List<ReminderDraft> {
+            val result = mutableListOf<ReminderDraft>()
+            var event: MutableMap<String, Pair<Map<String, String>, String>>? = null
+            var alarmMinutes: Int? = null
+            for (line in text.replace(Regex("\r?\n[ \t]"), "").lines()) {
+                val colon = line.indexOf(':')
+                if (colon < 0) continue
+                val head = line.substring(0, colon).split(';')
+                val name = head[0].uppercase()
+                val value = line.substring(colon + 1)
+                when {
+                    name == "BEGIN" && value == "VEVENT" -> { event = mutableMapOf(); alarmMinutes = null }
+                    name == "END" && value == "VEVENT" -> {
+                        event?.let { icsDraft(it, alarmMinutes, zone, today, now) }?.let(result::add)
+                        event = null
+                    }
+                    event == null -> Unit
+                    name == "TRIGGER" -> alarmMinutes = parseTrigger(value)
+                    else -> event.putIfAbsent(name, head.drop(1).mapNotNull { p -> p.split('=', limit = 2).takeIf { it.size == 2 } }.associate { it[0].uppercase() to it[1] } to value)
+                }
+            }
+            return result
+        }
+
+        private fun icsDraft(p: Map<String, Pair<Map<String, String>, String>>, alert: Int?, zone: ZoneId, today: LocalDate, now: Instant): ReminderDraft? {
+            if (p["STATUS"]?.second.equals("CANCELLED", true)) return null
+            val (startParams, startValue) = p["DTSTART"] ?: return null
+            val allDay = startParams["VALUE"] == "DATE" || startValue.length == 8
+            val start = icsDateTime(startValue, startParams["TZID"], zone) ?: return null
+            val end = p["DTEND"]?.let { icsDateTime(it.second, it.first["TZID"], zone) }
+            val first = start.toLocalDate()
+            // Un evento "tutto il giorno" finisce il giorno prima della data di DTEND.
+            val lastDay = end?.toLocalDate()?.let { if (allDay) it.minusDays(1) else it } ?: first
+            val rrule = p["RRULE"]?.second
+            if (rrule == null && lastDay.isBefore(today)) return null
+
+            fun text(key: String) = p[key]?.second?.let(::unescapeIcs)?.trim()?.takeIf { it.isNotEmpty() }
+            val title = text("SUMMARY") ?: "Evento"
+            val notes = text("DESCRIPTION")
+            val location = text("LOCATION")
+            val type = guessType(title, notes)
+            val reminder = Reminder(
+                title = title,
+                description = listOfNotNull(notes, location?.let { "Luogo: $it" }).joinToString("\n").ifEmpty { null },
+                type = type,
+                dueDate = first,
+                dueTime = if (allDay) null else start.toLocalTime(),
+                endDate = lastDay.takeIf { it.isAfter(first) },
+                category = CATEGORY_OTHER,
+                notifyOffsetMinutes = alert ?: 0,
+                createdAt = now,
+                updatedAt = now,
+            )
+            val recurrence = parseRRule(rrule, first)
+                ?: RecurrenceRule(frequency = RecurrenceFrequency.YEARLY, startDate = first).takeIf { type == ReminderType.BIRTHDAY }
+            return ReminderDraft(reminder, recurrence, emptySet(), emptySet())
+        }
+
+        /** "20261225", "20261225T100000" (ora locale) o "...Z" (UTC); TZID se è un fuso valido. */
+        private fun icsDateTime(value: String, tzid: String?, phoneZone: ZoneId): LocalDateTime? = runCatching {
+            if (value.length == 8) return@runCatching LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE).atStartOfDay()
+            val local = LocalDateTime.parse(value.removeSuffix("Z"), DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
+            val source = if (value.endsWith("Z")) ZoneOffset.UTC else tzid?.let { runCatching { ZoneId.of(it) }.getOrNull() } ?: phoneZone
+            local.atZone(source).withZoneSameInstant(phoneZone).toLocalDateTime()
+        }.getOrNull()
+
+        /** "-PT15M", "-PT1H", "-P1D" → minuti di anticipo; nulla se l'allarme è dopo l'evento. */
+        private fun parseTrigger(value: String): Int? {
+            val m = Regex("^-P(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?)?$").find(value.trim()) ?: return null
+            val (d, h, min) = m.destructured
+            return (d.toIntOrNull() ?: 0) * 1440 + (h.toIntOrNull() ?: 0) * 60 + (min.toIntOrNull() ?: 0)
+        }
+
+        private fun unescapeIcs(s: String) = s.replace("\\n", "\n").replace("\\N", "\n").replace("\\,", ",").replace("\\;", ";").replace("\\\\", "\\")
 
         /**
          * Converte la parte semplice di una RRULE (FREQ, INTERVAL, BYDAY, UNTIL).

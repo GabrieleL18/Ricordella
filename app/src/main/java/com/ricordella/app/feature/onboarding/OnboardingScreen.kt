@@ -113,6 +113,14 @@ class CalendarImportViewModel(
 
     fun setMode(mode: CalendarImporter.ConflictMode) = _state.update { it.copy(mode = mode) }
 
+    fun importIcs(uri: Uri) {
+        _state.update { it.copy(importing = true, error = false) }
+        viewModelScope.launch {
+            val count = runCatching { importer.importIcs(uri, _state.value.mode) }.getOrNull()
+            _state.update { it.copy(importing = false, imported = count, error = count == null) }
+        }
+    }
+
     fun import() {
         val accounts = _state.value.selected.toList().ifEmpty { return }
         _state.update { it.copy(importing = true, error = false) }
@@ -201,6 +209,14 @@ private fun Welcome(onNext: () -> Unit) {
 fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, doneLabel: String = tr("Inizia a usare Remindella")) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission(), viewModel::onPermission)
+    val pickIcs = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(viewModel::importIcs) }
+    val icsButton = @Composable {
+        OutlinedButton(onClick = { pickIcs.launch(arrayOf("text/calendar", "application/octet-stream", "*/*")) }, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Rounded.FolderOpen, contentDescription = null)
+            Spacer(Modifier.width(RicordellaDimensions.spaceS))
+            Text(tr("Importa da un file .ics"))
+        }
+    }
     val tone = MaterialTheme.ricordellaColors.lavender
     Column(
         Modifier
@@ -248,8 +264,13 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                     icon = Icons.Rounded.CalendarMonth,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                icsButton()
+                if (state.error) Text(tr("Import non riuscito, riprova."), color = MaterialTheme.colorScheme.error)
             }
-            accounts.isEmpty() -> Text(tr("Sul telefono non ci sono calendari da importare."), textAlign = TextAlign.Center)
+            accounts.isEmpty() -> {
+                Text(tr("Sul telefono non ci sono calendari da importare."), textAlign = TextAlign.Center)
+                icsButton()
+            }
             else -> {
                 val colors = MaterialTheme.ricordellaColors
                 Text(tr("Da quali calendari? Puoi sceglierne più di uno."), style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
@@ -290,6 +311,7 @@ fun CalendarImportStep(viewModel: CalendarImportViewModel, onDone: () -> Unit, d
                 )
                 if (state.error) Text(tr("Import non riuscito, riprova."), color = MaterialTheme.colorScheme.error)
                 PushButton(tr("Importa eventi"), onClick = viewModel::import, enabled = state.selected.isNotEmpty(), icon = Icons.Rounded.Download, modifier = Modifier.fillMaxWidth())
+                icsButton()
             }
         }
         TextButton(onClick = onDone, enabled = !state.importing) { Text(tr("Salta per ora")) }

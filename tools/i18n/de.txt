@@ -1530,3 +1530,4 @@ Voci da spuntare ||| Einträge zum Abhaken
 min ||| Min.
 Un altro timer ||| Noch ein Timer
 Suona alle %1$s ||| Klingelt um %1$s
+Importa da un file .ics ||| Aus .ics-Datei importieren
