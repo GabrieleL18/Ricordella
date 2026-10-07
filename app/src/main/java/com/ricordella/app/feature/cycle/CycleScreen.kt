@@ -3,6 +3,16 @@ package com.ricordella.app.feature.cycle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.PathEffect
+import com.ricordella.app.domain.model.CycleHistoryRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -239,39 +249,52 @@ private fun ProfileCard(
         val history = CycleCalendar.history(profile, log, today)
         if (history.isNotEmpty()) {
             SectionHeader(tr("Cronologia (ultimi 2 anni)"))
-            Text(
-                tr("Una riga per ogni mestruazione, dalla più recente: quando è iniziata e finita, quanti giorni è durata e a quanti giorni dall'inizio della precedente è arrivata."),
-                style = MaterialTheme.typography.bodySmall,
-                color = tone.content,
-            )
+            // Scala comune: la barra più lunga è il ciclo più lungo (o quello impostato).
+            val scale = maxOf(profile.cycleDays, history.maxOf { maxOf(it.days, it.cycleLength ?: 0) }).toFloat()
             history.forEach { row ->
-                val last = CycleCalendar.lastDay(row.entry, profile)
-                Row(
-                    Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest, MaterialTheme.shapes.medium).padding(start = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
-                        Text(
-                            trf("%1\$s → %2\$s", DateTexts.date(row.entry.start, settings.dateFormat, today), DateTexts.date(last, settings.dateFormat, today)),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                        Text(
-                            trf("Durata: %1\$s giorni", row.days) + (if (row.entry.end == null && !last.isBefore(today)) " · " + tr("in corso") else ""),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                        Text(
-                            row.cycleLength?.let { trf("Arrivata %1\$s giorni dopo l'inizio della precedente", it) } ?: tr("Primo ciclo registrato"),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    IconButton(onClick = { onRemoveEntry(row.entry) }) {
-                        Icon(Icons.Rounded.Close, contentDescription = tr("Elimina"))
-                    }
-                }
+                HistoryBar(row, profile, scale, today, onRemove = { onRemoveEntry(row.entry) })
             }
         }
         TextButton(onClick = onDelete) { Text(tr("Elimina il ciclo"), color = MaterialTheme.colorScheme.error) }
+    }
+}
+
+/** Una mestruazione: tratto pieno = giorni di mestruazione, pista chiara = giorni dal ciclo precedente, tratteggio = ciclo impostato. */
+@Composable
+private fun HistoryBar(row: CycleHistoryRow, profile: CycleProfile, scale: Float, today: LocalDate, onRemove: () -> Unit) {
+    val tone = MaterialTheme.ricordellaColors.coral
+    val settings = LocalAppSettings.current
+    val last = CycleCalendar.lastDay(row.entry, profile)
+    val ongoing = row.entry.end == null && !last.isBefore(today)
+    val dash = MaterialTheme.colorScheme.onSurfaceVariant
+    Row(
+        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest, MaterialTheme.shapes.medium).padding(start = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(DateTexts.date(row.entry.start, settings.dateFormat, today), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Text(
+                    trf("Durata: %1\$s giorni", row.days) + (if (ongoing) " · " + tr("in corso") else ""),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    Modifier.weight(1f).height(14.dp).clip(RoundedCornerShape(7.dp)).background(tone.container).drawBehind {
+                        val track = (row.cycleLength ?: 0) / scale * size.width
+                        drawRect(tone.solid.copy(alpha = 0.25f), size = Size(track, size.height))
+                        drawRect(tone.solid, size = Size(row.days / scale * size.width, size.height))
+                        val x = profile.cycleDays / scale * size.width
+                        drawLine(dash, Offset(x, 0f), Offset(x, size.height), strokeWidth = 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 4f)))
+                    },
+                )
+                Text(row.cycleLength?.toString() ?: "–", style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(24.dp))
+            }
+        }
+        IconButton(onClick = onRemove, modifier = Modifier.size(40.dp)) {
+            Icon(Icons.Rounded.Close, contentDescription = tr("Elimina"), modifier = Modifier.size(18.dp))
+        }
     }
 }
 

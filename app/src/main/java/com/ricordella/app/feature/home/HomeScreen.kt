@@ -147,7 +147,8 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val scope = rememberCoroutineScope()
     // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
     val showExtras = LocalAppSettings.current.showExtrasOnHome
-    val attentionAt = 4 + (if (showExtras) 1 else 0) + (if (resolutions != null) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
+    // Prima di "Da guardare": saluto, inserimento rapido, permesso (+ extra, + stato vuoto).
+    val attentionAt = 3 + (if (showExtras) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
     val todayAt = attentionAt + if (state.attention.isNotEmpty()) 1 + state.attention.size else 0
     val upcomingAt = todayAt + 2
     val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
@@ -170,22 +171,6 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
             if (showExtras) item(key = "extras") { HomeExtras(navigator) }
             item(key = "permission") { NotificationPermissionCard() }
-            item(key = "backup") {
-                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
-            }
-            resolutions?.let { (prompt, year) ->
-                item(key = "resolutions") {
-                    ResolutionsCard(
-                        prompt = prompt,
-                        year = year,
-                        count = LocalAppSettings.current.resolutions.count { it.year == year },
-                        onOpen = { navigator.openResolutions(year, recap = prompt == ResolutionsPrompt.RECAP) },
-                        onLater = { viewModel.onResolutionsLater(prompt) },
-                        onSkip = { viewModel.onResolutionsSkip(year) },
-                        modifier = Modifier.animateItem(),
-                    )
-                }
-            }
 
             if (!state.isLoading && state.isEmpty) {
                 item(key = "empty") {
@@ -250,6 +235,24 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         onToggleComplete = { complete(entry) },
                         dateMode = ReminderDateMode.RELATIVE,
                         modifier = Modifier.animateItem().reveal(tracker, "upcoming-" + entry.reminder.id, index + 3),
+                    )
+                }
+            }
+
+            // Avvisi di servizio in fondo: non coprono il contenuto.
+            item(key = "backup") {
+                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
+            }
+            resolutions?.let { (prompt, year) ->
+                item(key = "resolutions") {
+                    ResolutionsCard(
+                        prompt = prompt,
+                        year = year,
+                        count = LocalAppSettings.current.resolutions.count { it.year == year },
+                        onOpen = { navigator.openResolutions(year, recap = prompt == ResolutionsPrompt.RECAP) },
+                        onLater = { viewModel.onResolutionsLater(prompt) },
+                        onSkip = { viewModel.onResolutionsSkip(year) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
