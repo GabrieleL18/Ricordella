@@ -1570,4 +1570,10 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Scegli quali sezioni vedere" to "Wähle, welche Bereiche angezeigt werden",
     "Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola." to "Erinnerungen, Termine, Notizen, Dinge und Personen sind immer da. Schaltest du einen Bereich aus, bleiben seine Daten erhalten: schalte ihn wieder ein, um sie zu sehen.",
     "Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat." to "Ohne Nummer und E-Mail geht die Nachricht über WhatsApp: Es öffnet sich mit dem fertigen Text und du wählst den Chat.",
+    "Appuntamenti con i clienti" to "Kundentermine",
+    "Aggiungi i clienti a un evento e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco." to "Füge Kunden zu einem Termin hinzu und erinnere sie mit einem Tipp per WhatsApp, SMS oder E-Mail.",
+    "Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a mano. All'orario scelto arriva una notifica con «Invia messaggio»: si apre l'app giusta con il testo già scritto, anche per più clienti insieme. Il testo lo cambi nelle Impostazioni e contiene sempre data e ora." to "Schalte im Termin «Termin mit Kunden» ein und füge sie aus den Kontakten oder manuell hinzu. Zur gewählten Zeit kommt eine Benachrichtigung mit «Nachricht senden»: Die passende App öffnet sich mit fertigem Text, auch für mehrere Kunden. Den Text änderst du in den Einstellungen; Datum und Uhrzeit sind immer enthalten.",
+    "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Wähle in den Einstellungen die Farbe von Aufgaben, Terminen, Fristen und Zahlungen.",
+    "Solo le sezioni che usi" to "Nur die Bereiche, die du nutzt",
+    "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Schalte Wecker, Timer, Tränke, Urlaube, Arzttermine, Ausgaben, Zyklus oder Kundentermine in den Einstellungen aus: Sie verschwinden aus Hinzufügen und Start, die Daten bleiben.",
 )

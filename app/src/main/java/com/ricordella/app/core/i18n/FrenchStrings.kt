@@ -1570,4 +1570,10 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Scegli quali sezioni vedere" to "Choisis les sections à afficher",
     "Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola." to "Rappels, événements, notes, objets et personnes sont toujours là. Une section désactivée garde ses données : réactive-la pour les retrouver.",
     "Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat." to "Sans numéro ni e-mail, le message part par WhatsApp : il s'ouvre avec le texte prêt et tu choisis la discussion.",
+    "Appuntamenti con i clienti" to "Rendez-vous clients",
+    "Aggiungi i clienti a un evento e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco." to "Ajoute des clients à un événement et rappelle-leur le rendez-vous par WhatsApp, SMS ou e-mail en un geste.",
+    "Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a mano. All'orario scelto arriva una notifica con «Invia messaggio»: si apre l'app giusta con il testo già scritto, anche per più clienti insieme. Il testo lo cambi nelle Impostazioni e contiene sempre data e ora." to "Dans l'événement, active « Rendez-vous avec des clients » et ajoute-les depuis les contacts ou à la main. À l'heure choisie, une notification « Envoyer le message » arrive : la bonne app s'ouvre avec le texte déjà écrit, même pour plusieurs clients. Le texte se modifie dans les Réglages et contient toujours la date et l'heure.",
+    "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Choisis la couleur des tâches, événements, échéances et paiements dans les Réglages.",
+    "Solo le sezioni che usi" to "Seulement les sections utiles",
+    "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Désactive réveils, minuteurs, potions, vacances, visites, dépenses, cycle ou rendez-vous dans les Réglages : ils disparaissent d'Ajouter et de l'Accueil, les données restent.",
 )

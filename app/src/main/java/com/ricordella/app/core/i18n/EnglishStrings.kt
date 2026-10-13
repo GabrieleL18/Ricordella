@@ -1603,4 +1603,10 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Scegli quali sezioni vedere" to "Choose which sections to show",
     "Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola." to "Reminders, events, notes, things and people are always there. Turning a section off keeps its data: turn it back on to find it again.",
     "Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat." to "Without a number or email the message goes via WhatsApp: it opens with the text ready and you pick the chat.",
+    "Appuntamenti con i clienti" to "Client appointments",
+    "Aggiungi i clienti a un evento e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco." to "Add clients to an event and remind them of the appointment via WhatsApp, SMS or email in one tap.",
+    "Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a mano. All'orario scelto arriva una notifica con «Invia messaggio»: si apre l'app giusta con il testo già scritto, anche per più clienti insieme. Il testo lo cambi nelle Impostazioni e contiene sempre data e ora." to "In the event turn on «Appointment with clients» and add them from your contacts or by hand. At the chosen time a notification with «Send message» arrives: the right app opens with the text already written, even for several clients at once. Change the text in Settings; it always includes date and time.",
+    "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Pick the colour of tasks, events, deadlines and payments in Settings.",
+    "Solo le sezioni che usi" to "Only the sections you use",
+    "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Turn off alarms, timers, potions, holidays, visits, expenses, cycle or appointments in Settings: they disappear from Add and Home, your data stays.",
 )

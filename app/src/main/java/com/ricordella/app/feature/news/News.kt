@@ -85,6 +85,20 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
 val AllNews: List<NewsRelease>
     get() = listOf(
         NewsRelease(
+            versionCode = 10,
+            versionName = "0.6.0",
+            date = java.time.LocalDate.of(2026, 10, 13),
+            items = listOf(
+                NewsItem(
+                    Icons.Rounded.Person, { it.cyan }, tr("Appuntamenti con i clienti"),
+                    tr("Aggiungi i clienti a un evento e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco."),
+                    tr("Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a mano. All'orario scelto arriva una notifica con «Invia messaggio»: si apre l'app giusta con il testo già scritto, anche per più clienti insieme. Il testo lo cambi nelle Impostazioni e contiene sempre data e ora."),
+                ),
+                NewsItem(Icons.Rounded.CalendarMonth, { it.lavender }, tr("Colori del calendario"), tr("Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni.")),
+                NewsItem(Icons.Rounded.Widgets, { it.mint }, tr("Solo le sezioni che usi"), tr("Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano.")),
+            ),
+        ),
+        NewsRelease(
             versionCode = 9,
             versionName = "0.5.2",
             date = java.time.LocalDate.of(2026, 10, 5),

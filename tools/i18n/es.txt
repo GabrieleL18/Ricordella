@@ -1566,3 +1566,9 @@ Sezioni ||| Secciones
 Scegli quali sezioni vedere ||| Elige qué secciones ver
 Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Recordatorios, eventos, notas, cosas y personas siempre están. Al desactivar una sección sus datos se conservan: actívala de nuevo para verlos.
 Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat. ||| Sin número ni correo el mensaje va por WhatsApp: se abre con el texto listo y tú eliges el chat.
+Appuntamenti con i clienti ||| Citas con clientes
+Aggiungi i clienti a un evento e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco. ||| Añade clientes a un evento y recuérdales la cita por WhatsApp, SMS o correo con un toque.
+Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a mano. All'orario scelto arriva una notifica con «Invia messaggio»: si apre l'app giusta con il testo già scritto, anche per più clienti insieme. Il testo lo cambi nelle Impostazioni e contiene sempre data e ora. ||| En el evento activa «Cita con clientes» y añádelos desde contactos o a mano. A la hora elegida llega una notificación con «Enviar mensaje»: se abre la app adecuada con el texto ya escrito, también para varios clientes. El texto se cambia en Ajustes y siempre incluye fecha y hora.
+Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni. ||| Elige el color de tareas, eventos, vencimientos y pagos en Ajustes.
+Solo le sezioni che usi ||| Solo las secciones que usas
+Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano. ||| Desactiva alarmas, temporizadores, pociones, vacaciones, visitas, gastos, ciclo o citas en Ajustes: desaparecen de Añadir y del Inicio, los datos se conservan.

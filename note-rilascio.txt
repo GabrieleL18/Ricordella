@@ -1,45 +1,35 @@
 <it-IT>
 Novità:
-• Sveglia classica più magica, con stelline e grafica in linea con l'app
-• Disegno delle note a tutto schermo in orizzontale
-• Timer con anello e nuovo widget Timer
-• Note con audio, immagini e disegni
-• Profilo principale e backup con nome
-• Tutorial per ogni sezione
+• Appuntamenti con i clienti: aggiungili dalla rubrica e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco dalla notifica
+• Testo del messaggio personalizzabile, con data e ora sempre incluse
+• Colori del calendario a scelta
+• Mostra solo le sezioni che usi: le altre si spengono dalle Impostazioni
 </it-IT>
 <en-US>
 What's new:
-• Classic alarm with a magic touch: sparkles and a look that matches the app
-• Note drawings use the full screen in landscape
-• Timer with a ring and a new Timer widget
-• Notes with audio, images and drawings
-• Main profile and named backups
-• A tutorial for each section
+• Client appointments: add clients from your contacts and remind them via WhatsApp, SMS or email in one tap from the notification
+• Customisable message text, always with date and time
+• Choose your calendar colours
+• Show only the sections you use: turn the others off in Settings
 </en-US>
 <de-DE>
 Neu:
-• Klassischer Wecker mit Zauber: Funkeln und ein Look passend zur App
-• Notizzeichnungen nutzen im Querformat den ganzen Bildschirm
-• Timer mit Ring und neues Timer-Widget
-• Notizen mit Audio, Bildern und Zeichnungen
-• Hauptprofil und Backups mit Namen
-• Anleitung für jeden Bereich
+• Kundentermine: Kunden aus den Kontakten hinzufügen und per WhatsApp, SMS oder E-Mail mit einem Tipp aus der Benachrichtigung erinnern
+• Anpassbarer Nachrichtentext, immer mit Datum und Uhrzeit
+• Kalenderfarben nach Wahl
+• Nur die Bereiche, die du nutzt: die anderen in den Einstellungen ausschalten
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Réveil classique plus magique : étincelles et look cohérent avec l'appli
-• Les dessins de notes occupent tout l'écran en paysage
-• Minuteur avec anneau et nouveau widget Minuteur
-• Notes avec audio, images et dessins
-• Profil principal et sauvegardes nommées
-• Un tutoriel pour chaque section
+• Rendez-vous clients : ajoute-les depuis les contacts et rappelle-leur le rendez-vous par WhatsApp, SMS ou e-mail en un geste depuis la notification
+• Texte du message personnalisable, toujours avec date et heure
+• Couleurs du calendrier au choix
+• Affiche seulement les sections utiles : désactive les autres dans les Réglages
 </fr-FR>
 <es-ES>
 Novedades:
-• Alarma clásica más mágica: destellos y aspecto acorde con la app
-• Los dibujos de las notas ocupan toda la pantalla en horizontal
-• Temporizador con anillo y nuevo widget Temporizador
-• Notas con audio, imágenes y dibujos
-• Perfil principal y copias con nombre
-• Un tutorial por cada sección
+• Citas con clientes: añádelos desde contactos y recuérdales la cita por WhatsApp, SMS o correo con un toque desde la notificación
+• Texto del mensaje personalizable, siempre con fecha y hora
+• Colores del calendario a elección
+• Muestra solo las secciones que usas: desactiva las demás en Ajustes
 </es-ES>
