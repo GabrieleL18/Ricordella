@@ -1602,4 +1602,5 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Sezioni" to "Sections",
     "Scegli quali sezioni vedere" to "Choose which sections to show",
     "Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola." to "Reminders, events, notes, things and people are always there. Turning a section off keeps its data: turn it back on to find it again.",
+    "Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat." to "Without a number or email the message goes via WhatsApp: it opens with the text ready and you pick the chat.",
 )

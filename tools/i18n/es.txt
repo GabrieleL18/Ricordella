@@ -1565,3 +1565,4 @@ Ciao {nome}, ti ricordo il tuo appuntamento "{titolo}" di {data} alle {ora}. A p
 Sezioni ||| Secciones
 Scegli quali sezioni vedere ||| Elige qué secciones ver
 Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Recordatorios, eventos, notas, cosas y personas siempre están. Al desactivar una sección sus datos se conservan: actívala de nuevo para verlos.
+Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat. ||| Sin número ni correo el mensaje va por WhatsApp: se abre con el texto listo y tú eliges el chat.

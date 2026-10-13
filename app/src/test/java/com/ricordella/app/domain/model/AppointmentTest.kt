@@ -37,5 +37,8 @@ class AppointmentTest {
         // Solo email ma canale Email spento: l'email arriva lo stesso.
         val onlyPhones = info.copy(channels = setOf(MessageChannel.WHATSAPP, MessageChannel.SMS))
         assertEquals(listOf("A" to MessageChannel.WHATSAPP, "A" to MessageChannel.SMS, "B" to MessageChannel.EMAIL), onlyPhones.targets.map { it.first.name to it.second })
+        // Solo il nome: WhatsApp, scegliendo la chat a mano, anche se il canale è spento.
+        val nameOnly = AppointmentInfo(listOf(AppointmentContact("C")), channels = setOf(MessageChannel.SMS))
+        assertEquals(listOf("C" to MessageChannel.WHATSAPP), nameOnly.targets.map { it.first.name to it.second })
     }
 }

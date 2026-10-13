@@ -23,14 +23,19 @@ data class AppointmentInfo(
 ) {
     /**
      * Un messaggio per ogni cliente e canale utilizzabile (WhatsApp e SMS col telefono, email con l'indirizzo).
-     * Un cliente che con i canali scelti non si raggiungerebbe (es. solo l'email) riceve comunque l'email.
+     * Senza numero né email resta WhatsApp, dove la chat si sceglie a mano. Un cliente che con i canali scelti
+     * non si raggiungerebbe (es. solo l'email) riceve il messaggio nei modi che ha.
      */
     val targets: List<Pair<AppointmentContact, MessageChannel>>
         get() = contacts.flatMap { c ->
             val usable = MessageChannel.entries.filter { ch ->
-                if (ch == MessageChannel.EMAIL) !c.email.isNullOrBlank() else !c.phone.isNullOrBlank()
+                when (ch) {
+                    MessageChannel.EMAIL -> !c.email.isNullOrBlank()
+                    MessageChannel.SMS -> !c.phone.isNullOrBlank()
+                    MessageChannel.WHATSAPP -> !c.phone.isNullOrBlank() || c.email.isNullOrBlank()
+                }
             }
-            usable.filter { it in channels }.ifEmpty { usable.filter { it == MessageChannel.EMAIL } }.map { c to it }
+            usable.filter { it in channels }.ifEmpty { usable }.map { c to it }
         }
 }
 

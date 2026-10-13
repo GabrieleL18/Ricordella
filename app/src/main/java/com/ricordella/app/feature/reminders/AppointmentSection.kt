@@ -229,11 +229,18 @@ private fun ContactDialog(initial: AppointmentContact, onDismiss: () -> Unit, on
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 )
+                if (phone.isBlank() && email.isBlank()) {
+                    Text(
+                        tr("Senza numero né email il messaggio si manda su WhatsApp: si apre con il testo pronto e scegli tu la chat."),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(
-                enabled = phone.isNotBlank() || email.isNotBlank(),
+                enabled = name.isNotBlank() || phone.isNotBlank() || email.isNotBlank(),
                 onClick = { onSave(AppointmentContact(name.trim(), phone.trim().ifEmpty { null }, email.trim().ifEmpty { null })) },
             ) { Text(tr("Salva")) }
         },
@@ -253,7 +260,12 @@ fun appointmentText(settings: AppSettings, reminder: Reminder, contact: Appointm
 
 /** Apre WhatsApp, l'app degli SMS o quella della posta col messaggio già scritto: l'invio lo conferma l'utente. */
 fun appointmentIntent(context: Context, contact: AppointmentContact, channel: MessageChannel, text: String, subject: String): Intent = when (channel) {
-    MessageChannel.WHATSAPP -> Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/${whatsappNumber(context, contact.phone.orEmpty())}?text=${Uri.encode(text)}"))
+    MessageChannel.WHATSAPP -> if (contact.phone.isNullOrBlank()) {
+        // Senza numero: WhatsApp si apre col testo pronto e la chat si sceglie dall'elenco.
+        Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text).setPackage("com.whatsapp")
+    } else {
+        Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/${whatsappNumber(context, contact.phone)}?text=${Uri.encode(text)}"))
+    }
     MessageChannel.SMS -> Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(contact.phone.orEmpty())}")).putExtra("sms_body", text)
     // Destinatario, oggetto e testo anche nell'indirizzo mailto: alcune app di posta ignorano gli extra.
     MessageChannel.EMAIL -> Intent(
