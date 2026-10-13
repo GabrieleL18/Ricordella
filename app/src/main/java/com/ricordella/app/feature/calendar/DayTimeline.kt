@@ -66,6 +66,7 @@ import com.ricordella.app.core.ui.reveal
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.core.ui.tone
+import com.ricordella.app.core.ui.calendarTone
 import com.ricordella.app.domain.model.ReminderOccurrence
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.extraDays
@@ -262,7 +263,7 @@ private fun TimelineCard(
     modifier: Modifier = Modifier,
 ) {
     val reminder = occurrence.reminder
-    val tone = reminder.type.tone
+    val tone = reminder.type.calendarTone
     val done = reminder.status == ReminderStatus.COMPLETED
     val interaction = remember { MutableInteractionSource() }
     Row(

@@ -60,6 +60,8 @@ data class SchedulingCandidate(
     val lastNotifiedAt: java.time.Instant?,
     /** Sveglia: ha l'avviso silenzioso un po' prima, per poterla spegnere. */
     val isAlarm: Boolean = false,
+    /** Appuntamento con clienti: arriva anche la notifica per mandare loro il messaggio. */
+    val hasAppointment: Boolean = false,
 )
 
 /** Un'occorrenza (reale o calcolata dalla ricorrenza) di un promemoria in una data. */

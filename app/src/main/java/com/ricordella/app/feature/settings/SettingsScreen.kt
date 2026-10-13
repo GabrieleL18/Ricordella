@@ -24,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import com.ricordella.app.core.ui.theme.ricordellaColors
+import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -262,6 +263,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     label = { DateTexts.date(sample, it) },
                     onSelected = { style -> viewModel.update { it.copy(dateFormat = style) } },
                 )
+                CalendarColorsSection(settings, viewModel::update)
                 SettingRow(
                     icon = Icons.Rounded.Apps,
                     title = tr("Sezioni extra in Home"),
@@ -279,6 +281,10 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                         Switch(checked = settings.soundsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(soundsEnabled = value) } })
                     },
                 )
+            }
+
+            SettingsGroup(Icons.Rounded.Apps, tr("Sezioni"), tr("Scegli quali sezioni vedere")) {
+                SectionsSettings(settings, viewModel::update)
             }
 
             SettingsGroup(Icons.Rounded.Notifications, tr("Notifiche"), tr("Permessi, orari, anticipo e predefiniti per tipo")) {
@@ -313,6 +319,10 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 )
                 TypeDefaultsSection(settings, viewModel::update)
+            }
+
+            SettingsGroup(Icons.Rounded.Event, tr("Appuntamenti"), tr("Messaggio per ricordare l'appuntamento ai clienti")) {
+                AppointmentMessageSection(settings, viewModel::update)
             }
 
             SettingsGroup(Icons.Rounded.Alarm, tr("Sveglia"), tr("Suono, vibrazione, volume e posticipo")) {

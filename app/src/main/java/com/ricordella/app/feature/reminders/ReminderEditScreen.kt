@@ -136,6 +136,10 @@ fun ReminderEditScreen(onBack: () -> Unit) {
             if (form.type == ReminderType.VACATION) {
                 TripFields(form.trip, onChange = { trip -> viewModel.update { it.copy(trip = trip) } })
             }
+            val settings = com.ricordella.app.core.ui.LocalAppSettings.current
+            if (!form.isAlarm && !form.isPayment && (form.appointment != null || settings.shows(com.ricordella.app.domain.model.AppSection.APPOINTMENTS))) {
+                AppointmentFields(form.appointment, onChange = { info -> viewModel.update { it.copy(appointment = info) } })
+            }
             TextButton(onClick = { viewModel.update { it.copy(showAdvanced = !it.showAdvanced) } }) {
                 Icon(if (form.showAdvanced) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
                 Text(if (form.showAdvanced) tr("Nascondi opzioni") else tr("Altre opzioni"), modifier = Modifier.padding(start = 8.dp))
@@ -158,7 +162,9 @@ fun ReminderEditScreen(onBack: () -> Unit) {
 @Composable
 private fun TypeChooser(current: ReminderType, onChange: (ReminderType) -> Unit) {
     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        ReminderType.entries.filter { it != ReminderType.ALARM || current == ReminderType.ALARM }.forEach { type ->
+        val settings = com.ricordella.app.core.ui.LocalAppSettings.current
+        // Il tipo attuale resta sempre, anche se la sua sezione è spenta.
+        ReminderType.entries.filter { it == current || (it != ReminderType.ALARM && optionalSection(it)?.let(settings::shows) != false) }.forEach { type ->
             val tone = type.tone
             FilterChip(
                 selected = current == type,
@@ -677,4 +683,11 @@ private fun AlarmFields(form: ReminderForm, update: ((ReminderForm) -> ReminderF
             }
         }) { Text(tr("Concedi permesso")) }
     }
+}
+
+private fun optionalSection(type: ReminderType): com.ricordella.app.domain.model.AppSection? = when (type) {
+    ReminderType.VACATION -> com.ricordella.app.domain.model.AppSection.VACATIONS
+    ReminderType.MEDICAL_VISIT -> com.ricordella.app.domain.model.AppSection.MEDICAL_VISITS
+    ReminderType.PAYMENT -> com.ricordella.app.domain.model.AppSection.EXPENSES
+    else -> null
 }

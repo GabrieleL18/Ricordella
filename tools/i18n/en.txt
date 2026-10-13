@@ -1606,3 +1606,37 @@ min ||| min
 Un altro timer ||| Another timer
 Suona alle %1$s ||| Rings at %1$s
 Importa da un file .ics ||| Import from a .ics file
+Email ||| Email
+Appuntamento con clienti ||| Appointment with clients
+Ricordaglielo con un messaggio su WhatsApp, SMS o email ||| Remind them with a WhatsApp, SMS or email message
+Senza nome ||| No name
+Numero dalla rubrica ||| Number from contacts
+Email dalla rubrica ||| Email from contacts
+Scrivi a mano ||| Type it in
+Come avvisarli ||| How to remind them
+Notifica per mandare il messaggio ||| Notification to send the message
+All'orario dell'appuntamento ||| At the appointment time
+Aggiungi un cliente con il numero (per WhatsApp e SMS) o l'email. ||| Add a client with a phone number (for WhatsApp and SMS) or an email.
+Non c'è un'app della rubrica su questo telefono. ||| There is no contacts app on this phone.
+Cliente ||| Client
+Nome ||| Name
+Manca l'app per inviare questo messaggio. ||| No app available to send this message.
+Ricorda l'appuntamento ||| Remind the appointment
+%1$s a %2$s ||| %1$s to %2$s
+Invia tutti ||| Send all
+Appuntamento ||| Appointment
+Ricorda l'appuntamento a %1$s ||| Remind %1$s of the appointment
+Invia messaggio ||| Send message
+Colori del calendario ||| Calendar colours
+Predefinito ||| Default
+Il messaggio che mandi ai clienti dall'evento. Data e ora ci sono sempre: se le togli, vengono aggiunte in fondo. ||| The message you send clients from the event. Date and time are always included: if you remove them, they're added at the end.
+Messaggio ||| Message
+Anteprima ||| Preview
+Mario ||| John
+Visita ||| Visit
+Appuntamenti ||| Appointments
+Messaggio per ricordare l'appuntamento ai clienti ||| Message to remind clients of their appointment
+Ciao {nome}, ti ricordo il tuo appuntamento "{titolo}" di {data} alle {ora}. A presto! ||| Hi {nome}, just a reminder of your appointment "{titolo}" on {data} at {ora}. See you soon!
+Sezioni ||| Sections
+Scegli quali sezioni vedere ||| Choose which sections to show
+Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Reminders, events, notes, things and people are always there. Turning a section off keeps its data: turn it back on to find it again.

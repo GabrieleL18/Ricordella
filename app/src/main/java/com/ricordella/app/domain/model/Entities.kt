@@ -165,6 +165,8 @@ data class Reminder(
     val plan: InstallmentPlan? = null,
     /** Denaro (spesa, abbonamento, rate, entrata): importo e quote per persona. Solo per i pagamenti. */
     val money: MoneyInfo? = null,
+    /** Appuntamento con clienti da avvisare con un messaggio (WhatsApp, SMS, email). */
+    val appointment: AppointmentInfo? = null,
     val status: ReminderStatus = ReminderStatus.ACTIVE,
     val priority: Priority = Priority.NORMAL,
     val category: String? = null,

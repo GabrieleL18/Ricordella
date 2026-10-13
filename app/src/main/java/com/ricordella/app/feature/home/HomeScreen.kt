@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.home
 
+import com.ricordella.app.domain.model.AppSection
 import androidx.compose.material.icons.rounded.Timer
 import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material.icons.rounded.WaterDrop
@@ -527,11 +528,12 @@ private fun NotificationPermissionCard() {
 @Composable
 private fun HomeExtras(navigator: AppNavigator) {
     val colors = MaterialTheme.ricordellaColors
+    val settings = LocalAppSettings.current
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
-        ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
+        if (settings.shows(AppSection.ALARMS)) ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
+        if (settings.shows(AppSection.TIMERS)) ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
         ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
-        ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
+        if (settings.shows(AppSection.POTIONS)) ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
     }
 }
 

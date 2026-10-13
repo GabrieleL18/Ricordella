@@ -1531,3 +1531,37 @@ min ||| min
 Un altro timer ||| Un autre minuteur
 Suona alle %1$s ||| Sonne à %1$s
 Importa da un file .ics ||| Importer depuis un fichier .ics
+Email ||| E-mail
+Appuntamento con clienti ||| Rendez-vous avec des clients
+Ricordaglielo con un messaggio su WhatsApp, SMS o email ||| Rappelle-le-leur par WhatsApp, SMS ou e-mail
+Senza nome ||| Sans nom
+Numero dalla rubrica ||| Numéro des contacts
+Email dalla rubrica ||| E-mail des contacts
+Scrivi a mano ||| Saisir à la main
+Come avvisarli ||| Comment les prévenir
+Notifica per mandare il messaggio ||| Notification pour envoyer le message
+All'orario dell'appuntamento ||| À l'heure du rendez-vous
+Aggiungi un cliente con il numero (per WhatsApp e SMS) o l'email. ||| Ajoute un client avec son numéro (pour WhatsApp et SMS) ou son e-mail.
+Non c'è un'app della rubrica su questo telefono. ||| Aucune app de contacts sur ce téléphone.
+Cliente ||| Client
+Nome ||| Nom
+Manca l'app per inviare questo messaggio. ||| Aucune app pour envoyer ce message.
+Ricorda l'appuntamento ||| Rappeler le rendez-vous
+%1$s a %2$s ||| %1$s à %2$s
+Invia tutti ||| Tout envoyer
+Appuntamento ||| Rendez-vous
+Ricorda l'appuntamento a %1$s ||| Rappeler le rendez-vous à %1$s
+Invia messaggio ||| Envoyer le message
+Colori del calendario ||| Couleurs du calendrier
+Predefinito ||| Par défaut
+Il messaggio che mandi ai clienti dall'evento. Data e ora ci sono sempre: se le togli, vengono aggiunte in fondo. ||| Le message envoyé aux clients depuis l'événement. La date et l'heure sont toujours présentes : si tu les retires, elles sont ajoutées à la fin.
+Messaggio ||| Message
+Anteprima ||| Aperçu
+Mario ||| Jean
+Visita ||| Visite
+Appuntamenti ||| Rendez-vous
+Messaggio per ricordare l'appuntamento ai clienti ||| Message pour rappeler le rendez-vous aux clients
+Ciao {nome}, ti ricordo il tuo appuntamento "{titolo}" di {data} alle {ora}. A presto! ||| Bonjour {nome}, je te rappelle ton rendez-vous « {titolo} » le {data} à {ora}. À bientôt !
+Sezioni ||| Sections
+Scegli quali sezioni vedere ||| Choisis les sections à afficher
+Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Rappels, événements, notes, objets et personnes sont toujours là. Une section désactivée garde ses données : réactive-la pour les retrouver.

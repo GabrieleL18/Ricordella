@@ -1531,3 +1531,37 @@ min ||| min
 Un altro timer ||| Otro temporizador
 Suona alle %1$s ||| Suena a las %1$s
 Importa da un file .ics ||| Importar desde un archivo .ics
+Email ||| Correo
+Appuntamento con clienti ||| Cita con clientes
+Ricordaglielo con un messaggio su WhatsApp, SMS o email ||| Recuérdaselo con un mensaje por WhatsApp, SMS o correo
+Senza nome ||| Sin nombre
+Numero dalla rubrica ||| Número de contactos
+Email dalla rubrica ||| Correo de contactos
+Scrivi a mano ||| Escribir a mano
+Come avvisarli ||| Cómo avisarles
+Notifica per mandare il messaggio ||| Notificación para enviar el mensaje
+All'orario dell'appuntamento ||| A la hora de la cita
+Aggiungi un cliente con il numero (per WhatsApp e SMS) o l'email. ||| Añade un cliente con su número (para WhatsApp y SMS) o su correo.
+Non c'è un'app della rubrica su questo telefono. ||| No hay app de contactos en este teléfono.
+Cliente ||| Cliente
+Nome ||| Nombre
+Manca l'app per inviare questo messaggio. ||| Falta la app para enviar este mensaje.
+Ricorda l'appuntamento ||| Recordar la cita
+%1$s a %2$s ||| %1$s a %2$s
+Invia tutti ||| Enviar todos
+Appuntamento ||| Cita
+Ricorda l'appuntamento a %1$s ||| Recuerda la cita a %1$s
+Invia messaggio ||| Enviar mensaje
+Colori del calendario ||| Colores del calendario
+Predefinito ||| Predeterminado
+Il messaggio che mandi ai clienti dall'evento. Data e ora ci sono sempre: se le togli, vengono aggiunte in fondo. ||| El mensaje que envías a los clientes desde el evento. La fecha y la hora siempre aparecen: si las quitas, se añaden al final.
+Messaggio ||| Mensaje
+Anteprima ||| Vista previa
+Mario ||| Juan
+Visita ||| Visita
+Appuntamenti ||| Citas
+Messaggio per ricordare l'appuntamento ai clienti ||| Mensaje para recordar la cita a los clientes
+Ciao {nome}, ti ricordo il tuo appuntamento "{titolo}" di {data} alle {ora}. A presto! ||| Hola {nome}, te recuerdo tu cita "{titolo}" el {data} a las {ora}. ¡Hasta pronto!
+Sezioni ||| Secciones
+Scegli quali sezioni vedere ||| Elige qué secciones ver
+Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Recordatorios, eventos, notas, cosas y personas siempre están. Al desactivar una sección sus datos se conservan: actívala de nuevo para verlos.

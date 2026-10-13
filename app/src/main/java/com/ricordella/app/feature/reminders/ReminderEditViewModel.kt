@@ -52,6 +52,8 @@ data class ReminderForm(
     val multiDay: Boolean = false,
     /** Dettagli di viaggio, usati solo per le vacanze. */
     val trip: TripInfo = TripInfo(),
+    /** Appuntamento con clienti da avvisare; null = nessuno. */
+    val appointment: com.ricordella.app.domain.model.AppointmentInfo? = null,
     /** Anno di nascita (testo del campo), usato solo per i compleanni. */
     val birthYear: String = "",
     val endDate: LocalDate? = null,
@@ -198,6 +200,7 @@ class ReminderEditViewModel(
             date = reminder.dueDate,
             multiDay = reminder.endDate != null,
             trip = reminder.trip ?: TripInfo(),
+            appointment = reminder.appointment,
             birthYear = reminder.birthYear?.toString().orEmpty(),
             endDate = reminder.endDate,
             time = reminder.dueTime,
@@ -344,6 +347,7 @@ class ReminderEditViewModel(
             dueDate = date,
             endDate = if (form.multiDay) form.endDate else null,
             trip = form.trip.takeIf { form.type == ReminderType.VACATION && !it.isEmpty },
+            appointment = form.appointment.takeIf { !form.isAlarm && !form.isPayment },
             birthYear = form.birthYear.toIntOrNull()?.takeIf { form.type == ReminderType.BIRTHDAY && it in 1900..date.year },
             dueTime = form.time,
             pausedUntil = pausedUntil,

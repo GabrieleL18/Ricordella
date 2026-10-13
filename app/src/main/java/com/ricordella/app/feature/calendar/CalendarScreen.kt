@@ -79,6 +79,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.layout.layout
 import com.ricordella.app.core.ui.tone
+import com.ricordella.app.core.ui.calendarColor
+import com.ricordella.app.core.ui.calendarTone
+import com.ricordella.app.domain.model.CalendarGroup
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -647,7 +650,7 @@ private fun SpanBars(
             } else {
                 val first = date == span.start
                 val last = date == span.end
-                val tone = span.reminder.type.tone
+                val tone = span.reminder.type.calendarTone
                 val shape = RoundedCornerShape(
                     topStart = if (first || rowStart) 6.dp else 0.dp,
                     bottomStart = if (first || rowStart) 6.dp else 0.dp,
@@ -699,12 +702,12 @@ private fun Marker(shape: MarkerShape, faded: Boolean = false) {
     val colors = MaterialTheme.ricordellaColors
     val modifier = Modifier.size(6.dp)
     when (shape) {
-        MarkerShape.PAYMENT -> Icon(Icons.Rounded.Payments, contentDescription = tr("Pagamenti"), tint = colors.mint.solid, modifier = Modifier.size(10.dp))
+        MarkerShape.PAYMENT -> Icon(Icons.Rounded.Payments, contentDescription = tr("Pagamenti"), tint = calendarColor(CalendarGroup.PAYMENTS), modifier = Modifier.size(10.dp))
         MarkerShape.ALARM -> Icon(Icons.Rounded.Alarm, contentDescription = tr("Sveglie"), tint = ReminderType.ALARM.tone.solid, modifier = Modifier.size(10.dp))
         MarkerShape.CYCLE -> Icon(Icons.Rounded.WaterDrop, contentDescription = tr("Ciclo"), tint = colors.coral.solid.copy(alpha = if (faded) 0.45f else 1f), modifier = Modifier.size(10.dp))
-        MarkerShape.DOT -> Box(modifier.background(colors.cyan.solid, CircleShape))
-        MarkerShape.RING -> Box(modifier.border(1.5.dp, colors.lavender.solid, CircleShape))
-        MarkerShape.SQUARE -> Box(modifier.background(colors.coral.solid, RoundedCornerShape(1.dp)))
+        MarkerShape.DOT -> Box(modifier.background(calendarColor(CalendarGroup.TASKS), CircleShape))
+        MarkerShape.RING -> Box(modifier.border(1.5.dp, calendarColor(CalendarGroup.EVENTS), CircleShape))
+        MarkerShape.SQUARE -> Box(modifier.background(calendarColor(CalendarGroup.DEADLINES), RoundedCornerShape(1.dp)))
     }
 }
 

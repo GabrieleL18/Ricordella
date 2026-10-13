@@ -15,6 +15,7 @@ import com.ricordella.app.RicordellaApplication
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.domain.date.TimeSource
+import com.ricordella.app.domain.model.AppSection
 import com.ricordella.app.domain.model.CycleCalendar
 import com.ricordella.app.domain.repository.PersonRepository
 import com.ricordella.app.domain.repository.SettingsRepository
@@ -47,13 +48,13 @@ class CycleReminders(
     /** Riprogramma da solo quando cambiano i cicli o l'interruttore delle notifiche. */
     fun watch(scope: CoroutineScope) {
         scope.launch {
-            settings.settings.map { Triple(it.notificationsEnabled, it.cycleProfiles, it.cycleLog) }.distinctUntilChanged().collect { refresh() }
+            settings.settings.map { Triple(it.notificationsEnabled && it.shows(AppSection.CYCLE), it.cycleProfiles, it.cycleLog) }.distinctUntilChanged().collect { refresh() }
         }
     }
 
     suspend fun refresh() {
         val app = settings.current()
-        if (!app.notificationsEnabled || app.cycleProfiles.none { it.notifyLate }) {
+        if (!app.notificationsEnabled || !app.shows(AppSection.CYCLE) || app.cycleProfiles.none { it.notifyLate }) {
             alarmManager.cancel(alarmIntent())
             return
         }

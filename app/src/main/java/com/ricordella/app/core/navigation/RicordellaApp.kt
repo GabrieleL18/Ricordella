@@ -372,6 +372,17 @@ private fun NavIcon(top: TopLevelDestination, selected: Boolean) {
 
 private data class QuickAddOption(val kind: QuickAddKind, val icon: ImageVector, val title: String, val subtitle: String)
 
+/** Sezione facoltativa di ogni voce di "Aggiungi"; null = sempre presente. */
+private val QuickAddKind.section: com.ricordella.app.domain.model.AppSection?
+    get() = when (this) {
+        QuickAddKind.ALARM -> com.ricordella.app.domain.model.AppSection.ALARMS
+        QuickAddKind.VACATION -> com.ricordella.app.domain.model.AppSection.VACATIONS
+        QuickAddKind.MEDICAL_VISIT -> com.ricordella.app.domain.model.AppSection.MEDICAL_VISITS
+        QuickAddKind.EXPENSE -> com.ricordella.app.domain.model.AppSection.EXPENSES
+        QuickAddKind.CYCLE -> com.ricordella.app.domain.model.AppSection.CYCLE
+        else -> null
+    }
+
 private val QuickAddOptions get() = listOf(
     QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Da fare o da non dimenticare")),
     QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Appuntamento o ricorrenza")),
@@ -403,7 +414,8 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(tr("Cosa vuoi aggiungere?"), style = MaterialTheme.typography.headlineSmall)
-            QuickAddOptions.chunked(2).forEachIndexed { row, pair ->
+            val settings = LocalAppSettings.current
+            QuickAddOptions.filter { o -> o.kind.section?.let(settings::shows) ?: true }.chunked(2).forEachIndexed { row, pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     pair.forEachIndexed { column, option ->
                         val index = row * 2 + column

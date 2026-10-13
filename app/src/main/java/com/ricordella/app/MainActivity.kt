@@ -81,6 +81,11 @@ class MainActivity : ComponentActivity() {
         // Solo i file (content/file): le notifiche usano ACTION_VIEW con ricordella://, non sono backup.
         if (intent?.action == Intent.ACTION_VIEW) intent.data?.takeIf { it.scheme == "content" || it.scheme == "file" }?.let { backupToOpen.value = it }
         intent?.getStringExtra(EXTRA_REMINDER_ID)?.let { reminderToOpen.value = it }
+        // Pulsante "Invia messaggio" della notifica dell'appuntamento: si apre il dettaglio pronto per l'invio.
+        intent?.getStringExtra(EXTRA_SEND_APPOINTMENT)?.let {
+            com.ricordella.app.feature.reminders.AppointmentSend.pending = it
+            reminderToOpen.value = it
+        }
         intent?.getStringExtra(CalendarWidgetProvider.EXTRA_ACTION)?.let { action ->
             val epochDay = intent.getLongExtra(CalendarWidgetProvider.EXTRA_EPOCH_DAY, Long.MIN_VALUE)
             widgetRequest.value = WidgetRequest(action, epochDay.takeIf { it != Long.MIN_VALUE }?.let(LocalDate::ofEpochDay))
@@ -102,6 +107,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_REMINDER_ID = "com.ricordella.app.extra.OPEN_REMINDER_ID"
+        const val EXTRA_SEND_APPOINTMENT = "com.ricordella.app.extra.SEND_APPOINTMENT"
         const val EXTRA_OPEN_CYCLE = "com.ricordella.app.extra.OPEN_CYCLE"
         const val ACTION_OPEN_CYCLE = "cycle"
         const val EXTRA_NEW_ALARM = "com.ricordella.app.extra.NEW_ALARM"

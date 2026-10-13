@@ -56,7 +56,10 @@ class AlarmManagerReminderScheduler(
         val now = time.now()
         val candidates = reminders.getSchedulingCandidates()
         val plan = planner.plan(candidates, now, appSettings.allDayNotificationTime, time.zone)
-        val nextPreview = showAlarmPreviews(candidates, appSettings.alarmPreNotice, now, appSettings.allDayNotificationTime)
+        val nextPreview = listOfNotNull(
+            showAlarmPreviews(candidates, appSettings.alarmPreNotice, now, appSettings.allDayNotificationTime),
+            showAppointmentPrompts(candidates, now, appSettings.allDayNotificationTime),
+        ).minOrNull()
 
         if (plan.dueNow.isNotEmpty()) {
             val today = time.today()
@@ -101,6 +104,31 @@ class AlarmManagerReminderScheduler(
             } else if (Duration.between(preview, now) <= PREVIEW_GRACE && prefs.getLong(c.id, 0L) != trigger.toEpochMilli()) {
                 reminders.getReminder(c.id)?.takeIf { isMine(it, settings.current().sharedMeId) }?.let(notifier::showAlarmPreview)
                 prefs.edit().putLong(c.id, trigger.toEpochMilli()).apply()
+            }
+        }
+        return next
+    }
+
+    /**
+     * Notifica per mandare il messaggio ai clienti, una volta per occorrenza, [AppointmentInfo.remindMinutesBefore]
+     * prima dell'appuntamento (se è già passato quel momento ma l'appuntamento no, arriva subito).
+     * Restituisce la prossima da programmare.
+     */
+    private suspend fun showAppointmentPrompts(candidates: List<SchedulingCandidate>, now: Instant, allDay: LocalTime): Instant? {
+        val prefs = context.getSharedPreferences("appointment_prompts", Context.MODE_PRIVATE)
+        var next: Instant? = null
+        for (c in candidates) {
+            if (!c.hasAppointment) continue
+            val entry = reminders.getReminder(c.id) ?: continue
+            val info = entry.reminder.appointment?.takeIf { it.targets.isNotEmpty() } ?: continue
+            val at = planner.triggerAt(c.dueDate, c.dueTime, 0, null, allDay, time.zone)
+            if (now.isAfter(at.plusSeconds(3600))) continue
+            val prompt = planner.triggerAt(c.dueDate, c.dueTime, info.remindMinutesBefore, null, allDay, time.zone)
+            if (prompt.isAfter(now)) {
+                if (next == null || prompt.isBefore(next)) next = prompt
+            } else if (prefs.getLong(c.id, 0L) != at.toEpochMilli()) {
+                notifier.showAppointmentPrompt(entry, time.today())
+                prefs.edit().putLong(c.id, at.toEpochMilli()).apply()
             }
         }
         return next

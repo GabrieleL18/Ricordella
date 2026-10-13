@@ -59,6 +59,25 @@ data class ShareScope(
 @Serializable
 enum class AlarmsInCalendar { NEVER, IMPORTANT, ALL }
 
+/** Gruppi di promemoria con lo stesso colore nel calendario (come nella legenda). */
+@Serializable
+enum class CalendarGroup {
+    TASKS, EVENTS, DEADLINES, PAYMENTS;
+
+    companion object {
+        fun of(type: ReminderType): CalendarGroup = when {
+            type == ReminderType.PAYMENT -> PAYMENTS
+            type.isDeadlineLike -> DEADLINES
+            type == ReminderType.EVENT || type == ReminderType.BIRTHDAY -> EVENTS
+            else -> TASKS
+        }
+    }
+}
+
+/** Sezioni che si possono spegnere: spariscono da "Aggiungi", dalla Home e dai moduli. */
+@Serializable
+enum class AppSection { ALARMS, TIMERS, POTIONS, VACATIONS, MEDICAL_VISITS, EXPENSES, CYCLE, APPOINTMENTS }
+
 /** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
 @Serializable
 enum class AutoMode { AUTOMATIC, ASK, OFF }
@@ -159,7 +178,15 @@ data class AppSettings(
     val backupAlias: String = "",
     /** Sezioni di cui si è già visto il tutorial: compare la prima volta che si entra. */
     val sectionTutorialsSeen: Set<String> = emptySet(),
+    /** Messaggio per ricordare l'appuntamento ai clienti, con {nome} {titolo} {data} {ora}; null = quello predefinito. */
+    val appointmentTemplate: String? = null,
+    /** Colori scelti per il calendario (ARGB); i gruppi assenti usano quelli dell'app. */
+    val calendarColors: Map<CalendarGroup, Long> = emptyMap(),
+    /** Sezioni facoltative spente nelle Impostazioni (promemoria, eventi, note, cose e persone ci sono sempre). */
+    val hiddenSections: Set<AppSection> = emptySet(),
 ) {
+    fun shows(section: AppSection): Boolean = section !in hiddenSections
+
     fun defaultsFor(type: ReminderType): TypeDefaults =
         typeDefaults[type] ?: TypeDefaults(notifyOffsetMinutes = if (type == ReminderType.ALARM) 0 else defaultNotifyOffsetMinutes)
 }

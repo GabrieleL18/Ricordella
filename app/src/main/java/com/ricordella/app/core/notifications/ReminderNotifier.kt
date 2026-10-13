@@ -87,6 +87,37 @@ class ReminderNotifier(private val context: Context) {
         }
     }
 
+    /** "Ricorda l'appuntamento a Mario": il pulsante apre il messaggio già scritto. */
+    fun showAppointmentPrompt(entry: ReminderWithLinks, today: LocalDate) {
+        if (!canPostNotifications()) return
+        val reminder = entry.reminder
+        val names = reminder.appointment?.contacts.orEmpty().map { it.name.ifBlank { it.phone ?: it.email.orEmpty() } }.joinToString(", ")
+        val send = PendingIntent.getActivity(
+            context,
+            (reminder.id + "appointment").hashCode(),
+            Intent(context, MainActivity::class.java)
+                .setData("ricordella://appointment/${reminder.id}".toUri())
+                .putExtra(MainActivity.EXTRA_SEND_APPOINTMENT, reminder.id)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val notification = NotificationCompat.Builder(context, CHANNEL_REMINDERS)
+            .setSmallIcon(R.drawable.ic_stat_reminder)
+            .setContentTitle(trf("Ricorda l'appuntamento a %1\$s", names))
+            .setContentText(listOf(reminder.title, DateTexts.relativeWithTime(reminder.dueDate, reminder.dueTime, today)).joinToString(" · "))
+            .setColor(0xFFC9A400.toInt())
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(send)
+            .addAction(0, tr("Invia messaggio"), send)
+            .build()
+        try {
+            manager.notify(reminder.id, NOTIFICATION_ID_APPOINTMENT, notification)
+        } catch (_: SecurityException) {
+        }
+    }
+
     fun dismissAlarmPreview(reminderId: String) = manager.cancel(reminderId, NOTIFICATION_ID_PREVIEW)
 
     fun canPostNotifications(): Boolean =
@@ -216,6 +247,7 @@ class ReminderNotifier(private val context: Context) {
         const val CHANNEL_REMINDERS = "reminders_magic"
         private const val NOTIFICATION_ID = 1
         private const val NOTIFICATION_ID_PREVIEW = 2
+        const val NOTIFICATION_ID_APPOINTMENT = 3
         private const val CHANNEL_ALARM_PREVIEW = "alarm_preview"
     }
 }

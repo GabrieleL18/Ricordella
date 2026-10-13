@@ -1,5 +1,6 @@
 package com.ricordella.app.core.notifications
 
+import com.ricordella.app.domain.model.AppSection
 import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 
@@ -52,7 +53,7 @@ class PotionReminders(
     fun watch(scope: CoroutineScope) {
         scope.launch {
             settings.settings
-                .map { it.notificationsEnabled to it.potions.copy(day = null, drankMl = 0) }
+                .map { Triple(it.notificationsEnabled, it.potions.copy(day = null, drankMl = 0), it.shows(AppSection.POTIONS)) }
                 .distinctUntilChanged()
                 .collect { refresh() }
         }
@@ -61,7 +62,7 @@ class PotionReminders(
     /** Programma il prossimo avviso (o lo cancella se le pozioni o le notifiche sono spente). */
     suspend fun refresh() {
         val app = settings.current()
-        if (!app.notificationsEnabled || !app.potions.remindersOn) {
+        if (!app.notificationsEnabled || !app.potions.remindersOn || !app.shows(AppSection.POTIONS)) {
             alarmManager.cancel(alarmIntent())
             return
         }

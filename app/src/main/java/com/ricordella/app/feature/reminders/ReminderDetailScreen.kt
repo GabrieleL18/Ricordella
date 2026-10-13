@@ -163,6 +163,7 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
         ) {
             Header(entry, state.now)
             Details(entry, state.now)
+            AppointmentDetail(entry.reminder)
             entry.reminder.plan?.let { plan -> PlanSection(entry.reminder.id, plan, viewModel) }
             Links(entry, navigator)
             AttachmentsSection(
