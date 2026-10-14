@@ -12,23 +12,40 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.material3.FilterChip
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.CreditCard
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.PhotoCamera
+import androidx.compose.material.icons.rounded.PictureAsPdf
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -54,7 +72,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import androidx.compose.foundation.text.KeyboardOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
@@ -62,104 +79,166 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.ricordella.app.RicordellaApplication
 import com.ricordella.app.core.i18n.tr
+import com.ricordella.app.core.i18n.trf
+import com.ricordella.app.core.ui.ChoiceTile
+import com.ricordella.app.core.ui.ConfirmDialog
 import com.ricordella.app.core.ui.DetailScaffold
+import com.ricordella.app.core.ui.EmptyState
+import com.ricordella.app.core.ui.HappyWizard
 import com.ricordella.app.core.ui.LocalAppSettings
-import com.ricordella.app.core.ui.ScanCard
 import com.ricordella.app.core.ui.ScanFileTypes
-import com.ricordella.app.core.ui.ScanSource
+import com.ricordella.app.core.ui.WizardScene
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.scanInputImage
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
+import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
+import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.LoyaltyCard
+import com.ricordella.app.feature.settings.CalendarPalette
+import com.ricordella.app.feature.settings.Swatch
 import kotlinx.coroutines.launch
 
+/** Oltre questo numero di carte, una categoria mostra le prime e un "Mostra altre". */
+private const val COLLAPSED_COUNT = 3
+
+/** Un gruppo dell'elenco: le preferite, una categoria o le carte senza categoria. */
+private data class CardGroup(val key: String, val title: String, val color: Long?, val favorites: Boolean, val cards: List<LoyaltyCard>)
+
+/** Il modulo di una carta, nuova ([id] null) o da modificare. */
+private data class CardForm(val id: String?, val name: String, val category: String, val color: Long?, val code: String, val format: Int)
+
 /**
- * Carte fedeltà: si scansionano con la fotocamera (o da una foto/PDF, anche quelli di Klarna e simili)
- * o si scrive il numero, e alla cassa si mostra il codice a schermo, a tutta luminosità.
+ * Carte fedeltà: si scansionano con la fotocamera (o da una foto/PDF), o si scrive il numero, e alla cassa
+ * si mostra il codice a schermo, a tutta luminosità. Si organizzano per categoria (con un colore a scelta),
+ * si cercano per nome, categoria o numero e si possono mettere tra le preferite, che stanno in cima.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CardsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val container = (context.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
-    val cards = LocalAppSettings.current.cards
+    val settings = LocalAppSettings.current
+    val cards = settings.cards
     val categories = cards.map { it.category }.filter { it.isNotEmpty() }.distinct().sortedBy { it.lowercase() }
     val suggestions = (categories + DefaultCategories).distinct()
-    // Carta in corso di inserimento (codice letto o scritto) e carta mostrata a schermo intero.
-    var adding by rememberSaveable { mutableStateOf(false) }
-    var draftName by rememberSaveable { mutableStateOf("") }
-    var draftCategory by rememberSaveable { mutableStateOf("") }
-    var draftCode by rememberSaveable { mutableStateOf("") }
-    var draftFormat by rememberSaveable { mutableIntStateOf(Barcode.FORMAT_CODE_128) }
+    /** Il colore della categoria: quello scelto, altrimenti uno della tavolozza (fisso una volta salvata la carta). */
+    fun colorOf(category: String): Long =
+        settings.cardColors[category] ?: CalendarPalette[(categories.indexOf(category).takeIf { it >= 0 } ?: categories.size) % CalendarPalette.size]
+
+    var choosing by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
+    var formName by rememberSaveable { mutableStateOf("") }
+    var formCategory by rememberSaveable { mutableStateOf("") }
+    var formColor by rememberSaveable { mutableStateOf<Long?>(null) }
+    var formCode by rememberSaveable { mutableStateOf("") }
+    var formFormat by rememberSaveable { mutableIntStateOf(Barcode.FORMAT_CODE_128) }
+    var formId by rememberSaveable { mutableStateOf<String?>(null) }
+    var formOpen by rememberSaveable { mutableStateOf(false) }
     var shownId by rememberSaveable { mutableStateOf<String?>(null) }
-    fun edit(transform: (List<LoyaltyCard>) -> List<LoyaltyCard>) =
-        scope.launch { container.settingsRepository.update { it.copy(cards = transform(it.cards)) } }
-    fun startAdding(code: String, format: Int) {
-        draftName = ""; draftCategory = ""; draftCode = code; draftFormat = format; adding = true
+    var expanded by remember { mutableStateOf(emptySet<String>()) }
+
+    fun update(transform: (AppSettings) -> AppSettings) = scope.launch { container.settingsRepository.update(transform) }
+    fun openForm(form: CardForm) {
+        formId = form.id; formName = form.name; formCategory = form.category; formColor = form.color
+        formCode = form.code; formFormat = form.format; formOpen = true
+    }
+    fun save() {
+        val category = formCategory.trim()
+        val name = formName.trim()
+        val picked = formColor ?: colorOf(category)
+        // A mano il formato non si sa: 13 o 8 cifre sono EAN, il resto Code 128.
+        val format = when {
+            formFormat != Barcode.FORMAT_CODE_128 -> formFormat
+            formCode.all { it.isDigit() } && formCode.length == 13 -> Barcode.FORMAT_EAN_13
+            formCode.all { it.isDigit() } && formCode.length == 8 -> Barcode.FORMAT_EAN_8
+            else -> formFormat
+        }
+        val id = formId
+        update { s ->
+            val list = if (id == null) s.cards + LoyaltyCard(name = name, category = category, code = formCode, format = format)
+            else s.cards.map { if (it.id == id) it.copy(name = name, category = category) else it }
+            s.copy(cards = list, cardColors = if (category.isEmpty()) s.cardColors else s.cardColors + (category to picked))
+        }
+        formOpen = false
     }
     val onCodes: (List<Barcode>) -> Unit = { found ->
         val first = found.firstOrNull { it.rawValue != null }
         if (first == null) Toast.makeText(context, tr("Nessun codice trovato"), Toast.LENGTH_LONG).show()
-        else startAdding(first.rawValue!!, first.format)
+        else openForm(CardForm(null, "", "", null, first.rawValue!!, first.format))
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { readBarcodes(context, it, onCodes) }
     }
 
-    DetailScaffold(title = tr("Carte"), onBack = onBack) { padding ->
-        Column(
-            Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .contentWidth()
-                .padding(horizontal = RicordellaDimensions.screenPadding)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-        ) {
-            ScanCard(
-                title = tr("Scansiona una carta"),
-                subtitle = tr("Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa."),
-                tone = MaterialTheme.ricordellaColors.lavender,
-                onChoose = { source ->
-                    when (source) {
-                        ScanSource.CAMERA -> GmsBarcodeScanning.getClient(context).startScan()
-                            .addOnSuccessListener { onCodes(listOf(it)) }
-                            .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
-                        ScanSource.FILE -> picker.launch(ScanFileTypes)
-                    }
-                },
+    DetailScaffold(
+        title = tr("Carte"),
+        onBack = onBack,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { choosing = true },
+                containerColor = MaterialTheme.ricordellaColors.bolt,
+                contentColor = MaterialTheme.ricordellaColors.onBolt,
+            ) { Icon(Icons.Rounded.Add, contentDescription = tr("Aggiungi una carta")) }
+        },
+    ) { padding ->
+        if (cards.isEmpty()) {
+            EmptyState(
+                icon = Icons.Rounded.CreditCard,
+                title = tr("Nessuna carta"),
+                message = tr("Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri alla cassa."),
+                actionLabel = tr("Aggiungi una carta"),
+                onAction = { choosing = true },
+                modifier = Modifier.padding(padding),
             )
-            TextButton(onClick = { startAdding("", Barcode.FORMAT_CODE_128) }) { Text(tr("Scrivi il numero a mano")) }
-
-            val colors = MaterialTheme.ricordellaColors
-            val tones = listOf(colors.cyan, colors.pear, colors.coral, colors.mint, colors.lavender)
-            // Un colore per categoria, sempre lo stesso finché l'elenco delle categorie non cambia; "senza categoria" in fondo.
-            cards.groupBy { it.category }.toSortedMap(compareBy({ it.isEmpty() }, { it.lowercase() })).forEach { (category, group) ->
-                val tone = tones[categories.indexOf(category).coerceAtLeast(0) % tones.size]
-                if (categories.isNotEmpty()) {
-                    Text(
-                        "${category.ifEmpty { tr("Senza categoria") }} · ${group.size}",
-                        style = MaterialTheme.typography.titleSmall, color = tone.content,
-                        modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
+        } else {
+            val searching = query.isNotBlank()
+            val shown = if (!searching) cards else cards.filter { c -> listOf(c.name, c.category, c.code).any { it.contains(query.trim(), ignoreCase = true) } }
+            val groups = buildList {
+                shown.filter { it.favorite }.takeIf { it.isNotEmpty() }?.let { add(CardGroup("*fav", tr("Preferite"), null, true, it)) }
+                val rest = shown.filter { !it.favorite }
+                categories.forEach { c -> rest.filter { it.category == c }.takeIf { it.isNotEmpty() }?.let { add(CardGroup(c, c, colorOf(c), false, it)) } }
+                rest.filter { it.category.isEmpty() }.takeIf { it.isNotEmpty() }
+                    ?.let { add(CardGroup("", if (isEmpty()) "" else tr("Senza categoria"), null, false, it)) }
+            }
+            LazyColumn(
+                Modifier.fillMaxSize().contentWidth(),
+                contentPadding = PaddingValues(
+                    start = RicordellaDimensions.screenPadding,
+                    end = RicordellaDimensions.screenPadding,
+                    top = padding.calculateTopPadding() + RicordellaDimensions.spaceS,
+                    bottom = 112.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+            ) {
+                item(key = "search") {
+                    OutlinedTextField(
+                        query, { query = it },
+                        placeholder = { Text(tr("Cerca una carta")) },
+                        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                        trailingIcon = { if (searching) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, contentDescription = tr("Cancella")) } },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.large,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                group.forEach { card ->
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(tone.container, MaterialTheme.shapes.large)
-                            .clickable { shownId = card.id }
-                            .padding(RicordellaDimensions.spaceL),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
-                    ) {
-                        Box(Modifier.size(44.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+                if (shown.isEmpty()) item(key = "none") {
+                    Text(tr("Nessun risultato"), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(RicordellaDimensions.spaceL))
+                }
+                groups.forEach { group ->
+                    if (group.title.isNotEmpty()) item(key = "h/${group.key}") { GroupHeader(group) }
+                    // Una sola carta in più non vale un "Mostra altre": si ripiega solo se ne restano almeno due. Cercando, si vede tutto.
+                    val collapsible = group.cards.size > COLLAPSED_COUNT + 1 && !searching
+                    val open = !collapsible || group.key in expanded
+                    (if (open) group.cards else group.cards.take(COLLAPSED_COUNT)).forEach { card ->
+                        item(key = "c/${card.id}") {
+                            CardRow(card, cardTone(group.color ?: card.category.takeIf { it.isNotEmpty() }?.let(::colorOf)), onClick = { shownId = card.id })
                         }
-                        Column(Modifier.weight(1f)) {
-                            Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content)
-                            Text(card.code, style = MaterialTheme.typography.bodySmall, color = tone.content, maxLines = 1)
+                    }
+                    if (collapsible) item(key = "m/${group.key}") {
+                        TextButton(onClick = { expanded = if (open) expanded - group.key else expanded + group.key }) {
+                            Text(if (open) tr("Mostra meno") else trf("Mostra altre %1\$s", group.cards.size - COLLAPSED_COUNT))
                         }
                     }
                 }
@@ -167,59 +246,157 @@ fun CardsScreen(onBack: () -> Unit) {
         }
     }
 
-    if (adding) {
+    if (choosing) {
+        Dialog(onDismissRequest = { choosing = false }) {
+            Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 460.dp)) {
+                val colors = MaterialTheme.ricordellaColors
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()).padding(RicordellaDimensions.spaceXl),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+                ) {
+                    HappyWizard(size = 88.dp, scene = WizardScene.SEARCHING)
+                    Text(tr("Aggiungi una carta"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+                    ChoiceTile(Icons.Rounded.PhotoCamera, tr("Fotocamera"), tr("Inquadra il documento adesso"), colors.cyan) {
+                        choosing = false
+                        GmsBarcodeScanning.getClient(context).startScan()
+                            .addOnSuccessListener { onCodes(listOf(it)) }
+                            .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+                    }
+                    ChoiceTile(Icons.Rounded.PictureAsPdf, tr("Foto o PDF"), tr("Un file già sul telefono, anche un PDF ricevuto per email"), colors.lavender) {
+                        choosing = false; picker.launch(ScanFileTypes)
+                    }
+                    ChoiceTile(Icons.Rounded.Edit, tr("Scrivi il numero a mano"), tr("Digita il numero stampato sulla tessera"), colors.pear) {
+                        choosing = false; openForm(CardForm(null, "", "", null, "", Barcode.FORMAT_CODE_128))
+                    }
+                    TextButton(onClick = { choosing = false }) { Text(tr("Annulla")) }
+                }
+            }
+        }
+    }
+
+    if (formOpen) {
         AlertDialog(
-            onDismissRequest = { adding = false },
-            title = { Text(tr("Nuova carta")) },
+            onDismissRequest = { formOpen = false },
+            title = { Text(if (formId == null) tr("Nuova carta") else tr("Modifica carta")) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                    NameAndCategory(draftName, draftCategory, suggestions, { draftName = it }, { draftCategory = it })
-                    OutlinedTextField(draftCode, { draftCode = it.trim() }, label = { Text(tr("Numero")) }, singleLine = true)
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+                    OutlinedTextField(
+                        formName, { formName = it.take(40) },
+                        label = { Text(tr("Nome (Decathlon, Coop...)")) }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                    )
+                    if (formId == null) {
+                        OutlinedTextField(formCode, { formCode = it.trim() }, label = { Text(tr("Numero")) }, singleLine = true)
+                    }
+                    OutlinedTextField(
+                        formCategory, { formCategory = it.take(24); formColor = null },
+                        label = { Text(tr("Categoria")) }, singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                    )
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+                        suggestions.forEach { s ->
+                            FilterChip(selected = s == formCategory.trim(), onClick = { formCategory = s; formColor = null }, label = { Text(s) })
+                        }
+                    }
+                    if (formCategory.isNotBlank()) {
+                        Text(tr("Colore della categoria"), style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 4.dp))
+                        val chosen = formColor ?: colorOf(formCategory.trim())
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            CalendarPalette.forEach { argb ->
+                                Swatch(Color(argb), chosen == argb, formCategory.trim()) { formColor = argb }
+                            }
+                        }
+                    }
                 }
             },
             confirmButton = {
-                TextButton(
-                    enabled = draftName.isNotBlank() && draftCode.isNotBlank(),
-                    onClick = {
-                        // A mano il formato non si sa: 13 o 8 cifre sono EAN, il resto Code 128.
-                        val format = when {
-                            draftFormat != Barcode.FORMAT_CODE_128 -> draftFormat
-                            draftCode.all { it.isDigit() } && draftCode.length == 13 -> Barcode.FORMAT_EAN_13
-                            draftCode.all { it.isDigit() } && draftCode.length == 8 -> Barcode.FORMAT_EAN_8
-                            else -> draftFormat
-                        }
-                        val card = LoyaltyCard(name = draftName.trim(), category = draftCategory.trim(), code = draftCode, format = format)
-                        edit { it + card }
-                        adding = false
-                    },
-                ) { Text(tr("Salva")) }
+                TextButton(enabled = formName.isNotBlank() && formCode.isNotBlank(), onClick = ::save) { Text(tr("Salva")) }
             },
-            dismissButton = { TextButton(onClick = { adding = false }) { Text(tr("Annulla")) } },
+            dismissButton = { TextButton(onClick = { formOpen = false }) { Text(tr("Annulla")) } },
         )
     }
 
     cards.firstOrNull { it.id == shownId }?.let { card ->
-        CardDialog(card, suggestions, onEdit = { name, category -> edit { all -> all.map { if (it.id == card.id) it.copy(name = name, category = category) else it } } }, onDelete = { edit { all -> all.filterNot { it.id == card.id } }; shownId = null }, onDismiss = { shownId = null })
+        CardDialog(
+            card,
+            onFavorite = { update { s -> s.copy(cards = s.cards.map { if (it.id == card.id) it.copy(favorite = !it.favorite) else it }) } },
+            onEdit = { openForm(CardForm(card.id, card.name, card.category, null, card.code, card.format)) },
+            onDelete = { update { s -> s.copy(cards = s.cards.filterNot { it.id == card.id }) }; shownId = null },
+            onDismiss = { shownId = null },
+        )
+    }
+}
+
+/** I colori di una carta: il colore della categoria schiarito per lo sfondo, come le altre schede dell'app. */
+@Composable
+private fun cardTone(argb: Long?): Tone {
+    if (argb == null) return MaterialTheme.ricordellaColors.lavender
+    val color = Color(argb)
+    return Tone(lerp(color, MaterialTheme.colorScheme.surface, 0.82f), MaterialTheme.colorScheme.onSurface, color)
+}
+
+@Composable
+private fun GroupHeader(group: CardGroup) {
+    Row(
+        Modifier.padding(top = RicordellaDimensions.spaceS),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        if (group.favorites) Icon(Icons.Rounded.Star, contentDescription = null, tint = MaterialTheme.ricordellaColors.pear.solid, modifier = Modifier.size(16.dp))
+        else Box(Modifier.size(12.dp).background(group.color?.let(::Color) ?: MaterialTheme.ricordellaColors.lavender.solid, CircleShape))
+        Text(group.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("${group.cards.size}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun CardRow(card: LoyaltyCard, tone: Tone, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.large)
+            .clickable(onClick = onClick)
+            .padding(RicordellaDimensions.spaceM),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+    ) {
+        Box(Modifier.size(44.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content)
+            Text(card.code, style = MaterialTheme.typography.bodySmall, color = tone.content, maxLines = 1)
+        }
+        if (card.favorite) Icon(Icons.Rounded.Star, contentDescription = tr("Preferita"), tint = tone.solid)
     }
 }
 
 /** La carta a tutto schermo: sfondo bianco, codice grande e luminosità al massimo, perché il lettore lo legga bene. */
 @Composable
-private fun CardDialog(card: LoyaltyCard, suggestions: List<String>, onEdit: (String, String) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
+private fun CardDialog(card: LoyaltyCard, onFavorite: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
     var confirming by rememberSaveable { mutableStateOf(false) }
-    var renaming by rememberSaveable { mutableStateOf(false) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
         DisposableEffect(window) {
             window?.attributes = window?.attributes?.apply { screenBrightness = 1f }
             onDispose {}
         }
-        val bitmap = remember(card) { runCatching { renderBarcode(card) }.getOrNull() }
+        val bitmap = remember(card.code, card.format) { runCatching { renderBarcode(card) }.getOrNull() }
         Column(
             Modifier.fillMaxSize().background(Color.White).systemBarsPadding().padding(RicordellaDimensions.spaceL),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(card.name, style = MaterialTheme.typography.headlineMedium, color = Color.Black, textAlign = TextAlign.Center)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(card.name, style = MaterialTheme.typography.headlineMedium, color = Color.Black, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                IconButton(onClick = onFavorite) {
+                    Icon(
+                        if (card.favorite) Icons.Rounded.Star else Icons.Rounded.StarBorder,
+                        contentDescription = if (card.favorite) tr("Togli dai preferiti") else tr("Aggiungi ai preferiti"),
+                        tint = MaterialTheme.ricordellaColors.pear.solid,
+                    )
+                }
+            }
             // Il codice prende lo spazio che resta (weight): i pulsanti sotto restano sempre raggiungibili.
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 if (bitmap != null) {
@@ -232,32 +409,24 @@ private fun CardDialog(card: LoyaltyCard, suggestions: List<String>, onEdit: (St
             Text(card.code, style = MaterialTheme.typography.titleLarge, color = Color.Black, textAlign = TextAlign.Center)
             Row {
                 TextButton(onClick = onDismiss) { Text(tr("Chiudi")) }
-                TextButton(onClick = { renaming = true }) { Text(tr("Modifica")) }
+                TextButton(onClick = onEdit) { Text(tr("Modifica")) }
                 TextButton(onClick = { confirming = true }) { Text(tr("Elimina")) }
             }
         }
     }
-    if (renaming) {
-        var name by rememberSaveable { mutableStateOf(card.name) }
-        var category by rememberSaveable { mutableStateOf(card.category) }
-        AlertDialog(
-            onDismissRequest = { renaming = false },
-            title = { Text(tr("Modifica carta")) },
-            text = { Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) { NameAndCategory(name, category, suggestions, { name = it }, { category = it }) } },
-            confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onEdit(name.trim(), category.trim()); renaming = false }) { Text(tr("Salva")) } },
-            dismissButton = { TextButton(onClick = { renaming = false }) { Text(tr("Annulla")) } },
-        )
-    }
     if (confirming) {
-        AlertDialog(
-            onDismissRequest = { confirming = false },
-            title = { Text(tr("Eliminare la carta?")) },
-            text = { Text(card.name) },
-            confirmButton = { TextButton(onClick = onDelete) { Text(tr("Elimina")) } },
-            dismissButton = { TextButton(onClick = { confirming = false }) { Text(tr("Annulla")) } },
+        ConfirmDialog(
+            title = tr("Eliminare la carta?"),
+            message = card.name,
+            confirmLabel = tr("Elimina"),
+            destructive = true,
+            onConfirm = onDelete,
+            onDismiss = { confirming = false },
         )
     }
 }
+
+private val DefaultCategories get() = listOf(tr("Spesa"), tr("Sport"), tr("Salute"), tr("Casa"))
 
 private fun zxingFormat(mlKit: Int): BarcodeFormat = when (mlKit) {
     Barcode.FORMAT_CODE_39 -> BarcodeFormat.CODE_39
@@ -292,22 +461,3 @@ private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Barcode>) ->
         .addOnFailureListener { onCodes(emptyList()) }
 }
 
-/** Nome e categoria di una carta; sotto il campo categoria si propongono quelle già usate (e qualche idea). */
-@Composable
-private fun NameAndCategory(name: String, category: String, suggestions: List<String>, onName: (String) -> Unit, onCategory: (String) -> Unit) {
-    OutlinedTextField(
-        name, { onName(it.take(40)) },
-        label = { Text(tr("Nome (Decathlon, Coop...)")) }, singleLine = true,
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-    )
-    OutlinedTextField(
-        category, { onCategory(it.take(24)) },
-        label = { Text(tr("Categoria")) }, singleLine = true,
-        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-    )
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        suggestions.forEach { FilterChip(selected = it == category.trim(), onClick = { onCategory(it) }, label = { Text(it) }) }
-    }
-}
-
-private val DefaultCategories get() = listOf(tr("Spesa"), tr("Sport"), tr("Salute"), tr("Casa"))

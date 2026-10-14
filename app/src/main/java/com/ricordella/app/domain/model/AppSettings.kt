@@ -176,6 +176,8 @@ data class AppSettings(
     val notes: List<Note> = emptyList(),
     /** Carte fedeltà (Decathlon, Coop...): nome e codice da mostrare alla cassa. */
     val cards: List<LoyaltyCard> = emptyList(),
+    /** Colore (ARGB) scelto per ogni categoria delle carte; le categorie assenti usano uno della tavolozza. */
+    val cardColors: Map<String, Long> = emptyMap(),
     /** Nome in più per il backup in cartella condivisa, per distinguere due persone con lo stesso nome. */
     val backupAlias: String = "",
     /** Sezioni di cui si è già visto il tutorial: compare la prima volta che si entra. */

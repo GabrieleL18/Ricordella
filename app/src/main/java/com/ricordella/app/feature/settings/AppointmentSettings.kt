@@ -46,7 +46,7 @@ import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.LocalTime
 
-private val CalendarPalette = listOf(
+internal val CalendarPalette = listOf(
     0xFF1E88E5, 0xFF00897B, 0xFF43A047, 0xFFC0CA33, 0xFFFB8C00,
     0xFFE53935, 0xFFD81B60, 0xFF8E24AA, 0xFF6D4C41, 0xFF546E7A,
 )
@@ -81,7 +81,7 @@ internal fun CalendarColorsSection(settings: AppSettings, update: ((AppSettings)
 }
 
 @Composable
-private fun Swatch(color: Color, selected: Boolean, description: String, onClick: () -> Unit) {
+internal fun Swatch(color: Color, selected: Boolean, description: String, onClick: () -> Unit) {
     Box(
         Modifier
             .size(32.dp)

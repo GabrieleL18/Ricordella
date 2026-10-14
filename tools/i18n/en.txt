@@ -1660,3 +1660,15 @@ Modifica carta ||| Edit card
 Senza categoria ||| No category
 Sport ||| Sports
 Salute ||| Health
+Aggiungi una carta ||| Add a card
+Nessuna carta ||| No cards
+Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri alla cassa. ||| Add your store and supermarket cards: scan them once and show them at the checkout.
+Digita il numero stampato sulla tessera ||| Type the number printed on the card
+Preferite ||| Favourites
+Preferita ||| Favourite
+Mostra altre %1$s ||| Show %1$s more
+Mostra meno ||| Show less
+Togli dai preferiti ||| Remove from favourites
+Aggiungi ai preferiti ||| Add to favourites
+Colore della categoria ||| Category colour
+Cerca una carta ||| Search cards

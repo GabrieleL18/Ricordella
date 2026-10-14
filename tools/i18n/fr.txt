@@ -1585,3 +1585,15 @@ Modifica carta ||| Modifier la carte
 Senza categoria ||| Sans catégorie
 Sport ||| Sport
 Salute ||| Santé
+Aggiungi una carta ||| Ajouter une carte
+Nessuna carta ||| Aucune carte
+Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri alla cassa. ||| Ajoute tes cartes de magasins et supermarchés : scanne-les une fois et montre-les en caisse.
+Digita il numero stampato sulla tessera ||| Saisis le numéro imprimé sur la carte
+Preferite ||| Favorites
+Preferita ||| Favorite
+Mostra altre %1$s ||| Afficher %1$s de plus
+Mostra meno ||| Afficher moins
+Togli dai preferiti ||| Retirer des favorites
+Aggiungi ai preferiti ||| Ajouter aux favorites
+Colore della categoria ||| Couleur de la catégorie
+Cerca una carta ||| Chercher une carte
