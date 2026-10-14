@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -528,12 +529,13 @@ private fun CardTile(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavor
             .clip(MaterialTheme.shapes.large)
             .background(tone.container)
             .clickable(onClick = onClick)
+            .height(104.dp)
             .padding(start = RicordellaDimensions.spaceM, top = RicordellaDimensions.spaceM, bottom = RicordellaDimensions.spaceM, end = 4.dp),
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween) {
             Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+                Text(categoryEmoji(card.category), fontSize = 20.sp)
             }
             IconButton(onClick = onFavorite, Modifier.size(40.dp)) {
                 Icon(
@@ -543,7 +545,7 @@ private fun CardTile(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavor
                 )
             }
         }
-        Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(end = RicordellaDimensions.spaceS))
     }
 }
 
@@ -560,7 +562,7 @@ private fun CardRow(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavori
         horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
         Box(Modifier.size(44.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-            Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+            Text(categoryEmoji(card.category), fontSize = 22.sp)
         }
         Column(Modifier.weight(1f)) {
             Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content)
@@ -576,7 +578,7 @@ private fun CardRow(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavori
     }
 }
 
-private val DefaultCategories get() = listOf(tr("Spesa"), tr("Sport"), tr("Salute"), tr("Casa"))
+private val DefaultCategories get() = listOf(tr("Spesa"), tr("Sport"), tr("Salute"), tr("Casa"), tr("Altro"))
 
 private fun zxingFormat(mlKit: Int): BarcodeFormat = when (mlKit) {
     Barcode.FORMAT_CODE_39 -> BarcodeFormat.CODE_39
@@ -611,3 +613,26 @@ private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Barcode>) ->
         .addOnFailureListener { onCodes(emptyList()) }
 }
 
+
+/** L'emoji di una categoria, scelta dal nome (anche nelle altre lingue); 💳 se non è riconosciuta o manca. */
+internal fun categoryEmoji(category: String): String {
+    val c = category.lowercase()
+    fun has(vararg words: String) = words.any { c.contains(it) }
+    return when {
+        c.isEmpty() -> "💳"
+        has("spesa", "super", "alimentar", "grocer", "food", "cibo", "market", "courses", "einkauf", "compra") -> "🛒"
+        has("sport", "palestra", "gym", "fitness") -> "🏃"
+        has("salute", "farmac", "health", "santé", "gesundheit", "salud", "medic") -> "💊"
+        has("casa", "home", "bricolage", "arred", "maison", "haus", "hogar") -> "🏠"
+        has("benzin", "carburant", "fuel", "gas", "auto", "car ") -> "⛽"
+        has("viagg", "travel", "voyage", "reise", "viaje", "treno", "volo", "flight") -> "✈️"
+        has("bellezza", "beauty", "profum", "parrucch") -> "💄"
+        has("libr", "book", "cultura", "cinema") -> "📚"
+        has("ristor", "bar", "caff", "restaurant", "pizz") -> "🍽️"
+        has("abbigl", "moda", "cloth", "fashion", "vêtement", "kleid", "ropa") -> "👕"
+        has("anim", "pet", "tier", "mascot") -> "🐾"
+        has("tecnolog", "elettron", "tech") -> "💻"
+        has("altro", "other", "autre", "sonstig", "otro", "varie", "misc") -> "📦"
+        else -> "🏷️"
+    }
+}

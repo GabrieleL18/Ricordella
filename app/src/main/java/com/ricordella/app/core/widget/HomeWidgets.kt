@@ -23,6 +23,7 @@ import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.core.ui.emoji
 import com.ricordella.app.domain.date.nextRing
 import com.ricordella.app.feature.cards.cardColor
+import com.ricordella.app.feature.cards.categoryEmoji
 import com.ricordella.app.feature.timers.isTimer
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderFilter
@@ -625,6 +626,7 @@ private class CardsFactory(context: Context) : SimpleFactory(context) {
     override fun getViewAt(position: Int): RemoteViews {
         val (card, color) = rows[position]
         return RemoteViews(context.packageName, R.layout.widget_card_tile).apply {
+            setTextViewText(R.id.tile_emoji, categoryEmoji(card.category))
             setTextViewText(R.id.tile_name, (if (card.favorite) "⭐ " else "") + card.name)
             setInt(R.id.tile_dot, "setColorFilter", (color ?: 0xFF9B6BE6).toInt())
             setOnClickFillInIntent(
