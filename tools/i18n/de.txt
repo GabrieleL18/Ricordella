@@ -1581,3 +1581,4 @@ Nuova carta ||| Neue Karte
 Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
 Numero ||| Nummer
 Eliminare la carta? ||| Karte löschen?
+Nome della carta ||| Kartenname

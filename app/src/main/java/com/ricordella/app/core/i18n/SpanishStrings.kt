@@ -1585,4 +1585,5 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Nome (Decathlon, Coop...)" to "Nombre (Decathlon, Coop...)",
     "Numero" to "Número",
     "Eliminare la carta?" to "¿Eliminar la tarjeta?",
+    "Nome della carta" to "Nombre de la tarjeta",
 )

@@ -1581,3 +1581,4 @@ Nuova carta ||| Nueva tarjeta
 Nome (Decathlon, Coop...) ||| Nombre (Decathlon, Coop...)
 Numero ||| Número
 Eliminare la carta? ||| ¿Eliminar la tarjeta?
+Nome della carta ||| Nombre de la tarjeta

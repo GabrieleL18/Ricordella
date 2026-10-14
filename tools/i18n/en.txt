@@ -1656,3 +1656,4 @@ Nuova carta ||| New card
 Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
 Numero ||| Number
 Eliminare la carta? ||| Delete the card?
+Nome della carta ||| Card name

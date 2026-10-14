@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -187,14 +188,15 @@ fun CardsScreen(onBack: () -> Unit) {
     }
 
     cards.firstOrNull { it.id == shownId }?.let { card ->
-        CardDialog(card, onDelete = { edit { all -> all.filterNot { it.id == card.id } }; shownId = null }, onDismiss = { shownId = null })
+        CardDialog(card, onRename = { name -> edit { all -> all.map { if (it.id == card.id) it.copy(name = name) else it } } }, onDelete = { edit { all -> all.filterNot { it.id == card.id } }; shownId = null }, onDismiss = { shownId = null })
     }
 }
 
 /** La carta a tutto schermo: sfondo bianco, codice grande e luminosità al massimo, perché il lettore lo legga bene. */
 @Composable
-private fun CardDialog(card: LoyaltyCard, onDelete: () -> Unit, onDismiss: () -> Unit) {
+private fun CardDialog(card: LoyaltyCard, onRename: (String) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
     var confirming by rememberSaveable { mutableStateOf(false) }
+    var renaming by rememberSaveable { mutableStateOf(false) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
         DisposableEffect(window) {
@@ -203,23 +205,41 @@ private fun CardDialog(card: LoyaltyCard, onDelete: () -> Unit, onDismiss: () ->
         }
         val bitmap = remember(card) { runCatching { renderBarcode(card) }.getOrNull() }
         Column(
-            Modifier.fillMaxSize().background(Color.White).padding(RicordellaDimensions.spaceXl),
+            Modifier.fillMaxSize().background(Color.White).systemBarsPadding().padding(RicordellaDimensions.spaceL),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
             Text(card.name, style = MaterialTheme.typography.headlineMedium, color = Color.Black, textAlign = TextAlign.Center)
-            if (bitmap != null) {
-                Image(
-                    bitmap.asImageBitmap(), contentDescription = card.name, filterQuality = FilterQuality.None,
-                    contentScale = ContentScale.FillWidth, modifier = Modifier.fillMaxWidth().padding(vertical = RicordellaDimensions.spaceXl),
-                )
+            // Il codice prende lo spazio che resta (weight): i pulsanti sotto restano sempre raggiungibili.
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap.asImageBitmap(), contentDescription = card.name, filterQuality = FilterQuality.None,
+                        contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(vertical = RicordellaDimensions.spaceM),
+                    )
+                }
             }
             Text(card.code, style = MaterialTheme.typography.titleLarge, color = Color.Black, textAlign = TextAlign.Center)
-            Row(Modifier.padding(top = RicordellaDimensions.spaceXl)) {
+            Row {
                 TextButton(onClick = onDismiss) { Text(tr("Chiudi")) }
+                TextButton(onClick = { renaming = true }) { Text(tr("Modifica")) }
                 TextButton(onClick = { confirming = true }) { Text(tr("Elimina")) }
             }
         }
+    }
+    if (renaming) {
+        var name by rememberSaveable { mutableStateOf(card.name) }
+        AlertDialog(
+            onDismissRequest = { renaming = false },
+            title = { Text(tr("Nome della carta")) },
+            text = {
+                OutlinedTextField(
+                    name, { name = it.take(40) }, singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+                )
+            },
+            confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onRename(name.trim()); renaming = false }) { Text(tr("Salva")) } },
+            dismissButton = { TextButton(onClick = { renaming = false }) { Text(tr("Annulla")) } },
+        )
     }
     if (confirming) {
         AlertDialog(

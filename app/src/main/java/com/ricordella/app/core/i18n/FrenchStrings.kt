@@ -1585,4 +1585,5 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Nome (Decathlon, Coop...)" to "Nom (Decathlon, Coop...)",
     "Numero" to "Numéro",
     "Eliminare la carta?" to "Supprimer la carte ?",
+    "Nome della carta" to "Nom de la carte",
 )
