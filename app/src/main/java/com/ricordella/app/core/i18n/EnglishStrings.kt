@@ -1630,6 +1630,8 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Preferita" to "Favourite",
     "Mostra altre %1\$s" to "Show %1\$s more",
     "Mostra meno" to "Show less",
+    "Vedi in elenco" to "View as list",
+    "Vedi a blocchi" to "View as blocks",
     "Togli dai preferiti" to "Remove from favourites",
     "Aggiungi ai preferiti" to "Add to favourites",
     "Colore della categoria" to "Category colour",

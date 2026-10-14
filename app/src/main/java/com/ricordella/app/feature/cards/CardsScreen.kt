@@ -39,11 +39,13 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.PictureAsPdf
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material.icons.rounded.ViewAgenda
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -74,6 +76,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -109,6 +112,12 @@ import com.ricordella.app.feature.settings.CalendarPalette
 import com.ricordella.app.feature.settings.Swatch
 import kotlinx.coroutines.launch
 
+/** Il colore (ARGB) di una categoria: quello scelto, altrimenti uno della tavolozza (fisso una volta salvata la carta). */
+internal fun AppSettings.cardColor(category: String): Long {
+    val categories = cards.map { it.category }.filter { it.isNotEmpty() }.distinct().sortedBy { it.lowercase() }
+    return cardColors[category] ?: CalendarPalette[(categories.indexOf(category).takeIf { it >= 0 } ?: categories.size) % CalendarPalette.size]
+}
+
 /** Oltre questo numero di carte, una categoria mostra le prime e un "Mostra altre". */
 private const val COLLAPSED_COUNT = 3
 
@@ -125,7 +134,7 @@ private data class CardForm(val id: String?, val name: String, val category: Str
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CardsScreen(onBack: () -> Unit) {
+fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
     val context = LocalContext.current
     val container = (context.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
@@ -134,8 +143,7 @@ fun CardsScreen(onBack: () -> Unit) {
     val categories = cards.map { it.category }.filter { it.isNotEmpty() }.distinct().sortedBy { it.lowercase() }
     val suggestions = (categories + DefaultCategories).distinct()
     /** Il colore della categoria: quello scelto, altrimenti uno della tavolozza (fisso una volta salvata la carta). */
-    fun colorOf(category: String): Long =
-        settings.cardColors[category] ?: CalendarPalette[(categories.indexOf(category).takeIf { it >= 0 } ?: categories.size) % CalendarPalette.size]
+    fun colorOf(category: String): Long = settings.cardColor(category)
 
     var choosing by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
@@ -146,7 +154,7 @@ fun CardsScreen(onBack: () -> Unit) {
     var formFormat by rememberSaveable { mutableIntStateOf(Barcode.FORMAT_CODE_128) }
     var formId by rememberSaveable { mutableStateOf<String?>(null) }
     var formOpen by rememberSaveable { mutableStateOf(false) }
-    var previewId by rememberSaveable { mutableStateOf<String?>(null) }
+    var previewId by rememberSaveable { mutableStateOf(openId) }
     var detailId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleting by rememberSaveable { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(emptySet<String>()) }
@@ -348,15 +356,23 @@ fun CardsScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
                 ) {
                     item(key = "search") {
-                        OutlinedTextField(
-                            query, { query = it },
-                            placeholder = { Text(tr("Cerca una carta")) },
-                            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                            trailingIcon = { if (searching) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, contentDescription = tr("Cancella")) } },
-                            singleLine = true,
-                            shape = MaterialTheme.shapes.large,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                query, { query = it },
+                                placeholder = { Text(tr("Cerca una carta")) },
+                                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                                trailingIcon = { if (searching) IconButton(onClick = { query = "" }) { Icon(Icons.Rounded.Close, contentDescription = tr("Cancella")) } },
+                                singleLine = true,
+                                shape = MaterialTheme.shapes.large,
+                                modifier = Modifier.weight(1f),
+                            )
+                            IconButton(onClick = { update { it.copy(cardsGrid = !it.cardsGrid) } }) {
+                                Icon(
+                                    if (settings.cardsGrid) Icons.Rounded.ViewAgenda else Icons.Rounded.GridView,
+                                    contentDescription = if (settings.cardsGrid) tr("Vedi in elenco") else tr("Vedi a blocchi"),
+                                )
+                            }
+                        }
                     }
                     if (shown.isEmpty()) item(key = "none") {
                         Text(tr("Nessun risultato"), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(RicordellaDimensions.spaceL))
@@ -366,12 +382,18 @@ fun CardsScreen(onBack: () -> Unit) {
                         // Una sola carta in più non vale un "Mostra altre": si ripiega solo se ne restano almeno due. Cercando, si vede tutto.
                         val collapsible = group.cards.size > COLLAPSED_COUNT + 1 && !searching
                         val open = !collapsible || group.key in expanded
-                        (if (open) group.cards else group.cards.take(COLLAPSED_COUNT)).forEach { card ->
-                            item(key = "c/${card.id}") {
-                                CardRow(
-                                    card, cardTone(card.category.takeIf { it.isNotEmpty() }?.let(::colorOf)),
-                                    onClick = { previewId = card.id }, onFavorite = { toggleFavorite(card.id) },
-                                )
+                        val visible = if (open) group.cards else group.cards.take(COLLAPSED_COUNT)
+                        // A blocchi: due carte per riga (l'ultima, se dispari, lascia il posto vuoto).
+                        (if (settings.cardsGrid) visible.chunked(2) else visible.map { listOf(it) }).forEach { line ->
+                            item(key = "c/${line.first().id}") {
+                                Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+                                    line.forEach { card ->
+                                        val tone = cardTone(card.category.takeIf { it.isNotEmpty() }?.let(::colorOf))
+                                        if (settings.cardsGrid) CardTile(card, tone, { previewId = card.id }, { toggleFavorite(card.id) }, Modifier.weight(1f))
+                                        else CardRow(card, tone, { previewId = card.id }, { toggleFavorite(card.id) }, Modifier.weight(1f))
+                                    }
+                                    if (line.size == 1 && settings.cardsGrid) Box(Modifier.weight(1f))
+                                }
                             }
                         }
                         if (collapsible) item(key = "m/${group.key}") {
@@ -500,9 +522,35 @@ private fun GroupHeader(group: CardGroup) {
 }
 
 @Composable
-private fun CardRow(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavorite: () -> Unit) {
+private fun CardTile(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavorite: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
+            .padding(start = RicordellaDimensions.spaceM, top = RicordellaDimensions.spaceM, bottom = RicordellaDimensions.spaceM, end = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween) {
+            Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+            }
+            IconButton(onClick = onFavorite, Modifier.size(40.dp)) {
+                Icon(
+                    if (card.favorite) Icons.Rounded.Star else Icons.Rounded.StarBorder,
+                    contentDescription = if (card.favorite) tr("Togli dai preferiti") else tr("Aggiungi ai preferiti"),
+                    tint = if (card.favorite) MaterialTheme.ricordellaColors.pear.solid else tone.content,
+                )
+            }
+        }
+        Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content, maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+@Composable
+private fun CardRow(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavorite: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
             .background(tone.container)

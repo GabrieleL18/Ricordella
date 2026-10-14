@@ -101,6 +101,8 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(EXTRA_OPEN_NOTES, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTES, null)
         if (intent?.getBooleanExtra(EXTRA_NEW_NOTE, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_NOTE, null)
         intent?.getStringExtra(EXTRA_NOTE_ID)?.let { widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTE, null, it) }
+        // Widget carte: la sezione, o una carta da mostrare alla cassa.
+        if (intent?.getBooleanExtra(EXTRA_OPEN_CARDS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_CARDS, null, intent.getStringExtra(EXTRA_CARD_ID))
         // Tocco sul widget dei buoni propositi: si apre la loro schermata.
         if (intent?.getBooleanExtra(EXTRA_OPEN_RESOLUTIONS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_RESOLUTIONS, null)
     }
@@ -124,6 +126,9 @@ class MainActivity : ComponentActivity() {
         const val ACTION_NEW_NOTE = "new_note"
         const val EXTRA_NOTE_ID = "com.ricordella.app.extra.NOTE_ID"
         const val ACTION_OPEN_NOTE = "note"
+        const val EXTRA_OPEN_CARDS = "com.ricordella.app.extra.OPEN_CARDS"
+        const val EXTRA_CARD_ID = "com.ricordella.app.extra.CARD_ID"
+        const val ACTION_OPEN_CARDS = "cards"
         const val EXTRA_OPEN_RESOLUTIONS = "com.ricordella.app.extra.OPEN_RESOLUTIONS"
         const val ACTION_OPEN_RESOLUTIONS = "resolutions"
     }

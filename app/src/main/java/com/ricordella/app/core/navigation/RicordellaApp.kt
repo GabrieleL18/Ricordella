@@ -210,6 +210,7 @@ fun RicordellaApp(
             com.ricordella.app.MainActivity.ACTION_OPEN_NOTES -> navigator.openNotes()
             com.ricordella.app.MainActivity.ACTION_NEW_NOTE -> navigator.newNote()
             com.ricordella.app.MainActivity.ACTION_OPEN_NOTE -> request.id?.let(navigator::openNote)
+            com.ricordella.app.MainActivity.ACTION_OPEN_CARDS -> navigator.openCards(request.id)
             com.ricordella.app.MainActivity.ACTION_OPEN_POTIONS -> navigator.openPotions()
             com.ricordella.app.MainActivity.ACTION_OPEN_RESOLUTIONS -> navigator.openResolutions(java.time.LocalDate.now().year)
         }
@@ -294,7 +295,7 @@ fun RicordellaApp(
             composable<AlarmsRoute> { com.ricordella.app.feature.alarms.AlarmsScreen(navigator, onBack = navigator::back) }
             composable<AlarmEditRoute> { entry -> com.ricordella.app.feature.alarms.AlarmEditScreen(entry.toRoute<AlarmEditRoute>().id, onBack = navigator::back) }
             composable<TimersRoute> { com.ricordella.app.feature.timers.TimersScreen(onBack = navigator::back) }
-            composable<CardsRoute> { com.ricordella.app.feature.cards.CardsScreen(onBack = navigator::back) }
+            composable<CardsRoute> { entry -> com.ricordella.app.feature.cards.CardsScreen(onBack = navigator::back, openId = entry.toRoute<CardsRoute>().open) }
             composable<NotesRoute> { com.ricordella.app.feature.notes.NotesScreen(navigator, onBack = navigator::back) }
             composable<NoteRoute> { entry -> com.ricordella.app.feature.notes.NoteEditScreen(entry.toRoute<NoteRoute>(), onBack = navigator::back) }
             composable<TrashRoute> { com.ricordella.app.feature.settings.TrashScreen(onBack = navigator::back) }

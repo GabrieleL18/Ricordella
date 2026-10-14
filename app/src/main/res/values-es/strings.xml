@@ -16,4 +16,6 @@
     <string name="widget_notes_description">Tus notas y listas de la compra: toca una nota para abrirla, + para crear una</string>
     <string name="widget_timer_label">Temporizador Remindella</string>
     <string name="widget_timer_description">Cuenta atrás del próximo temporizador: toca para abrir los temporizadores</string>
+    <string name="widget_cards_label">Tarjetas de Remindella</string>
+    <string name="widget_cards_description">Tus tarjetas de fidelidad en bloques: toca una para mostrar el código en la caja</string>
 </resources>

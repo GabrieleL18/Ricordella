@@ -16,4 +16,6 @@
     <string name="widget_notes_description">Tes notes et listes de courses : touche une note pour l\'ouvrir, + pour en créer une</string>
     <string name="widget_timer_label">Minuteur Remindella</string>
     <string name="widget_timer_description">Le compte à rebours du prochain minuteur : touche pour ouvrir les minuteurs</string>
+    <string name="widget_cards_label">Cartes Remindella</string>
+    <string name="widget_cards_description">Tes cartes de fidélité en blocs : touche-en une pour afficher le code en caisse</string>
 </resources>

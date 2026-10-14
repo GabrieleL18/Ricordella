@@ -35,7 +35,7 @@ class AppNavigator(private val navController: NavController) {
     fun editAlarm(id: String) = navController.navigate(AlarmEditRoute(id)) { launchSingleTop = true }
     fun openAlarms() = navController.navigate(AlarmsRoute) { launchSingleTop = true }
     fun openTimers() = navController.navigate(TimersRoute) { launchSingleTop = true }
-    fun openCards() = navController.navigate(CardsRoute) { launchSingleTop = true }
+    fun openCards(open: String? = null) = navController.navigate(CardsRoute(open)) { launchSingleTop = true }
     fun openNotes() = navController.navigate(NotesRoute) { launchSingleTop = true }
     fun openNote(id: String) = navController.navigate(NoteRoute(id)) { launchSingleTop = true }
     fun newNote(list: Boolean = false, prices: Boolean = false, drawing: Boolean = false) =

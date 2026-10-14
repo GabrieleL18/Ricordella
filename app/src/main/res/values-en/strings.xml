@@ -16,4 +16,6 @@
     <string name="widget_notes_description">Your notes and shopping lists: tap a note to open it, + to add one</string>
     <string name="widget_timer_label">Remindella Timer</string>
     <string name="widget_timer_description">Countdown of the next timer: tap to open timers</string>
+    <string name="widget_cards_label">Remindella Cards</string>
+    <string name="widget_cards_description">Your loyalty cards as blocks: tap one to show its code at the checkout</string>
 </resources>

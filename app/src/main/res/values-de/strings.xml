@@ -16,4 +16,6 @@
     <string name="widget_notes_description">Deine Notizen und Einkaufslisten: Tippen öffnet die Notiz, + legt eine neue an</string>
     <string name="widget_timer_label">Remindella Timer</string>
     <string name="widget_timer_description">Countdown des nächsten Timers: Tippen öffnet die Timer</string>
+    <string name="widget_cards_label">Remindella Karten</string>
+    <string name="widget_cards_description">Deine Kundenkarten als Kacheln: Tippen zeigt den Code für die Kasse</string>
 </resources>

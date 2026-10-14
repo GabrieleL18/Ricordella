@@ -17,4 +17,6 @@
     <string name="widget_notes_description">Le tue note e liste della spesa: un tocco apre la nota, il + ne crea una</string>
     <string name="widget_timer_label">Timer Remindella</string>
     <string name="widget_timer_description">Il conto alla rovescia del prossimo timer: un tocco apre i timer</string>
+    <string name="widget_cards_label">Carte Remindella</string>
+    <string name="widget_cards_description">Le tue carte fedeltà a blocchi: un tocco mostra il codice da far leggere alla cassa</string>
 </resources>

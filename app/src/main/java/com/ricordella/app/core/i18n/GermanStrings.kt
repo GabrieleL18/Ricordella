@@ -1597,6 +1597,8 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Preferita" to "Favorit",
     "Mostra altre %1\$s" to "%1\$s weitere zeigen",
     "Mostra meno" to "Weniger zeigen",
+    "Vedi in elenco" to "Als Liste ansehen",
+    "Vedi a blocchi" to "Als Kacheln ansehen",
     "Togli dai preferiti" to "Aus Favoriten entfernen",
     "Aggiungi ai preferiti" to "Zu Favoriten hinzufügen",
     "Colore della categoria" to "Kategoriefarbe",

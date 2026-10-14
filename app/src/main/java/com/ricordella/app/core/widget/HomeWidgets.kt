@@ -22,6 +22,7 @@ import com.ricordella.app.core.i18n.tr
 import com.ricordella.app.core.i18n.trf
 import com.ricordella.app.core.ui.emoji
 import com.ricordella.app.domain.date.nextRing
+import com.ricordella.app.feature.cards.cardColor
 import com.ricordella.app.feature.timers.isTimer
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderFilter
@@ -52,12 +53,13 @@ object HomeWidgets {
     fun watch(context: Context, scope: CoroutineScope) {
         scope.launch {
             context.container.settingsRepository.settings
-                .map { Triple(it.potions, it.resolutions, it.notes) }
+                .map { listOf(it.potions, it.resolutions, it.notes, it.cards, it.cardColors) }
                 .distinctUntilChanged()
                 .collect {
                     WaterWidgetProvider.requestUpdate(context)
                     ResolutionsWidgetProvider.requestUpdate(context)
                     NotesWidgetProvider.requestUpdate(context)
+                    CardsWidgetProvider.requestUpdate(context)
                 }
         }
     }
@@ -69,6 +71,7 @@ object HomeWidgets {
         AgendaWidgetProvider.requestUpdate(context)
         AlarmWidgetProvider.requestUpdate(context)
         TimerWidgetProvider.requestUpdate(context)
+        CardsWidgetProvider.requestUpdate(context)
         NotesWidgetProvider.requestUpdate(context)
     }
 }
@@ -291,6 +294,46 @@ class NotesWidgetProvider : AppWidgetProvider() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Carte
+
+/** Le carte fedeltà a blocchi (preferite prime): un tocco su una carta ne apre il codice nell'app, l'intestazione apre le Carte. */
+class CardsWidgetProvider : AppWidgetProvider() {
+
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        ids.forEach { widgetId ->
+            val views = RemoteViews(context.packageName, R.layout.widget_cards)
+            views.setTextViewText(R.id.cards_title, tr("Carte"))
+            views.setTextViewText(R.id.cards_empty, tr("Nessuna carta"))
+            views.setViewVisibility(R.id.cards_sample, View.GONE)
+            views.bindList(context, R.id.cards_grid, WidgetListService.KIND_CARDS, widgetId)
+            views.setEmptyView(R.id.cards_grid, R.id.cards_empty)
+            // Come per le note: il modello è un'attività, ogni blocco aggiunge l'id della sua carta.
+            views.setPendingIntentTemplate(
+                R.id.cards_grid,
+                PendingIntent.getActivity(
+                    context,
+                    REQUEST_ROW,
+                    Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                ),
+            )
+            val open = openApp(context, REQUEST_OPEN) { putExtra(MainActivity.EXTRA_OPEN_CARDS, true) }
+            views.setOnClickPendingIntent(R.id.cards_header, open)
+            views.setOnClickPendingIntent(R.id.cards_empty, open)
+            manager.updateAppWidget(widgetId, views)
+        }
+        manager.notifyAppWidgetViewDataChanged(ids, R.id.cards_grid)
+    }
+
+    companion object {
+        private const val REQUEST_OPEN = 2_500
+        private const val REQUEST_ROW = 2_501
+
+        fun requestUpdate(context: Context) = requestUpdate(context, CardsWidgetProvider::class.java)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
 // Buoni propositi
 
 /** Lista scorrevole dei propositi dell'anno: un tocco su una riga la spunta (o la toglie). */
@@ -485,6 +528,7 @@ class WidgetListService : RemoteViewsService() {
         when (intent.getStringExtra(EXTRA_KIND)) {
             KIND_AGENDA -> AgendaFactory(applicationContext, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID))
             KIND_NOTES -> NotesFactory(applicationContext)
+            KIND_CARDS -> CardsFactory(applicationContext)
             else -> ResolutionsFactory(applicationContext)
         }
 
@@ -493,6 +537,7 @@ class WidgetListService : RemoteViewsService() {
         const val KIND_RESOLUTIONS = "resolutions"
         const val KIND_AGENDA = "agenda"
         const val KIND_NOTES = "notes"
+        const val KIND_CARDS = "cards"
     }
 }
 
@@ -558,6 +603,34 @@ private class NotesFactory(context: Context) : SimpleFactory(context) {
             setTextViewText(R.id.row_subtitle, subtitle)
             setViewVisibility(R.id.row_subtitle, if (subtitle.isEmpty()) View.GONE else View.VISIBLE)
             setOnClickFillInIntent(R.id.row, Intent().putExtra(MainActivity.EXTRA_NOTE_ID, note.id))
+        }
+    }
+}
+
+private class CardsFactory(context: Context) : SimpleFactory(context) {
+    private var rows = emptyList<Pair<com.ricordella.app.domain.model.LoyaltyCard, Long?>>()
+
+    override fun onDataSetChanged() {
+        rows = runBlocking {
+            val settings = context.container.settingsRepository.current()
+            settings.cards
+                .sortedWith(compareByDescending<com.ricordella.app.domain.model.LoyaltyCard> { it.favorite }.thenBy { it.name.lowercase() })
+                .map { it to it.category.takeIf { c -> c.isNotEmpty() }?.let(settings::cardColor) }
+        }
+    }
+
+    override fun getCount() = rows.size
+    override fun getViewTypeCount() = 1
+
+    override fun getViewAt(position: Int): RemoteViews {
+        val (card, color) = rows[position]
+        return RemoteViews(context.packageName, R.layout.widget_card_tile).apply {
+            setTextViewText(R.id.tile_name, (if (card.favorite) "⭐ " else "") + card.name)
+            setInt(R.id.tile_dot, "setColorFilter", (color ?: 0xFF9B6BE6).toInt())
+            setOnClickFillInIntent(
+                R.id.tile,
+                Intent().putExtra(MainActivity.EXTRA_OPEN_CARDS, true).putExtra(MainActivity.EXTRA_CARD_ID, card.id),
+            )
         }
     }
 }
