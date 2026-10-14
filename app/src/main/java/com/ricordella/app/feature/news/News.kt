@@ -86,6 +86,15 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
 val AllNews: List<NewsRelease>
     get() = listOf(
         NewsRelease(
+            versionCode = 12,
+            versionName = "0.8.0",
+            date = java.time.LocalDate.of(2026, 10, 14),
+            items = listOf(
+                NewsItem(Icons.Rounded.Widgets, { it.cyan }, tr("Widget Carte"), tr("Le tue carte nella schermata Home: un tocco mostra il codice da far leggere alla cassa.")),
+                NewsItem(Icons.Rounded.CreditCard, { it.lavender }, tr("Carte a blocchi"), tr("Vedi le carte a blocchi o in elenco, con un'icona per ogni categoria e la nuova categoria Altro.")),
+            ),
+        ),
+        NewsRelease(
             versionCode = 11,
             versionName = "0.7.0",
             date = java.time.LocalDate.of(2026, 10, 14),

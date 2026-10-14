@@ -1,30 +1,30 @@
 <it-IT>
 Novità:
-• Carte fedeltà: scansiona le tessere di negozi e supermercati (fotocamera, foto o PDF) e mostrale alla cassa a tutto schermo
-• Organizzale per categoria con un colore a scelta e metti le preferite in cima
-• Cercale per nome, categoria o numero
+• Widget Carte: le tue carte fedeltà a blocchi nella Home, un tocco mostra il codice alla cassa
+• Nelle Carte puoi scegliere la vista a blocchi o l'elenco
+• Un'icona per ogni categoria e la nuova categoria Altro
 </it-IT>
 <en-US>
 What's new:
-• Loyalty cards: scan your store and supermarket cards (camera, photo or PDF) and show them full screen at the checkout
-• Organise them by category with a colour of your choice and pin favourites on top
-• Search by name, category or number
+• Cards widget: your loyalty cards as blocks on the home screen, one tap shows the code at the checkout
+• Choose block or list view in Cards
+• An icon for each category and the new Other category
 </en-US>
 <de-DE>
 Neu:
-• Kundenkarten: Karten von Geschäften und Supermärkten scannen (Kamera, Foto oder PDF) und an der Kasse im Vollbild zeigen
-• Nach Kategorien mit Farbe ordnen, Favoriten nach oben
-• Suche nach Name, Kategorie oder Nummer
+• Karten-Widget: deine Kundenkarten als Kacheln auf dem Startbildschirm, ein Tipp zeigt den Code an der Kasse
+• In Karten zwischen Kachel- und Listenansicht wählen
+• Ein Symbol pro Kategorie und die neue Kategorie Sonstiges
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Cartes de fidélité : scanne tes cartes de magasins et supermarchés (appareil photo, photo ou PDF) et montre-les en plein écran en caisse
-• Classe-les par catégorie avec la couleur de ton choix, favorites en haut
-• Recherche par nom, catégorie ou numéro
+• Widget Cartes : tes cartes de fidélité en blocs sur l'écran d'accueil, un appui affiche le code en caisse
+• Dans Cartes, choisis la vue en blocs ou en liste
+• Une icône par catégorie et la nouvelle catégorie Autre
 </fr-FR>
 <es-ES>
 Novedades:
-• Tarjetas de fidelidad: escanea las tarjetas de tiendas y supermercados (cámara, foto o PDF) y muéstralas a pantalla completa en la caja
-• Organízalas por categoría con el color que quieras y pon las favoritas arriba
-• Búscalas por nombre, categoría o número
+• Widget de tarjetas: tus tarjetas de fidelidad en bloques en la pantalla de inicio, un toque muestra el código en la caja
+• En Tarjetas elige la vista en bloques o en lista
+• Un icono por categoría y la nueva categoría Otro
 </es-ES>
