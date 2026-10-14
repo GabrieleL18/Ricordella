@@ -88,6 +88,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogWindowProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
@@ -452,9 +453,12 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                     Text(tr("Aggiungi una carta"), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
                     ChoiceTile(Icons.Rounded.PhotoCamera, tr("Fotocamera"), tr("Inquadra il documento adesso"), colors.cyan) {
                         choosing = false
-                        GmsBarcodeScanning.getClient(context).startScan()
-                            .addOnSuccessListener { onCodes(listOf(it)) }
-                            .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+                        // Con le opzioni predefinite (nessun formato) lo scanner di Google va in crash: i formati si indicano sempre.
+                        runCatching {
+                            GmsBarcodeScanning.getClient(context, GmsBarcodeScannerOptions.Builder().setBarcodeFormats(ScanFormats[0], *ScanFormats.drop(1).toIntArray()).build()).startScan()
+                                .addOnSuccessListener { onCodes(listOf(it)) }
+                                .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+                        }.onFailure { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
                     }
                     ChoiceTile(Icons.Rounded.PictureAsPdf, tr("Foto o PDF"), tr("Un file già sul telefono, anche un PDF ricevuto per email"), colors.lavender) {
                         choosing = false; picker.launch(ScanFileTypes)
@@ -668,3 +672,8 @@ internal fun categoryEmoji(category: String): String {
         else -> "🏷️"
     }
 }
+
+private val ScanFormats = listOf(
+    Barcode.FORMAT_CODE_128, Barcode.FORMAT_CODE_39, Barcode.FORMAT_CODE_93, Barcode.FORMAT_CODABAR, Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,
+    Barcode.FORMAT_ITF, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E, Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX, Barcode.FORMAT_PDF417, Barcode.FORMAT_AZTEC,
+)

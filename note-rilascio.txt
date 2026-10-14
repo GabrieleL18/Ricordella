@@ -1,30 +1,25 @@
 <it-IT>
-Novità:
-• Invia una carta fedeltà a un'altra persona: la aggiunge con un tocco
-• Condivisione su Drive più precisa: scegli uno per uno cosa condividere, anche le carte
-• Alla prima configurazione scegli le sezioni che ti interessano
+Correzioni:
+• Carte: risolto l'arresto dell'app aprendo la fotocamera per scansionare una carta
+• Novità della 0.9: invio delle carte, condivisione Drive più precisa, scelta delle sezioni all'avvio
 </it-IT>
 <en-US>
-What's new:
-• Send a loyalty card to someone else: they add it with one tap
-• More precise Drive sharing: choose one by one what to share, cards included
-• At first setup, pick the sections you care about
+Fixes:
+• Cards: fixed the app crashing when opening the camera to scan a card
+• New in 0.9: send cards, more precise Drive sharing, pick your sections at first setup
 </en-US>
 <de-DE>
-Neu:
-• Kundenkarte an jemand anderen senden: mit einem Tipp hinzugefügt
-• Genaueres Teilen über Drive: einzeln wählen, was geteilt wird, auch Karten
-• Bei der ersten Einrichtung die gewünschten Bereiche wählen
+Korrekturen:
+• Karten: Absturz beim Öffnen der Kamera zum Scannen einer Karte behoben
+• Neu in 0.9: Karten senden, genaueres Teilen über Drive, Bereiche bei der Einrichtung wählen
 </de-DE>
 <fr-FR>
-Nouveautés :
-• Envoie une carte de fidélité à quelqu'un : elle l'ajoute d'un appui
-• Partage Drive plus précis : choisis un par un ce qui est partagé, cartes comprises
-• À la première configuration, choisis les sections qui t'intéressent
+Corrections :
+• Cartes : correction du plantage à l'ouverture de l'appareil photo pour scanner une carte
+• Nouveau en 0.9 : envoi de cartes, partage Drive plus précis, choix des sections au démarrage
 </fr-FR>
 <es-ES>
-Novedades:
-• Envía una tarjeta de fidelidad a otra persona: la añade con un toque
-• Compartir en Drive con más precisión: elige una a una qué compartir, también las tarjetas
-• En la primera configuración elige las secciones que te interesan
+Correcciones:
+• Tarjetas: corregido el cierre de la app al abrir la cámara para escanear una tarjeta
+• Novedades de la 0.9: envío de tarjetas, compartir en Drive con más precisión, elegir secciones al empezar
 </es-ES>
