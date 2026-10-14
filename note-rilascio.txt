@@ -1,35 +1,30 @@
 <it-IT>
 Novità:
-• Appuntamenti con i clienti: aggiungili dalla rubrica e ricorda loro l'appuntamento su WhatsApp, SMS o email con un tocco dalla notifica
-• Testo del messaggio personalizzabile, con data e ora sempre incluse
-• Colori del calendario a scelta
-• Mostra solo le sezioni che usi: le altre si spengono dalle Impostazioni
+• Carte fedeltà: scansiona le tessere di negozi e supermercati (fotocamera, foto o PDF) e mostrale alla cassa a tutto schermo
+• Organizzale per categoria con un colore a scelta e metti le preferite in cima
+• Cercale per nome, categoria o numero
 </it-IT>
 <en-US>
 What's new:
-• Client appointments: add clients from your contacts and remind them via WhatsApp, SMS or email in one tap from the notification
-• Customisable message text, always with date and time
-• Choose your calendar colours
-• Show only the sections you use: turn the others off in Settings
+• Loyalty cards: scan your store and supermarket cards (camera, photo or PDF) and show them full screen at the checkout
+• Organise them by category with a colour of your choice and pin favourites on top
+• Search by name, category or number
 </en-US>
 <de-DE>
 Neu:
-• Kundentermine: Kunden aus den Kontakten hinzufügen und per WhatsApp, SMS oder E-Mail mit einem Tipp aus der Benachrichtigung erinnern
-• Anpassbarer Nachrichtentext, immer mit Datum und Uhrzeit
-• Kalenderfarben nach Wahl
-• Nur die Bereiche, die du nutzt: die anderen in den Einstellungen ausschalten
+• Kundenkarten: Karten von Geschäften und Supermärkten scannen (Kamera, Foto oder PDF) und an der Kasse im Vollbild zeigen
+• Nach Kategorien mit Farbe ordnen, Favoriten nach oben
+• Suche nach Name, Kategorie oder Nummer
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Rendez-vous clients : ajoute-les depuis les contacts et rappelle-leur le rendez-vous par WhatsApp, SMS ou e-mail en un geste depuis la notification
-• Texte du message personnalisable, toujours avec date et heure
-• Couleurs du calendrier au choix
-• Affiche seulement les sections utiles : désactive les autres dans les Réglages
+• Cartes de fidélité : scanne tes cartes de magasins et supermarchés (appareil photo, photo ou PDF) et montre-les en plein écran en caisse
+• Classe-les par catégorie avec la couleur de ton choix, favorites en haut
+• Recherche par nom, catégorie ou numéro
 </fr-FR>
 <es-ES>
 Novedades:
-• Citas con clientes: añádelos desde contactos y recuérdales la cita por WhatsApp, SMS o correo con un toque desde la notificación
-• Texto del mensaje personalizable, siempre con fecha y hora
-• Colores del calendario a elección
-• Muestra solo las secciones que usas: desactiva las demás en Ajustes
+• Tarjetas de fidelidad: escanea las tarjetas de tiendas y supermercados (cámara, foto o PDF) y muéstralas a pantalla completa en la caja
+• Organízalas por categoría con el color que quieras y pon las favoritas arriba
+• Búscalas por nombre, categoría o número
 </es-ES>

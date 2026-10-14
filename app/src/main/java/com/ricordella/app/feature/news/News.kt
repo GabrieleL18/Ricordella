@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.StickyNote2
@@ -84,6 +85,18 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 11,
+            versionName = "0.7.0",
+            date = java.time.LocalDate.of(2026, 10, 14),
+            items = listOf(
+                NewsItem(
+                    Icons.Rounded.CreditCard, { it.lavender }, tr("Carte fedeltà"),
+                    tr("Scansiona le tessere di negozi e supermercati e mostrale alla cassa dal telefono."),
+                    tr("Nella nuova sezione Carte scansioni il codice con la fotocamera, da una foto o da un PDF, oppure scrivi il numero. Alla cassa la carta si apre a tutto schermo, con la luminosità al massimo, pronta da leggere. Le organizzi per categoria con un colore a scelta, metti le preferite in cima e le ritrovi con la ricerca."),
+                ),
+            ),
+        ),
         NewsRelease(
             versionCode = 10,
             versionName = "0.6.0",

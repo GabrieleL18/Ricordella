@@ -1634,4 +1634,10 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Aggiungi ai preferiti" to "Add to favourites",
     "Colore della categoria" to "Category colour",
     "Cerca una carta" to "Search cards",
+    "Carte fedeltà" to "Loyalty cards",
+    "Scansiona le tessere di negozi e supermercati e mostrale alla cassa dal telefono." to "Scan your store and supermarket cards and show them at the checkout from your phone.",
+    "Nella nuova sezione Carte scansioni il codice con la fotocamera, da una foto o da un PDF, oppure scrivi il numero. Alla cassa la carta si apre a tutto schermo, con la luminosità al massimo, pronta da leggere. Le organizzi per categoria con un colore a scelta, metti le preferite in cima e le ritrovi con la ricerca." to "In the new Cards section you scan the code with the camera, from a photo or a PDF, or type the number. At the checkout the card opens full screen at maximum brightness, ready to be read. Organise them by category with a colour of your choice, pin favourites on top and find them with search.",
+    "Mostra dettagli" to "Show details",
+    "Nascondi dettagli" to "Hide details",
+    "Formato" to "Format",
 )
