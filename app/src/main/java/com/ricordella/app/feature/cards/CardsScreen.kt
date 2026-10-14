@@ -109,6 +109,7 @@ import com.ricordella.app.core.ui.ScanFileTypes
 import com.ricordella.app.core.ui.WizardScene
 import com.ricordella.app.core.ui.contentWidth
 import com.ricordella.app.core.ui.scanInputImage
+import com.ricordella.app.core.ui.renderFirstPdfPage
 import com.ricordella.app.core.ui.theme.RicordellaDimensions
 import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
@@ -198,10 +199,10 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
         }
         formOpen = false
     }
-    val onCodes: (List<Barcode>) -> Unit = { found ->
-        val first = found.firstOrNull { it.rawValue != null }
+    val onCodes: (List<Scan>) -> Unit = { found ->
+        val first = found.firstOrNull()
         if (first == null) Toast.makeText(context, tr("Nessun codice trovato"), Toast.LENGTH_LONG).show()
-        else openForm(CardForm(null, "", "", null, first.rawValue!!, first.format))
+        else openForm(CardForm(null, "", "", null, first.code, first.format))
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { readBarcodes(context, it, onCodes) }
@@ -456,7 +457,7 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                         // Con le opzioni predefinite (nessun formato) lo scanner di Google va in crash: i formati si indicano sempre.
                         runCatching {
                             GmsBarcodeScanning.getClient(context, GmsBarcodeScannerOptions.Builder().setBarcodeFormats(ScanFormats[0], *ScanFormats.drop(1).toIntArray()).build()).startScan()
-                                .addOnSuccessListener { onCodes(listOf(it)) }
+                                .addOnSuccessListener { b -> onCodes(listOfNotNull(b.rawValue?.let { Scan(it, b.format) })) }
                                 .addOnFailureListener { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
                         }.onFailure { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
                     }
@@ -642,12 +643,6 @@ private fun renderBarcode(card: LoyaltyCard): Bitmap {
     return Bitmap.createBitmap(pixels, matrix.width, matrix.height, Bitmap.Config.ARGB_8888)
 }
 
-private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Barcode>) -> Unit) {
-    val image = runCatching { scanInputImage(context, uri) }.getOrElse { return onCodes(emptyList()) }
-    BarcodeScanning.getClient().process(image)
-        .addOnSuccessListener(onCodes)
-        .addOnFailureListener { onCodes(emptyList()) }
-}
 
 
 /** L'emoji di una categoria, scelta dal nome (anche nelle altre lingue); 💳 se non è riconosciuta o manca. */
@@ -677,3 +672,59 @@ private val ScanFormats = listOf(
     Barcode.FORMAT_CODE_128, Barcode.FORMAT_CODE_39, Barcode.FORMAT_CODE_93, Barcode.FORMAT_CODABAR, Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,
     Barcode.FORMAT_ITF, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E, Barcode.FORMAT_QR_CODE, Barcode.FORMAT_DATA_MATRIX, Barcode.FORMAT_PDF417, Barcode.FORMAT_AZTEC,
 )
+
+/** Un codice letto: il testo e il formato (costante `Barcode.FORMAT_*`). */
+private class Scan(val code: String, val format: Int)
+
+/**
+ * Legge i codici di una foto o di un PDF con ML Kit; se non è disponibile o non trova nulla
+ * (servizi Google mancanti, modulo non scaricato) riprova con ZXing, che è dentro l'app.
+ */
+private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Scan>) -> Unit) {
+    fun fallback() {
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        Thread { val found = runCatching { zxingScan(context, uri) }.getOrNull(); main.post { onCodes(listOfNotNull(found)) } }.start()
+    }
+    val image = runCatching { scanInputImage(context, uri) }.getOrElse { return fallback() }
+    runCatching {
+        BarcodeScanning.getClient().process(image)
+            .addOnSuccessListener { found ->
+                val scans = found.mapNotNull { b -> b.rawValue?.let { Scan(it, b.format) } }
+                if (scans.isEmpty()) fallback() else onCodes(scans)
+            }
+            .addOnFailureListener { fallback() }
+    }.onFailure { fallback() }
+}
+
+private fun zxingScan(context: Context, uri: Uri): Scan? {
+    val bitmap = if (context.contentResolver.getType(uri) == "application/pdf") renderFirstPdfPage(context, uri) else {
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
+        val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = (maxOf(bounds.outWidth, bounds.outHeight) / 2000).coerceAtLeast(1) }
+        context.contentResolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, options) } ?: return null
+    }
+    val pixels = IntArray(bitmap.width * bitmap.height).also { bitmap.getPixels(it, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height) }
+    val source = com.google.zxing.RGBLuminanceSource(bitmap.width, bitmap.height, pixels)
+    val hints = mapOf(com.google.zxing.DecodeHintType.TRY_HARDER to true)
+    for (luminance in listOf(source, source.invert())) {
+        val result = runCatching { com.google.zxing.MultiFormatReader().decode(com.google.zxing.BinaryBitmap(com.google.zxing.common.HybridBinarizer(luminance)), hints) }.getOrNull() ?: continue
+        return Scan(result.text, mlKitFormat(result.barcodeFormat))
+    }
+    return null
+}
+
+private fun mlKitFormat(zxing: BarcodeFormat): Int = when (zxing) {
+    BarcodeFormat.CODE_39 -> Barcode.FORMAT_CODE_39
+    BarcodeFormat.CODE_93 -> Barcode.FORMAT_CODE_93
+    BarcodeFormat.CODABAR -> Barcode.FORMAT_CODABAR
+    BarcodeFormat.DATA_MATRIX -> Barcode.FORMAT_DATA_MATRIX
+    BarcodeFormat.EAN_13 -> Barcode.FORMAT_EAN_13
+    BarcodeFormat.EAN_8 -> Barcode.FORMAT_EAN_8
+    BarcodeFormat.ITF -> Barcode.FORMAT_ITF
+    BarcodeFormat.QR_CODE -> Barcode.FORMAT_QR_CODE
+    BarcodeFormat.UPC_A -> Barcode.FORMAT_UPC_A
+    BarcodeFormat.UPC_E -> Barcode.FORMAT_UPC_E
+    BarcodeFormat.PDF_417 -> Barcode.FORMAT_PDF417
+    BarcodeFormat.AZTEC -> Barcode.FORMAT_AZTEC
+    else -> Barcode.FORMAT_CODE_128
+}

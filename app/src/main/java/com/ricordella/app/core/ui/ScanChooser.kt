@@ -148,7 +148,7 @@ fun scanInputImage(context: Context, uri: Uri): InputImage =
     else InputImage.fromFilePath(context, uri)
 
 // ponytail: legge solo la prima pagina del PDF, dove c'è quasi sempre quello che serve; scorrere le pagine se servisse.
-private fun renderFirstPdfPage(context: Context, uri: Uri): Bitmap =
+internal fun renderFirstPdfPage(context: Context, uri: Uri): Bitmap =
     context.contentResolver.openFileDescriptor(uri, "r")!!.use { fd ->
         PdfRenderer(fd).use { pdf ->
             pdf.openPage(0).use { page ->
