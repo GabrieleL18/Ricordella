@@ -2,6 +2,7 @@ package com.ricordella.app.feature.home
 
 import com.ricordella.app.domain.model.AppSection
 import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.CreditCard
 import com.ricordella.app.core.ui.pressScale
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material.icons.rounded.StickyNote2
@@ -533,6 +534,7 @@ private fun HomeExtras(navigator: AppNavigator) {
         if (settings.shows(AppSection.ALARMS)) ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
         if (settings.shows(AppSection.TIMERS)) ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
         ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
+        ExtraTile(Icons.Rounded.CreditCard, tr("Carte"), colors.lavender, navigator::openCards, Modifier.weight(1f))
         if (settings.shows(AppSection.POTIONS)) ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
     }
 }

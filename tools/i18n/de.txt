@@ -1572,3 +1572,12 @@ Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a 
 Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni. ||| Wähle in den Einstellungen die Farbe von Aufgaben, Terminen, Fristen und Zahlungen.
 Solo le sezioni che usi ||| Nur die Bereiche, die du nutzt
 Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano. ||| Schalte Wecker, Timer, Tränke, Urlaube, Arzttermine, Ausgaben, Zyklus oder Kundentermine in den Einstellungen aus: Sie verschwinden aus Hinzufügen und Start, die Daten bleiben.
+Carte ||| Karten
+Nessun codice trovato ||| Kein Code gefunden
+Scansiona una carta ||| Karte scannen
+Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa. ||| Richte die Kamera auf Strichcode oder QR: Du findest ihn hier, bereit für die Kasse.
+Scrivi il numero a mano ||| Nummer von Hand eingeben
+Nuova carta ||| Neue Karte
+Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
+Numero ||| Nummer
+Eliminare la carta? ||| Karte löschen?

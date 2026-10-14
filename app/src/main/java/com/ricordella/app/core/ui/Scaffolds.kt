@@ -1,6 +1,7 @@
 package com.ricordella.app.core.ui
 
 import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material3.DropdownMenu
@@ -105,6 +106,7 @@ fun TopLevelScaffold(
                     DropdownMenu(expanded = sections, onDismissRequest = { sections = false }) {
                         DropdownMenuItem(text = { Text(tr("Sveglie")) }, leadingIcon = { Icon(Icons.Rounded.Alarm, null) }, onClick = { sections = false; navigator.openAlarms() })
                         DropdownMenuItem(text = { Text(tr("Note")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) }, onClick = { sections = false; navigator.openNotes() })
+                        DropdownMenuItem(text = { Text(tr("Carte")) }, leadingIcon = { Icon(Icons.Rounded.CreditCard, null) }, onClick = { sections = false; navigator.openCards() })
                         DropdownMenuItem(text = { Text(tr("Pozioni")) }, leadingIcon = { Icon(Icons.Rounded.WaterDrop, null) }, onClick = { sections = false; navigator.openPotions() })
                     }
                     IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }

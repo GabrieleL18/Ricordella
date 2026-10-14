@@ -174,6 +174,8 @@ data class AppSettings(
     val showExtrasOnHome: Boolean = true,
     /** Note e liste della spesa. */
     val notes: List<Note> = emptyList(),
+    /** Carte fedeltà (Decathlon, Coop...): nome e codice da mostrare alla cassa. */
+    val cards: List<LoyaltyCard> = emptyList(),
     /** Nome in più per il backup in cartella condivisa, per distinguere due persone con lo stesso nome. */
     val backupAlias: String = "",
     /** Sezioni di cui si è già visto il tutorial: compare la prima volta che si entra. */

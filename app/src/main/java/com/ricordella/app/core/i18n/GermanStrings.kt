@@ -1576,4 +1576,13 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Wähle in den Einstellungen die Farbe von Aufgaben, Terminen, Fristen und Zahlungen.",
     "Solo le sezioni che usi" to "Nur die Bereiche, die du nutzt",
     "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Schalte Wecker, Timer, Tränke, Urlaube, Arzttermine, Ausgaben, Zyklus oder Kundentermine in den Einstellungen aus: Sie verschwinden aus Hinzufügen und Start, die Daten bleiben.",
+    "Carte" to "Karten",
+    "Nessun codice trovato" to "Kein Code gefunden",
+    "Scansiona una carta" to "Karte scannen",
+    "Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa." to "Richte die Kamera auf Strichcode oder QR: Du findest ihn hier, bereit für die Kasse.",
+    "Scrivi il numero a mano" to "Nummer von Hand eingeben",
+    "Nuova carta" to "Neue Karte",
+    "Nome (Decathlon, Coop...)" to "Name (Decathlon, Coop...)",
+    "Numero" to "Nummer",
+    "Eliminare la carta?" to "Karte löschen?",
 )

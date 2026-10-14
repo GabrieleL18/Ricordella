@@ -1647,3 +1647,12 @@ Nell'evento accendi «Appuntamento con clienti» e aggiungili dalla rubrica o a 
 Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni. ||| Pick the colour of tasks, events, deadlines and payments in Settings.
 Solo le sezioni che usi ||| Only the sections you use
 Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano. ||| Turn off alarms, timers, potions, holidays, visits, expenses, cycle or appointments in Settings: they disappear from Add and Home, your data stays.
+Carte ||| Cards
+Nessun codice trovato ||| No code found
+Scansiona una carta ||| Scan a card
+Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa. ||| Point at the barcode or QR: you'll find it here, ready for the checkout.
+Scrivi il numero a mano ||| Type the number by hand
+Nuova carta ||| New card
+Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
+Numero ||| Number
+Eliminare la carta? ||| Delete the card?

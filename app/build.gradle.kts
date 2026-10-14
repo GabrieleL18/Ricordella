@@ -120,6 +120,8 @@ dependencies {
     // Carte d'imbarco: scansione con la fotocamera (senza permesso) e lettura da foto/PDF.
     implementation(libs.play.services.code.scanner)
     implementation(libs.mlkit.barcode.scanning)
+    // Disegna il codice a barre delle carte fedeltà (la lettura è di ML Kit).
+    implementation(libs.zxing.core)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

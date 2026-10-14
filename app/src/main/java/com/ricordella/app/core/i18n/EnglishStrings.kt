@@ -1609,4 +1609,13 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Pick the colour of tasks, events, deadlines and payments in Settings.",
     "Solo le sezioni che usi" to "Only the sections you use",
     "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Turn off alarms, timers, potions, holidays, visits, expenses, cycle or appointments in Settings: they disappear from Add and Home, your data stays.",
+    "Carte" to "Cards",
+    "Nessun codice trovato" to "No code found",
+    "Scansiona una carta" to "Scan a card",
+    "Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa." to "Point at the barcode or QR: you'll find it here, ready for the checkout.",
+    "Scrivi il numero a mano" to "Type the number by hand",
+    "Nuova carta" to "New card",
+    "Nome (Decathlon, Coop...)" to "Name (Decathlon, Coop...)",
+    "Numero" to "Number",
+    "Eliminare la carta?" to "Delete the card?",
 )

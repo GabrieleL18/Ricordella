@@ -1576,4 +1576,13 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Scegli il colore di attività, eventi, scadenze e pagamenti nelle Impostazioni." to "Elige el color de tareas, eventos, vencimientos y pagos en Ajustes.",
     "Solo le sezioni che usi" to "Solo las secciones que usas",
     "Spegni nelle Impostazioni sveglie, timer, pozioni, vacanze, visite, spese, ciclo o appuntamenti: spariscono da Aggiungi e dalla Home, i dati restano." to "Desactiva alarmas, temporizadores, pociones, vacaciones, visitas, gastos, ciclo o citas en Ajustes: desaparecen de Añadir y del Inicio, los datos se conservan.",
+    "Carte" to "Tarjetas",
+    "Nessun codice trovato" to "No se encontró ningún código",
+    "Scansiona una carta" to "Escanear una tarjeta",
+    "Inquadra il codice a barre o il QR: lo rivedi qui, pronto per la cassa." to "Enfoca el código de barras o el QR: lo verás aquí, listo para la caja.",
+    "Scrivi il numero a mano" to "Escribir el número a mano",
+    "Nuova carta" to "Nueva tarjeta",
+    "Nome (Decathlon, Coop...)" to "Nombre (Decathlon, Coop...)",
+    "Numero" to "Número",
+    "Eliminare la carta?" to "¿Eliminar la tarjeta?",
 )
