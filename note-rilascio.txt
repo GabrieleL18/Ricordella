@@ -1,6 +1,6 @@
 <it-IT>
 Correzioni:
-• Carte: risolto l'arresto dell'app aprendo la fotocamera per scansionare una carta
+• Carte: risolto l'arresto dell'app aprendo la fotocamera per scansionare una carta (versione Store)
 • Novità della 0.9: invio delle carte, condivisione Drive più precisa, scelta delle sezioni all'avvio
 </it-IT>
 <en-US>
