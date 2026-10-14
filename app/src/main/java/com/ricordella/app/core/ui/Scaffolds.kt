@@ -104,10 +104,11 @@ fun TopLevelScaffold(
                         Icon(Icons.Rounded.Apps, contentDescription = tr("Sveglie, note e pozioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
                     }
                     DropdownMenu(expanded = sections, onDismissRequest = { sections = false }) {
-                        DropdownMenuItem(text = { Text(tr("Sveglie")) }, leadingIcon = { Icon(Icons.Rounded.Alarm, null) }, onClick = { sections = false; navigator.openAlarms() })
-                        DropdownMenuItem(text = { Text(tr("Note")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) }, onClick = { sections = false; navigator.openNotes() })
-                        DropdownMenuItem(text = { Text(tr("Carte")) }, leadingIcon = { Icon(Icons.Rounded.CreditCard, null) }, onClick = { sections = false; navigator.openCards() })
-                        DropdownMenuItem(text = { Text(tr("Pozioni")) }, leadingIcon = { Icon(Icons.Rounded.WaterDrop, null) }, onClick = { sections = false; navigator.openPotions() })
+                        val shown = com.ricordella.app.core.ui.LocalAppSettings.current
+                        if (shown.shows(com.ricordella.app.domain.model.AppSection.ALARMS)) DropdownMenuItem(text = { Text(tr("Sveglie")) }, leadingIcon = { Icon(Icons.Rounded.Alarm, null) }, onClick = { sections = false; navigator.openAlarms() })
+                        if (shown.shows(com.ricordella.app.domain.model.AppSection.NOTES)) DropdownMenuItem(text = { Text(tr("Note")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) }, onClick = { sections = false; navigator.openNotes() })
+                        if (shown.shows(com.ricordella.app.domain.model.AppSection.CARDS)) DropdownMenuItem(text = { Text(tr("Carte")) }, leadingIcon = { Icon(Icons.Rounded.CreditCard, null) }, onClick = { sections = false; navigator.openCards() })
+                        if (shown.shows(com.ricordella.app.domain.model.AppSection.POTIONS)) DropdownMenuItem(text = { Text(tr("Pozioni")) }, leadingIcon = { Icon(Icons.Rounded.WaterDrop, null) }, onClick = { sections = false; navigator.openPotions() })
                     }
                     IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }
                     IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = tr("Impostazioni")) }

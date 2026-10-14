@@ -79,7 +79,7 @@ import java.time.ZoneId
  * aprire quello ricevuto, sincronizzare a mano e smettere di condividere. Con tutorial animato.
  */
 @Composable
-fun SharingSection(settings: AppSettings, space: SharedSpace) {
+fun SharingSection(settings: AppSettings, space: SharedSpace, onManage: () -> Unit = {}) {
     val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
     val container = (androidx.compose.ui.platform.LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
@@ -213,7 +213,7 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
         }
     }
 
-    ShareScopeCard(settings.shareScope, shared, onChange = { scope -> update { it.copy(shareScope = scope) } })
+    ShareScopeCard(settings.shareScope, shared, onManage, onChange = { scope -> update { it.copy(shareScope = scope) } })
 
     if (help) TutorialDialog(SharingTutorialPages, onDismiss = { help = false })
     choosingMode?.let { mode ->
@@ -265,7 +265,7 @@ fun SharingSection(settings: AppSettings, space: SharedSpace) {
 
 /** Cosa finisce nel file condiviso e cosa no, con gli interruttori per scegliere. */
 @Composable
-private fun ShareScopeCard(scope: com.ricordella.app.domain.model.ShareScope, active: Boolean, onChange: (com.ricordella.app.domain.model.ShareScope) -> Unit) {
+private fun ShareScopeCard(scope: com.ricordella.app.domain.model.ShareScope, active: Boolean, onManage: () -> Unit, onChange: (com.ricordella.app.domain.model.ShareScope) -> Unit) {
     val colors = MaterialTheme.ricordellaColors
     @Composable
     fun row(title: String, subtitle: String, checked: Boolean, onToggle: (Boolean) -> Unit) {
@@ -292,8 +292,10 @@ private fun ShareScopeCard(scope: com.ricordella.app.domain.model.ShareScope, ac
         row(tr("Persone"), tr("Nomi e note, senza le foto."), scope.people) { onChange(scope.copy(people = it)) }
         row(tr("Cose e spese"), tr("Garanzie, manutenzioni e spese, senza foto e documenti."), scope.items) { onChange(scope.copy(items = it)) }
         row(tr("Sveglie"), tr("Suonano solo sul telefono della persona a cui sono assegnate."), scope.alarms) { onChange(scope.copy(alarms = it)) }
+        row(tr("Carte"), tr("Le carte fedeltà, con nome, categoria e numero."), scope.cards) { onChange(scope.copy(cards = it)) }
+        OutlinedButton(onClick = onManage, modifier = Modifier.fillMaxWidth()) { Text(tr("Scegli uno per uno cosa condividere")) }
         Text(
-            tr("Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi."),
+            tr("Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi. Le carte condivise sono visibili a chi ha il file."),
             style = MaterialTheme.typography.bodySmall,
             color = colors.cyan.content,
             modifier = Modifier.padding(top = 4.dp),

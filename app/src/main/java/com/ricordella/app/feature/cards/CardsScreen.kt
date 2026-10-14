@@ -2,6 +2,7 @@ package com.ricordella.app.feature.cards
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.net.Uri
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.PictureAsPdf
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material.icons.rounded.ViewAgenda
@@ -54,6 +56,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -109,6 +113,7 @@ import com.ricordella.app.core.ui.theme.Tone
 import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.AppSettings
 import com.ricordella.app.domain.model.LoyaltyCard
+import com.ricordella.app.domain.model.CardLink
 import com.ricordella.app.feature.settings.CalendarPalette
 import com.ricordella.app.feature.settings.Swatch
 import kotlinx.coroutines.launch
@@ -135,7 +140,7 @@ private data class CardForm(val id: String?, val name: String, val category: Str
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
+fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? = null) {
     val context = LocalContext.current
     val container = (context.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
@@ -158,11 +163,17 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
     var previewId by rememberSaveable { mutableStateOf(openId) }
     var detailId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleting by rememberSaveable { mutableStateOf(false) }
+    var importing by remember { mutableStateOf(importLink?.let(CardLink::parse)) }
     var expanded by remember { mutableStateOf(emptySet<String>()) }
     val listState = rememberLazyListState()
 
     fun update(transform: (AppSettings) -> AppSettings) = scope.launch { container.settingsRepository.update(transform) }
-    fun toggleFavorite(id: String) = update { s -> s.copy(cards = s.cards.map { if (it.id == id) it.copy(favorite = !it.favorite) else it }) }
+    fun toggleFavorite(id: String) = update { s -> s.copy(cards = s.cards.map { if (it.id == id) it.copy(favorite = !it.favorite, updatedAt = System.currentTimeMillis()) else it }) }
+    fun shareCard(card: LoyaltyCard) {
+        val text = trf("Carta %1\$s: %2\$s", card.name, card.code) + "\n\n" + tr("Aprila con Remindella:") + "\n" + CardLink.encode(card)
+        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null))
+    }
+    fun toggleShared(id: String) = update { s -> s.copy(shareExcluded = if (id in s.shareExcluded) s.shareExcluded - id else s.shareExcluded + id) }
     fun openForm(form: CardForm) {
         formId = form.id; formName = form.name; formCategory = form.category; formColor = form.color
         formCode = form.code; formFormat = form.format; formOpen = true
@@ -180,8 +191,8 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
         }
         val id = formId
         update { s ->
-            val list = if (id == null) s.cards + LoyaltyCard(name = name, category = category, code = formCode, format = format)
-            else s.cards.map { if (it.id == id) it.copy(name = name, category = category) else it }
+            val list = if (id == null) s.cards + LoyaltyCard(name = name, category = category, code = formCode, format = format, updatedAt = System.currentTimeMillis())
+            else s.cards.map { if (it.id == id) it.copy(name = name, category = category, updatedAt = System.currentTimeMillis()) else it }
             s.copy(cards = list, cardColors = if (category.isEmpty()) s.cardColors else s.cardColors + (category to picked))
         }
         formOpen = false
@@ -297,6 +308,16 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
                     InfoRow(tr("Numero"), detail.code)
                     InfoRow(tr("Categoria"), detail.category.ifEmpty { tr("Senza categoria") })
                     InfoRow(tr("Formato"), zxingFormat(detail.format).name.replace('_', ' '))
+                    if (settings.sharedFileUri != null && settings.shareScope.cards) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(tr("Nel file condiviso"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                            Switch(checked = detail.id !in settings.shareExcluded, onCheckedChange = { toggleShared(detail.id) })
+                        }
+                    }
+                    OutlinedButton(onClick = { shareCard(detail) }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Rounded.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Text(tr("Invia la carta"), modifier = Modifier.padding(start = 6.dp))
+                    }
                     EditDeleteRow(
                         onEdit = { openForm(CardForm(detail.id, detail.name, detail.category, null, detail.code, detail.format)) },
                         onDelete = { deleting = true },
@@ -408,6 +429,16 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
         }
     }
 
+    importing?.let { card ->
+        ConfirmDialog(
+            title = tr("Aggiungere la carta?"),
+            message = card.name + "\n" + card.code,
+            confirmLabel = tr("Aggiungi"),
+            onConfirm = { update { s -> s.copy(cards = s.cards + card) }; importing = null },
+            onDismiss = { importing = null },
+        )
+    }
+
     if (choosing) {
         Dialog(onDismissRequest = { choosing = false }) {
             Surface(shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.background, modifier = Modifier.widthIn(max = 460.dp)) {
@@ -454,6 +485,7 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null) {
                     Row {
                         TextButton(onClick = { previewId = null }) { Text(tr("Chiudi"), color = tone.content) }
                         TextButton(onClick = { detailId = card.id; previewId = null }) { Text(tr("Dettagli"), color = tone.content) }
+                        TextButton(onClick = { shareCard(card) }) { Text(tr("Invia"), color = tone.content) }
                     }
                 }
             }

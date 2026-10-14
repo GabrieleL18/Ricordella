@@ -15,13 +15,14 @@ import kotlinx.serialization.Serializable
 @Serializable data object ExpensesRoute
 @Serializable data object CycleRoute
 @Serializable data object TrashRoute
+@Serializable data object ShareManageRoute
 @Serializable data object AlarmsRoute
 @Serializable data object TimersRoute
 
 /** Creazione (id null) o modifica di una sveglia. */
 @Serializable data class AlarmEditRoute(val id: String? = null)
 /** Le carte; [open] = carta da mostrare subito (dal widget). */
-@Serializable data class CardsRoute(val open: String? = null)
+@Serializable data class CardsRoute(val open: String? = null, val link: String? = null)
 @Serializable data object NotesRoute
 
 /** Una nota (nuova o esistente); [id] è già deciso alla creazione, [list]/[prices] dicono che tipo di nota è nuova. */

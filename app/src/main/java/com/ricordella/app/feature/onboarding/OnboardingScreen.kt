@@ -148,7 +148,7 @@ class CalendarImportViewModel(
     }
 }
 
-private enum class Stage { WELCOME, PREFERENCES, CALENDAR }
+private enum class Stage { WELCOME, SECTIONS, PREFERENCES, CALENDAR }
 
 /** Configurazione iniziale: benvenuto, tutorial animato delle sezioni, import da un calendario. */
 @Composable
@@ -166,7 +166,8 @@ fun OnboardingScreen() {
         ) { current ->
             when (current) {
                 Stage.WELCOME -> Welcome(onNext = { stage = 1 })
-                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onBackupFile = viewModel::saveBackupTo, onNext = { stage = 2 })
+                Stage.SECTIONS -> SectionsStep(onUpdate = viewModel::updateSettings, onNext = { stage = 2 })
+                Stage.PREFERENCES -> PreferencesStep(onUpdate = viewModel::updateSettings, onBackupFile = viewModel::saveBackupTo, onNext = { stage = 3 })
                 Stage.CALENDAR -> CalendarImportStep(viewModel, onDone = viewModel::finishOnboarding)
             }
         }
@@ -364,6 +365,30 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
                 Text(tr("Scegli dove salvarlo (es. Drive)"))
             }
         }
+        PushButton(tr("Avanti"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** Cosa interessa usare: le sezioni facoltative spente spariscono da Home e da "Aggiungi", poi si riaccendono dalle Impostazioni. */
+@Composable
+private fun SectionsStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNext: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState())
+            .contentWidth()
+            .padding(RicordellaDimensions.spaceXl),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceL),
+    ) {
+        Text(tr("Cosa ti interessa usare?"), style = MaterialTheme.typography.headlineMedium)
+        Text(
+            tr("Lascia accese le sezioni che userai: le altre non compaiono nell'app. Promemoria, eventi, cose e persone ci sono sempre. Potrai cambiare idea quando vuoi nelle Impostazioni."),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        com.ricordella.app.feature.settings.SectionsSettings(LocalAppSettings.current, onUpdate)
         PushButton(tr("Avanti"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward, modifier = Modifier.fillMaxWidth())
     }
 }

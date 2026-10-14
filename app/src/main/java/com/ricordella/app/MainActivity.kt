@@ -101,6 +101,13 @@ class MainActivity : ComponentActivity() {
         if (intent?.getBooleanExtra(EXTRA_OPEN_NOTES, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTES, null)
         if (intent?.getBooleanExtra(EXTRA_NEW_NOTE, false) == true) widgetRequest.value = WidgetRequest(ACTION_NEW_NOTE, null)
         intent?.getStringExtra(EXTRA_NOTE_ID)?.let { widgetRequest.value = WidgetRequest(ACTION_OPEN_NOTE, null, it) }
+        // Una carta ricevuta (condivisa come testo o toccando il suo link): si propone di aggiungerla.
+        val shared = when (intent?.action) {
+            Intent.ACTION_SEND -> intent.getStringExtra(Intent.EXTRA_TEXT)
+            Intent.ACTION_VIEW -> intent.dataString
+            else -> null
+        }
+        if (shared != null && com.ricordella.app.domain.model.CardLink.parse(shared) != null) widgetRequest.value = WidgetRequest(ACTION_IMPORT_CARD, null, shared)
         // Widget carte: la sezione, o una carta da mostrare alla cassa.
         if (intent?.getBooleanExtra(EXTRA_OPEN_CARDS, false) == true) widgetRequest.value = WidgetRequest(ACTION_OPEN_CARDS, null, intent.getStringExtra(EXTRA_CARD_ID))
         // Tocco sul widget dei buoni propositi: si apre la loro schermata.
@@ -129,6 +136,7 @@ class MainActivity : ComponentActivity() {
         const val EXTRA_OPEN_CARDS = "com.ricordella.app.extra.OPEN_CARDS"
         const val EXTRA_CARD_ID = "com.ricordella.app.extra.CARD_ID"
         const val ACTION_OPEN_CARDS = "cards"
+        const val ACTION_IMPORT_CARD = "import_card"
         const val EXTRA_OPEN_RESOLUTIONS = "com.ricordella.app.extra.OPEN_RESOLUTIONS"
         const val ACTION_OPEN_RESOLUTIONS = "resolutions"
     }

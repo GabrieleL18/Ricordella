@@ -140,7 +140,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onOpenTrash: () -> Unit, onGoHome: () -> Unit = onBack) {
+fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onOpenTrash: () -> Unit, onOpenShareManage: () -> Unit = {}, onGoHome: () -> Unit = onBack) {
     val viewModel = appViewModel { c, _ ->
         SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
@@ -408,7 +408,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 AutomationSettings(settings, viewModel::update, includeBackup = true)
             }
 
-            SharingSection(settings, (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.sharedSpace)
+            SharingSection(settings, (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.sharedSpace, onOpenShareManage)
 
             SupportCard(loved = settings.supportLoved, onLoved = { viewModel.update { it.copy(supportLoved = true) } })
 

@@ -41,4 +41,31 @@ class ShareScopeTest {
             assertTrue(joined.reminders.size == content.reminders.size)
         }
     }
+
+    @Test
+    fun excludedPersonTakesTheirOwnRemindersAway() {
+        val shared = ShareMerge.strip(content, ShareScope(alarms = true), excluded = setOf("p"))
+        assertTrue(shared.people.isEmpty())
+        assertTrue(shared.reminders.isEmpty())
+        val joined = ShareMerge.plus(shared, ShareMerge.rest(content, ShareScope(alarms = true), setOf("p")))
+        assertEquals(2, joined.reminders.size)
+    }
+
+    @Test
+    fun excludedReminderAndCardStayOut() {
+        val card = com.ricordella.app.domain.model.LoyaltyCard(id = "c", name = "Coop", code = "1", format = 0)
+        val withCard = content.copy(cards = listOf(card))
+        assertTrue(ShareMerge.strip(withCard, ShareScope()).cards.isEmpty())
+        assertEquals(listOf(card), ShareMerge.strip(withCard, ShareScope(cards = true)).cards)
+        val out = ShareMerge.strip(withCard, ShareScope(cards = true), excluded = setOf("c", "r"))
+        assertTrue(out.cards.isEmpty())
+        assertTrue(out.reminders.isEmpty())
+    }
+
+    @Test
+    fun cardLinkRoundTrips() {
+        val card = com.ricordella.app.domain.model.LoyaltyCard(name = "Coop & Co", code = "123 45", format = 7, category = "Spesa")
+        val back = com.ricordella.app.domain.model.CardLink.parse("Ecco\n" + com.ricordella.app.domain.model.CardLink.encode(card) + "\nciao")!!
+        assertEquals(listOf("Coop & Co", "123 45", 7, "Spesa"), listOf(back.name, back.code, back.format, back.category))
+    }
 }

@@ -30,12 +30,13 @@ class AppNavigator(private val navController: NavController) {
     fun openReminders() = openTopLevel(RemindersRoute)
     fun openHome() = openTopLevel(HomeRoute)
     fun openTrash() = navController.navigate(TrashRoute) { launchSingleTop = true }
+    fun openShareManage() = navController.navigate(ShareManageRoute) { launchSingleTop = true }
     fun openCycle() = navController.navigate(CycleRoute) { launchSingleTop = true }
     fun newAlarm() = navController.navigate(AlarmEditRoute()) { launchSingleTop = true }
     fun editAlarm(id: String) = navController.navigate(AlarmEditRoute(id)) { launchSingleTop = true }
     fun openAlarms() = navController.navigate(AlarmsRoute) { launchSingleTop = true }
     fun openTimers() = navController.navigate(TimersRoute) { launchSingleTop = true }
-    fun openCards(open: String? = null) = navController.navigate(CardsRoute(open)) { launchSingleTop = true }
+    fun openCards(open: String? = null, link: String? = null) = navController.navigate(CardsRoute(open, link)) { launchSingleTop = true }
     fun openNotes() = navController.navigate(NotesRoute) { launchSingleTop = true }
     fun openNote(id: String) = navController.navigate(NoteRoute(id)) { launchSingleTop = true }
     fun newNote(list: Boolean = false, prices: Boolean = false, drawing: Boolean = false) =

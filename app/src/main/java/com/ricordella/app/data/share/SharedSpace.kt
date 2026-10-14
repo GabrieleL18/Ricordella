@@ -237,12 +237,14 @@ class SharedSpace(
     private suspend fun syncWith(uri: Uri): Boolean {
         val bytes = readBytes(uri)
         val remote = parse(bytes)
-        val fullLocal = backupDao.readAll()
-        val scope = settings.current().shareScope
+        val app = settings.current()
+        val fullLocal = backupDao.readAll().copy(cards = app.cards)
+        val scope = app.shareScope
+        val excluded = app.shareExcluded
         // Solo ciò che si condivide entra nell'unione; il resto resta com'è, qui e nel file.
-        val local = ShareMerge.strip(fullLocal, scope)
-        val remoteShared = ShareMerge.strip(remote.content, scope)
-        val base = readBase()?.let { ShareMerge.strip(it, scope) }
+        val local = ShareMerge.strip(fullLocal, scope, excluded)
+        val remoteShared = ShareMerge.strip(remote.content, scope, excluded)
+        val base = readBase()?.let { ShareMerge.strip(it, scope, excluded) }
         val now = Instant.now()
 
         val deleted = HashMap<String, Instant>()
@@ -251,31 +253,37 @@ class SharedSpace(
         deleted.entries.removeAll { it.value.isBefore(now.minus(DELETION_MEMORY)) }
 
         val mergedShared = ShareMerge.merge(base, local, remoteShared, deleted)
-        val merged = ShareMerge.plus(mergedShared, ShareMerge.rest(fullLocal, scope))
-        val forFile = ShareMerge.forFile(ShareMerge.plus(mergedShared, ShareMerge.rest(remote.content, scope)))
+        val merged = ShareMerge.plus(mergedShared, ShareMerge.rest(fullLocal, scope, excluded))
+        val forFile = ShareMerge.forFile(ShareMerge.plus(mergedShared, ShareMerge.rest(remote.content, scope, excluded)))
         val pending = readPending()
         val activity = (remote.activity + pending).distinctBy { it.id }.sortedByDescending { it.at }.take(MAX_ACTIVITY)
         val deletedText = deleted.mapValues { it.value.toString() }
 
-        val fileChanged = !sameData(forFile, ShareMerge.forFile(remote.content)) || deletedText != remote.deleted || activity != remote.activity
+        val fileChanged = !sameData(forFile, ShareMerge.forFile(remote.content)) || deletedText != remote.deleted || activity != remote.activity || forFile.cards.toSet() != remote.content.cards.toSet()
         if (fileChanged) {
             // Copia di sicurezza del file com'era, prima di riscriverlo.
             if (bytes.isNotEmpty()) previousFile.writeBytes(bytes)
             write(uri, SharedFile(savedAt = now.toString(), content = forFile, deleted = deletedText, activity = activity))
         }
         pendingFile.delete()
-        val changedHere = !sameData(merged, fullLocal)
+        val changedDb = !sameData(merged, fullLocal)
+        val cardsChanged = merged.cards.toSet() != fullLocal.cards.toSet()
         // ponytail: tra la lettura e la sostituzione passano pochi millisecondi; una modifica fatta
         // proprio in quell'istante verrebbe ripresa alla sincronizzazione successiva solo se ancora presente.
-        if (changedHere) {
+        if (changedDb) {
             ignoreChangesUntil = System.currentTimeMillis() + 3_000
             backupDao.replaceAll(merged)
             scheduler.refresh()
         }
+        if (cardsChanged) {
+            // Le carte vivono nelle impostazioni; quelle aggiunte mentre sincronizzavo si tengono.
+            val seen = fullLocal.cards.mapTo(HashSet()) { it.id }
+            settings.update { s -> s.copy(cards = merged.cards + s.cards.filter { it.id !in seen }) }
+        }
         writeBase(forFile)
         _activity.value = activity
         notifyNewActivity(activity)
-        return changedHere
+        return changedDb || cardsChanged
     }
 
     /** Notifica le attività dell'altra persona non ancora viste. */

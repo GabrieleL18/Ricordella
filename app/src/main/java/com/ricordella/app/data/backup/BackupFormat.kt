@@ -33,6 +33,8 @@ data class BackupDatabaseContent(
     val reminderPeople: List<ReminderPersonCrossRef> = emptyList(),
     val reminderItems: List<ReminderItemCrossRef> = emptyList(),
     val personItems: List<PersonItemCrossRef> = emptyList(),
+    /** Carte fedeltà: vivono nelle impostazioni, qui solo per il file condiviso. */
+    val cards: List<com.ricordella.app.domain.model.LoyaltyCard> = emptyList(),
 ) {
     /** Tutti i riferimenti a file presenti nei dati (foto, documenti, allegati). */
     fun fileUris(): Set<String> = buildSet {

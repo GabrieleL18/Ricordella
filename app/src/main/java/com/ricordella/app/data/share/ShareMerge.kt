@@ -107,7 +107,8 @@ object ShareMerge {
             gone(base.items, local.items, { it.id }, { it.updatedAt }) +
             gone(base.reminders, local.reminders, { it.id }, { it.updatedAt }) +
             gone(base.completions, local.completions, { it.id }, { it.completedAt }) +
-            gone(base.maintenance, local.maintenance, { it.id }, { it.createdAt })
+            gone(base.maintenance, local.maintenance, { it.id }, { it.createdAt }) +
+            gone(base.cards, local.cards, { it.id }, { Instant.ofEpochMilli(it.updatedAt) })
     }
 
     /**
@@ -126,6 +127,7 @@ object ShareMerge {
         val reminders = pick(base?.reminders, local.reminders, remote.reminders, deleted, Reminder.serializer(), { it.id }, { it.updatedAt })
         val completions = pick(base?.completions, local.completions, remote.completions, deleted, ReminderCompletion.serializer(), { it.id }, { it.completedAt })
         val maintenance = pick(base?.maintenance, local.maintenance, remote.maintenance, deleted, MaintenanceRecord.serializer(), { it.id }, { it.createdAt })
+        val cards = pick(base?.cards, local.cards, remote.cards, deleted, com.ricordella.app.domain.model.LoyaltyCard.serializer(), { it.id }, { Instant.ofEpochMilli(it.updatedAt) })
 
         val localPeople = local.people.associateBy { it.id }
         val localItems = local.items.associateBy { it.id }
@@ -170,16 +172,29 @@ object ShareMerge {
                 .filter { it.itemId in itemIds }.distinct(),
             personItems = fromWinner(items, local.personItems, remote.personItems) { it.itemId }
                 .filter { it.personId in personIds }.distinctBy { it.personId to it.itemId },
+            cards = cards.values.map { it.first },
         )
     }
 
-    /** Solo ciò che si condivide secondo [scope], con i collegamenti che restano validi. */
-    fun strip(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope): BackupDatabaseContent {
-        val reminders = c.reminders.filter { if (it.type == com.ricordella.app.domain.model.ReminderType.ALARM) scope.alarms else scope.reminders }
+    /**
+     * Solo ciò che si condivide secondo [scope] e senza gli elementi [excluded] (id scelti uno a uno).
+     * Una persona esclusa porta con sé le cose e i promemoria collegati solo a persone escluse.
+     * I collegamenti che restano devono essere validi.
+     */
+    fun strip(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope, excluded: Set<String> = emptySet()): BackupDatabaseContent {
+        val hiddenPeople = c.people.mapNotNullTo(HashSet()) { it.id.takeIf { id -> id in excluded } }
+        /** Collegato a qualcuno e solo a persone escluse. */
+        fun onlyHidden(links: List<String>) = links.isNotEmpty() && links.all { it in hiddenPeople }
+        val reminderLinks = c.reminderPeople.groupBy({ it.reminderId }, { it.personId })
+        val itemLinks = c.personItems.groupBy({ it.itemId }, { it.personId })
+        val reminders = c.reminders.filter {
+            (if (it.type == com.ricordella.app.domain.model.ReminderType.ALARM) scope.alarms else scope.reminders) &&
+                it.id !in excluded && !onlyHidden(reminderLinks[it.id].orEmpty())
+        }
         val rIds = reminders.mapTo(HashSet()) { it.id }
         val ruleIds = reminders.mapNotNullTo(HashSet()) { it.recurrenceRuleId }
-        val people = if (scope.people) c.people else emptyList()
-        val items = if (scope.items) c.items else emptyList()
+        val people = if (scope.people) c.people.filter { it.id !in excluded } else emptyList()
+        val items = if (scope.items) c.items.filter { it.id !in excluded && !onlyHidden(itemLinks[it.id].orEmpty()) } else emptyList()
         val pIds = people.mapTo(HashSet()) { it.id }
         val iIds = items.mapTo(HashSet()) { it.id }
         return c.copy(
@@ -192,12 +207,13 @@ object ShareMerge {
             reminderPeople = c.reminderPeople.filter { it.reminderId in rIds && it.personId in pIds },
             reminderItems = c.reminderItems.filter { it.reminderId in rIds && it.itemId in iIds },
             personItems = c.personItems.filter { it.personId in pIds && it.itemId in iIds },
+            cards = if (scope.cards) c.cards.filter { it.id !in excluded } else emptyList(),
         )
     }
 
     /** Il resto: ciò che [strip] lascia fuori. Non viaggia nel file ma non va perso (né qui né nel file). */
-    fun rest(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope): BackupDatabaseContent {
-        val kept = strip(c, scope)
+    fun rest(c: BackupDatabaseContent, scope: com.ricordella.app.domain.model.ShareScope, excluded: Set<String> = emptySet()): BackupDatabaseContent {
+        val kept = strip(c, scope, excluded)
         return BackupDatabaseContent(
             people = c.people - kept.people.toSet(),
             items = c.items - kept.items.toSet(),
@@ -208,6 +224,7 @@ object ShareMerge {
             reminderPeople = c.reminderPeople - kept.reminderPeople.toSet(),
             reminderItems = c.reminderItems - kept.reminderItems.toSet(),
             personItems = c.personItems - kept.personItems.toSet(),
+            cards = c.cards - kept.cards.toSet(),
         )
     }
 
@@ -224,6 +241,7 @@ object ShareMerge {
         reminderPeople = a.reminderPeople + b.reminderPeople,
         reminderItems = a.reminderItems + b.reminderItems,
         personItems = a.personItems + b.personItems,
+        cards = a.cards + b.cards,
     )
 
     /** Versione da scrivere nel file condiviso: senza foto, documenti e allegati (sono file di questo telefono). */

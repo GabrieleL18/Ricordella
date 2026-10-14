@@ -1,30 +1,30 @@
 <it-IT>
 Novità:
-• Widget Carte: le tue carte fedeltà a blocchi nella Home, un tocco mostra il codice alla cassa
-• Nelle Carte puoi scegliere la vista a blocchi o l'elenco
-• Un'icona per ogni categoria e la nuova categoria Altro
+• Invia una carta fedeltà a un'altra persona: la aggiunge con un tocco
+• Condivisione su Drive più precisa: scegli uno per uno cosa condividere, anche le carte
+• Alla prima configurazione scegli le sezioni che ti interessano
 </it-IT>
 <en-US>
 What's new:
-• Cards widget: your loyalty cards as blocks on the home screen, one tap shows the code at the checkout
-• Choose block or list view in Cards
-• An icon for each category and the new Other category
+• Send a loyalty card to someone else: they add it with one tap
+• More precise Drive sharing: choose one by one what to share, cards included
+• At first setup, pick the sections you care about
 </en-US>
 <de-DE>
 Neu:
-• Karten-Widget: deine Kundenkarten als Kacheln auf dem Startbildschirm, ein Tipp zeigt den Code an der Kasse
-• In Karten zwischen Kachel- und Listenansicht wählen
-• Ein Symbol pro Kategorie und die neue Kategorie Sonstiges
+• Kundenkarte an jemand anderen senden: mit einem Tipp hinzugefügt
+• Genaueres Teilen über Drive: einzeln wählen, was geteilt wird, auch Karten
+• Bei der ersten Einrichtung die gewünschten Bereiche wählen
 </de-DE>
 <fr-FR>
 Nouveautés :
-• Widget Cartes : tes cartes de fidélité en blocs sur l'écran d'accueil, un appui affiche le code en caisse
-• Dans Cartes, choisis la vue en blocs ou en liste
-• Une icône par catégorie et la nouvelle catégorie Autre
+• Envoie une carte de fidélité à quelqu'un : elle l'ajoute d'un appui
+• Partage Drive plus précis : choisis un par un ce qui est partagé, cartes comprises
+• À la première configuration, choisis les sections qui t'intéressent
 </fr-FR>
 <es-ES>
 Novedades:
-• Widget de tarjetas: tus tarjetas de fidelidad en bloques en la pantalla de inicio, un toque muestra el código en la caja
-• En Tarjetas elige la vista en bloques o en lista
-• Un icono por categoría y la nueva categoría Otro
+• Envía una tarjeta de fidelidad a otra persona: la añade con un toque
+• Compartir en Drive con más precisión: elige una a una qué compartir, también las tarjetas
+• En la primera configuración elige las secciones que te interesan
 </es-ES>

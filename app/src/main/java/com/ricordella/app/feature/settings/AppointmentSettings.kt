@@ -133,6 +133,8 @@ private val AppSection.label: String
         AppSection.ALARMS -> tr("Sveglie")
         AppSection.TIMERS -> tr("Timer")
         AppSection.POTIONS -> tr("Pozioni")
+        AppSection.NOTES -> tr("Note")
+        AppSection.CARDS -> tr("Carte")
         AppSection.VACATIONS -> tr("Vacanza")
         AppSection.MEDICAL_VISITS -> tr("Visita medica")
         AppSection.EXPENSES -> tr("Spesa")
@@ -144,7 +146,7 @@ private val AppSection.label: String
 @Composable
 internal fun SectionsSettings(settings: AppSettings, update: ((AppSettings) -> AppSettings) -> Unit) {
     Text(
-        tr("Promemoria, eventi, note, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola."),
+        tr("Promemoria, eventi, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola."),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(bottom = 4.dp),

@@ -86,6 +86,16 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
 val AllNews: List<NewsRelease>
     get() = listOf(
         NewsRelease(
+            versionCode = 13,
+            versionName = "0.9.0",
+            date = java.time.LocalDate.of(2026, 10, 14),
+            items = listOf(
+                NewsItem(Icons.Rounded.CreditCard, { it.lavender }, tr("Invia una carta"), tr("Manda una carta fedeltà a un'altra persona: chi la riceve la aggiunge con un tocco.")),
+                NewsItem(Icons.Rounded.CloudSync, { it.cyan }, tr("Condivisione più precisa"), tr("Nel file condiviso scegli uno per uno cosa mandare, anche le carte, e spieghiamo cosa succede se l'altra persona non condivide.")),
+                NewsItem(Icons.Rounded.Widgets, { it.mint }, tr("Scegli cosa usare"), tr("Alla prima configurazione scegli le sezioni che ti interessano: le altre non compaiono.")),
+            ),
+        ),
+        NewsRelease(
             versionCode = 12,
             versionName = "0.8.0",
             date = java.time.LocalDate.of(2026, 10, 14),

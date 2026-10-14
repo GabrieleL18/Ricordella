@@ -58,6 +58,7 @@ class AppContainer(context: Context) {
     val databaseFileName = if (isDemo) "ricordella-demo.db" else "ricordella.db"
 
     private val database = RicordellaDatabase.create(appContext, databaseFileName)
+    val backupDao get() = database.backupDao()
 
     /** Svuota il database (solo per rifare i dati demo). */
     suspend fun clearAllTables() = kotlinx.coroutines.withContext(Dispatchers.IO) {

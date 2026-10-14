@@ -53,6 +53,7 @@ data class ShareScope(
     val items: Boolean = true,
     val reminders: Boolean = true,
     val alarms: Boolean = false,
+    val cards: Boolean = false,
 )
 
 /** Quali sveglie si vedono nel calendario (con la loro icona): di default nessuna. */
@@ -76,7 +77,7 @@ enum class CalendarGroup {
 
 /** Sezioni che si possono spegnere: spariscono da "Aggiungi", dalla Home e dai moduli. */
 @Serializable
-enum class AppSection { ALARMS, TIMERS, POTIONS, VACATIONS, MEDICAL_VISITS, EXPENSES, CYCLE, APPOINTMENTS }
+enum class AppSection { ALARMS, TIMERS, POTIONS, NOTES, CARDS, VACATIONS, MEDICAL_VISITS, EXPENSES, CYCLE, APPOINTMENTS }
 
 /** Come gestire le operazioni annuali (feste, pulizia): da sole, chiedendo prima, o mai. */
 @Serializable
@@ -180,6 +181,8 @@ data class AppSettings(
     val cardColors: Map<String, Long> = emptyMap(),
     /** Le carte si vedono a blocchi invece che in elenco. */
     val cardsGrid: Boolean = false,
+    /** Id di persone, cose, promemoria e carte che restano fuori dal file condiviso anche se la loro categoria si condivide. */
+    val shareExcluded: Set<String> = emptySet(),
     /** Nome in più per il backup in cartella condivisa, per distinguere due persone con lo stesso nome. */
     val backupAlias: String = "",
     /** Sezioni di cui si è già visto il tutorial: compare la prima volta che si entra. */
@@ -188,7 +191,7 @@ data class AppSettings(
     val appointmentTemplate: String? = null,
     /** Colori scelti per il calendario (ARGB); i gruppi assenti usano quelli dell'app. */
     val calendarColors: Map<CalendarGroup, Long> = emptyMap(),
-    /** Sezioni facoltative spente nelle Impostazioni (promemoria, eventi, note, cose e persone ci sono sempre). */
+    /** Sezioni facoltative spente nelle Impostazioni (promemoria, eventi, cose e persone ci sono sempre). */
     val hiddenSections: Set<AppSection> = emptySet(),
 ) {
     fun shows(section: AppSection): Boolean = section !in hiddenSections

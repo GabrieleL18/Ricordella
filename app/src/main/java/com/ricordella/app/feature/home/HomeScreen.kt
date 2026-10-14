@@ -533,8 +533,8 @@ private fun HomeExtras(navigator: AppNavigator) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         if (settings.shows(AppSection.ALARMS)) ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
         if (settings.shows(AppSection.TIMERS)) ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
-        ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
-        ExtraTile(Icons.Rounded.CreditCard, tr("Carte"), colors.lavender, navigator::openCards, Modifier.weight(1f))
+        if (settings.shows(AppSection.NOTES)) ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
+        if (settings.shows(AppSection.CARDS)) ExtraTile(Icons.Rounded.CreditCard, tr("Carte"), colors.lavender, navigator::openCards, Modifier.weight(1f))
         if (settings.shows(AppSection.POTIONS)) ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
     }
 }
