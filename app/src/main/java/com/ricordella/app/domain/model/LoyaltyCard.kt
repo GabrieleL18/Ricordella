@@ -13,4 +13,6 @@ data class LoyaltyCard(
     val name: String,
     val code: String,
     val format: Int,
+    /** Categoria scelta a piacere ("Spesa", "Sport"...); vuota = senza categoria. */
+    val category: String = "",
 )

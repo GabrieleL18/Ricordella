@@ -1581,4 +1581,7 @@ Nuova carta ||| Neue Karte
 Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
 Numero ||| Nummer
 Eliminare la carta? ||| Karte löschen?
-Nome della carta ||| Kartenname
+Modifica carta ||| Karte bearbeiten
+Senza categoria ||| Ohne Kategorie
+Sport ||| Sport
+Salute ||| Gesundheit

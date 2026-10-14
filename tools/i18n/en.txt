@@ -1656,4 +1656,7 @@ Nuova carta ||| New card
 Nome (Decathlon, Coop...) ||| Name (Decathlon, Coop...)
 Numero ||| Number
 Eliminare la carta? ||| Delete the card?
-Nome della carta ||| Card name
+Modifica carta ||| Edit card
+Senza categoria ||| No category
+Sport ||| Sports
+Salute ||| Health

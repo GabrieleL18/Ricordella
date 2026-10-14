@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material3.FilterChip
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -82,16 +84,19 @@ fun CardsScreen(onBack: () -> Unit) {
     val container = (context.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
     val cards = LocalAppSettings.current.cards
+    val categories = cards.map { it.category }.filter { it.isNotEmpty() }.distinct().sortedBy { it.lowercase() }
+    val suggestions = (categories + DefaultCategories).distinct()
     // Carta in corso di inserimento (codice letto o scritto) e carta mostrata a schermo intero.
     var adding by rememberSaveable { mutableStateOf(false) }
     var draftName by rememberSaveable { mutableStateOf("") }
+    var draftCategory by rememberSaveable { mutableStateOf("") }
     var draftCode by rememberSaveable { mutableStateOf("") }
     var draftFormat by rememberSaveable { mutableIntStateOf(Barcode.FORMAT_CODE_128) }
     var shownId by rememberSaveable { mutableStateOf<String?>(null) }
     fun edit(transform: (List<LoyaltyCard>) -> List<LoyaltyCard>) =
         scope.launch { container.settingsRepository.update { it.copy(cards = transform(it.cards)) } }
     fun startAdding(code: String, format: Int) {
-        draftName = ""; draftCode = code; draftFormat = format; adding = true
+        draftName = ""; draftCategory = ""; draftCode = code; draftFormat = format; adding = true
     }
     val onCodes: (List<Barcode>) -> Unit = { found ->
         val first = found.firstOrNull { it.rawValue != null }
@@ -129,23 +134,33 @@ fun CardsScreen(onBack: () -> Unit) {
 
             val colors = MaterialTheme.ricordellaColors
             val tones = listOf(colors.cyan, colors.pear, colors.coral, colors.mint, colors.lavender)
-            cards.forEachIndexed { index, card ->
-                val tone = tones[index % tones.size]
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(tone.container, MaterialTheme.shapes.large)
-                        .clickable { shownId = card.id }
-                        .padding(RicordellaDimensions.spaceL),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
-                ) {
-                    Box(Modifier.size(44.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content)
-                        Text(card.code, style = MaterialTheme.typography.bodySmall, color = tone.content, maxLines = 1)
+            // Un colore per categoria, sempre lo stesso finché l'elenco delle categorie non cambia; "senza categoria" in fondo.
+            cards.groupBy { it.category }.toSortedMap(compareBy({ it.isEmpty() }, { it.lowercase() })).forEach { (category, group) ->
+                val tone = tones[categories.indexOf(category).coerceAtLeast(0) % tones.size]
+                if (categories.isNotEmpty()) {
+                    Text(
+                        "${category.ifEmpty { tr("Senza categoria") }} · ${group.size}",
+                        style = MaterialTheme.typography.titleSmall, color = tone.content,
+                        modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
+                    )
+                }
+                group.forEach { card ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(tone.container, MaterialTheme.shapes.large)
+                            .clickable { shownId = card.id }
+                            .padding(RicordellaDimensions.spaceL),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
+                    ) {
+                        Box(Modifier.size(44.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Rounded.CreditCard, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest)
+                        }
+                        Column(Modifier.weight(1f)) {
+                            Text(card.name, style = MaterialTheme.typography.titleMedium, color = tone.content)
+                            Text(card.code, style = MaterialTheme.typography.bodySmall, color = tone.content, maxLines = 1)
+                        }
                     }
                 }
             }
@@ -158,11 +173,7 @@ fun CardsScreen(onBack: () -> Unit) {
             title = { Text(tr("Nuova carta")) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-                    OutlinedTextField(
-                        draftName, { draftName = it.take(40) },
-                        label = { Text(tr("Nome (Decathlon, Coop...)")) }, singleLine = true,
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-                    )
+                    NameAndCategory(draftName, draftCategory, suggestions, { draftName = it }, { draftCategory = it })
                     OutlinedTextField(draftCode, { draftCode = it.trim() }, label = { Text(tr("Numero")) }, singleLine = true)
                 }
             },
@@ -177,7 +188,7 @@ fun CardsScreen(onBack: () -> Unit) {
                             draftCode.all { it.isDigit() } && draftCode.length == 8 -> Barcode.FORMAT_EAN_8
                             else -> draftFormat
                         }
-                        val card = LoyaltyCard(name = draftName.trim(), code = draftCode, format = format)
+                        val card = LoyaltyCard(name = draftName.trim(), category = draftCategory.trim(), code = draftCode, format = format)
                         edit { it + card }
                         adding = false
                     },
@@ -188,13 +199,13 @@ fun CardsScreen(onBack: () -> Unit) {
     }
 
     cards.firstOrNull { it.id == shownId }?.let { card ->
-        CardDialog(card, onRename = { name -> edit { all -> all.map { if (it.id == card.id) it.copy(name = name) else it } } }, onDelete = { edit { all -> all.filterNot { it.id == card.id } }; shownId = null }, onDismiss = { shownId = null })
+        CardDialog(card, suggestions, onEdit = { name, category -> edit { all -> all.map { if (it.id == card.id) it.copy(name = name, category = category) else it } } }, onDelete = { edit { all -> all.filterNot { it.id == card.id } }; shownId = null }, onDismiss = { shownId = null })
     }
 }
 
 /** La carta a tutto schermo: sfondo bianco, codice grande e luminosità al massimo, perché il lettore lo legga bene. */
 @Composable
-private fun CardDialog(card: LoyaltyCard, onRename: (String) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
+private fun CardDialog(card: LoyaltyCard, suggestions: List<String>, onEdit: (String, String) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
     var confirming by rememberSaveable { mutableStateOf(false) }
     var renaming by rememberSaveable { mutableStateOf(false) }
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
@@ -228,16 +239,12 @@ private fun CardDialog(card: LoyaltyCard, onRename: (String) -> Unit, onDelete: 
     }
     if (renaming) {
         var name by rememberSaveable { mutableStateOf(card.name) }
+        var category by rememberSaveable { mutableStateOf(card.category) }
         AlertDialog(
             onDismissRequest = { renaming = false },
-            title = { Text(tr("Nome della carta")) },
-            text = {
-                OutlinedTextField(
-                    name, { name = it.take(40) }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-                )
-            },
-            confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onRename(name.trim()); renaming = false }) { Text(tr("Salva")) } },
+            title = { Text(tr("Modifica carta")) },
+            text = { Column(verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) { NameAndCategory(name, category, suggestions, { name = it }, { category = it }) } },
+            confirmButton = { TextButton(enabled = name.isNotBlank(), onClick = { onEdit(name.trim(), category.trim()); renaming = false }) { Text(tr("Salva")) } },
             dismissButton = { TextButton(onClick = { renaming = false }) { Text(tr("Annulla")) } },
         )
     }
@@ -284,3 +291,23 @@ private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Barcode>) ->
         .addOnSuccessListener(onCodes)
         .addOnFailureListener { onCodes(emptyList()) }
 }
+
+/** Nome e categoria di una carta; sotto il campo categoria si propongono quelle già usate (e qualche idea). */
+@Composable
+private fun NameAndCategory(name: String, category: String, suggestions: List<String>, onName: (String) -> Unit, onCategory: (String) -> Unit) {
+    OutlinedTextField(
+        name, { onName(it.take(40)) },
+        label = { Text(tr("Nome (Decathlon, Coop...)")) }, singleLine = true,
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
+    )
+    OutlinedTextField(
+        category, { onCategory(it.take(24)) },
+        label = { Text(tr("Categoria")) }, singleLine = true,
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+    )
+    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+        suggestions.forEach { FilterChip(selected = it == category.trim(), onClick = { onCategory(it) }, label = { Text(it) }) }
+    }
+}
+
+private val DefaultCategories get() = listOf(tr("Spesa"), tr("Sport"), tr("Salute"), tr("Casa"))
