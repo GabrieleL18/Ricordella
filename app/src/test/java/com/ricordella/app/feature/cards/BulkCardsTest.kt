@@ -11,9 +11,28 @@ class BulkCardsTest {
     fun guessesTheNameFromPrintedText() {
         assertEquals("Decathlon", guessCardName(listOf("Decathlon", "0123456789")))
         // Salta indirizzi web, email, numeri e parole generiche; prende la prima riga che sembra un nome.
-        assertEquals("Coop Alleanza", guessCardName(listOf("www.coop.it", "tessera", "1234 5678", "Coop Alleanza", "Socio")))
+        assertEquals("Bottega del Borgo", guessCardName(listOf("www.bottega.it", "tessera", "1234 5678", "Bottega del Borgo", "Socio")))
         assertEquals("", guessCardName(listOf("0123456789", "ab", "info@negozio.it")))
         assertEquals("", guessCardName(emptyList()))
+    }
+
+    @Test
+    fun recognizesKnownChainsAnywhereInTheText() {
+        // Il marchio vince anche se una riga qualsiasi sopra sembra un nome.
+        assertEquals("Esselunga", guessCardName(listOf("Presenta la tessera alla cassa", "ESSELUNGA S.p.A.", "0123456789")))
+        assertEquals("Leroy Merlin", guessCardName(listOf("Carta Leroy-Merlin Italia")))
+        assertEquals("Decathlon", guessCardName(listOf("DECATHLON ITALIA")))
+        assertEquals("MD", guessCardName(listOf("MD S.p.A.", "tessera")))
+        assertEquals("Coop", guessCardName(listOf("Carta Coop")))
+    }
+
+    @Test
+    fun shortChainNamesMatchOnlyAsWholeWords() {
+        // «Cooperativa» non è Coop, «Pamela» non è Pam, «Menu» non è Eni, «Capi» non è Api.
+        assertEquals("Cooperativa Agricola", guessCardName(listOf("Cooperativa Agricola")))
+        assertEquals("Pamela Store", guessCardName(listOf("Pamela Store")))
+        assertEquals("Menu del giorno", guessCardName(listOf("Menu del giorno")))
+        assertEquals("Capi sportivi", guessCardName(listOf("Capi sportivi")))
     }
 
     @Test

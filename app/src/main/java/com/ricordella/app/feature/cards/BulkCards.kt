@@ -41,11 +41,43 @@ import com.ricordella.app.domain.model.LoyaltyCard
 /** Una carta letta in blocco, in attesa di conferma: il nome è solo una proposta, si cambia (o si lascia vuoto). */
 internal data class DraftCard(val code: String, val format: Int, val name: String, val key: String = java.util.UUID.randomUUID().toString())
 
+/** Catene e marchi italiani con tessera fedeltà: se il testo letto ne contiene uno, il nome è quello (scritto bene). */
+internal val KnownChains = listOf(
+    // Supermercati
+    "Coop", "Conad", "Esselunga", "Carrefour", "Lidl", "Eurospin", "MD", "Despar", "Eurospar", "Interspar", "Pam", "Panorama", "Penny",
+    "Aldi", "Iper", "Bennet", "Famila", "Tigros", "Unes", "Il Gigante", "Crai", "Sigma", "Todis", "Simply", "Auchan", "Metro", "Selex",
+    "Dok", "Italmark", "Prix", "Superconti", "Tigotà", "Acqua e Sapone", "Naturasì", "Eataly",
+    // Casa, bricolage, elettronica
+    "Leroy Merlin", "Bricocenter", "Brico io", "Obi", "Ikea", "Maisons du Monde", "MediaWorld", "Unieuro", "Euronics", "Trony", "Expert",
+    // Sport, abbigliamento, scarpe
+    "Decathlon", "Intersport", "Foot Locker", "OVS", "Upim", "Coin", "Piazza Italia", "Tezenis", "Calzedonia", "Intimissimi", "Zara", "H&M",
+    "Primark", "Geox", "Prénatal", "Toys Center",
+    // Bellezza e salute
+    "Sephora", "Douglas", "Kiko", "Equivalenza", "Marionnaud",
+    // Libri e animali
+    "Feltrinelli", "Mondadori", "Libraccio", "Arcaplanet", "Maxi Zoo", "Isola dei Tesori",
+    // Carburanti, viaggi, ristorazione
+    "Eni", "IP", "Q8", "Tamoil", "Esso", "Api", "Trenitalia", "Italo", "Autogrill", "McDonald's", "Burger King", "Roadhouse",
+)
+
+private fun String.plain(): String = lowercase().replace(Regex("""[^\p{L}\p{N}]+"""), " ").trim()
+
+/** Il marchio noto nella riga, se c'è: le sigle corte (MD, Eni, Pam...) solo come parola intera, per non confonderle con altre parole. */
+private fun knownChainIn(line: String): String? {
+    val text = " " + line.plain() + " "
+    return KnownChains.firstOrNull { chain ->
+        val key = chain.plain()
+        if (key.length <= 4) text.contains(" $key ") else text.contains(key)
+    }
+}
+
 /**
- * Propone il nome dal testo stampato sulla tessera: la prima riga fatta soprattutto di lettere, di lunghezza
- * ragionevole e che non sia un indirizzo web, un'email o una parola generica. Vuoto se non ne trova una.
+ * Propone il nome dal testo stampato sulla tessera. Prima cerca un marchio noto (Coop, Decathlon...) in qualsiasi riga;
+ * altrimenti prende la prima riga fatta soprattutto di lettere, di lunghezza ragionevole e che non sia un indirizzo web,
+ * un'email o una parola generica. Vuoto se non ne trova una.
  */
 internal fun guessCardName(lines: List<String>): String {
+    lines.firstNotNullOfOrNull(::knownChainIn)?.let { return it }
     val generic = setOf("tessera", "card", "carta", "fedeltà", "fidelity", "club", "loyalty", "member", "socio", "numero", "customer", "cliente")
     return lines.map { it.trim() }.firstOrNull { line ->
         val letters = line.count { it.isLetter() }
