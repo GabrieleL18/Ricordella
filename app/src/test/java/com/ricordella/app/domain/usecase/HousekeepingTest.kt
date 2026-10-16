@@ -25,6 +25,15 @@ class HousekeepingTest {
     }
 
     @Test
+    fun staleBackupWarnsOnlyAfterThirtyDays() {
+        val day = 24 * 3_600_000L
+        val now = 100 * day
+        assertEquals(0, Housekeeping.staleBackupDays(AppSettings(), now)) // mai fatto: non si sa da quando usa l'app
+        assertEquals(0, Housekeeping.staleBackupDays(AppSettings(lastBackupMillis = now - 30 * day), now))
+        assertEquals(31, Housekeeping.staleBackupDays(AppSettings(lastBackupMillis = now - 31 * day), now))
+    }
+
+    @Test
     fun parsesSimpleGoogleRecurrences() {
         val weekly = CalendarImporter.parseRRule("FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,TH;UNTIL=20271231T000000Z", today)!!
         assertEquals(RecurrenceFrequency.WEEKLY, weekly.frequency)

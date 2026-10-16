@@ -220,7 +220,7 @@ Giorno %1$s di %2$s ||| Day %1$s of %2$s
 Backup aggiornato ||| Backup updated
 Backup non riuscito, riprova ||| Backup failed, try again
 Niente all'orizzonte ||| Nothing on the horizon
-Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io. ||| Nothing to remember in the coming days. Add something and I'll take care of it.
+Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sopra «dentista domani alle 9»: ci penso io. ||| Nothing to remember in the next few days. Try typing above “dentist tomorrow at 9”: I'll take care of it.
 Da guardare ||| Needs attention
 La tua giornata ||| Your day
 Prossimamente ||| Coming up
@@ -1764,3 +1764,16 @@ Sblocca ||| Unlock
 Proteggi il ciclo con impronta o PIN ||| Protect the cycle with fingerprint or PIN
 Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot. ||| Opening the Cycle section requires your phone's fingerprint or PIN. It also hides the screen from screenshots.
 Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android. ||| The phone has no fingerprint or PIN: set one in Android settings.
+Canale dei promemoria ||| Reminders channel
+Acceso. ||| On.
+È spento: i promemoria non suonano né compaiono. Tocca per riaccenderlo. ||| It is off: reminders neither sound nor appear. Tap to turn it back on.
+Sveglia a schermo intero ||| Full-screen alarm
+La sveglia compare anche a telefono bloccato. ||| The alarm also appears when the phone is locked.
+Non consentito: a telefono bloccato la sveglia suona ma non compare lo schermo. Tocca per consentire. ||| Not allowed: when the phone is locked the alarm rings but the screen does not appear. Tap to allow.
+Risparmio energetico ||| Battery saver
+Senza limiti: Android non ferma l'app in background. ||| Unrestricted: Android does not stop the app in the background.
+Con alcuni telefoni (Xiaomi, Samsung, Huawei...) il risparmio energetico può ritardare i promemoria. Tocca e scegli «Non ottimizzare» per Remindella. ||| On some phones (Xiaomi, Samsung, Huawei...) battery saving can delay reminders. Tap and choose “Don't optimise” for Remindella.
+A posto ||| OK
+Da sistemare ||| Needs fixing
+Qualche promemoria potrebbe non arrivare ||| Some reminders may not arrive
+Risolvi ||| Fix

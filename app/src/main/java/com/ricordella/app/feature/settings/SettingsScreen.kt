@@ -306,6 +306,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 )
                 NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
                 ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
+                com.ricordella.app.core.ui.NotificationHealthRows()
                 SettingRow(
                     icon = Icons.AutoMirrored.Rounded.VolumeUp,
                     title = tr("Suono e vibrazione"),

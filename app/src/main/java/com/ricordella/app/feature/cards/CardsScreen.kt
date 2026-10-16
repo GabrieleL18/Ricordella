@@ -574,7 +574,7 @@ private fun CardTile(card: LoyaltyCard, tone: Tone, onClick: () -> Unit, onFavor
             Box(Modifier.size(40.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
                 Text(categoryEmoji(card.category), fontSize = 20.sp)
             }
-            IconButton(onClick = onFavorite, Modifier.size(40.dp)) {
+            IconButton(onClick = onFavorite, Modifier.size(48.dp)) {
                 Icon(
                     if (card.favorite) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                     contentDescription = if (card.favorite) tr("Togli dai preferiti") else tr("Aggiungi ai preferiti"),

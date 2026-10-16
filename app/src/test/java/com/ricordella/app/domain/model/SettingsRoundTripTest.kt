@@ -2,6 +2,7 @@ package com.ricordella.app.domain.model
 
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 import java.time.LocalDate
 
@@ -29,5 +30,6 @@ class SettingsRoundTripTest {
         assertEquals(emptyList<CycleProfile>(), loaded.cycleProfiles)
         assertEquals(60, loaded.alarmPreNotice)
         assertEquals(emptyList<Note>(), loaded.notes)
+        assertFalse(loaded.lockCycle) // il blocco del ciclo è solo su richiesta
     }
 }

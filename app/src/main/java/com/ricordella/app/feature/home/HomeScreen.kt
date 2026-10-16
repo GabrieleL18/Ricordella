@@ -177,13 +177,14 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             }
             if (showExtras) item(key = "extras") { HomeExtras(navigator) }
             item(key = "permission") { NotificationPermissionCard() }
+            item(key = "notificationHealth") { com.ricordella.app.core.ui.NotificationHealthCard() }
 
             if (!state.isLoading && state.isEmpty) {
                 item(key = "empty") {
                     EmptyState(
                         icon = Icons.Rounded.EventAvailable,
                         title = tr("Niente all'orizzonte"),
-                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io."),
+                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sopra «dentista domani alle 9»: ci penso io."),
                         actionLabel = tr("Aggiungi"),
                         onAction = onAdd,
                         modifier = Modifier.animateItem(),

@@ -297,7 +297,7 @@ private fun HistoryBar(row: CycleHistoryRow, profile: CycleProfile, scale: Float
                 Text(row.cycleLength?.toString() ?: "–", style = MaterialTheme.typography.labelMedium, modifier = Modifier.width(24.dp))
             }
         }
-        IconButton(onClick = onRemove, modifier = Modifier.size(40.dp)) {
+        IconButton(onClick = onRemove, modifier = Modifier.size(48.dp)) {
             Icon(Icons.Rounded.Close, contentDescription = tr("Elimina"), modifier = Modifier.size(18.dp))
         }
     }

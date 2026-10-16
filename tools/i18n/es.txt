@@ -421,7 +421,7 @@ Backup aggiornato ||| Copia actualizada
 Backup non riuscito, riprova ||| No se pudo hacer la copia, inténtalo de nuevo
 Remindella ||| Remindella
 Niente all'orizzonte ||| Nada en el horizonte
-Nei prossimi giorni non c'è nulla da ricordare. Aggiungi qualcosa e ci penso io. ||| En los próximos días no hay nada que recordar. Añade algo y yo me encargo.
+Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sopra «dentista domani alle 9»: ci penso io. ||| No hay nada que recordar en los próximos días. Prueba a escribir arriba «dentista mañana a las 9»: yo me ocupo.
 Da guardare ||| Requiere atención
 Prossimamente ||| Próximamente
 Vedi tutto ||| Ver todo
@@ -1689,3 +1689,16 @@ Sblocca ||| Desbloquear
 Proteggi il ciclo con impronta o PIN ||| Proteger el ciclo con huella o PIN
 Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot. ||| Para abrir la sección Ciclo hace falta la huella o el PIN del teléfono. También oculta la pantalla de las capturas.
 Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android. ||| El teléfono no tiene huella ni PIN: configúralos en los ajustes de Android.
+Canale dei promemoria ||| Canal de recordatorios
+Acceso. ||| Activado.
+È spento: i promemoria non suonano né compaiono. Tocca per riaccenderlo. ||| Está apagado: los recordatorios ni suenan ni aparecen. Toca para volver a encenderlo.
+Sveglia a schermo intero ||| Alarma a pantalla completa
+La sveglia compare anche a telefono bloccato. ||| La alarma aparece también con el teléfono bloqueado.
+Non consentito: a telefono bloccato la sveglia suona ma non compare lo schermo. Tocca per consentire. ||| No permitido: con el teléfono bloqueado la alarma suena pero no aparece la pantalla. Toca para permitir.
+Risparmio energetico ||| Ahorro de energía
+Senza limiti: Android non ferma l'app in background. ||| Sin límites: Android no detiene la app en segundo plano.
+Con alcuni telefoni (Xiaomi, Samsung, Huawei...) il risparmio energetico può ritardare i promemoria. Tocca e scegli «Non ottimizzare» per Remindella. ||| En algunos teléfonos (Xiaomi, Samsung, Huawei...) el ahorro de energía puede retrasar los recordatorios. Toca y elige «No optimizar» para Remindella.
+A posto ||| Todo bien
+Da sistemare ||| Hay que arreglarlo
+Qualche promemoria potrebbe non arrivare ||| Algunos recordatorios podrían no llegar
+Risolvi ||| Arreglar
