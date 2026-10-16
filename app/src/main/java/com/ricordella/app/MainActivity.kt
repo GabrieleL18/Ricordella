@@ -54,6 +54,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
                         onWidgetRequestHandled = { widgetRequest.value = null },
                     )
                     if (BuildConfig.DEBUG) com.ricordella.app.core.ui.DebugBadge()
+                    if (settings.termsAcceptedVersion >= TERMS_VERSION) com.ricordella.app.core.ui.CrashReportDialog()
                     if (settings.termsAcceptedVersion >= TERMS_VERSION) pendingBackup?.let { OpenedBackupImport(it, onDone = { backupToOpen.value = null }) }
                 }
             }

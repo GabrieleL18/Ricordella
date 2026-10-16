@@ -1738,4 +1738,9 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Da sistemare" to "Needs fixing",
     "Qualche promemoria potrebbe non arrivare" to "Some reminders may not arrive",
     "Risolvi" to "Fix",
+    "Remindella si è chiusa all'improvviso" to "Remindella closed unexpectedly",
+    "Vuoi mandare il rapporto dell'errore allo sviluppatore? Si apre la tua app di posta: contiene versione, modello del telefono e l'errore tecnico, non i tuoi promemoria. Qui sotto puoi leggerlo prima di inviarlo." to "Do you want to send the error report to the developer? Your mail app opens: it contains the version, phone model and the technical error, not your reminders. You can read it below before sending.",
+    "Nessuna app di posta trovata" to "No mail app found",
+    "Segnala un problema" to "Report a problem",
+    "Apre la posta con versione e modello del telefono già scritti." to "Opens your mail with the version and phone model already filled in.",
 )

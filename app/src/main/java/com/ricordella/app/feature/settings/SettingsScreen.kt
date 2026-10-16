@@ -90,6 +90,7 @@ import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.Lock
 import com.ricordella.app.core.ui.hasScreenLock
 import androidx.compose.material.icons.rounded.Email
@@ -487,6 +488,15 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     title = tr("Termini d'uso e privacy"),
                     subtitle = tr("Cosa fa l'app, i suoi limiti e i tuoi dati."),
                     onClick = { showPrivacy = true },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.BugReport,
+                    title = tr("Segnala un problema"),
+                    subtitle = tr("Apre la posta con versione e modello del telefono già scritti."),
+                    onClick = {
+                        val report = com.ricordella.app.core.CrashReport.pending(context) ?: com.ricordella.app.core.CrashReport.deviceInfo()
+                        if (com.ricordella.app.core.CrashReport.send(context, report)) com.ricordella.app.core.CrashReport.clear(context)
+                    },
                 )
                 SettingRow(
                     icon = Icons.Rounded.Email,

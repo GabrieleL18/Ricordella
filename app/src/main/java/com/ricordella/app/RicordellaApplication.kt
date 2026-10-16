@@ -13,6 +13,7 @@ class RicordellaApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        com.ricordella.app.core.CrashReport.install(this)
         com.ricordella.app.core.i18n.Lang.init(this)
         container = AppContainer(this)
         container.notifier.createChannel()
