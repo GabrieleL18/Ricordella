@@ -372,6 +372,10 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
 /** Cosa interessa usare: le sezioni facoltative spente spariscono da Home e da "Aggiungi", poi si riaccendono dalle Impostazioni. */
 @Composable
 private fun SectionsStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNext: () -> Unit) {
+    // Chi comincia trova il nucleo (promemoria, cose, persone) e accende da sé le sezioni di nicchia o personali.
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        onUpdate { it.copy(hiddenSections = it.hiddenSections + com.ricordella.app.domain.model.AppSection.CYCLE + com.ricordella.app.domain.model.AppSection.POTIONS) }
+    }
     Column(
         Modifier
             .fillMaxSize()

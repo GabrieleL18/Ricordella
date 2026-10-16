@@ -199,3 +199,14 @@ fun DetailScaffold(
         content = content,
     )
 }
+
+/**
+ * Dopo aver completato [entry] offre "Riapri". Solo per i promemoria semplici: uno che si ripete o a rate
+ * avanza alla scadenza successiva, e riaprirlo non la rimetterebbe com'era.
+ */
+suspend fun SnackbarHostState.offerReopen(entry: com.ricordella.app.domain.model.ReminderWithLinks, reopen: () -> Unit) {
+    val reminder = entry.reminder
+    if (entry.recurrenceRule != null || reminder.plan != null || reminder.type == com.ricordella.app.domain.model.ReminderType.ALARM) return
+    currentSnackbarData?.dismiss()
+    if (showSnackbar(com.ricordella.app.core.i18n.tr("Completato"), com.ricordella.app.core.i18n.tr("Riapri")) == androidx.compose.material3.SnackbarResult.ActionPerformed) reopen()
+}

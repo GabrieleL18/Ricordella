@@ -50,6 +50,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.material3.SnackbarHostState
+import com.ricordella.app.core.ui.offerReopen
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -113,7 +115,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
-    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping, c.saveReminder, c.developerTools.resolutionsDay) }
+    val viewModel = appViewModel { c, _ -> HomeViewModel(c.reminderRepository, c.completeReminder, c.time, c.settingsRepository, c.housekeeping, c.saveReminder, c.developerTools.resolutionsDay, c.reopenReminder) }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val yearly by viewModel.yearly.collectAsStateWithLifecycle()
     val resolutions by viewModel.resolutions.collectAsStateWithLifecycle()
@@ -140,13 +142,15 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val mascot = rememberMascotState()
     val tracker = rememberRevealTracker()
     val colors = MaterialTheme.ricordellaColors
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val complete: (ReminderWithLinks) -> Unit = { entry ->
         viewModel.onToggleComplete(entry.reminder.id)
         mascot.celebrate()
+        scope.launch { snackbar.offerReopen(entry) { viewModel.onReopen(entry.reminder.id) } }
     }
 
     val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
     // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
     val showExtras = LocalAppSettings.current.showExtrasOnHome
     // Prima di "Da guardare": saluto, inserimento rapido, permesso (+ extra, + stato vuoto).
@@ -155,7 +159,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val upcomingAt = todayAt + 2
     val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
 
-    TopLevelScaffold(title = tr("Remindella"), navigator = navigator, onAdd = onAdd, brandTitle = true) { padding ->
+    TopLevelScaffold(title = tr("Remindella"), navigator = navigator, onAdd = onAdd, snackbarHostState = snackbar, brandTitle = true) { padding ->
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize().contentWidth(),
@@ -243,7 +247,15 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
 
             // Avvisi di servizio in fondo: non coprono il contenuto.
             item(key = "backup") {
-                BackupDueCard(visible = state.backupDue, intervalDays = state.backupIntervalDays, onExport = { showBackupChoices = true }, onLater = viewModel::onPostponeBackup)
+                var staleHidden by rememberSaveable { mutableStateOf(false) }
+                val stale = state.backupStaleDays > 0 && !staleHidden
+                BackupDueCard(
+                    visible = state.backupDue || stale,
+                    intervalDays = state.backupIntervalDays,
+                    staleDays = if (stale && !state.backupDue) state.backupStaleDays else 0,
+                    onExport = { showBackupChoices = true },
+                    onLater = { if (state.backupDue) viewModel.onPostponeBackup() else staleHidden = true },
+                )
             }
             resolutions?.let { (prompt, year) ->
                 item(key = "resolutions") {
@@ -443,8 +455,8 @@ private fun ResolutionsCard(
 
 /** Scaduto l'intervallo scelto: invito ad aggiornare il backup, che sovrascrive il precedente. */
 @Composable
-private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> Unit, onLater: () -> Unit) {
-    val tone = MaterialTheme.ricordellaColors.mint
+private fun BackupDueCard(visible: Boolean, intervalDays: Int, staleDays: Int, onExport: () -> Unit, onLater: () -> Unit) {
+    val tone = if (staleDays > 0) MaterialTheme.ricordellaColors.coral else MaterialTheme.ricordellaColors.mint
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn() + expandVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)),
@@ -461,9 +473,13 @@ private fun BackupDueCard(visible: Boolean, intervalDays: Int, onExport: () -> U
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
                 Icon(Icons.Rounded.CloudUpload, contentDescription = null, tint = tone.content)
                 Column(Modifier.weight(1f)) {
-                    Text(tr("È ora di aggiornare il backup"), style = MaterialTheme.typography.titleMedium, color = tone.content)
                     Text(
-                        when (intervalDays) {
+                        if (staleDays > 0) tr("Il backup è vecchio") else tr("È ora di aggiornare il backup"),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = tone.content,
+                    )
+                    Text(
+                        if (staleDays > 0) trf("L'ultimo backup risale a %1\$s giorni fa: se perdi il telefono perdi i dati dopo quella data.", staleDays) else when (intervalDays) {
                             1 -> tr("Aggiorna il backup di oggi: sovrascrivo quello precedente.")
                             7 -> tr("È passata una settimana: aggiorno il backup sovrascrivendo il precedente.")
                             30 -> tr("È passato un mese: aggiorno il backup sovrascrivendo il precedente.")

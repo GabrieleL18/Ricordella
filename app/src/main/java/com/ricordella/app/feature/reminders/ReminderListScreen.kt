@@ -93,6 +93,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.SnackbarHostState
+import kotlinx.coroutines.launch
+import com.ricordella.app.core.ui.offerReopen
+import com.ricordella.app.domain.model.ReminderStatus
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -161,7 +166,10 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showFilters by rememberSaveable { mutableStateOf(false) }
 
-    TopLevelScaffold(title = tr("Promemoria"), navigator = navigator, onAdd = onAdd) { padding ->
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    TopLevelScaffold(title = tr("Promemoria"), navigator = navigator, onAdd = onAdd, snackbarHostState = snackbar) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().contentWidth(),
             contentPadding = PaddingValues(
@@ -204,7 +212,10 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     entry = entry,
                     now = state.now,
                     onClick = { navigator.openReminder(entry.reminder.id) },
-                    onToggleComplete = { viewModel.onToggleComplete(entry) },
+                    onToggleComplete = {
+                        viewModel.onToggleComplete(entry)
+                        if (entry.reminder.status == ReminderStatus.ACTIVE) scope.launch { snackbar.offerReopen(entry) { viewModel.onReopen(entry.reminder.id) } }
+                    },
                     occurrenceDate = state.occurrenceDates[entry.reminder.id] ?: entry.reminder.dueDate,
                     modifier = Modifier.animateItem(),
                 )

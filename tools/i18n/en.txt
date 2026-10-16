@@ -1160,7 +1160,7 @@ Condivisione con un'altra persona ||| Sharing with another person
 Con la Condivisione due telefoni leggono e scrivono lo stesso file (es. su Google Drive). Chi ha il file può leggere e modificare promemoria, persone, cose e spese che contiene: condividilo solo con chi vuoi.  ||| With Sharing, two phones read and write the same file (e.g. on Google Drive). Anyone with the file can read and edit the reminders, people, items and expenses in it: share it only with people you choose.
 In automatico il file si aggiorna da solo, anche in background; in manuale solo quando lo chiedi. Se entrambi modificate gli stessi dati, l'app unisce le modifiche e, se lo stesso campo è cambiato da tutti e due, tiene la più recente.  ||| In automatic mode the file updates by itself, even in the background; in manual mode only when you ask. If you both edit the same data, the app merges the changes and, if the same field changed on both sides, keeps the most recent.
 Quando spunti o modifichi una cosa di un'altra persona, nel file resta scritto chi l'ha fatto. La sincronizzazione dipende dall'app che gestisce il file: verifica che sia aggiornato prima di decisioni importanti. ||| When you tick off or edit something belonging to another person, the file records who did it. Syncing depends on the app that manages the file: check it's up to date before important decisions.
-Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; Remindella non registra né salva l'audio); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Only when you ask: it uses the microphone for voice "Quick add" (the audio is transcribed by the phone's speech recognition, which may use the Internet under its own rules; Remindella doesn't record or keep the audio); it uses the camera to take photos to attach or scan; it reads the phone's calendar to import events; it uses the phone's Google Play services to read text and codes from photos (processing happens on the phone, but Google services may send technical data to Google under their terms); with Sharing it writes a file in the place you choose (e.g. Google Drive), managed by that service under its own rules.⏎⏎
+Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; per «Scrivi al volo» Remindella non registra né salva l'audio; nelle note puoi registrare messaggi vocali, che restano solo sul telefono); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Only when you ask: it uses the microphone for voice "Quick add" (the audio is transcribed by the phone's speech recognition, which may use the Internet under its own rules; for "Quick add" Remindella doesn't record or keep the audio; in notes you can record voice messages, which stay only on your phone); it uses the camera to take photos to attach or scan; it reads the phone's calendar to import events; it uses the phone's Google Play services to read text and codes from photos (processing happens on the phone, but Google services may send technical data to Google under their terms); with Sharing it writes a file in the place you choose (e.g. Google Drive), managed by that service under its own rules.⏎⏎
 In "Scrivi al volo" tocca il microfono e parla: la sfera ti ascolta e scrive per te. ||| In "Quick add" tap the mic and talk: the orb listens and writes for you.
 Condivisione automatica ||| Automatic sharing
 Il file condiviso si sincronizza da solo e, se avete modificato entrambi, unisce le modifiche senza perdere niente. ||| The shared file syncs by itself and, if you both made changes, merges them without losing anything.
@@ -1678,3 +1678,89 @@ Nella nuova sezione Carte scansioni il codice con la fotocamera, da una foto o d
 Mostra dettagli ||| Show details
 Nascondi dettagli ||| Hide details
 Formato ||| Format
+Il backup è vecchio ||| The backup is old
+L'ultimo backup risale a %1$s giorni fa: se perdi il telefono perdi i dati dopo quella data. ||| Your last backup was %1$s days ago: if you lose your phone you lose everything after that date.
+Ultimo backup ||| Last backup
+Mai: fai subito il primo, bastano pochi secondi. ||| Never: make the first one now, it takes a few seconds.
+Aggiungere la carta? ||| Add the card?
+Al posto di «Prossima sveglia» ora c'è l'icona della sveglia. ||| The alarm icon now replaces “Next alarm”.
+Alla prima configurazione scegli le sezioni che ti interessano: le altre non compaiono. ||| At first setup, choose the sections you want: the others stay hidden.
+Aprila con Remindella: ||| Open it with Remindella:
+Audio ||| Audio
+Cancella tutto ||| Clear all
+Carta %1$s: %2$s ||| Card %1$s: %2$s
+Carte a blocchi ||| Cards as tiles
+Classica ||| Classic
+Come nelle Impostazioni (%1$s) ||| As in Settings (%1$s)
+Con il telefono girato il foglio occupa tutto lo spazio e gli strumenti stanno di fianco. ||| With the phone rotated, the sheet fills the space and the tools sit on the side.
+Condivisione più precisa ||| More precise sharing
+Cosa ti interessa usare? ||| What do you want to use?
+Cosa è condiviso ||| What is shared
+Data di creazione ||| Creation date
+Disegno ||| Drawing
+Disegno in orizzontale ||| Drawing in landscape
+Elimina la registrazione ||| Delete the recording
+Gomma ||| Eraser
+Home più ricca ||| Richer Home
+Il file condiviso non è ancora attivo: le scelte valgono dalla prima sincronizzazione. ||| The shared file is not active yet: your choices apply from the first sync.
+Immagine ||| Image
+Impossibile riprodurre l'audio. ||| Can't play the audio.
+Invia ||| Send
+Invia la carta ||| Send the card
+Invia una carta ||| Send a card
+Lascia accese le sezioni che userai: le altre non compaiono nell'app. Promemoria, eventi, cose e persone ci sono sempre. Potrai cambiare idea quando vuoi nelle Impostazioni. ||| Leave on the sections you will use: the others do not appear in the app. Reminders, events, things and people are always there. You can change your mind anytime in Settings.
+Le carte fedeltà, con nome, categoria e numero. ||| Loyalty cards, with name, category and number.
+Le sue cose e i suoi promemoria restano fuori se non sono di nessun altro ||| Their things and reminders stay out if they belong to no one else
+Le tue carte nella schermata Home: un tocco mostra il codice da far leggere alla cassa. ||| Your cards on the Home screen: one tap shows the code to scan at the checkout.
+Magica ||| Magic
+Manda una carta fedeltà a un'altra persona: chi la riceve la aggiunge con un tocco. ||| Send a loyalty card to someone: they add it with one tap.
+Nel file condiviso ||| In the shared file
+Nel file condiviso scegli uno per uno cosa mandare, anche le carte, e spieghiamo cosa succede se l'altra persona non condivide. ||| In the shared file, choose one by one what to send, cards included, and we explain what happens if the other person does not share.
+Nessun timer attivo ||| No active timer
+Nessuna app per aprire l'immagine. ||| No app to open the image.
+Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi. Le carte condivise sono visibili a chi ha il file. ||| Never shared: photos, documents and attachments (they stay on the phone that has them), settings, cycle, water and resolutions. Shared cards are visible to anyone with the file.
+Note a tema ||| Themed notes
+Note con audio e disegni ||| Notes with audio and drawings
+Nuovo! ||| New!
+Ognuno decide per sé cosa mandare e cosa ricevere. Se tu condividi una cosa e lei no, la cosa resta nel file ma sul suo telefono non arriva e non la può toccare; tu non vedi nulla di suo. Se togli dalla condivisione una cosa già mandata, nel file resta com'è: l'altra persona la tiene, ma non si aggiorna più. ||| Each person decides what to send and what to receive. If you share something and they don't, it stays in the file but does not reach their phone and they can't touch it; you see nothing of theirs. If you stop sharing something already sent, it stays as it is in the file: the other person keeps it, but it no longer updates.
+Ordina ||| Sort
+Pausa ||| Pause
+Penna, colori e gomma ||| Pen, colours and eraser
+Predefinita ||| Default
+Profilo e backup ||| Profile and backup
+Promemoria, eventi, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Reminders, events, things and people are always there. If you turn a section off its data stays, and you find it again when you turn it back on.
+Registra ||| Record
+Registra la voce, carica immagini o disegna con penna e colori. Ordina le note e trovale dalla ricerca. ||| Record your voice, add images or draw with pen and colours. Sort your notes and find them with search.
+Registrazione ||| Recording
+Registrazione non riuscita. ||| Recording failed.
+Riproduci ||| Play
+Scegli cosa usare ||| Choose what to use
+Scegli il tipo di nota, personalizza il tema e vedile a tasselli. ||| Pick the note type, customise the theme and see them as tiles.
+Scegli il tuo profilo principale e dai un nome ai backup. ||| Choose your main profile and name your backups.
+Scegli quanto dura e guarda l'anello svuotarsi, preciso al secondo. Nuovo widget Timer sulla Home. ||| Choose how long it lasts and watch the ring empty, accurate to the second. New Timer widget for the Home screen.
+Scegli uno per uno cosa condividere ||| Choose what to share, one by one
+Schermata della sveglia ||| Alarm screen
+Se condividi una cosa e l'altra persona no ||| If you share something and the other person doesn't
+Serve il permesso del microfono per registrare. ||| Microphone permission is needed to record.
+Stelline di polvere magica sopra il bagliore arancione e una grafica in linea con il resto dell'app, anche in orizzontale. ||| Magic dust stars over the orange glow and a look in line with the rest of the app, in landscape too.
+Sveglia classica ||| Classic alarm
+Sveglia classica più magica ||| A more magical classic alarm
+Tasselli extra, un tutorial per ogni sezione e «Indietro» che torna al foglio del giorno. ||| Extra tiles, a tutorial for every section, and “Back” returns to the day sheet.
+Testo, immagini e audio ||| Text, images and audio
+Timer con anello ||| Timer with ring
+Titolo A–Z ||| Title A–Z
+Togli l'immagine ||| Remove the image
+Ultima modifica ||| Last modified
+Una sfumatura arancione che respira, solo l'ora al centro. È la sveglia di default: la cambi nelle Impostazioni o per ogni sveglia. ||| A breathing orange gradient, just the time in the centre. It is the default alarm: change it in Settings or per alarm.
+Vedi a blocchi ||| View as tiles
+Vedi in elenco ||| View as list
+Vedi le carte a blocchi o in elenco, con un'icona per ogni categoria e la nuova categoria Altro. ||| See cards as tiles or as a list, with an icon for each category and the new category Other.
+Widget Carte ||| Cards widget
+Widget Sveglia più pulito ||| Cleaner Alarm widget
+spento ||| off
+Sezione protetta ||| Protected section
+Sblocca per vedere questa sezione ||| Unlock to see this section
+Sblocca ||| Unlock
+Proteggi il ciclo con il blocco schermo ||| Protect the cycle with the screen lock
+Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot. ||| Opening the Cycle section requires unlocking the phone. It also hides the screen from screenshots.
+Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android. ||| The phone has no screen lock: set one in Android settings.

@@ -109,6 +109,8 @@ class AlarmActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
+        // Finché suona lo schermo non si spegne da solo: spento, al risveglio resterebbe solo il blocco schermo.
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {

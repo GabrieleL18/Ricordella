@@ -27,6 +27,13 @@ Non usare `connectedAndroidTest`: **cancella i dati dell'app sul telefono**. Si 
 
 Cosa controllare sulla release: avvio, backup/ripristino, widget (Sveglia, Timer, ecc.), timer e sveglie che suonano, notifiche, lingue.
 
+Prima di ogni release, in ordine:
+1. `py tools/i18n/generate.py check`: deve dire «mancanti: 0» per ogni lingua (esce con errore altrimenti).
+2. `.\gradlew testDebugUnitTest`.
+3. Con la build di release (minificata) apri **ogni sezione**, compresa la fotocamera per le carte e gli scontrini: R8 ha già rotto ML Kit una volta (0.9.1).
+4. Sveglia a schermo bloccato: deve comparire a tutto schermo e fermarsi senza sbloccare.
+5. Dopo il caricamento guarda Play Console › Qualità › Android vitals (arresti anomali e ANR): non servono librerie in più.
+
 ## 2. Creare l'AAB
 
 ### Prerequisiti (nella radice del progetto, fuori da git)

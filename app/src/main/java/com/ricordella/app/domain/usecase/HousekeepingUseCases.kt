@@ -199,6 +199,14 @@ class Housekeeping(
             return today.toEpochDay() - since >= settings.backupIntervalDays
         }
 
+        const val STALE_BACKUP_DAYS = 30
+
+        /** Giorni dall'ultimo backup se superano [STALE_BACKUP_DAYS], altrimenti 0 (mai fatto: 0, non si sa da quando usa l'app). */
+        fun staleBackupDays(settings: AppSettings, nowMillis: Long): Int {
+            val days = ((nowMillis - (settings.lastBackupMillis ?: return 0)) / (24 * HOUR_MILLIS)).toInt()
+            return if (days > STALE_BACKUP_DAYS) days else 0
+        }
+
         /** "Ogni 3 ore" o "Ogni settimana": la frequenza scelta, in ore o in giorni. */
         fun frequencyLabel(settings: AppSettings): String =
             if (settings.backupEveryHours > 0) hoursLabel(settings.backupEveryHours) else intervalLabel(settings.backupIntervalDays)

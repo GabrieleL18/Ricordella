@@ -644,7 +644,7 @@ In automatico il file si aggiorna da solo, anche in background; in manuale solo 
 Quando spunti o modifichi una cosa di un'altra persona, nel file resta scritto chi l'ha fatto. La sincronizzazione dipende dall'app che gestisce il file: verifica che sia aggiornato prima di decisioni importanti. ||| Cuando marcas o modificas algo de otra persona, el archivo deja constancia de quién lo hizo. La sincronización depende de la app que gestiona el archivo: comprueba que esté al día antes de decisiones importantes.
 Informativa privacy ||| Política de privacidad
 Remindella non chiede account, non ha accesso a Internet, non mostra pubblicità, non raccoglie statistiche e non invia i tuoi dati allo sviluppatore.  ||| Remindella no pide cuenta, no tiene acceso a Internet, no muestra publicidad, no recoge estadísticas y no envía tus datos al desarrollador.
-Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; Remindella non registra né salva l'audio); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Solo cuando tú lo pides: usa el micrófono para «Escribe al vuelo» por voz (el audio lo transcribe el reconocimiento de voz del móvil, que puede usar Internet según sus propias normas; Remindella no graba ni guarda el audio); usa la cámara para hacer fotos que adjuntar o escanear; lee el calendario del móvil para importar los eventos; usa los servicios de Google Play del móvil para leer textos y códigos de las fotos (el procesamiento se hace en el móvil, pero los servicios de Google pueden enviar datos técnicos a Google según sus condiciones); al compartir escribe un archivo en el lugar que elijas (p. ej. Google Drive), gestionado por ese servicio según sus normas.⏎⏎
+Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; per «Scrivi al volo» Remindella non registra né salva l'audio; nelle note puoi registrare messaggi vocali, che restano solo sul telefono); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Solo cuando tú lo pides: usa el micrófono para «Escribe al vuelo» por voz (el audio lo transcribe el reconocimiento de voz del móvil, que puede usar Internet según sus propias normas; para «Escribir al vuelo» Remindella no graba ni guarda el audio; en las notas puedes grabar mensajes de voz, que se quedan solo en el teléfono); usa la cámara para hacer fotos que adjuntar o escanear; lee el calendario del móvil para importar los eventos; usa los servicios de Google Play del móvil para leer textos y códigos de las fotos (el procesamiento se hace en el móvil, pero los servicios de Google pueden enviar datos técnicos a Google según sus condiciones); al compartir escribe un archivo en el lugar que elijas (p. ej. Google Drive), gestionado por ese servicio según sus normas.⏎⏎
 Puoi cancellare tutto da Impostazioni › Dati e backup › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| Puedes borrarlo todo desde Ajustes › Datos y copia › Borrar todos los datos o desinstalando la app. Preguntas:
 Limitazione di responsabilità ||| Limitación de responsabilidad
 L'app è fornita gratuitamente «così com'è», senza garanzia che funzioni sempre e senza errori.  ||| La app se ofrece gratis «tal cual», sin garantía de que funcione siempre y sin errores.
@@ -1603,3 +1603,89 @@ Nella nuova sezione Carte scansioni il codice con la fotocamera, da una foto o d
 Mostra dettagli ||| Mostrar detalles
 Nascondi dettagli ||| Ocultar detalles
 Formato ||| Formato
+Il backup è vecchio ||| La copia de seguridad es antigua
+L'ultimo backup risale a %1$s giorni fa: se perdi il telefono perdi i dati dopo quella data. ||| La última copia de seguridad es de hace %1$s días: si pierdes el teléfono, pierdes todo lo posterior.
+Ultimo backup ||| Última copia de seguridad
+Mai: fai subito il primo, bastano pochi secondi. ||| Nunca: haz la primera ahora, solo tarda unos segundos.
+Aggiungere la carta? ||| ¿Añadir la tarjeta?
+Al posto di «Prossima sveglia» ora c'è l'icona della sveglia. ||| El icono de la alarma ahora sustituye a «Próxima alarma».
+Alla prima configurazione scegli le sezioni che ti interessano: le altre non compaiono. ||| En la primera configuración elige las secciones que te interesan: las demás no aparecen.
+Aprila con Remindella: ||| Ábrela con Remindella:
+Audio ||| Audio
+Cancella tutto ||| Borrar todo
+Carta %1$s: %2$s ||| Tarjeta %1$s: %2$s
+Carte a blocchi ||| Tarjetas en bloques
+Classica ||| Clásica
+Come nelle Impostazioni (%1$s) ||| Como en Ajustes (%1$s)
+Con il telefono girato il foglio occupa tutto lo spazio e gli strumenti stanno di fianco. ||| Con el teléfono girado, la hoja ocupa todo el espacio y las herramientas quedan al lado.
+Condivisione più precisa ||| Compartir con más precisión
+Cosa ti interessa usare? ||| ¿Qué te interesa usar?
+Cosa è condiviso ||| Qué se comparte
+Data di creazione ||| Fecha de creación
+Disegno ||| Dibujo
+Disegno in orizzontale ||| Dibujo en horizontal
+Elimina la registrazione ||| Eliminar la grabación
+Gomma ||| Goma
+Home più ricca ||| Inicio más completo
+Il file condiviso non è ancora attivo: le scelte valgono dalla prima sincronizzazione. ||| El archivo compartido aún no está activo: tus elecciones valen desde la primera sincronización.
+Immagine ||| Imagen
+Impossibile riprodurre l'audio. ||| No se puede reproducir el audio.
+Invia ||| Enviar
+Invia la carta ||| Enviar la tarjeta
+Invia una carta ||| Enviar una tarjeta
+Lascia accese le sezioni che userai: le altre non compaiono nell'app. Promemoria, eventi, cose e persone ci sono sempre. Potrai cambiare idea quando vuoi nelle Impostazioni. ||| Deja activadas las secciones que usarás: las demás no aparecen en la app. Recordatorios, eventos, cosas y personas siempre están. Podrás cambiar de idea cuando quieras en Ajustes.
+Le carte fedeltà, con nome, categoria e numero. ||| Las tarjetas de fidelidad, con nombre, categoría y número.
+Le sue cose e i suoi promemoria restano fuori se non sono di nessun altro ||| Sus cosas y recordatorios quedan fuera si no son de nadie más
+Le tue carte nella schermata Home: un tocco mostra il codice da far leggere alla cassa. ||| Tus tarjetas en la pantalla de inicio: un toque muestra el código para leer en caja.
+Magica ||| Mágica
+Manda una carta fedeltà a un'altra persona: chi la riceve la aggiunge con un tocco. ||| Envía una tarjeta de fidelidad a otra persona: quien la recibe la añade con un toque.
+Nel file condiviso ||| En el archivo compartido
+Nel file condiviso scegli uno per uno cosa mandare, anche le carte, e spieghiamo cosa succede se l'altra persona non condivide. ||| En el archivo compartido eliges una por una qué enviar, también las tarjetas, y explicamos qué pasa si la otra persona no comparte.
+Nessun timer attivo ||| Ningún temporizador activo
+Nessuna app per aprire l'immagine. ||| Ninguna app para abrir la imagen.
+Non si condividono mai: foto, documenti e allegati (restano sul telefono di chi li ha), impostazioni, ciclo, acqua e buoni propositi. Le carte condivise sono visibili a chi ha il file. ||| Nunca se comparten: fotos, documentos y adjuntos (se quedan en el teléfono que los tiene), ajustes, ciclo, agua y propósitos. Las tarjetas compartidas las ve quien tenga el archivo.
+Note a tema ||| Notas con tema
+Note con audio e disegni ||| Notas con audio y dibujos
+Nuovo! ||| ¡Nuevo!
+Ognuno decide per sé cosa mandare e cosa ricevere. Se tu condividi una cosa e lei no, la cosa resta nel file ma sul suo telefono non arriva e non la può toccare; tu non vedi nulla di suo. Se togli dalla condivisione una cosa già mandata, nel file resta com'è: l'altra persona la tiene, ma non si aggiorna più. ||| Cada uno decide qué enviar y qué recibir. Si compartes algo y la otra persona no, se queda en el archivo pero no llega a su teléfono y no puede tocarlo; tú no ves nada suyo. Si dejas de compartir algo ya enviado, en el archivo queda como está: la otra persona lo conserva, pero ya no se actualiza.
+Ordina ||| Ordenar
+Pausa ||| Pausa
+Penna, colori e gomma ||| Lápiz, colores y goma
+Predefinita ||| Predeterminada
+Profilo e backup ||| Perfil y copia de seguridad
+Promemoria, eventi, cose e persone ci sono sempre. Spegnendo una sezione i suoi dati restano e la ritrovi riaccendendola. ||| Recordatorios, eventos, cosas y personas siempre están. Si apagas una sección, sus datos se conservan y los recuperas al volver a encenderla.
+Registra ||| Grabar
+Registra la voce, carica immagini o disegna con penna e colori. Ordina le note e trovale dalla ricerca. ||| Graba tu voz, añade imágenes o dibuja con lápiz y colores. Ordena las notas y encuéntralas con la búsqueda.
+Registrazione ||| Grabación
+Registrazione non riuscita. ||| La grabación ha fallado.
+Riproduci ||| Reproducir
+Scegli cosa usare ||| Elige qué usar
+Scegli il tipo di nota, personalizza il tema e vedile a tasselli. ||| Elige el tipo de nota, personaliza el tema y velas en mosaico.
+Scegli il tuo profilo principale e dai un nome ai backup. ||| Elige tu perfil principal y ponle nombre a tus copias de seguridad.
+Scegli quanto dura e guarda l'anello svuotarsi, preciso al secondo. Nuovo widget Timer sulla Home. ||| Elige cuánto dura y mira cómo se vacía el anillo, con precisión de segundos. Nuevo widget de Temporizador para la pantalla de inicio.
+Scegli uno per uno cosa condividere ||| Elige una por una qué compartir
+Schermata della sveglia ||| Pantalla de la alarma
+Se condividi una cosa e l'altra persona no ||| Si compartes algo y la otra persona no
+Serve il permesso del microfono per registrare. ||| Se necesita el permiso del micrófono para grabar.
+Stelline di polvere magica sopra il bagliore arancione e una grafica in linea con il resto dell'app, anche in orizzontale. ||| Estrellitas de polvo mágico sobre el brillo naranja y un diseño acorde con el resto de la app, también en horizontal.
+Sveglia classica ||| Alarma clásica
+Sveglia classica più magica ||| Alarma clásica más mágica
+Tasselli extra, un tutorial per ogni sezione e «Indietro» che torna al foglio del giorno. ||| Mosaicos extra, un tutorial para cada sección y «Atrás» vuelve a la hoja del día.
+Testo, immagini e audio ||| Texto, imágenes y audio
+Timer con anello ||| Temporizador con anillo
+Titolo A–Z ||| Título A–Z
+Togli l'immagine ||| Quitar la imagen
+Ultima modifica ||| Última modificación
+Una sfumatura arancione che respira, solo l'ora al centro. È la sveglia di default: la cambi nelle Impostazioni o per ogni sveglia. ||| Un degradado naranja que respira, solo la hora en el centro. Es la alarma predeterminada: se cambia en Ajustes o en cada alarma.
+Vedi a blocchi ||| Ver en bloques
+Vedi in elenco ||| Ver en lista
+Vedi le carte a blocchi o in elenco, con un'icona per ogni categoria e la nuova categoria Altro. ||| Mira las tarjetas en bloques o en lista, con un icono por categoría y la nueva categoría Otro.
+Widget Carte ||| Widget de tarjetas
+Widget Sveglia più pulito ||| Widget de alarma más limpio
+spento ||| apagado
+Sezione protetta ||| Sección protegida
+Sblocca per vedere questa sezione ||| Desbloquea para ver esta sección
+Sblocca ||| Desbloquear
+Proteggi il ciclo con il blocco schermo ||| Proteger el ciclo con el bloqueo de pantalla
+Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot. ||| Para abrir la sección Ciclo hay que desbloquear el teléfono. También oculta la pantalla de las capturas.
+Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android. ||| El teléfono no tiene bloqueo de pantalla: configúralo en los ajustes de Android.

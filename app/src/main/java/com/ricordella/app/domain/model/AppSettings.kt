@@ -173,6 +173,8 @@ data class AppSettings(
     val shareScope: ShareScope = ShareScope(),
     /** In Home i collegamenti alle sezioni extra (Sveglie, Note, Pozioni). */
     val showExtrasOnHome: Boolean = true,
+    /** La sezione Ciclo (dati sulla salute) si apre solo con lo sblocco del telefono. */
+    val lockCycle: Boolean = false,
     /** Note e liste della spesa. */
     val notes: List<Note> = emptyList(),
     /** Carte fedeltà (Decathlon, Coop...): nome e codice da mostrare alla cassa. */

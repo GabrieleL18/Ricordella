@@ -50,6 +50,8 @@ data class HomeUiState(
     /** È passato l'intervallo scelto dall'ultimo backup. */
     val backupDue: Boolean = false,
     val backupIntervalDays: Int = 1,
+    /** Giorni dall'ultimo backup riuscito, se sono più di [Housekeeping.STALE_BACKUP_DAYS] (anche con il backup automatico). */
+    val backupStaleDays: Int = 0,
 ) {
     val isEmpty: Boolean get() = attention.isEmpty() && today.isEmpty() && upcoming.isEmpty()
 }
@@ -76,6 +78,7 @@ class HomeViewModel(
     private val saveReminder: SaveReminderUseCase,
     /** Giorno finto per gli inviti dei buoni propositi (sezione Sviluppatore); null = oggi. */
     resolutionsDay: Flow<LocalDate?>,
+    private val reopenReminder: com.ricordella.app.domain.usecase.ReopenReminderUseCase,
 ) : ViewModel() {
 
     /** Crea il promemoria scritto al volo, con i predefiniti del suo tipo. */
@@ -194,6 +197,7 @@ class HomeViewModel(
         buildState(entries.filterNot { it.reminder.type == ReminderType.ALARM }, now).copy(
             backupDue = appSettings.autoBackupTime == null && Housekeeping.isBackupDue(appSettings, now.toLocalDate()),
             backupIntervalDays = appSettings.backupIntervalDays,
+            backupStaleDays = Housekeeping.staleBackupDays(appSettings, now.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()),
         )
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(now = time.localNow()))
@@ -220,6 +224,10 @@ class HomeViewModel(
 
     fun onToggleComplete(reminderId: String) {
         viewModelScope.launch { completeReminder(reminderId) }
+    }
+
+    fun onReopen(reminderId: String) {
+        viewModelScope.launch { reopenReminder(reminderId) }
     }
 
     /** Sovrascrive il backup nel file già scelto; se non c'è, la UI chiede dove salvarlo. */

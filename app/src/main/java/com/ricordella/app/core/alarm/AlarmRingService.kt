@@ -174,10 +174,16 @@ class AlarmRingService : Service() {
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .setPriority(NotificationCompat.PRIORITY_MAX)
         .setOngoing(true)
+        // Sul blocco schermo la notifica resta visibile e i pulsanti funzionano senza sbloccare il telefono.
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setContentIntent(screenIntent())
         .setFullScreenIntent(screenIntent(), true)
-        .addAction(0, trf("Posticipa %1\$s min", alarm.snoozeMinutes), serviceIntent(ACTION_SNOOZE))
-        .addAction(0, tr("Ferma"), serviceIntent(ACTION_STOP))
+        .addAction(action(trf("Posticipa %1\$s min", alarm.snoozeMinutes), ACTION_SNOOZE))
+        .addAction(action(tr("Ferma"), ACTION_STOP))
+        .build()
+
+    private fun action(label: String, action: String) = NotificationCompat.Action.Builder(0, label, serviceIntent(action))
+        .setAuthenticationRequired(false)
         .build()
 
     private fun screenIntent(): PendingIntent = PendingIntent.getActivity(
@@ -272,6 +278,7 @@ class AlarmRingService : Service() {
         /** Canale senza suono: suona il servizio, in loop, sul volume della sveglia. */
         private fun createChannel(context: Context) {
             val channel = NotificationChannel(CHANNEL_ALARMS, tr("Sveglie"), NotificationManager.IMPORTANCE_HIGH).apply {
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
                 setSound(null, null)
                 enableVibration(false)
             }

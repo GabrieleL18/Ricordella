@@ -78,6 +78,11 @@ import java.time.LocalDate
  */
 @Composable
 fun CycleScreen(onBack: () -> Unit) {
+    com.ricordella.app.core.ui.SensitiveLock(LocalAppSettings.current.lockCycle, onCancel = onBack) { CycleContent(onBack) }
+}
+
+@Composable
+private fun CycleContent(onBack: () -> Unit) {
     val container = (LocalContext.current.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
     val app = LocalAppSettings.current

@@ -90,6 +90,8 @@ import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Lock
+import com.ricordella.app.core.ui.hasScreenLock
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Schedule
@@ -330,6 +332,13 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
             }
 
             SettingsGroup(Icons.Rounded.Storage, tr("Dati e backup"), tr("Backup, importazione e operazioni di inizio anno")) {
+                val lastBackupDay = settings.lastBackupMillis?.let { java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate() }
+                SettingRow(
+                    icon = Icons.Rounded.Shield,
+                    title = tr("Ultimo backup"),
+                    subtitle = lastBackupDay?.let { DateTexts.fullDate(it) } ?: tr("Mai: fai subito il primo, bastano pochi secondi."),
+                    onClick = { backupAction(BACKUP_EXPORT) },
+                )
                 SettingRow(
                     icon = Icons.Rounded.Upload,
                     title = tr("Esporta backup"),
@@ -397,6 +406,21 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     title = tr("Cestino"),
                     subtitle = tr("Recupera ciò che hai eliminato negli ultimi 7 giorni."),
                     onClick = onOpenTrash,
+                )
+                val screenLockSet = remember { context.hasScreenLock() }
+                SettingRow(
+                    icon = Icons.Rounded.Lock,
+                    title = tr("Proteggi il ciclo con il blocco schermo"),
+                    subtitle = if (screenLockSet) tr("Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot.")
+                    else tr("Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android."),
+                    onClick = { if (screenLockSet) viewModel.update { it.copy(lockCycle = !it.lockCycle) } },
+                    trailing = {
+                        Switch(
+                            checked = settings.lockCycle && screenLockSet,
+                            enabled = screenLockSet,
+                            onCheckedChange = { on -> viewModel.update { it.copy(lockCycle = on) } },
+                        )
+                    },
                 )
                 SettingRow(
                     icon = Icons.Rounded.DeleteForever,

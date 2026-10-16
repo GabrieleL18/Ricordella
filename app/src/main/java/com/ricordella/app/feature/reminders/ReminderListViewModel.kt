@@ -120,6 +120,10 @@ class ReminderListViewModel(
         it.copy(personId = null, itemId = null, category = null, type = null, priority = null)
     }
 
+    fun onReopen(id: String) {
+        viewModelScope.launch { reopenReminder(id) }
+    }
+
     fun onToggleComplete(entry: ReminderWithLinks) {
         viewModelScope.launch {
             if (entry.reminder.status == ReminderStatus.ACTIVE) completeReminder(entry.reminder.id)

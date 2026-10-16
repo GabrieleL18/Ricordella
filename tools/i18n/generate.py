@@ -45,6 +45,7 @@ def kotlin(s):
 
 
 show = sys.argv[1:]
+failed = False
 for code, name, adjective in LANGS:
     pairs = {}
     path = os.path.join(here, f'{code}.txt')
@@ -79,3 +80,8 @@ for code, name, adjective in LANGS:
     if code in show:
         for k in missing:
             print('  MISSING:', repr(k))
+    if missing and 'check' in show:
+        failed = True
+
+if failed:
+    sys.exit('Traduzioni mancanti: lancia "python tools/i18n/generate.py <lingua>" per l\'elenco.')
