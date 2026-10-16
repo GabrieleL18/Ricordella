@@ -1782,3 +1782,16 @@ Vuoi mandare il rapporto dell'errore allo sviluppatore? Si apre la tua app di po
 Nessuna app di posta trovata ||| No mail app found
 Segnala un problema ||| Report a problem
 Apre la posta con versione e modello del telefono già scritti. ||| Opens your mail with the version and phone model already filled in.
+Più carte di seguito ||| Several cards in a row
+Inquadra una tessera dopo l'altra: i nomi li metti alla fine, anche dopo ||| Scan one card after another: you add the names at the end, or later
+Più foto o PDF insieme ||| Several photos or PDFs at once
+Scegli tutte le foto: provo a leggere codice e nome da ognuna ||| Pick all the photos: I try to read code and name from each
+Leggo le carte… ||| Reading the cards…
+%1$s carte lette ||| %1$s cards read
+Il nome è una proposta: correggilo o lascialo vuoto, poi lo cambi quando vuoi. ||| The name is a suggestion: fix it or leave it empty, you can change it any time.
+%1$s senza codice o già presenti: saltate. ||| %1$s without a code or already saved: skipped.
+Togli la carta %1$s ||| Remove card %1$s
+Categoria per tutte ||| Category for all
+Aggiungi %1$s carte ||| Add %1$s cards
+Scansiona un'altra ||| Scan another
+Carta senza nome ||| Unnamed card

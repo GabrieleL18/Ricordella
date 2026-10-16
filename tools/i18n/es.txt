@@ -1707,3 +1707,16 @@ Vuoi mandare il rapporto dell'errore allo sviluppatore? Si apre la tua app di po
 Nessuna app di posta trovata ||| No se encontró ninguna app de correo
 Segnala un problema ||| Informar de un problema
 Apre la posta con versione e modello del telefono già scritti. ||| Abre el correo con la versión y el modelo del teléfono ya escritos.
+Più carte di seguito ||| Varias tarjetas seguidas
+Inquadra una tessera dopo l'altra: i nomi li metti alla fine, anche dopo ||| Escanea una tarjeta tras otra: los nombres los pones al final, o más tarde
+Più foto o PDF insieme ||| Varias fotos o PDF a la vez
+Scegli tutte le foto: provo a leggere codice e nome da ognuna ||| Elige todas las fotos: intento leer código y nombre de cada una
+Leggo le carte… ||| Leyendo las tarjetas…
+%1$s carte lette ||| %1$s tarjetas leídas
+Il nome è una proposta: correggilo o lascialo vuoto, poi lo cambi quando vuoi. ||| El nombre es una sugerencia: corrígelo o déjalo vacío, puedes cambiarlo cuando quieras.
+%1$s senza codice o già presenti: saltate. ||| %1$s sin código o ya guardadas: omitidas.
+Togli la carta %1$s ||| Quitar la tarjeta %1$s
+Categoria per tutte ||| Categoría para todas
+Aggiungi %1$s carte ||| Añadir %1$s tarjetas
+Scansiona un'altra ||| Escanear otra
+Carta senza nome ||| Tarjeta sin nombre

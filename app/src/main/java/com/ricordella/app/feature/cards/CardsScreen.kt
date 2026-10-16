@@ -1,5 +1,6 @@
 package com.ricordella.app.feature.cards
 
+import kotlin.coroutines.resume
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -198,6 +199,49 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
             s.copy(cards = list, cardColors = if (category.isEmpty()) s.cardColors else s.cardColors + (category to picked))
         }
         formOpen = false
+    }
+    // Inserimento in blocco: le carte lette aspettano la conferma in un elenco, dove si correggono i nomi.
+    var drafts by remember { mutableStateOf(emptyList<DraftCard>()) }
+    var skipped by remember { mutableIntStateOf(0) }
+    var reviewing by remember { mutableStateOf(false) }
+    var reading by remember { mutableStateOf(false) }
+    fun addDrafts(found: List<DraftCard>) {
+        val fresh = newDrafts(found, cards).filter { f -> drafts.none { it.code == f.code } }
+        skipped += found.size - fresh.size
+        drafts = drafts + fresh
+    }
+    // Fotocamera di seguito: dopo ogni lettura riparte da sola, finché non si torna indietro.
+    fun scanNext() {
+        runCatching {
+            GmsBarcodeScanning.getClient(context, GmsBarcodeScannerOptions.Builder().setBarcodeFormats(ScanFormats[0], *ScanFormats.drop(1).toIntArray()).build()).startScan()
+                .addOnSuccessListener { b ->
+                    b.rawValue?.let { addDrafts(listOf(DraftCard(it, b.format, ""))) }
+                    scanNext()
+                }
+                .addOnCanceledListener { reviewing = drafts.isNotEmpty() }
+                .addOnFailureListener {
+                    if (drafts.isEmpty()) Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() else reviewing = true
+                }
+        }.onFailure { Toast.makeText(context, tr("Scanner non disponibile"), Toast.LENGTH_LONG).show() }
+    }
+    val multiPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        reading = true
+        scope.launch {
+            val found = mutableListOf<DraftCard>()
+            var withoutCode = 0
+            uris.forEach { uri ->
+                val scans = kotlinx.coroutines.suspendCancellableCoroutine<List<Scan>> { cont -> readBarcodes(context, uri) { if (cont.isActive) cont.resume(it) } }
+                val first = scans.firstOrNull()
+                if (first == null) withoutCode++
+                else found += DraftCard(first.code, first.format, guessCardName(runCatching { com.ricordella.app.core.ui.recognizeLines(context, uri) }.getOrDefault(emptyList())))
+            }
+            addDrafts(found)
+            skipped += withoutCode
+            reading = false
+            reviewing = drafts.isNotEmpty()
+            if (drafts.isEmpty()) Toast.makeText(context, tr("Nessun codice trovato"), Toast.LENGTH_LONG).show()
+        }
     }
     val onCodes: (List<Scan>) -> Unit = { found ->
         val first = found.firstOrNull()
@@ -431,6 +475,26 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
         }
     }
 
+    if (reading) androidx.compose.material3.AlertDialog(
+        onDismissRequest = {},
+        confirmButton = {},
+        title = { Text(tr("Leggo le carte…")) },
+        text = { androidx.compose.material3.LinearProgressIndicator(Modifier.fillMaxWidth()) },
+    )
+    if (reviewing) BulkCardsDialog(
+        drafts = drafts,
+        skipped = skipped,
+        suggestions = suggestions,
+        onChange = { drafts = it },
+        onSave = { category ->
+            val added = draftsToCards(drafts, category, System.currentTimeMillis(), tr("Carta senza nome"))
+            update { s -> s.copy(cards = s.cards + added, cardColors = if (category.isEmpty() || category in s.cardColors) s.cardColors else s.cardColors + (category to colorOf(category))) }
+            drafts = emptyList(); skipped = 0; reviewing = false
+        },
+        onMore = { reviewing = false; scanNext() },
+        onCancel = { drafts = emptyList(); skipped = 0; reviewing = false },
+    )
+
     importing?.let { card ->
         ConfirmDialog(
             title = tr("Aggiungere la carta?"),
@@ -463,6 +527,12 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                     }
                     ChoiceTile(Icons.Rounded.PictureAsPdf, tr("Foto o PDF"), tr("Un file già sul telefono, anche un PDF ricevuto per email"), colors.lavender) {
                         choosing = false; picker.launch(ScanFileTypes)
+                    }
+                    ChoiceTile(Icons.Rounded.PhotoCamera, tr("Più carte di seguito"), tr("Inquadra una tessera dopo l'altra: i nomi li metti alla fine, anche dopo"), colors.mint) {
+                        choosing = false; drafts = emptyList(); skipped = 0; scanNext()
+                    }
+                    ChoiceTile(Icons.Rounded.PictureAsPdf, tr("Più foto o PDF insieme"), tr("Scegli tutte le foto: provo a leggere codice e nome da ognuna"), colors.coral) {
+                        choosing = false; drafts = emptyList(); skipped = 0; multiPicker.launch(ScanFileTypes)
                     }
                     ChoiceTile(Icons.Rounded.Edit, tr("Scrivi il numero a mano"), tr("Digita il numero stampato sulla tessera"), colors.pear) {
                         choosing = false; openForm(CardForm(null, "", "", null, "", Barcode.FORMAT_CODE_128))
@@ -674,13 +744,13 @@ private val ScanFormats = listOf(
 )
 
 /** Un codice letto: il testo e il formato (costante `Barcode.FORMAT_*`). */
-private class Scan(val code: String, val format: Int)
+internal class Scan(val code: String, val format: Int)
 
 /**
  * Legge i codici di una foto o di un PDF con ML Kit; se non è disponibile o non trova nulla
  * (servizi Google mancanti, modulo non scaricato) riprova con ZXing, che è dentro l'app.
  */
-private fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Scan>) -> Unit) {
+internal fun readBarcodes(context: Context, uri: Uri, onCodes: (List<Scan>) -> Unit) {
     fun fallback() {
         val main = android.os.Handler(android.os.Looper.getMainLooper())
         Thread { val found = runCatching { zxingScan(context, uri) }.getOrNull(); main.post { onCodes(listOfNotNull(found)) } }.start()
