@@ -1761,6 +1761,6 @@ spento ||| off
 Sezione protetta ||| Protected section
 Sblocca per vedere questa sezione ||| Unlock to see this section
 Sblocca ||| Unlock
-Proteggi il ciclo con il blocco schermo ||| Protect the cycle with the screen lock
-Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot. ||| Opening the Cycle section requires unlocking the phone. It also hides the screen from screenshots.
-Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android. ||| The phone has no screen lock: set one in Android settings.
+Proteggi il ciclo con impronta o PIN ||| Protect the cycle with fingerprint or PIN
+Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot. ||| Opening the Cycle section requires your phone's fingerprint or PIN. It also hides the screen from screenshots.
+Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android. ||| The phone has no fingerprint or PIN: set one in Android settings.

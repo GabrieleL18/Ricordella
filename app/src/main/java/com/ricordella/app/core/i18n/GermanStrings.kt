@@ -1690,7 +1690,7 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Sezione protetta" to "Geschützter Bereich",
     "Sblocca per vedere questa sezione" to "Entsperren, um diesen Bereich zu sehen",
     "Sblocca" to "Entsperren",
-    "Proteggi il ciclo con il blocco schermo" to "Zyklus mit der Displaysperre schützen",
-    "Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot." to "Zum Öffnen des Bereichs Zyklus muss das Handy entsperrt werden. Der Bildschirm wird auch in Screenshots ausgeblendet.",
-    "Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android." to "Das Handy hat keine Displaysperre: Richte sie in den Android-Einstellungen ein.",
+    "Proteggi il ciclo con impronta o PIN" to "Zyklus mit Fingerabdruck oder PIN schützen",
+    "Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot." to "Zum Öffnen des Bereichs Zyklus braucht es den Fingerabdruck oder die PIN des Handys. Der Bildschirm wird auch in Screenshots ausgeblendet.",
+    "Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android." to "Das Handy hat weder Fingerabdruck noch PIN: Richte sie in den Android-Einstellungen ein.",
 )

@@ -410,9 +410,9 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 val screenLockSet = remember { context.hasScreenLock() }
                 SettingRow(
                     icon = Icons.Rounded.Lock,
-                    title = tr("Proteggi il ciclo con il blocco schermo"),
-                    subtitle = if (screenLockSet) tr("Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot.")
-                    else tr("Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android."),
+                    title = tr("Proteggi il ciclo con impronta o PIN"),
+                    subtitle = if (screenLockSet) tr("Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot.")
+                    else tr("Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android."),
                     onClick = { if (screenLockSet) viewModel.update { it.copy(lockCycle = !it.lockCycle) } },
                     trailing = {
                         Switch(

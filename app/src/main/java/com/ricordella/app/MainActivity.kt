@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.fragment.app.FragmentActivity() {
 
     /** Promemoria da aprire perché l'utente ha toccato una notifica. */
     private val reminderToOpen = MutableStateFlow<String?>(null)

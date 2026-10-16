@@ -1690,7 +1690,7 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Sezione protetta" to "Section protégée",
     "Sblocca per vedere questa sezione" to "Déverrouille pour voir cette section",
     "Sblocca" to "Déverrouiller",
-    "Proteggi il ciclo con il blocco schermo" to "Protéger le cycle avec le verrouillage d'écran",
-    "Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot." to "Ouvrir la section Cycle demande de déverrouiller le téléphone. L'écran est aussi masqué des captures d'écran.",
-    "Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android." to "Le téléphone n'a pas de verrouillage d'écran : configure-le dans les réglages Android.",
+    "Proteggi il ciclo con impronta o PIN" to "Protéger le cycle avec l'empreinte ou le PIN",
+    "Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot." to "Ouvrir la section Cycle demande l'empreinte ou le code PIN du téléphone. L'écran est aussi masqué des captures d'écran.",
+    "Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android." to "Le téléphone n'a ni empreinte ni code PIN : configure-en un dans les réglages Android.",
 )

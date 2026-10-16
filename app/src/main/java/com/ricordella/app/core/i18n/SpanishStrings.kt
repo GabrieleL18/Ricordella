@@ -1690,7 +1690,7 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Sezione protetta" to "Sección protegida",
     "Sblocca per vedere questa sezione" to "Desbloquea para ver esta sección",
     "Sblocca" to "Desbloquear",
-    "Proteggi il ciclo con il blocco schermo" to "Proteger el ciclo con el bloqueo de pantalla",
-    "Per aprire la sezione Ciclo serve lo sblocco del telefono. Nasconde anche la schermata dagli screenshot." to "Para abrir la sección Ciclo hay que desbloquear el teléfono. También oculta la pantalla de las capturas.",
-    "Il telefono non ha un blocco schermo: impostalo dalle impostazioni di Android." to "El teléfono no tiene bloqueo de pantalla: configúralo en los ajustes de Android.",
+    "Proteggi il ciclo con impronta o PIN" to "Proteger el ciclo con huella o PIN",
+    "Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot." to "Para abrir la sección Ciclo hace falta la huella o el PIN del teléfono. También oculta la pantalla de las capturas.",
+    "Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android." to "El teléfono no tiene huella ni PIN: configúralos en los ajustes de Android.",
 )

@@ -1,12 +1,13 @@
 package com.ricordella.app.core.ui
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.view.WindowManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,8 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ricordella.app.core.i18n.tr
 
-/** True se il telefono ha un blocco schermo (PIN, sequenza, password o impronta): senza, non c'è nulla da chiedere. */
-fun Context.hasScreenLock(): Boolean = getSystemService(KeyguardManager::class.java)?.isDeviceSecure == true
+private const val AUTHENTICATORS = BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+
+/** True se il telefono ha un'impronta/volto registrati o un PIN, sequenza o password: senza, non c'è nulla da chiedere. */
+fun Context.hasScreenLock(): Boolean = BiometricManager.from(this).canAuthenticate(AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS
 
 private tailrec fun Context.activity(): Activity? = when (this) {
     is Activity -> this
@@ -56,15 +59,21 @@ fun SensitiveLock(enabled: Boolean, onCancel: () -> Unit, content: @Composable (
         content()
         return
     }
-    @Suppress("DEPRECATION")
-    val prompt = context.getSystemService(KeyguardManager::class.java)
-        .createConfirmDeviceCredentialIntent(tr("Remindella"), tr("Sblocca per vedere questa sezione"))
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) unlocked = true else onCancel()
+    val host = context.activity() as? FragmentActivity
+    val title = tr("Remindella")
+    val subtitle = tr("Sblocca per vedere questa sezione")
+    // Impronta (o volto) se ci sono, altrimenti PIN, sequenza o password del telefono.
+    fun ask() {
+        host ?: return
+        val callback = object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) { unlocked = true }
+        }
+        val info = BiometricPrompt.PromptInfo.Builder().setTitle(title).setSubtitle(subtitle).setAllowedAuthenticators(AUTHENTICATORS).build()
+        BiometricPrompt(host, ContextCompat.getMainExecutor(context), callback).authenticate(info)
     }
     var asked by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (!asked && prompt != null) { asked = true; launcher.launch(prompt) }
+        if (!asked) { asked = true; ask() }
     }
     Column(
         Modifier.fillMaxSize().padding(24.dp),
@@ -78,7 +87,7 @@ fun SensitiveLock(enabled: Boolean, onCancel: () -> Unit, content: @Composable (
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp),
         )
-        if (prompt != null) TextButton(onClick = { launcher.launch(prompt) }, modifier = Modifier.padding(top = 16.dp)) { Text(tr("Sblocca")) }
+        TextButton(onClick = ::ask, modifier = Modifier.padding(top = 16.dp)) { Text(tr("Sblocca")) }
         TextButton(onClick = onCancel) { Text(tr("Indietro")) }
     }
 }
