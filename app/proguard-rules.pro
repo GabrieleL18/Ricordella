@@ -13,3 +13,8 @@
 # che R8 in modalità completa toglierebbe: senza, SharedPrefManager manca e la fotocamera va in crash (solo in release).
 -keep class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }
 -keep class com.google.mlkit.common.internal.MlKitInitProvider { <init>(); }
+
+# Rapporti di errore leggibili: nome del file e numero di riga restano nello stack trace anche in release
+# (i nomi abbreviati si leggono con il mapping.txt di quella build).
+-keepattributes SourceFile, LineNumberTable
+-renamesourcefileattribute SourceFile
