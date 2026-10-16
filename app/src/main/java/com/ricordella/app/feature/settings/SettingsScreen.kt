@@ -230,6 +230,12 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 onClick = { onOpenResolutions(year) },
             )
 
+            Text(
+                "Remindella ${com.ricordella.app.BuildConfig.VERSION_NAME} (${com.ricordella.app.BuildConfig.VERSION_CODE})",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
             SettingsGroup(Icons.Rounded.Palette, tr("Aspetto"), tr("Tema, lingua, calendario e suoni")) {
                 Text(tr("Tema"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
                 Segmented(
