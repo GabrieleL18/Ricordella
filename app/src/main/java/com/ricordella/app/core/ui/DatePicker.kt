@@ -143,7 +143,7 @@ private fun Header(selected: LocalDate, today: LocalDate, onSelect: (LocalDate) 
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text("SCEGLI LA DATA", style = MaterialTheme.typography.labelMedium, color = tone.content)
+        Text(tr("Scegli la data").uppercase(com.ricordella.app.core.i18n.Lang.locale), style = MaterialTheme.typography.labelMedium, color = tone.content)
         AnimatedContent(
             selected,
             transitionSpec = {

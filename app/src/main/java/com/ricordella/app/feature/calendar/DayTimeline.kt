@@ -107,7 +107,7 @@ fun DayTimeline(
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         if (allDay.isNotEmpty()) {
             Text(
-                "TUTTO IL GIORNO",
+                tr("Tutto il giorno").uppercase(com.ricordella.app.core.i18n.Lang.locale),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 4.dp),

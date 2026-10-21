@@ -1720,3 +1720,5 @@ Categoria per tutte ||| Kategorie für alle
 Aggiungi %1$s carte ||| %1$s Karten hinzufügen
 Scansiona un'altra ||| Noch eine scannen
 Carta senza nome ||| Unbenannte Karte
+
+Scegli la data ||| Datum wählen

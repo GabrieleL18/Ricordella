@@ -1724,4 +1724,5 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Aggiungi %1\$s carte" to "%1\$s Karten hinzufügen",
     "Scansiona un'altra" to "Noch eine scannen",
     "Carta senza nome" to "Unbenannte Karte",
+    "Scegli la data" to "Datum wählen",
 )

@@ -53,7 +53,7 @@ object DemoMode {
 }
 
 /** Versione dei dati demo: da alzare ogni volta che si aggiungono o cambiano gli esempi. */
-private const val DEMO_DATA_VERSION = 5
+private const val DEMO_DATA_VERSION = 8
 
 /** Riempie il database demo al primo avvio in modalità demo (se è già pieno non fa nulla). */
 suspend fun AppContainer.seedDemoDataIfEmpty() {
@@ -231,6 +231,22 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
         )
     }
 
+    // Carte fedeltà: formati ML Kit (EAN-13 = 32, Code 128 = 1, QR = 256).
+    fun card(name: String, code: String, format: Int, category: String, favorite: Boolean = false) =
+        com.ricordella.app.domain.model.LoyaltyCard(name = name, code = code, format = format, category = tr(category), favorite = favorite, updatedAt = nowMillis)
+    settingsRepository.update {
+        it.copy(
+            cards = listOf(
+                // Nomi e codici inventati: negli screenshot non compaiono tessere vere.
+                card("Market Stella", "5901234123457", 32, "Spesa", favorite = true),
+                card("Sport Più", "4006381333931", 32, "Sport", favorite = true),
+                card("Mercato Verde", "MV-004829", 1, "Spesa"),
+                card("Farmacia Centrale", "FC-558204", 1, "Salute"),
+                card("Casa Bella", "9780201379624", 32, "Casa"),
+            ),
+        )
+    }
+
     // Ciclo di Giulia: in corso da qualche giorno, con la cronologia dei mesi scorsi.
     val period = com.ricordella.app.domain.model.CycleProfile(giulia.id, periodDays = 5, cycleDays = 28, notifyLate = false)
     settingsRepository.update {
@@ -253,7 +269,8 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
     val couple = listOf(giulia, marco)
     val mortgageFirst = today.minusMonths(6).withDayOfMonth(5)
     var mortgage = com.ricordella.app.domain.model.InstallmentPlan.create(mortgageFirst, 240, 65_000, 1, false, false)
-    (0 until 6).forEach { mortgage = mortgage.pay(it, mortgage.dueDate(it)) }
+    // Pagate tutte le rate già scadute: così nessuna risulta in ritardo, qualunque sia il giorno del mese.
+    (0 until 240).takeWhile { !mortgage.dueDate(it).isAfter(today) }.forEach { mortgage = mortgage.pay(it, mortgage.dueDate(it)) }
     val netflixStart = today.minusMonths(7).withDayOfMonth(14)
     val netflixNext = generateSequence(netflixStart) { it.plusMonths(1) }.first { !it.isBefore(today) }
     listOf(
@@ -292,7 +309,7 @@ suspend fun AppContainer.seedDemoDataIfEmpty() {
     // Condominio a rate trimestrali con importi che cambiano: le prime 3 pagate, le altre da pagare.
     var condo = com.ricordella.app.domain.model.InstallmentPlan.create(yearStart.withDayOfMonth(20), 8, 28_000, 3, true, false)
     condo = condo.withAmount(2, 31_500, following = true).withAmount(5, 29_000, following = false)
-    (0 until 3).forEach { condo = condo.pay(it, condo.dueDate(it)) }
+    (0 until 8).takeWhile { !condo.dueDate(it).isAfter(today) }.forEach { condo = condo.pay(it, condo.dueDate(it)) }
     val condoDue = condo.dueDate(condo.nextUnpaid() ?: 0)
     val insuranceStart = yearStart.withDayOfMonth(22).plusMonths(4)
     listOf(

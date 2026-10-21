@@ -1795,3 +1795,5 @@ Categoria per tutte ||| Category for all
 Aggiungi %1$s carte ||| Add %1$s cards
 Scansiona un'altra ||| Scan another
 Carta senza nome ||| Unnamed card
+
+Scegli la data ||| Pick a date
