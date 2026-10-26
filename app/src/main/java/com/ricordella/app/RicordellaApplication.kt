@@ -19,6 +19,7 @@ class RicordellaApplication : Application() {
         container.notifier.createChannel()
         container.potionReminders.createChannel()
         container.cycleReminders.createChannel()
+        container.weeklySummary.createChannel()
         com.ricordella.app.core.ui.UiSoundPlayer.init(this)
         // In demo i dati vanno pronti prima della prima schermata, altrimenti partirebbe la configurazione iniziale.
         if (container.isDemo) runBlocking { container.seedDemoDataIfEmpty() }
@@ -28,6 +29,7 @@ class RicordellaApplication : Application() {
         // Cestino: toglie ciò che è stato eliminato da più di una settimana.
         container.applicationScope.launch { container.trash.reload() }
         container.cycleReminders.watch(container.applicationScope)
+        container.weeklySummary.watch(container.applicationScope)
         container.autoBackup.watch(container.applicationScope)
         container.sharedSpace.start()
         com.ricordella.app.core.widget.HomeWidgets.watch(this, container.applicationScope)

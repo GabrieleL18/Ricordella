@@ -51,6 +51,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.StickyNote2
 import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
@@ -133,7 +135,7 @@ private enum class TopLevelDestination(
     val label: String get() = tr(italianLabel)
 }
 
-private enum class QuickAddKind { REMINDER, EVENT, ALARM, NOTE, VACATION, MEDICAL_VISIT, EXPENSE, CYCLE, ITEM, PERSON }
+private enum class QuickAddKind { REMINDER, EVENT, ALARM, TIMER, NOTE, CARD, VACATION, MEDICAL_VISIT, EXPENSE, CYCLE, ITEM, PERSON }
 
 /**
  * Shell dell'app: navigazione adattiva (barra in basso su schermi compatti,
@@ -296,7 +298,7 @@ fun RicordellaApp(
             composable<AlarmsRoute> { com.ricordella.app.feature.alarms.AlarmsScreen(navigator, onBack = navigator::back) }
             composable<AlarmEditRoute> { entry -> com.ricordella.app.feature.alarms.AlarmEditScreen(entry.toRoute<AlarmEditRoute>().id, onBack = navigator::back) }
             composable<TimersRoute> { com.ricordella.app.feature.timers.TimersScreen(onBack = navigator::back) }
-            composable<CardsRoute> { entry -> com.ricordella.app.feature.cards.CardsScreen(onBack = navigator::back, openId = entry.toRoute<CardsRoute>().open, importLink = entry.toRoute<CardsRoute>().link) }
+            composable<CardsRoute> { entry -> com.ricordella.app.feature.cards.CardsScreen(onBack = navigator::back, openId = entry.toRoute<CardsRoute>().open, importLink = entry.toRoute<CardsRoute>().link, startAdding = entry.toRoute<CardsRoute>().add) }
             composable<NotesRoute> { com.ricordella.app.feature.notes.NotesScreen(navigator, onBack = navigator::back) }
             composable<NoteRoute> { entry -> com.ricordella.app.feature.notes.NoteEditScreen(entry.toRoute<NoteRoute>(), onBack = navigator::back) }
             composable<TrashRoute> { com.ricordella.app.feature.settings.TrashScreen(onBack = navigator::back) }
@@ -324,11 +326,13 @@ fun RicordellaApp(
             onDismiss = { showQuickAdd = false },
             onSelected = { kind ->
                 showQuickAdd = false
-                returnToAdd = kind != QuickAddKind.CYCLE
+                returnToAdd = kind != QuickAddKind.CYCLE && kind != QuickAddKind.TIMER && kind != QuickAddKind.CARD
                 when (kind) {
                     QuickAddKind.REMINDER -> navigator.newReminder(date = quickAddDate)
                     QuickAddKind.EVENT -> navigator.newReminder(type = ReminderType.EVENT, date = quickAddDate)
                     QuickAddKind.ALARM -> navigator.newAlarm()
+                    QuickAddKind.TIMER -> navigator.openTimers()
+                    QuickAddKind.CARD -> navigator.openCards(add = true)
                     QuickAddKind.NOTE -> chooseNote = true
                     QuickAddKind.VACATION -> navigator.newReminder(type = ReminderType.VACATION, date = quickAddDate)
                     QuickAddKind.MEDICAL_VISIT -> navigator.newReminder(type = ReminderType.MEDICAL_VISIT, date = quickAddDate)
@@ -380,6 +384,8 @@ private data class QuickAddOption(val kind: QuickAddKind, val icon: ImageVector,
 private val QuickAddKind.section: com.ricordella.app.domain.model.AppSection?
     get() = when (this) {
         QuickAddKind.ALARM -> com.ricordella.app.domain.model.AppSection.ALARMS
+        QuickAddKind.TIMER -> com.ricordella.app.domain.model.AppSection.TIMERS
+        QuickAddKind.CARD -> com.ricordella.app.domain.model.AppSection.CARDS
         QuickAddKind.VACATION -> com.ricordella.app.domain.model.AppSection.VACATIONS
         QuickAddKind.MEDICAL_VISIT -> com.ricordella.app.domain.model.AppSection.MEDICAL_VISITS
         QuickAddKind.EXPENSE -> com.ricordella.app.domain.model.AppSection.EXPENSES
@@ -388,10 +394,12 @@ private val QuickAddKind.section: com.ricordella.app.domain.model.AppSection?
     }
 
 private val QuickAddOptions get() = listOf(
-    QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Da fare o da non dimenticare")),
-    QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Appuntamento o ricorrenza")),
+    QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Una cosa da fare: pagare il bollo, chiamare il medico")),
+    QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Succede quel giorno: una cena, un compleanno")),
     QuickAddOption(QuickAddKind.ALARM, Icons.Rounded.Alarm, tr("Sveglia"), tr("Suona a tutto schermo, anche ogni giorno")),
+    QuickAddOption(QuickAddKind.TIMER, Icons.Rounded.Timer, tr("Timer"), tr("Conto alla rovescia per la pasta o la lavatrice")),
     QuickAddOption(QuickAddKind.NOTE, Icons.Rounded.StickyNote2, tr("Nota"), tr("Testo, liste e lista della spesa")),
+    QuickAddOption(QuickAddKind.CARD, Icons.Rounded.CreditCard, tr("Carta"), tr("Tessera fedeltà da mostrare alla cassa")),
     QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
     QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
     QuickAddOption(QuickAddKind.EXPENSE, Icons.Rounded.Payments, tr("Spesa"), tr("Spese, abbonamenti, rate ed entrate")),
@@ -429,6 +437,8 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
                                 QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
                                 QuickAddKind.EVENT -> colors.lavender
                                 QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
+                                QuickAddKind.TIMER -> colors.mint
+                                QuickAddKind.CARD -> colors.lavender
                                 QuickAddKind.VACATION, QuickAddKind.EXPENSE -> colors.mint
                                 QuickAddKind.ITEM, QuickAddKind.NOTE -> colors.pear
                             },

@@ -1739,3 +1739,15 @@ Tutte le sezioni ||| Todas las secciones
 Qualcosa richiede attenzione: parti da «Da guardare». ||| Algo requiere tu atención: empieza por «Requiere atención».
 Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo.  ||| Abre las Pociones desde el recuadro de la gota en Inicio o desde el menú de secciones de arriba (los cuadraditos): elige cuánta agua beber al día y cada cuánto recordártelo. 
 A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget. ||| A finales de diciembre te muestro el resumen: cuántos has cumplido. Siempre los encuentras en el menú de secciones de arriba (los cuadraditos) y en el widget.
+Carta ||| Tarjeta
+Tessera fedeltà da mostrare alla cassa ||| Tarjeta de fidelidad para enseñar en caja
+Conto alla rovescia per la pasta o la lavatrice ||| Cuenta atrás para la pasta o la lavadora
+Una cosa da fare: pagare il bollo, chiamare il medico ||| Algo que hacer: pagar el impuesto del coche, llamar al médico
+Succede quel giorno: una cena, un compleanno ||| Pasa ese día: una cena, un cumpleaños
+acqua ||| agua
+Riepilogo della settimana ||| Resumen de la semana
+Riepilogo della domenica ||| Resumen del domingo
+Domenica alle 19 ti dico cosa arriva la settimana dopo. ||| El domingo a las 19 te digo lo que llega la semana siguiente.
+La prossima settimana: 1 cosa ||| La próxima semana: 1 cosa
+La prossima settimana: %1$s cose ||| La próxima semana: %1$s cosas
+e altre %1$s ||| y %1$s más

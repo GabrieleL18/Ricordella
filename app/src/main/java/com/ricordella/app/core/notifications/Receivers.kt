@@ -85,6 +85,7 @@ class AlarmRestoreReceiver : BroadcastReceiver() {
             it.reminderScheduler.refresh()
             it.potionReminders.refresh()
             it.cycleReminders.refresh()
+            it.weeklySummary.refresh()
             it.autoBackup.refresh()
         }
     }

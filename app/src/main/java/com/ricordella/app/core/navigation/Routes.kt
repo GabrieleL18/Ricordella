@@ -21,8 +21,8 @@ import kotlinx.serialization.Serializable
 
 /** Creazione (id null) o modifica di una sveglia. */
 @Serializable data class AlarmEditRoute(val id: String? = null)
-/** Le carte; [open] = carta da mostrare subito (dal widget). */
-@Serializable data class CardsRoute(val open: String? = null, val link: String? = null)
+/** Le carte; [open] = carta da mostrare subito (dal widget), [add] = si apre subito "Aggiungi una carta" (dal +). */
+@Serializable data class CardsRoute(val open: String? = null, val link: String? = null, val add: Boolean = false)
 @Serializable data object NotesRoute
 
 /** Una nota (nuova o esistente); [id] è già deciso alla creazione, [list]/[prices] dicono che tipo di nota è nuova. */

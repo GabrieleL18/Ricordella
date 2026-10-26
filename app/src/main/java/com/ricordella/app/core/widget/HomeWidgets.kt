@@ -54,7 +54,7 @@ object HomeWidgets {
     fun watch(context: Context, scope: CoroutineScope) {
         scope.launch {
             context.container.settingsRepository.settings
-                .map { listOf(it.potions, it.resolutions, it.notes, it.cards, it.cardColors) }
+                .map { listOf(it.potions, it.resolutions, it.notes, it.cards, it.cardColors, it.cardUses) }
                 .distinctUntilChanged()
                 .collect {
                     WaterWidgetProvider.requestUpdate(context)
@@ -615,7 +615,7 @@ private class CardsFactory(context: Context) : SimpleFactory(context) {
         rows = runBlocking {
             val settings = context.container.settingsRepository.current()
             settings.cards
-                .sortedWith(compareByDescending<com.ricordella.app.domain.model.LoyaltyCard> { it.favorite }.thenBy { it.name.lowercase() })
+                .sortedWith(compareByDescending<com.ricordella.app.domain.model.LoyaltyCard> { it.favorite }.thenByDescending { settings.cardUses[it.id] ?: 0 }.thenBy { it.name.lowercase() })
                 .map { it to it.category.takeIf { c -> c.isNotEmpty() }?.let(settings::cardColor) }
         }
     }

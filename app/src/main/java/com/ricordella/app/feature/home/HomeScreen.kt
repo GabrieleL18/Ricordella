@@ -44,6 +44,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -547,20 +549,22 @@ private fun NotificationPermissionCard() {
 private fun HomeExtras(navigator: AppNavigator) {
     val colors = MaterialTheme.ricordellaColors
     val settings = LocalAppSettings.current
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
+    Row(Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
         if (settings.shows(AppSection.ALARMS)) ExtraTile(Icons.Rounded.Alarm, tr("Sveglie"), colors.coral, navigator::openAlarms, Modifier.weight(1f))
         if (settings.shows(AppSection.TIMERS)) ExtraTile(Icons.Rounded.Timer, tr("Timer"), colors.mint, navigator::openTimers, Modifier.weight(1f))
         if (settings.shows(AppSection.NOTES)) ExtraTile(Icons.Rounded.StickyNote2, tr("Note"), colors.pear, navigator::openNotes, Modifier.weight(1f))
         if (settings.shows(AppSection.CARDS)) ExtraTile(Icons.Rounded.CreditCard, tr("Carte"), colors.lavender, navigator::openCards, Modifier.weight(1f))
-        if (settings.shows(AppSection.POTIONS)) ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f))
+        if (settings.shows(AppSection.POTIONS)) ExtraTile(Icons.Rounded.WaterDrop, tr("Pozioni"), colors.cyan, navigator::openPotions, Modifier.weight(1f), hint = tr("acqua"))
     }
 }
 
 @Composable
-private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () -> Unit, modifier: Modifier) {
+/** [hint]: una parola sotto il nome quando il nome da solo non dice cosa c'è dentro (Pozioni = acqua). */
+private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () -> Unit, modifier: Modifier, hint: String? = null) {
     val interaction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
     Column(
         modifier
+            .fillMaxHeight()
             .pressScale(interaction, pressedScale = 0.92f)
             .clip(MaterialTheme.shapes.extraLarge)
             .background(tone.container)
@@ -573,5 +577,6 @@ private fun ExtraTile(icon: ImageVector, label: String, tone: Tone, onClick: () 
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(26.dp))
         }
         Text(label, style = MaterialTheme.typography.labelLarge, color = tone.content, maxLines = 1)
+        if (hint != null) Text(hint, style = MaterialTheme.typography.labelSmall, color = tone.content, maxLines = 1)
     }
 }

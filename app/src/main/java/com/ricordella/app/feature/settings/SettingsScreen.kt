@@ -317,6 +317,14 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 com.ricordella.app.core.ui.NotificationHealthRows()
                 NotificationVolumeRow()
                 SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Riepilogo della domenica"),
+                    subtitle = tr("Domenica alle 19 ti dico cosa arriva la settimana dopo."),
+                    trailing = {
+                        Switch(checked = settings.weeklySummary, onCheckedChange = { value -> viewModel.update { it.copy(weeklySummary = value) } })
+                    },
+                )
+                SettingRow(
                     icon = Icons.AutoMirrored.Rounded.VolumeUp,
                     title = tr("Suono e vibrazione"),
                     subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),

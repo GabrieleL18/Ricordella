@@ -229,6 +229,10 @@
             android:name=".core.notifications.CycleReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".core.notifications.WeeklySummaryReceiver"
+            android:exported="false" />
+
         <!-- Righe delle liste scorrevoli dei widget (propositi e giornata). -->
         <service
             android:name=".core.widget.WidgetListService"

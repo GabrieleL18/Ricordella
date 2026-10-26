@@ -145,18 +145,19 @@ private data class CardForm(val id: String?, val name: String, val category: Str
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? = null) {
+fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? = null, startAdding: Boolean = false) {
     val context = LocalContext.current
     val container = (context.applicationContext as RicordellaApplication).container
     val scope = rememberCoroutineScope()
     val settings = LocalAppSettings.current
-    val cards = settings.cards
+    // Le più usate in cima (a parità resta l'ordine di inserimento); le preferite restano comunque sopra, nel loro gruppo.
+    val cards = settings.cards.sortedByDescending { settings.cardUses[it.id] ?: 0 }
     val categories = cards.map { it.category }.filter { it.isNotEmpty() }.distinct().sortedBy { it.lowercase() }
     val suggestions = (categories + DefaultCategories).distinct()
     /** Il colore della categoria: quello scelto, altrimenti uno della tavolozza (fisso una volta salvata la carta). */
     fun colorOf(category: String): Long = settings.cardColor(category)
 
-    var choosing by rememberSaveable { mutableStateOf(false) }
+    var choosing by rememberSaveable { mutableStateOf(startAdding) }
     var query by rememberSaveable { mutableStateOf("") }
     var formName by rememberSaveable { mutableStateOf("") }
     var formCategory by rememberSaveable { mutableStateOf("") }
@@ -179,6 +180,13 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
         context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null))
     }
     fun toggleShared(id: String) = update { s -> s.copy(shareExcluded = if (id in s.shareExcluded) s.shareExcluded - id else s.shareExcluded + id) }
+    // Ogni volta che si apre il codice (dall'elenco o dal widget) la carta conta un uso; una sola volta anche se si gira lo schermo.
+    var counted by rememberSaveable { mutableStateOf<String?>(null) }
+    androidx.compose.runtime.LaunchedEffect(previewId) {
+        val id = previewId
+        if (id != null && id != counted) update { s -> s.copy(cardUses = s.cardUses + (id to (s.cardUses[id] ?: 0) + 1)) }
+        counted = id
+    }
     fun openForm(form: CardForm) {
         formId = form.id; formName = form.name; formCategory = form.category; formColor = form.color
         formCode = form.code; formFormat = form.format; formOpen = true
@@ -379,7 +387,7 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                     message = detail.name,
                     confirmLabel = tr("Elimina"),
                     destructive = true,
-                    onConfirm = { update { s -> s.copy(cards = s.cards.filterNot { it.id == detail.id }) }; detailId = null },
+                    onConfirm = { update { s -> s.copy(cards = s.cards.filterNot { it.id == detail.id }, cardUses = s.cardUses - detail.id) }; detailId = null },
                     onDismiss = { deleting = false },
                 )
             }

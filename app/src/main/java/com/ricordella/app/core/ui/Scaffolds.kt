@@ -127,7 +127,7 @@ fun TopLevelScaffold(
                         Entry(com.ricordella.app.domain.model.AppSection.TIMERS, tr("Timer"), Icons.Rounded.Timer, navigator::openTimers)
                         Entry(com.ricordella.app.domain.model.AppSection.NOTES, tr("Note"), Icons.Rounded.StickyNote2, navigator::openNotes)
                         Entry(com.ricordella.app.domain.model.AppSection.CARDS, tr("Carte"), Icons.Rounded.CreditCard) { navigator.openCards() }
-                        Entry(com.ricordella.app.domain.model.AppSection.POTIONS, tr("Pozioni"), Icons.Rounded.WaterDrop, navigator::openPotions)
+                        Entry(com.ricordella.app.domain.model.AppSection.POTIONS, tr("Pozioni") + " · " + tr("acqua"), Icons.Rounded.WaterDrop, navigator::openPotions)
                         Entry(com.ricordella.app.domain.model.AppSection.EXPENSES, tr("Spese"), Icons.Rounded.Payments, navigator::openExpenses)
                         Entry(com.ricordella.app.domain.model.AppSection.CYCLE, tr("Ciclo"), Icons.Rounded.WaterDrop, navigator::openCycle)
                         Entry(null, tr("Buoni propositi"), Icons.Rounded.EmojiEvents) { navigator.openResolutions(java.time.LocalDate.now().year) }

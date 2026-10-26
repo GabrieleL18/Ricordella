@@ -1739,3 +1739,15 @@ Tutte le sezioni ||| Alle Bereiche
 Qualcosa richiede attenzione: parti da «Da guardare». ||| Etwas braucht deine Aufmerksamkeit: Fang bei „Braucht Aufmerksamkeit“ an.
 Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo.  ||| Öffne die Tränke über die Kachel mit dem Tropfen auf der Startseite oder über das Bereichsmenü oben (die kleinen Quadrate): Wähle, wie viel Wasser du am Tag trinken willst und wie oft du erinnert wirst. 
 A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget. ||| Ende Dezember zeige ich dir den Rückblick: wie viele du eingehalten hast. Du findest sie immer im Bereichsmenü oben (die kleinen Quadrate) und im Widget.
+Carta ||| Karte
+Tessera fedeltà da mostrare alla cassa ||| Kundenkarte zum Vorzeigen an der Kasse
+Conto alla rovescia per la pasta o la lavatrice ||| Countdown für die Nudeln oder die Waschmaschine
+Una cosa da fare: pagare il bollo, chiamare il medico ||| Etwas zu erledigen: Kfz-Steuer zahlen, den Arzt anrufen
+Succede quel giorno: una cena, un compleanno ||| Passiert an dem Tag: ein Abendessen, ein Geburtstag
+acqua ||| Wasser
+Riepilogo della settimana ||| Wochenüberblick
+Riepilogo della domenica ||| Sonntagsüberblick
+Domenica alle 19 ti dico cosa arriva la settimana dopo. ||| Sonntags um 19 Uhr sage ich dir, was nächste Woche ansteht.
+La prossima settimana: 1 cosa ||| Nächste Woche: 1 Sache
+La prossima settimana: %1$s cose ||| Nächste Woche: %1$s Sachen
+e altre %1$s ||| und %1$s weitere

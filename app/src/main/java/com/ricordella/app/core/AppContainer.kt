@@ -127,6 +127,7 @@ class AppContainer(context: Context) {
     )
     val potionReminders = com.ricordella.app.core.notifications.PotionReminders(appContext, settingsRepository, time)
     val cycleReminders = com.ricordella.app.core.notifications.CycleReminders(appContext, settingsRepository, personRepository, time)
+    val weeklySummary = com.ricordella.app.core.notifications.WeeklySummary(appContext, settingsRepository, reminderRepository, recurrenceCalculator, time)
     val autoBackup = com.ricordella.app.core.notifications.AutoBackup(appContext, settingsRepository, housekeeping, backupRepository, time)
     /** Crea una sveglia da un'ora (importata dal telefono): suona alla prossima occasione, una volta. */
     suspend fun importPhoneAlarm(at: java.time.LocalTime, title: String) {

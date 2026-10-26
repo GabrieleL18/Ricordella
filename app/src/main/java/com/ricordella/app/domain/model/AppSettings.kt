@@ -183,6 +183,10 @@ data class AppSettings(
     val cardColors: Map<String, Long> = emptyMap(),
     /** Le carte si vedono a blocchi invece che in elenco. */
     val cardsGrid: Boolean = false,
+    /** Quante volte è stato aperto il codice di ogni carta (per id): le più usate salgono in cima. Resta su questo telefono, fuori dal file condiviso. */
+    val cardUses: Map<String, Int> = emptyMap(),
+    /** La domenica sera una notifica con le cose della settimana dopo. */
+    val weeklySummary: Boolean = true,
     /** Id di persone, cose, promemoria e carte che restano fuori dal file condiviso anche se la loro categoria si condivide. */
     val shareExcluded: Set<String> = emptySet(),
     /** Nome in più per il backup in cartella condivisa, per distinguere due persone con lo stesso nome. */

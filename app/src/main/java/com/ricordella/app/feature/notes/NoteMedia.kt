@@ -153,10 +153,15 @@ fun NoteMediaSection(note: Note, tone: Tone, edit: ((Note) -> Note) -> Unit) {
 
 @Composable
 private fun RemoveBadge(description: String, modifier: Modifier, onClick: () -> Unit) {
+    // Il cerchietto resta piccolo, ma la zona da toccare è di 48dp come gli altri pulsanti.
     Box(
-        modifier.padding(4.dp).size(24.dp).background(Color.Black.copy(alpha = 0.55f), CircleShape).clickable(onClick = onClick),
+        modifier.size(48.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
-    ) { Icon(Icons.Rounded.Close, contentDescription = description, tint = Color.White, modifier = Modifier.size(16.dp)) }
+    ) {
+        Box(Modifier.size(24.dp).background(Color.Black.copy(alpha = 0.55f), CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Icons.Rounded.Close, contentDescription = description, tint = Color.White, modifier = Modifier.size(16.dp))
+        }
+    }
 }
 
 @Composable
