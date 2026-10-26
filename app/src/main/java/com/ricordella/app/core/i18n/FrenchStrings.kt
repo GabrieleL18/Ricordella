@@ -1738,4 +1738,8 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN." to "Si vous le souhaitez, la section Cycle ne s'ouvre qu'avec l'empreinte, le visage ou le code PIN.",
     "Notifiche sotto controllo" to "Notifications sous contrôle",
     "Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria." to "Réglez le volume des notifications dans les Paramètres ; l'app vous prévient si quelque chose bloque vos rappels.",
+    "Tutte le sezioni" to "Toutes les sections",
+    "Qualcosa richiede attenzione: parti da «Da guardare»." to "Quelque chose demande votre attention : commencez par « À surveiller ».",
+    "Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Ouvrez les Potions depuis la tuile avec la goutte sur l'Accueil ou depuis le menu des sections en haut (les petits carrés) : choisissez combien d'eau boire par jour et à quelle fréquence vous le rappeler. ",
+    "A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget." to "Fin décembre, je vous montre le bilan : combien vous en avez tenu. Vous les retrouvez toujours dans le menu des sections en haut (les petits carrés) et dans le widget.",
 )

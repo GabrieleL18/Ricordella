@@ -289,13 +289,17 @@ private fun ReminderCardBody(
     val tone = if (checked) colors.mint else reminder.type.tone
 
     val lastDay = occurrenceDate.plusDays(reminder.extraDays)
+    // Il riquadro a destra dice già quanti giorni mancano (o da quanti è scaduto): il testo dà la data vera, senza ripeterli.
+    val daysShown = reminder.status == ReminderStatus.ACTIVE
     val dateText = if (reminder.isMultiDay) {
         trf("Dal %1\$s al %2\$s", DateTexts.date(occurrenceDate, settings.dateFormat, today), DateTexts.date(lastDay, settings.dateFormat, today))
     } else when (dateMode) {
         ReminderDateMode.ABSOLUTE -> DateTexts.dateWithTime(occurrenceDate, reminder.dueTime, settings.dateFormat, today)
         ReminderDateMode.TIME_ONLY -> reminder.dueTime?.let(DateTexts::time) ?: tr("Tutto il giorno")
         ReminderDateMode.RELATIVE ->
-            if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(occurrenceDate, today)
+            if (daysShown && occurrenceDate == today) reminder.dueTime?.let(DateTexts::time) ?: tr("Tutto il giorno")
+            else if (daysShown) DateTexts.dateWithTime(occurrenceDate, reminder.dueTime, settings.dateFormat, today)
+            else if (reminder.type.isDeadlineLike) RelativeDateDescriber.describeDeadline(occurrenceDate, today)
             else DateTexts.relativeWithTime(occurrenceDate, reminder.dueTime, today)
     }
     val installment = reminder.plan?.let { plan ->
@@ -350,9 +354,9 @@ private fun ReminderCardBody(
                 if (links.isNotEmpty()) {
                     Text(links, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                ReminderBadges(entry, overdue)
+                ReminderBadges(entry, overdue && !daysShown)
             }
-            if (reminder.status == ReminderStatus.ACTIVE && !checked) DaysLeft(occurrenceDate, lastDay, today, overdue)
+            if (daysShown && !checked) DaysLeft(occurrenceDate, lastDay, today, overdue)
             if (onUndo != null) {
                 TextButton(onClick = onUndo) {
                     Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -403,7 +407,7 @@ private fun DaysLeft(date: LocalDate, lastDay: LocalDate, today: LocalDate, over
             .background(tone.container, RoundedCornerShape(14.dp))
             .padding(horizontal = 8.dp, vertical = 6.dp)
             .semantics(mergeDescendants = true) {
-                contentDescription = if (days == 0L) tr("Oggi") else if (days > 0) trf("Mancano %1\$s %2\$s", value, unit) else "$value $unit"
+                contentDescription = if (days == 0L) tr("Oggi") else if (days > 0) trf("Mancano %1\$s %2\$s", value, unit) else tr("Scaduto") + ", $value $unit"
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

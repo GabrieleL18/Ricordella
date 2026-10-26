@@ -138,15 +138,12 @@ fun ItemDetailScreen(navigator: AppNavigator) {
         snackbarHostState = snackbar,
         actions = {
             if (entry != null) {
-                IconButton(onClick = { navigator.editItem(entry.item.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
-                IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
-                IconButton(onClick = viewModel::onToggleArchived) {
-                    val archived = entry.item.isArchived
-                    Icon(
-                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
-                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
-                    )
-                }
+                com.ricordella.app.core.ui.DetailActions(
+                    archived = entry.item.isArchived,
+                    onEdit = { navigator.editItem(entry.item.id) },
+                    onToggleArchived = viewModel::onToggleArchived,
+                    onDelete = { confirmDelete = true },
+                )
             }
         },
     ) { padding ->

@@ -133,15 +133,12 @@ fun ReminderDetailScreen(navigator: AppNavigator) {
         snackbarHostState = snackbar,
         actions = {
             if (entry != null) {
-                IconButton(onClick = { navigator.editReminder(entry.reminder.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
-                IconButton(onClick = { showDeleteConfirm = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
-                IconButton(onClick = viewModel::onToggleArchived) {
-                    val archived = entry.reminder.isArchived
-                    Icon(
-                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
-                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
-                    )
-                }
+                com.ricordella.app.core.ui.DetailActions(
+                    archived = entry.reminder.isArchived,
+                    onEdit = { navigator.editReminder(entry.reminder.id) },
+                    onToggleArchived = viewModel::onToggleArchived,
+                    onDelete = { showDeleteConfirm = true },
+                )
             }
         },
         bottomBar = { if (entry != null) ActionBar(entry, viewModel) },

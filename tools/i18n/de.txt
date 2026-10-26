@@ -1735,3 +1735,7 @@ Ciclo protetto ||| Geschützter Zyklus
 Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN. ||| Wenn du willst, öffnet sich der Bereich Zyklus nur mit Fingerabdruck, Gesicht oder PIN.
 Notifiche sotto controllo ||| Benachrichtigungen im Griff
 Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria. ||| Stell die Benachrichtigungslautstärke in den Einstellungen ein; die App warnt dich, wenn etwas deine Erinnerungen blockiert.
+Tutte le sezioni ||| Alle Bereiche
+Qualcosa richiede attenzione: parti da «Da guardare». ||| Etwas braucht deine Aufmerksamkeit: Fang bei „Braucht Aufmerksamkeit“ an.
+Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo.  ||| Öffne die Tränke über die Kachel mit dem Tropfen auf der Startseite oder über das Bereichsmenü oben (die kleinen Quadrate): Wähle, wie viel Wasser du am Tag trinken willst und wie oft du erinnert wirst. 
+A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget. ||| Ende Dezember zeige ich dir den Rückblick: wie viele du eingehalten hast. Du findest sie immer im Bereichsmenü oben (die kleinen Quadrate) und im Widget.

@@ -321,8 +321,8 @@ private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier
                     state.isLoading -> " "
                     count == 0 && state.today.isEmpty() -> tr("Tutto sotto controllo. Goditi la giornata.")
                     count == 0 -> tr("Niente di urgente: solo le cose di oggi.")
-                    count == 1 -> tr("C'è 1 cosa che richiede attenzione.")
-                    else -> trf("Ci sono %1\$s cose che richiedono attenzione.", count)
+                    // Il numero lo dicono già le pillole qui sotto.
+                    else -> tr("Qualcosa richiede attenzione: parti da «Da guardare».")
                 }
                 Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

@@ -2,6 +2,9 @@ package com.ricordella.app.core.ui
 
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Unarchive
 import com.ricordella.app.core.i18n.tr
 
 import androidx.compose.animation.animateColorAsState
@@ -81,6 +84,37 @@ fun EditDeleteRow(onEdit: () -> Unit, onDelete: () -> Unit, modifier: Modifier =
             edge = MaterialTheme.colorScheme.onErrorContainer,
             modifier = Modifier.weight(1f),
         )
+    }
+}
+
+/**
+ * Azioni in alto nei dettagli, con le parole: «Modifica» scritto, «Archivia» ed «Elimina» nel menu ⋮
+ * (cestino e archivio come sole icone si confondevano, ed eliminare per sbaglio era facile).
+ */
+@Composable
+fun DetailActions(archived: Boolean, onEdit: () -> Unit, onToggleArchived: () -> Unit, onDelete: () -> Unit) {
+    val icons = Icons.Rounded
+    TextButton(onClick = onEdit) {
+        Icon(icons.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+        Text(tr("Modifica"), modifier = Modifier.padding(start = 6.dp))
+    }
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }) {
+            Icon(Icons.Rounded.MoreVert, contentDescription = tr("Altre azioni"))
+        }
+        androidx.compose.material3.DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(
+                text = { Text(if (archived) tr("Ripristina dall'archivio") else tr("Archivia")) },
+                leadingIcon = { Icon(if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive, contentDescription = null) },
+                onClick = { open = false; onToggleArchived() },
+            )
+            DropdownMenuItem(
+                text = { Text(tr("Elimina"), color = MaterialTheme.colorScheme.error) },
+                leadingIcon = { Icon(icons.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                onClick = { open = false; onDelete() },
+            )
+        }
     }
 }
 

@@ -1738,4 +1738,8 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN." to "Si quieres, la sección Ciclo solo se abre con huella, rostro o PIN.",
     "Notifiche sotto controllo" to "Notificaciones bajo control",
     "Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria." to "Ajusta el volumen de las notificaciones en los Ajustes y la app te avisa si algo bloquea tus recordatorios.",
+    "Tutte le sezioni" to "Todas las secciones",
+    "Qualcosa richiede attenzione: parti da «Da guardare»." to "Algo requiere tu atención: empieza por «Requiere atención».",
+    "Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Abre las Pociones desde el recuadro de la gota en Inicio o desde el menú de secciones de arriba (los cuadraditos): elige cuánta agua beber al día y cada cuánto recordártelo. ",
+    "A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget." to "A finales de diciembre te muestro el resumen: cuántos has cumplido. Siempre los encuentras en el menú de secciones de arriba (los cuadraditos) y en el widget.",
 )

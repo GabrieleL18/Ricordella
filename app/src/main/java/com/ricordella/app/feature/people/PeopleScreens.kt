@@ -376,15 +376,12 @@ fun PersonDetailScreen(navigator: AppNavigator) {
         onBack = navigator::back,
         actions = {
             if (person != null) {
-                IconButton(onClick = { navigator.editPerson(person.id) }) { Icon(Icons.Rounded.Edit, contentDescription = tr("Modifica")) }
-                IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Rounded.Delete, contentDescription = tr("Elimina"), tint = MaterialTheme.colorScheme.error) }
-                IconButton(onClick = viewModel::onToggleArchived) {
-                    val archived = person.isArchived
-                    Icon(
-                        if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
-                        contentDescription = if (archived) tr("Ripristina dall'archivio") else tr("Archivia"),
-                    )
-                }
+                com.ricordella.app.core.ui.DetailActions(
+                    archived = person.isArchived,
+                    onEdit = { navigator.editPerson(person.id) },
+                    onToggleArchived = viewModel::onToggleArchived,
+                    onDelete = { confirmDelete = true },
+                )
             }
         },
     ) { padding ->

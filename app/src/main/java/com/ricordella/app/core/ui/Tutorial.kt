@@ -533,13 +533,13 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
     ) { PeopleIllustration() },
     TutorialPage(
         tr("Pozioni: bevi abbastanza"),
-        tr("La goccia in alto apre le Pozioni: scegli quanta acqua bere al giorno e ogni quanto ricordartelo. ") +
+        tr("Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. ") +
             tr("A ogni bicchiere tocca +: il mago si riempie e gli avvisi si fermano quando hai raggiunto l'obiettivo."),
     ) { PotionsIllustration() },
     TutorialPage(
         tr("Buoni propositi"),
         tr("A gennaio ti propongo di scrivere i buoni propositi dell'anno; spuntali quando li rispetti. ") +
-            tr("A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi anche nelle Impostazioni e nel widget."),
+            tr("A fine dicembre ti mostro il recap: quanti ne hai mantenuti. Li trovi sempre nel menu delle sezioni in alto (i quadratini) e nel widget."),
     ) { ResolutionsIllustration() },
     TutorialPage(
         tr("Scansiona documenti"),

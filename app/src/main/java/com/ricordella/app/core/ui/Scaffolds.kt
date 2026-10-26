@@ -40,6 +40,9 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.Payments
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -52,6 +55,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,8 +87,18 @@ fun TopLevelScaffold(
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    // Il "+" si nasconde mentre si scorre verso il basso (non copre le card che si leggono) e torna appena si risale.
+    var fabShown by remember { mutableStateOf(true) }
+    val fabScroll = remember {
+        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+            override fun onPreScroll(available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
+                if (available.y < -4f) fabShown = false else if (available.y > 4f) fabShown = true
+                return androidx.compose.ui.geometry.Offset.Zero
+            }
+        }
+    }
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).nestedScroll(fabScroll),
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         topBar = {
             TopAppBar(
@@ -98,24 +112,38 @@ fun TopLevelScaffold(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
-                    // Sveglie, note e pozioni (acqua da bere) vivono a parte: si aprono da qui, in ogni sezione.
+                    // Tutte le sezioni che non stanno nella barra in basso, in un solo posto (in ogni sezione).
                     var sections by remember { mutableStateOf(false) }
                     IconButton(onClick = { sections = true }) {
-                        Icon(Icons.Rounded.Apps, contentDescription = tr("Sveglie, note e pozioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
+                        Icon(Icons.Rounded.Apps, contentDescription = tr("Tutte le sezioni"), tint = MaterialTheme.ricordellaColors.cyan.solid)
                     }
                     DropdownMenu(expanded = sections, onDismissRequest = { sections = false }) {
                         val shown = com.ricordella.app.core.ui.LocalAppSettings.current
-                        if (shown.shows(com.ricordella.app.domain.model.AppSection.ALARMS)) DropdownMenuItem(text = { Text(tr("Sveglie")) }, leadingIcon = { Icon(Icons.Rounded.Alarm, null) }, onClick = { sections = false; navigator.openAlarms() })
-                        if (shown.shows(com.ricordella.app.domain.model.AppSection.NOTES)) DropdownMenuItem(text = { Text(tr("Note")) }, leadingIcon = { Icon(Icons.Rounded.StickyNote2, null) }, onClick = { sections = false; navigator.openNotes() })
-                        if (shown.shows(com.ricordella.app.domain.model.AppSection.CARDS)) DropdownMenuItem(text = { Text(tr("Carte")) }, leadingIcon = { Icon(Icons.Rounded.CreditCard, null) }, onClick = { sections = false; navigator.openCards() })
-                        if (shown.shows(com.ricordella.app.domain.model.AppSection.POTIONS)) DropdownMenuItem(text = { Text(tr("Pozioni")) }, leadingIcon = { Icon(Icons.Rounded.WaterDrop, null) }, onClick = { sections = false; navigator.openPotions() })
+                        @Composable
+                        fun Entry(section: com.ricordella.app.domain.model.AppSection?, label: String, icon: ImageVector, open: () -> Unit) {
+                            if (section == null || shown.shows(section)) DropdownMenuItem(text = { Text(label) }, leadingIcon = { Icon(icon, null) }, onClick = { sections = false; open() })
+                        }
+                        Entry(com.ricordella.app.domain.model.AppSection.ALARMS, tr("Sveglie"), Icons.Rounded.Alarm, navigator::openAlarms)
+                        Entry(com.ricordella.app.domain.model.AppSection.TIMERS, tr("Timer"), Icons.Rounded.Timer, navigator::openTimers)
+                        Entry(com.ricordella.app.domain.model.AppSection.NOTES, tr("Note"), Icons.Rounded.StickyNote2, navigator::openNotes)
+                        Entry(com.ricordella.app.domain.model.AppSection.CARDS, tr("Carte"), Icons.Rounded.CreditCard) { navigator.openCards() }
+                        Entry(com.ricordella.app.domain.model.AppSection.POTIONS, tr("Pozioni"), Icons.Rounded.WaterDrop, navigator::openPotions)
+                        Entry(com.ricordella.app.domain.model.AppSection.EXPENSES, tr("Spese"), Icons.Rounded.Payments, navigator::openExpenses)
+                        Entry(com.ricordella.app.domain.model.AppSection.CYCLE, tr("Ciclo"), Icons.Rounded.WaterDrop, navigator::openCycle)
+                        Entry(null, tr("Buoni propositi"), Icons.Rounded.EmojiEvents) { navigator.openResolutions(java.time.LocalDate.now().year) }
                     }
                     IconButton(onClick = navigator::openSearch) { Icon(Icons.Rounded.Search, contentDescription = tr("Cerca")) }
                     IconButton(onClick = navigator::openSettings) { Icon(Icons.Rounded.Settings, contentDescription = tr("Impostazioni")) }
                 },
             )
         },
-        floatingActionButton = { AddFab(onAdd) },
+        floatingActionButton = {
+            androidx.compose.animation.AnimatedVisibility(
+                fabShown,
+                enter = androidx.compose.animation.scaleIn() + androidx.compose.animation.fadeIn(),
+                exit = androidx.compose.animation.scaleOut() + androidx.compose.animation.fadeOut(),
+            ) { AddFab(onAdd) }
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = content,
     )
