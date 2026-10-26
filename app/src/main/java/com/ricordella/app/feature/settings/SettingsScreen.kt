@@ -150,7 +150,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, onOpenTrash: () -> Unit, onOpenShareManage: () -> Unit = {}, onGoHome: () -> Unit = onBack) {
+fun SettingsScreen(onBack: () -> Unit, onOpenTrash: () -> Unit, onOpenShareManage: () -> Unit = {}, onGoHome: () -> Unit = onBack) {
     val viewModel = appViewModel { c, _ ->
         SettingsViewModel(c.settingsRepository, c.backupRepository, c.restoreBackup, c.deleteAllData, c.reminderScheduler, c.housekeeping)
     }
@@ -228,21 +228,134 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
         ) {
             if (state.isBusy) LinearProgressIndicator(Modifier.fillMaxWidth())
 
-            val year = LocalDate.now().year
-            val resolutions = settings.resolutions.filter { it.year == year }
-            SettingRow(
-                icon = Icons.Rounded.AutoAwesome,
-                title = tr("Buoni propositi"),
-                subtitle = if (resolutions.isEmpty()) trf("Scrivi i propositi per il %1\$s", year)
-                else trf("%1\$s: rispettati %2\$s su %3\$s", year, resolutions.count { it.kept }, resolutions.size),
-                onClick = { onOpenResolutions(year) },
-            )
+            // In ordine di quanto servono: notifiche, sezioni, backup, aspetto; poi le sezioni facoltative e i dati.
+            SettingsGroup(Icons.Rounded.Notifications, tr("Notifiche"), tr("Permessi, orari, anticipo e predefiniti per tipo")) {
+                SettingRow(
+                    icon = Icons.Rounded.Notifications,
+                    title = tr("Notifiche abilitate"),
+                    subtitle = tr("Remindella ti avvisa anche ad app chiusa."),
+                    trailing = {
+                        Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
+                    },
+                )
+                NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
+                com.ricordella.app.core.ui.NotificationHealthRows()
+                NotificationVolumeRow()
+                SettingRow(
+                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                    title = tr("Suono e vibrazione"),
+                    subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),
+                    onClick = { openChannelSettings(context) },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Orario promemoria senza ora"),
+                    subtitle = trf("Notifica alle %1\$s", DateTexts.time(settings.allDayNotificationTime)),
+                    onClick = { pickAllDayTime = true },
+                )
+                DropdownField(
+                    label = tr("Anticipo predefinito"),
+                    options = NotifyOffsetPresets,
+                    selected = settings.defaultNotifyOffsetMinutes,
+                    optionLabel = ::notifyOffsetLabel,
+                    onSelected = { minutes -> viewModel.update { it.copy(defaultNotifyOffsetMinutes = minutes) } },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Riepilogo della domenica"),
+                    subtitle = tr("Domenica alle 19 ti dico cosa arriva la settimana dopo."),
+                    trailing = {
+                        Switch(checked = settings.weeklySummary, onCheckedChange = { value -> viewModel.update { it.copy(weeklySummary = value) } })
+                    },
+                )
+                TypeDefaultsSection(settings, viewModel::update)
+            }
 
-            Text(
-                "Remindella ${com.ricordella.app.BuildConfig.VERSION_NAME} (${com.ricordella.app.BuildConfig.VERSION_CODE})",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            SettingsGroup(Icons.Rounded.Apps, tr("Sezioni"), tr("Scegli quali sezioni vedere")) {
+                SectionsSettings(settings, viewModel::update)
+                if (settings.shows(com.ricordella.app.domain.model.AppSection.CYCLE)) {
+                    val screenLockSet = remember { context.hasScreenLock() }
+                    SettingRow(
+                        icon = Icons.Rounded.Lock,
+                        title = tr("Proteggi il ciclo con impronta o PIN"),
+                        subtitle = if (screenLockSet) tr("Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot.")
+                        else tr("Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android."),
+                        onClick = { if (screenLockSet) viewModel.update { it.copy(lockCycle = !it.lockCycle) } },
+                        trailing = {
+                            Switch(
+                                checked = settings.lockCycle && screenLockSet,
+                                enabled = screenLockSet,
+                                onCheckedChange = { on -> viewModel.update { it.copy(lockCycle = on) } },
+                            )
+                        },
+                    )
+                }
+            }
+
+            // Backup: dove va (scritto chiaro), salvarlo ora, in automatico, ripristinarlo. Il resto sta in "Altro sul backup".
+            val lastBackupDay = settings.lastBackupMillis?.let { java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate() }
+            val lastBackupText = lastBackupDay?.let { trf("Ultimo: %1\$s", DateTexts.fullDate(it)) }
+            SettingsGroup(Icons.Rounded.Shield, tr("Backup"), lastBackupText ?: tr("Non l'hai ancora fatto")) {
+                BackupPlaceCard(settings, onChoose = { folderLauncher.launch(null) }, modifier = Modifier.padding(vertical = 8.dp))
+                SettingRow(
+                    icon = Icons.Rounded.Upload,
+                    title = tr("Salva il backup ora"),
+                    subtitle = lastBackupText ?: tr("Mai: fai subito il primo, bastano pochi secondi."),
+                    onClick = { backupAction(BACKUP_EXPORT) },
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Schedule,
+                    title = tr("Backup automatico"),
+                    subtitle = settings.autoBackupTime?.let {
+                        if (settings.backupEveryHours > 0) trf("%1\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.frequencyLabel(settings))
+                        else trf("%1\$s alle %2\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.intervalLabel(settings.backupIntervalDays), DateTexts.time(it))
+                    } ?: tr("Spento: tocca per scegliere l'orario."),
+                    onClick = { pickBackupTime = true },
+                    trailing = {
+                        Switch(
+                            checked = settings.autoBackupTime != null,
+                            onCheckedChange = { on -> if (on) pickBackupTime = true else viewModel.update { it.copy(autoBackupTime = null) } },
+                        )
+                    },
+                )
+                BackupIntervalField(settings, viewModel::update, modifier = Modifier.padding(vertical = 8.dp))
+                SettingRow(
+                    icon = Icons.Rounded.Download,
+                    title = tr("Ripristina un backup"),
+                    subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
+                    onClick = { backupAction(BACKUP_IMPORT) },
+                )
+                var moreBackup by rememberSaveable { mutableStateOf(false) }
+                TextButton(onClick = { moreBackup = !moreBackup }) {
+                    Icon(if (moreBackup) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
+                    Text(if (moreBackup) tr("Nascondi") else tr("Altro sul backup"), modifier = Modifier.padding(start = 8.dp))
+                }
+                if (moreBackup) {
+                    if (settings.backupFolderUri != null) {
+                        SettingRow(
+                            icon = Icons.Rounded.LinkOff,
+                            title = tr("Smetti di usare la cartella"),
+                            subtitle = tr("I backup tornano nel file scelto o in Download/Remindella."),
+                            onClick = viewModel::clearBackupFolder,
+                        )
+                    }
+                    if (state.reserveSavedAt != null) {
+                        SettingRow(
+                            icon = Icons.Rounded.Shield,
+                            title = tr("Copie di riserva"),
+                            subtitle = tr("Le ultime 3 copie, sul telefono, con la data. Usale se il file di backup si rovina."),
+                            onClick = { showReserveList = true },
+                        )
+                    }
+                    SettingRow(
+                        icon = Icons.AutoMirrored.Rounded.HelpOutline,
+                        title = tr("Come funzionano i backup"),
+                        subtitle = tr("Dove vanno le copie, cosa succede se cambi telefono."),
+                        onClick = { showBackupTutorial = true },
+                    )
+                }
+            }
 
             SettingsGroup(Icons.Rounded.Palette, tr("Aspetto"), tr("Tema, lingua, calendario e suoni")) {
                 Text(tr("Tema"), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
@@ -299,126 +412,19 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 )
             }
 
-            SettingsGroup(Icons.Rounded.Apps, tr("Sezioni"), tr("Scegli quali sezioni vedere")) {
-                SectionsSettings(settings, viewModel::update)
-            }
-
-            SettingsGroup(Icons.Rounded.Notifications, tr("Notifiche"), tr("Permessi, orari, anticipo e predefiniti per tipo")) {
-                SettingRow(
-                    icon = Icons.Rounded.Notifications,
-                    title = tr("Notifiche abilitate"),
-                    subtitle = tr("Remindella ti avvisa anche ad app chiusa."),
-                    trailing = {
-                        Switch(checked = settings.notificationsEnabled, onCheckedChange = { value -> viewModel.update { it.copy(notificationsEnabled = value) } })
-                    },
-                )
-                NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
-                ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
-                com.ricordella.app.core.ui.NotificationHealthRows()
-                NotificationVolumeRow()
-                SettingRow(
-                    icon = Icons.Rounded.Schedule,
-                    title = tr("Riepilogo della domenica"),
-                    subtitle = tr("Domenica alle 19 ti dico cosa arriva la settimana dopo."),
-                    trailing = {
-                        Switch(checked = settings.weeklySummary, onCheckedChange = { value -> viewModel.update { it.copy(weeklySummary = value) } })
-                    },
-                )
-                SettingRow(
-                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
-                    title = tr("Suono e vibrazione"),
-                    subtitle = tr("Gestiti dalle impostazioni di sistema del canale \"Promemoria\"."),
-                    onClick = { openChannelSettings(context) },
-                )
-                SettingRow(
-                    icon = Icons.Rounded.Schedule,
-                    title = tr("Orario promemoria senza ora"),
-                    subtitle = trf("Notifica alle %1\$s", DateTexts.time(settings.allDayNotificationTime)),
-                    onClick = { pickAllDayTime = true },
-                )
-                DropdownField(
-                    label = tr("Anticipo predefinito"),
-                    options = NotifyOffsetPresets,
-                    selected = settings.defaultNotifyOffsetMinutes,
-                    optionLabel = ::notifyOffsetLabel,
-                    onSelected = { minutes -> viewModel.update { it.copy(defaultNotifyOffsetMinutes = minutes) } },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                )
-                TypeDefaultsSection(settings, viewModel::update)
-            }
-
-            SettingsGroup(Icons.Rounded.Event, tr("Appuntamenti"), tr("Messaggio per ricordare l'appuntamento ai clienti")) {
-                AppointmentMessageSection(settings, viewModel::update)
-            }
-
-            SettingsGroup(Icons.Rounded.Alarm, tr("Sveglia"), tr("Suono, vibrazione, volume e posticipo")) {
-                AlarmSettingsSection(settings, viewModel::update)
-            }
-
-            SettingsGroup(Icons.Rounded.Storage, tr("Dati e backup"), tr("Backup, importazione e operazioni di inizio anno")) {
-                val lastBackupDay = settings.lastBackupMillis?.let { java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault()).toLocalDate() }
-                SettingRow(
-                    icon = Icons.Rounded.Shield,
-                    title = tr("Ultimo backup"),
-                    subtitle = lastBackupDay?.let { DateTexts.fullDate(it) } ?: tr("Mai: fai subito il primo, bastano pochi secondi."),
-                    onClick = { backupAction(BACKUP_EXPORT) },
-                )
-                SettingRow(
-                    icon = Icons.Rounded.Upload,
-                    title = tr("Esporta backup"),
-                    subtitle = tr("Un file .zip compresso al massimo: ogni volta sovrascrive il precedente, a meno che tu non chieda una nuova versione."),
-                    onClick = { backupAction(BACKUP_EXPORT) },
-                )
-                SettingRow(
-                    icon = Icons.Rounded.Download,
-                    title = tr("Importa backup"),
-                    subtitle = tr("Ripristina un backup sostituendo i dati attuali."),
-                    onClick = { backupAction(BACKUP_IMPORT) },
-                )
-                SettingRow(
-                    icon = Icons.Rounded.CloudSync,
-                    title = tr("Cartella dei backup (Drive)"),
-                    subtitle = if (settings.backupFolderUri != null) tr("Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per cambiare cartella.")
-                    else tr("Scegli una cartella su Drive: così non perdi i dati se cambi telefono. Se non la scegli, le copie restano sul telefono."),
-                    onClick = { folderLauncher.launch(null) },
-                )
-                if (settings.backupFolderUri != null) {
-                    SettingRow(
-                        icon = Icons.Rounded.LinkOff,
-                        title = tr("Smetti di usare la cartella"),
-                        subtitle = tr("I backup tornano nel file scelto o in Download/Remindella."),
-                        onClick = viewModel::clearBackupFolder,
-                    )
+            // Le impostazioni di una sezione facoltativa compaiono solo se la sezione è accesa.
+            if (settings.shows(com.ricordella.app.domain.model.AppSection.ALARMS)) {
+                SettingsGroup(Icons.Rounded.Alarm, tr("Sveglia"), tr("Suono, vibrazione, volume e posticipo")) {
+                    AlarmSettingsSection(settings, viewModel::update)
                 }
-                if (state.reserveSavedAt != null) {
-                    SettingRow(
-                        icon = Icons.Rounded.Shield,
-                        title = tr("Copie di riserva"),
-                        subtitle = tr("Le ultime 3 copie, sul telefono, con la data. Usale se il file di backup si rovina."),
-                        onClick = { showReserveList = true },
-                    )
+            }
+            if (settings.shows(com.ricordella.app.domain.model.AppSection.APPOINTMENTS)) {
+                SettingsGroup(Icons.Rounded.Event, tr("Appuntamenti"), tr("Messaggio per ricordare l'appuntamento ai clienti")) {
+                    AppointmentMessageSection(settings, viewModel::update)
                 }
-                SettingRow(
-                    icon = Icons.AutoMirrored.Rounded.HelpOutline,
-                    title = tr("Come funzionano i backup"),
-                    subtitle = tr("Dove vanno le copie, cosa succede se cambi telefono."),
-                    onClick = { showBackupTutorial = true },
-                )
-                SettingRow(
-                    icon = Icons.Rounded.Schedule,
-                    title = tr("Backup automatico"),
-                    subtitle = settings.autoBackupTime?.let {
-                        if (settings.backupEveryHours > 0) trf("%1\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.frequencyLabel(settings))
-                        else trf("%1\$s alle %2\$s, da sola: nel file scelto o in Download/Remindella.", Housekeeping.intervalLabel(settings.backupIntervalDays), DateTexts.time(it))
-                    } ?: tr("Spento: tocca per scegliere l'orario."),
-                    onClick = { pickBackupTime = true },
-                    trailing = {
-                        Switch(
-                            checked = settings.autoBackupTime != null,
-                            onCheckedChange = { on -> if (on) pickBackupTime = true else viewModel.update { it.copy(autoBackupTime = null) } },
-                        )
-                    },
-                )
+            }
+
+            SettingsGroup(Icons.Rounded.Storage, tr("Dati"), tr("Importa da un calendario, cestino e pulizia")) {
                 SettingRow(
                     icon = Icons.Rounded.CalendarMonth,
                     title = tr("Importa da un calendario"),
@@ -431,29 +437,14 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                     subtitle = tr("Recupera ciò che hai eliminato negli ultimi 7 giorni."),
                     onClick = onOpenTrash,
                 )
-                val screenLockSet = remember { context.hasScreenLock() }
-                SettingRow(
-                    icon = Icons.Rounded.Lock,
-                    title = tr("Proteggi il ciclo con impronta o PIN"),
-                    subtitle = if (screenLockSet) tr("Per aprire la sezione Ciclo serve l'impronta o il PIN del telefono. Nasconde anche la schermata dagli screenshot.")
-                    else tr("Il telefono non ha né impronta né PIN: impostali dalle impostazioni di Android."),
-                    onClick = { if (screenLockSet) viewModel.update { it.copy(lockCycle = !it.lockCycle) } },
-                    trailing = {
-                        Switch(
-                            checked = settings.lockCycle && screenLockSet,
-                            enabled = screenLockSet,
-                            onCheckedChange = { on -> viewModel.update { it.copy(lockCycle = on) } },
-                        )
-                    },
-                )
+                Text(tr("Operazioni periodiche"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(vertical = 8.dp))
+                AutomationSettings(settings, viewModel::update, includeBackup = false)
                 SettingRow(
                     icon = Icons.Rounded.DeleteForever,
                     title = tr("Elimina tutti i dati"),
                     subtitle = tr("Cancella persone, cose, promemoria e storico da questo dispositivo."),
                     onClick = { confirmDelete = 1 },
                 )
-                Text(tr("Operazioni periodiche"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(vertical = 8.dp))
-                AutomationSettings(settings, viewModel::update, includeBackup = true)
             }
 
             SharingSection(settings, (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container.sharedSpace, onOpenShareManage)
@@ -757,32 +748,6 @@ private fun NotificationPermissionRow(onChanged: () -> Unit) {
         onClick = if (isGranted) null else ({
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }),
-    )
-}
-
-@Composable
-private fun ExactAlarmRow(onChanged: () -> Unit) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
-    val context = LocalContext.current
-    val alarmManager = context.getSystemService(AlarmManager::class.java)
-    var allowed by remember { mutableStateOf(alarmManager.canScheduleExactAlarms()) }
-    LifecycleResumeEffect(Unit) {
-        val now = alarmManager.canScheduleExactAlarms()
-        if (now != allowed) onChanged()
-        allowed = now
-        onPauseOrDispose { }
-    }
-    SettingRow(
-        icon = Icons.Rounded.AlarmOn,
-        title = tr("Promemoria puntuali"),
-        subtitle = if (allowed) tr("Le notifiche con orario arrivano al minuto esatto.")
-        else tr("Non consentito: le notifiche possono arrivare con qualche minuto di ritardo. Tocca per consentire."),
-        onClick = {
-            context.startActivity(
-                Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:${context.packageName}".toUri())
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
-        },
     )
 }
 

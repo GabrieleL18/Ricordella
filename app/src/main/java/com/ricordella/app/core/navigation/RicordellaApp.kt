@@ -293,7 +293,7 @@ fun RicordellaApp(
             composable<ItemsRoute> { ItemListScreen(navigator, openQuickAdd); SectionTutorialOnce("items", 3) }
             composable<PeopleRoute> { PersonListScreen(navigator, openQuickAdd); SectionTutorialOnce("people", 4) }
             composable<SearchRoute> { SearchScreen(navigator) }
-            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenResolutions = { navigator.openResolutions(it) }, onOpenTrash = navigator::openTrash, onOpenShareManage = navigator::openShareManage, onGoHome = navigator::openHome) }
+            composable<SettingsRoute> { SettingsScreen(onBack = navigator::back, onOpenTrash = navigator::openTrash, onOpenShareManage = navigator::openShareManage, onGoHome = navigator::openHome) }
             composable<PotionsRoute> { PotionsScreen(onBack = navigator::back); SectionTutorialOnce("potions", 5) }
             composable<AlarmsRoute> { com.ricordella.app.feature.alarms.AlarmsScreen(navigator, onBack = navigator::back) }
             composable<AlarmEditRoute> { entry -> com.ricordella.app.feature.alarms.AlarmEditScreen(entry.toRoute<AlarmEditRoute>().id, onBack = navigator::back) }
@@ -322,10 +322,13 @@ fun RicordellaApp(
     }
 
     if (showQuickAdd) {
+        val container = (LocalContext.current.applicationContext as com.ricordella.app.RicordellaApplication).container
+        val scope = rememberCoroutineScope()
         QuickAddSheet(
             onDismiss = { showQuickAdd = false },
             onSelected = { kind ->
                 showQuickAdd = false
+                scope.launch { container.settingsRepository.update { s -> s.copy(addUses = s.addUses + (kind.name to (s.addUses[kind.name] ?: 0) + 1)) } }
                 returnToAdd = kind != QuickAddKind.CYCLE && kind != QuickAddKind.TIMER && kind != QuickAddKind.CARD
                 when (kind) {
                     QuickAddKind.REMINDER -> navigator.newReminder(date = quickAddDate)
@@ -396,9 +399,9 @@ private val QuickAddKind.section: com.ricordella.app.domain.model.AppSection?
 private val QuickAddOptions get() = listOf(
     QuickAddOption(QuickAddKind.REMINDER, Icons.Rounded.NotificationsActive, tr("Promemoria"), tr("Una cosa da fare: pagare il bollo, chiamare il medico")),
     QuickAddOption(QuickAddKind.EVENT, Icons.Rounded.Event, tr("Evento"), tr("Succede quel giorno: una cena, un compleanno")),
+    QuickAddOption(QuickAddKind.NOTE, Icons.Rounded.StickyNote2, tr("Nota"), tr("Testo, liste e lista della spesa")),
     QuickAddOption(QuickAddKind.ALARM, Icons.Rounded.Alarm, tr("Sveglia"), tr("Suona a tutto schermo, anche ogni giorno")),
     QuickAddOption(QuickAddKind.TIMER, Icons.Rounded.Timer, tr("Timer"), tr("Conto alla rovescia per la pasta o la lavatrice")),
-    QuickAddOption(QuickAddKind.NOTE, Icons.Rounded.StickyNote2, tr("Nota"), tr("Testo, liste e lista della spesa")),
     QuickAddOption(QuickAddKind.CARD, Icons.Rounded.CreditCard, tr("Carta"), tr("Tessera fedeltà da mostrare alla cassa")),
     QuickAddOption(QuickAddKind.VACATION, Icons.Rounded.BeachAccess, tr("Vacanza"), tr("Voli, navi e alloggio")),
     QuickAddOption(QuickAddKind.MEDICAL_VISIT, Icons.Rounded.MedicalServices, tr("Visita medica"), tr("Medico, esami, dentista")),
@@ -427,30 +430,67 @@ private fun QuickAddSheet(onDismiss: () -> Unit, onSelected: (QuickAddKind) -> U
         ) {
             Text(tr("Cosa vuoi aggiungere?"), style = MaterialTheme.typography.headlineSmall)
             val settings = LocalAppSettings.current
-            QuickAddOptions.filter { o -> o.kind.section?.let(settings::shows) ?: true }.chunked(2).forEachIndexed { row, pair ->
+            fun toneOf(kind: QuickAddKind) = when (kind) {
+                QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
+                QuickAddKind.EVENT -> colors.lavender
+                QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
+                QuickAddKind.TIMER -> colors.mint
+                QuickAddKind.CARD -> colors.lavender
+                QuickAddKind.VACATION, QuickAddKind.EXPENSE -> colors.mint
+                QuickAddKind.ITEM, QuickAddKind.NOTE -> colors.pear
+            }
+            // In cima, grandi, le 4 voci più usate (all'inizio quelle dell'elenco); le altre sotto, piccole.
+            val (top, rest) = mostUsedFirst(QuickAddOptions.filter { o -> o.kind.section?.let(settings::shows) ?: true }, settings.addUses) { it.kind.name }
+            top.chunked(2).forEachIndexed { row, pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     pair.forEachIndexed { column, option ->
-                        val index = row * 2 + column
-                        QuickAddTile(
-                            option = option,
-                            tone = when (option.kind) {
-                                QuickAddKind.REMINDER, QuickAddKind.MEDICAL_VISIT -> colors.cyan
-                                QuickAddKind.EVENT -> colors.lavender
-                                QuickAddKind.ALARM, QuickAddKind.PERSON, QuickAddKind.CYCLE -> colors.coral
-                                QuickAddKind.TIMER -> colors.mint
-                                QuickAddKind.CARD -> colors.lavender
-                                QuickAddKind.VACATION, QuickAddKind.EXPENSE -> colors.mint
-                                QuickAddKind.ITEM, QuickAddKind.NOTE -> colors.pear
-                            },
-                            index = index,
-                            onClick = { onSelected(option.kind) },
-                            modifier = Modifier.weight(1f),
-                        )
+                        QuickAddTile(option, toneOf(option.kind), index = row * 2 + column, onClick = { onSelected(option.kind) }, modifier = Modifier.weight(1f))
                     }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
+            if (rest.isNotEmpty()) {
+                Text(tr("Altro"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+                rest.chunked(3).forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        row.forEach { option ->
+                            SmallAddTile(option, toneOf(option.kind), onClick = { onSelected(option.kind) }, modifier = Modifier.weight(1f))
+                        }
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+            }
         }
+    }
+}
+
+/**
+ * Le [top] voci più usate (a pari uso vince l'ordine dell'elenco) e, a parte, le altre
+ * nel loro ordine di sempre, così restano facili da ritrovare.
+ */
+internal fun <T> mostUsedFirst(options: List<T>, uses: Map<String, Int>, top: Int = 4, key: (T) -> String): Pair<List<T>, List<T>> {
+    val first = options.sortedByDescending { uses[key(it)] ?: 0 }.take(top)
+    return first to options.filterNot { it in first }
+}
+
+/** Voce piccola del foglio "Aggiungi" (sotto "Altro"): icona e nome. */
+@Composable
+private fun SmallAddTile(option: QuickAddOption, tone: Tone, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val interaction = remember { MutableInteractionSource() }
+    Column(
+        modifier = modifier
+            .pressScale(interaction, pressedScale = 0.95f)
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(Modifier.size(36.dp).background(tone.solid, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(option.icon, contentDescription = null, tint = MaterialTheme.colorScheme.surfaceContainerLowest, modifier = Modifier.size(20.dp))
+        }
+        Text(option.title, style = MaterialTheme.typography.labelLarge, color = tone.content, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 

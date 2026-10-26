@@ -142,6 +142,21 @@ private val AppSection.label: String
         AppSection.APPOINTMENTS -> tr("Appuntamento con clienti")
     }
 
+/** Una riga sotto il nome: cosa c.è dentro, per chi non lo indovina dal nome. */
+private val AppSection.hint: String
+    get() = when (this) {
+        AppSection.ALARMS -> tr("Suona a tutto schermo, anche ogni giorno")
+        AppSection.TIMERS -> tr("Conto alla rovescia per la pasta o la lavatrice")
+        AppSection.POTIONS -> tr("Ti ricorda di bere acqua")
+        AppSection.NOTES -> tr("Testo, liste e lista della spesa")
+        AppSection.CARDS -> tr("Tessera fedeltà da mostrare alla cassa")
+        AppSection.VACATIONS -> tr("Voli, navi e alloggio")
+        AppSection.MEDICAL_VISITS -> tr("Medico, esami, dentista")
+        AppSection.EXPENSES -> tr("Spese, abbonamenti, rate ed entrate")
+        AppSection.CYCLE -> tr("Previsione e cronologia, senza notifiche")
+        AppSection.APPOINTMENTS -> tr("Ricordaglielo con un messaggio su WhatsApp, SMS o email")
+    }
+
 /** Sezioni facoltative da mostrare: spente spariscono da "Aggiungi", dalla Home e dai moduli (i dati restano). */
 @Composable
 internal fun SectionsSettings(settings: AppSettings, update: ((AppSettings) -> AppSettings) -> Unit) {
@@ -153,7 +168,10 @@ internal fun SectionsSettings(settings: AppSettings, update: ((AppSettings) -> A
     )
     AppSection.entries.forEach { section ->
         androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(section.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            Column(Modifier.weight(1f)) {
+                Text(section.label, style = MaterialTheme.typography.bodyLarge)
+                Text(section.hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             Switch(
                 checked = settings.shows(section),
                 onCheckedChange = { on -> update { it.copy(hiddenSections = if (on) it.hiddenSections - section else it.hiddenSections + section) } },

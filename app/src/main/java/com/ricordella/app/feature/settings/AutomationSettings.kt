@@ -65,32 +65,34 @@ fun AutomationSettings(settings: AppSettings, update: ((AppSettings) -> AppSetti
             onHelp = { help = YearlyTask.CLEANUP.name },
             onSelected = { mode -> update { it.copy(cleanupMode = mode) } },
         )
-        if (includeBackup) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // Valori negativi = ore (-3 = ogni 3 ore), positivi = giorni: un solo menu per entrambi.
-                DropdownField(
-                    label = tr("Ogni quanto aggiornare il backup"),
-                    options = Housekeeping.BACKUP_HOURS.map { -it } + Housekeeping.BACKUP_INTERVALS,
-                    selected = if (settings.backupEveryHours > 0) -settings.backupEveryHours else settings.backupIntervalDays,
-                    optionLabel = { if (it < 0) Housekeeping.hoursLabel(-it) else Housekeeping.intervalLabel(it) },
-                    onSelected = { value ->
-                        update {
-                            // Ogni tot ore ha senso solo in automatico: lo si accende se era spento.
-                            if (value < 0) it.copy(backupEveryHours = -value, autoBackupTime = it.autoBackupTime ?: LocalTime.of(22, 0))
-                            else it.copy(backupEveryHours = 0, backupIntervalDays = value)
-                        }
-                    },
-                    modifier = Modifier.weight(1f),
-                )
-                IconButton(onClick = { help = "BACKUP" }) { Icon(Icons.AutoMirrored.Rounded.HelpOutline, contentDescription = tr("Come funziona")) }
-            }
-        }
+        if (includeBackup) BackupIntervalField(settings, update)
     }
-    when (help) {
-        null -> Unit
-        "BACKUP" -> TutorialDialog(BackupTutorialPages, onDismiss = { help = null })
-        else -> TutorialDialog(listOf(YearlyTask.valueOf(help!!).tutorialPage(year)), onDismiss = { help = null })
+    help?.let { task -> TutorialDialog(listOf(YearlyTask.valueOf(task).tutorialPage(year)), onDismiss = { help = null }) }
+}
+
+/** Ogni quanto aggiornare il backup, con il "?" che spiega come funziona. */
+@Composable
+fun BackupIntervalField(settings: AppSettings, update: ((AppSettings) -> AppSettings) -> Unit, modifier: Modifier = Modifier) {
+    var help by rememberSaveable { mutableStateOf(false) }
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        // Valori negativi = ore (-3 = ogni 3 ore), positivi = giorni: un solo menu per entrambi.
+        DropdownField(
+            label = tr("Ogni quanto aggiornare il backup"),
+            options = Housekeeping.BACKUP_HOURS.map { -it } + Housekeeping.BACKUP_INTERVALS,
+            selected = if (settings.backupEveryHours > 0) -settings.backupEveryHours else settings.backupIntervalDays,
+            optionLabel = { if (it < 0) Housekeeping.hoursLabel(-it) else Housekeeping.intervalLabel(it) },
+            onSelected = { value ->
+                update {
+                    // Ogni tot ore ha senso solo in automatico: lo si accende se era spento.
+                    if (value < 0) it.copy(backupEveryHours = -value, autoBackupTime = it.autoBackupTime ?: LocalTime.of(22, 0))
+                    else it.copy(backupEveryHours = 0, backupIntervalDays = value)
+                }
+            },
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = { help = true }) { Icon(Icons.AutoMirrored.Rounded.HelpOutline, contentDescription = tr("Come funziona")) }
     }
+    if (help) TutorialDialog(BackupTutorialPages, onDismiss = { help = false })
 }
 
 @Composable

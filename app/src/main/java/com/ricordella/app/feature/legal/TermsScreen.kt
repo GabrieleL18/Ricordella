@@ -95,8 +95,8 @@ private fun sections(): List<TermsSection> {
         ),
         TermsSection(
             Icons.Rounded.SwapVert, tr("Esportare e importare i dati"),
-            tr("Impostazioni › Dati e backup › Esporta backup crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.\n\n") +
-                tr("Per ripristinare: Impostazioni › Dati e backup › Importa backup e scegli il file. I dati presenti vengono sostituiti. ") +
+            tr("Impostazioni › Backup › Salva il backup ora crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.\n\n") +
+                tr("Per ripristinare: Impostazioni › Backup › Ripristina un backup e scegli il file. I dati presenti vengono sostituiti. ") +
                 tr("Tieni il file in un posto sicuro (Drive, un computer): non è cifrato e chi lo ha può leggerne il contenuto. ") +
                 tr("Di ogni backup l'app tiene anche una copia di riserva sul telefono, per quando il file principale si rovina; anche la copia sparisce se disinstalli l'app."),
             c.mint,
@@ -112,7 +112,7 @@ private fun sections(): List<TermsSection> {
             Icons.Rounded.Lock, tr("Informativa privacy"),
             tr("Remindella non chiede account, non ha accesso a Internet, non mostra pubblicità, non raccoglie statistiche e non invia i tuoi dati allo sviluppatore. ") +
                 tr("Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; per «Scrivi al volo» Remindella non registra né salva l'audio; nelle note puoi registrare messaggi vocali, che restano solo sul telefono); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.\n\n") +
-                tr("Puoi cancellare tutto da Impostazioni › Dati e backup › Elimina tutti i dati o disinstallando l'app. Per domande: ") + SUPPORT_EMAIL,
+                tr("Puoi cancellare tutto da Impostazioni › Dati › Elimina tutti i dati o disinstallando l'app. Per domande: ") + SUPPORT_EMAIL,
             c.lavender,
         ),
         TermsSection(

@@ -339,7 +339,7 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
         ) {
             Text(tr("Il mio consiglio"), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.ricordellaColors.pear.content)
             Text(
-                tr("Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Dati e backup."),
+                tr("Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Backup."),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.ricordellaColors.pear.content,
             )
@@ -353,17 +353,8 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
         AutomationSettings(LocalAppSettings.current, onUpdate, includeBackup = true)
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(tr("Dove salvo il backup"), style = MaterialTheme.typography.titleMedium)
-            Text(
-                if (LocalAppSettings.current.backupTargetUri != null) tr("Nel file che hai scelto: lo aggiorno da sola.")
-                else tr("In Download/Remindella sul telefono. Per non perderlo se cambi telefono, sceglilo su Drive."),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            OutlinedButton(onClick = { chooseBackupFile.launch("remindella-backup.zip") }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.FolderOpen, contentDescription = null)
-                Spacer(Modifier.width(RicordellaDimensions.spaceS))
-                Text(tr("Scegli dove salvarlo (es. Drive)"))
-            }
+            // Dopo la scelta il riquadro diventa verde con il nome del file: si vede che è fatto.
+            com.ricordella.app.feature.settings.BackupPlaceCard(LocalAppSettings.current, onChoose = { chooseBackupFile.launch("remindella-backup.zip") })
         }
         PushButton(tr("Avanti"), onClick = onNext, icon = Icons.AutoMirrored.Rounded.ArrowForward, modifier = Modifier.fillMaxWidth())
     }
@@ -372,9 +363,9 @@ private fun PreferencesStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, on
 /** Cosa interessa usare: le sezioni facoltative spente spariscono da Home e da "Aggiungi", poi si riaccendono dalle Impostazioni. */
 @Composable
 private fun SectionsStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNext: () -> Unit) {
-    // Chi comincia trova il nucleo (promemoria, cose, persone) e accende da sé le sezioni di nicchia o personali.
+    // Si parte con tutte spente: si accende solo quello che interessa (promemoria, eventi, cose e persone ci sono sempre).
     androidx.compose.runtime.LaunchedEffect(Unit) {
-        onUpdate { it.copy(hiddenSections = it.hiddenSections + com.ricordella.app.domain.model.AppSection.CYCLE + com.ricordella.app.domain.model.AppSection.POTIONS) }
+        onUpdate { it.copy(hiddenSections = com.ricordella.app.domain.model.AppSection.entries.toSet()) }
     }
     Column(
         Modifier
@@ -388,7 +379,7 @@ private fun SectionsStep(onUpdate: ((AppSettings) -> AppSettings) -> Unit, onNex
     ) {
         Text(tr("Cosa ti interessa usare?"), style = MaterialTheme.typography.headlineMedium)
         Text(
-            tr("Lascia accese le sezioni che userai: le altre non compaiono nell'app. Promemoria, eventi, cose e persone ci sono sempre. Potrai cambiare idea quando vuoi nelle Impostazioni."),
+            tr("Accendi solo quello che userai: il resto non compare nell'app. Potrai cambiare idea quando vuoi nelle Impostazioni."),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

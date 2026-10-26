@@ -185,6 +185,8 @@ data class AppSettings(
     val cardsGrid: Boolean = false,
     /** Quante volte è stato aperto il codice di ogni carta (per id): le più usate salgono in cima. Resta su questo telefono, fuori dal file condiviso. */
     val cardUses: Map<String, Int> = emptyMap(),
+    /** Quante volte si è scelta ogni voce del "+" (per nome): le più usate vanno in cima. */
+    val addUses: Map<String, Int> = emptyMap(),
     /** La domenica sera una notifica con le cose della settimana dopo. */
     val weeklySummary: Boolean = true,
     /** Id di persone, cose, promemoria e carte che restano fuori dal file condiviso anche se la loro categoria si condivide. */

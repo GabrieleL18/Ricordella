@@ -979,7 +979,7 @@ val BackupGuidePages: List<TutorialPage>
         ) { HappyWizard(size = 180.dp, scene = WizardScene.CONJURING) },
         TutorialPage(
             tr("Salvale su Drive"),
-            tr("In Impostazioni › Dati e backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione."),
+            tr("In Impostazioni › Backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione."),
         ) { HappyWizard(size = 180.dp, scene = WizardScene.BROOM) },
         TutorialPage(
             tr("Cambi telefono?"),

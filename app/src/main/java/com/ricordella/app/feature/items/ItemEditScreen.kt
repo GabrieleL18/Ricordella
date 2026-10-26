@@ -83,6 +83,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -339,27 +341,37 @@ private fun DetailsForm(form: ItemForm, viewModel: ItemEditViewModel, onChangeCa
         verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
         GroupCrumb(form.group, onChange = onChangeCategory, kindName = form.category?.label)
-        if (ItemReminderTemplates.supportsWarranty(form.group)) ReceiptScanCard(onScanned = viewModel::onReceiptScanned)
-        FormSection(tr("Com'è fatta"), Icons.Rounded.Info, form.group.tone) {
-            PhotoRow(form, viewModel)
-            MainFields(form, viewModel)
-        }
-        if (ItemReminderTemplates.supportsWarranty(form.group)) {
-            FormSection(tr("Garanzia"), Icons.Rounded.VerifiedUser, MaterialTheme.ricordellaColors.mint) { WarrantyFields(form, viewModel) }
-        }
-        FormSection(tr("Persone"), Icons.Rounded.People, MaterialTheme.ricordellaColors.coral) { PeopleFields(form, viewModel) }
+        // In vista solo l'essenziale: il nome e cosa ricordare (scadenze, garanzia). Il resto sta in "Altre opzioni".
+        FormSection(tr("Com'è fatta"), Icons.Rounded.Info, form.group.tone) { NameFields(form, viewModel) }
         if (form.isNew && form.suggestions.isNotEmpty()) {
             FormSection(tr("Cosa vuoi ricordare?"), Icons.Rounded.NotificationsActive, MaterialTheme.ricordellaColors.pear) { SuggestionFields(form, viewModel) }
         }
-        FormSection(tr("Note"), Icons.AutoMirrored.Rounded.Notes, MaterialTheme.ricordellaColors.lavender) {
-            OutlinedTextField(
-                value = form.notes,
-                onValueChange = { value -> viewModel.update { it.copy(notes = value) } },
-                label = { Text(tr("Note")) },
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                minLines = 2,
-                modifier = Modifier.fillMaxWidth(),
-            )
+        if (ItemReminderTemplates.supportsWarranty(form.group)) {
+            ReceiptScanCard(onScanned = viewModel::onReceiptScanned)
+            FormSection(tr("Garanzia"), Icons.Rounded.VerifiedUser, MaterialTheme.ricordellaColors.mint) { WarrantyFields(form, viewModel) }
+        }
+        // Modificando una cosa già salvata si vede tutto, come nei promemoria.
+        var more by rememberSaveable { mutableStateOf(!form.isNew) }
+        TextButton(onClick = { more = !more }) {
+            Icon(if (more) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
+            Text(if (more) tr("Nascondi opzioni") else tr("Altre opzioni"), modifier = Modifier.padding(start = 8.dp))
+        }
+        if (more) {
+            FormSection(tr("Dettagli"), Icons.Rounded.Info, form.group.tone) {
+                PhotoRow(form, viewModel)
+                MoreFields(form, viewModel)
+            }
+            FormSection(tr("Persone"), Icons.Rounded.People, MaterialTheme.ricordellaColors.coral) { PeopleFields(form, viewModel) }
+            FormSection(tr("Note"), Icons.AutoMirrored.Rounded.Notes, MaterialTheme.ricordellaColors.lavender) {
+                OutlinedTextField(
+                    value = form.notes,
+                    onValueChange = { value -> viewModel.update { it.copy(notes = value) } },
+                    label = { Text(tr("Note")) },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                    minLines = 2,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
         PushButton(
             text = tr("Salva"),
@@ -414,8 +426,9 @@ private fun PhotoRow(form: ItemForm, viewModel: ItemEditViewModel) {
     }
 }
 
+/** Sempre in vista: il nome e, per i veicoli, i chilometri (servono alle scadenze a km). */
 @Composable
-private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
+private fun NameFields(form: ItemForm, viewModel: ItemEditViewModel) {
     val update = viewModel::update
     OutlinedTextField(
         value = form.name,
@@ -427,6 +440,15 @@ private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         modifier = Modifier.fillMaxWidth(),
     )
+    if (form.isVehicle) {
+        NumberInput(tr("Chilometri attuali"), form.odometerKm, Modifier.fillMaxWidth(), maxLength = 7) { value -> update { it.copy(odometerKm = value) } }
+    }
+}
+
+/** In "Altre opzioni": marca, modello, targa, numero di serie, acquisto. */
+@Composable
+private fun MoreFields(form: ItemForm, viewModel: ItemEditViewModel) {
+    val update = viewModel::update
     if (form.group != ItemGroup.DOCUMENTS) {
         Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
             TextInput(tr("Marca"), form.brand, Modifier.weight(1f)) { value -> update { it.copy(brand = value) } }
@@ -440,7 +462,6 @@ private fun MainFields(form: ItemForm, viewModel: ItemEditViewModel) {
             }
             NumberInput(tr("Anno"), form.productionYear, Modifier.weight(0.7f), maxLength = 4) { value -> update { it.copy(productionYear = value) } }
         }
-        NumberInput(tr("Chilometri attuali"), form.odometerKm, Modifier.fillMaxWidth(), maxLength = 7) { value -> update { it.copy(odometerKm = value) } }
     }
     if (form.group != ItemGroup.DOCUMENTS) {
         TextInput(tr("Numero di serie"), form.serialNumber, Modifier.fillMaxWidth(), capitalization = KeyboardCapitalization.Characters) { value ->

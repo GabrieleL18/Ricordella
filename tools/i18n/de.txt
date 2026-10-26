@@ -634,8 +634,8 @@ I dati vivono solo sul telefono ||| Die Daten bleiben auf dem Handy
 Non ci sono account né copie sul cloud, e i dati sono esclusi dal backup automatico di Android.  ||| Es gibt weder Konten noch Cloud-Kopien, und die Daten sind von der automatischen Android-Sicherung ausgeschlossen.
 Se disinstalli l'app, ne cancelli i dati, ripristini, perdi o rompi il telefono, i dati vanno persi per sempre, a meno che tu non abbia esportato un backup. ||| Wenn du die App deinstallierst, ihre Daten löschst, das Handy zurücksetzt, verlierst oder es kaputtgeht, sind die Daten für immer weg, außer du hast ein Backup exportiert.
 Esportare e importare i dati ||| Daten exportieren und importieren
-Impostazioni › Dati e backup › Esporta backup crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.⏎⏎ ||| Einstellungen › Daten und Backup › Backup exportieren erstellt eine .zip-Datei mit Erinnerungen, Dingen, Personen, Fotos und Einstellungen: Du kannst sie überschreiben, eine neue Version speichern oder teilen. Das automatische Backup aktualisiert sie zur gewählten Uhrzeit von selbst.⏎⏎
-Per ripristinare: Impostazioni › Dati e backup › Importa backup e scegli il file. I dati presenti vengono sostituiti.  ||| Zum Wiederherstellen: Einstellungen › Daten und Backup › Backup importieren und die Datei wählen. Die vorhandenen Daten werden ersetzt.
+Impostazioni › Backup › Salva il backup ora crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.⏎⏎ ||| Einstellungen › Backup › Backup jetzt speichern erstellt eine .zip-Datei mit Erinnerungen, Dingen, Personen, Fotos und Einstellungen: Du kannst sie überschreiben, eine neue Version speichern oder teilen. Das automatische Backup aktualisiert sie zur gewählten Uhrzeit von selbst.⏎⏎
+Per ripristinare: Impostazioni › Backup › Ripristina un backup e scegli il file. I dati presenti vengono sostituiti.  ||| Zum Wiederherstellen: Einstellungen › Backup › Backup wiederherstellen und die Datei wählen. Die vorhandenen Daten werden ersetzt.
 Tieni il file in un posto sicuro (Drive, un computer): non è cifrato e chi lo ha può leggerne il contenuto.  ||| Bewahre die Datei sicher auf (Drive, ein Computer): Sie ist nicht verschlüsselt, und wer sie hat, kann sie lesen.
 Di ogni backup l'app tiene anche una copia di riserva sul telefono, per quando il file principale si rovina; anche la copia sparisce se disinstalli l'app. ||| Von jedem Backup behält die App zusätzlich eine Reservekopie auf dem Handy, falls die Hauptdatei beschädigt wird; auch die Kopie verschwindet, wenn du die App deinstallierst.
 Condivisione con un'altra persona ||| Teilen mit einer anderen Person
@@ -645,7 +645,7 @@ Quando spunti o modifichi una cosa di un'altra persona, nel file resta scritto c
 Informativa privacy ||| Datenschutzhinweis
 Remindella non chiede account, non ha accesso a Internet, non mostra pubblicità, non raccoglie statistiche e non invia i tuoi dati allo sviluppatore.  ||| Remindella verlangt kein Konto, hat keinen Internetzugriff, zeigt keine Werbung, sammelt keine Statistiken und sendet deine Daten nicht an den Entwickler.
 Solo quando lo chiedi tu: usa il microfono per «Scrivi al volo» a voce (l'audio lo trascrive il riconoscimento vocale del telefono, che può usare Internet secondo le sue regole; per «Scrivi al volo» Remindella non registra né salva l'audio; nelle note puoi registrare messaggi vocali, che restano solo sul telefono); usa la fotocamera per scattare foto da allegare o scansionare; legge il calendario del telefono per importare gli eventi; usa i servizi Google Play del telefono per leggere testi e codici dalle foto (l'elaborazione avviene sul telefono, ma i servizi Google possono inviare a Google dati tecnici secondo le loro condizioni); con la Condivisione scrive un file nel posto che scegli (es. Google Drive), gestito da quel servizio secondo le sue regole.⏎⏎ ||| Nur wenn du es willst: Sie nutzt das Mikrofon für die Schnelleingabe per Sprache (das Audio wandelt die Spracherkennung des Handys um, die nach ihren eigenen Regeln Internet nutzen kann; bei „Schnell notieren“ nimmt Remindella nichts auf und speichert kein Audio; in Notizen kannst du Sprachnachrichten aufnehmen, die nur auf dem Handy bleiben); sie nutzt die Kamera für Fotos zum Anhängen oder Scannen; sie liest den Kalender des Handys, um Termine zu importieren; sie nutzt die Google-Play-Dienste des Handys, um Text und Codes aus Fotos zu lesen (die Verarbeitung erfolgt auf dem Handy, Google-Dienste können aber technische Daten nach ihren Bedingungen an Google senden); beim Teilen schreibt sie eine Datei an den Ort deiner Wahl (z. B. Google Drive), den dieser Dienst nach seinen Regeln verwaltet.⏎⏎
-Puoi cancellare tutto da Impostazioni › Dati e backup › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| Du kannst alles über Einstellungen › Daten und Backup › Alle Daten löschen oder durch Deinstallieren der App entfernen. Fragen:
+Puoi cancellare tutto da Impostazioni › Dati › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| Du kannst alles über Einstellungen › Daten › Alle Daten löschen oder durch Deinstallieren der App entfernen. Fragen:
 Limitazione di responsabilità ||| Haftungsbeschränkung
 L'app è fornita gratuitamente «così com'è», senza garanzia che funzioni sempre e senza errori.  ||| Die App wird kostenlos „wie besehen“ bereitgestellt, ohne Gewähr, dass sie immer und fehlerfrei funktioniert.
 Nei limiti consentiti dalla legge, lo sviluppatore non risponde dei danni diretti o indiretti dovuti all'uso o al mancato funzionamento dell'app, come scadenze mancate, sanzioni, interessi di mora, appuntamenti persi o dati perduti.  ||| Soweit gesetzlich zulässig, haftet der Entwickler nicht für direkte oder indirekte Schäden durch die Nutzung oder das Nichtfunktionieren der App, etwa verpasste Fristen, Strafen, Verzugszinsen, versäumte Termine oder verlorene Daten.
@@ -1256,7 +1256,7 @@ I backup tornano nel file scelto o in Download/Remindella. ||| Backups gehen wie
 I tuoi dati sono sul telefono ||| Deine Daten sind auf dem Handy
 Il backup automatico parte da solo all'orario e con la frequenza che scegli nelle Impostazioni. Prima di un ripristino ti chiedo sempre conferma. ||| Das automatische Backup startet von selbst zu der Zeit und mit der Häufigkeit, die du in den Einstellungen wählst. Vor einer Wiederherstellung frage ich immer nach.
 Il mio consiglio ||| Mein Rat
-In Impostazioni › Dati e backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione. ||| Wähle in Einstellungen › Daten und Backup einen Ordner in Drive: Jedes Backup landet dort in einer Datei mit Datum, Kopien über die letzten 3 hinaus werden automatisch gelöscht. Wenn Drive nicht unter den Ordnern erscheint, nutze „Backup exportieren“ und wähle Drive als Ziel.
+In Impostazioni › Backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione. ||| Wähle in Einstellungen › Backup einen Ordner in Drive: Jedes Backup landet dort in einer Datei mit Datum, Kopien über die letzten 3 hinaus werden automatisch gelöscht. Wenn Drive nicht unter den Ordnern erscheint, nutze „Backup exportieren“ und wähle Drive als Ziel.
 Installa Remindella, apri Impostazioni › Importa backup e scegli l'ultimo file dalla cartella su Drive: ritrovi tutto com'era. ||| Installiere Remindella, öffne Einstellungen › Backup importieren und wähle die neueste Datei aus dem Drive-Ordner: Alles ist wieder wie vorher.
 Le copie sul telefono ||| Kopien auf dem Handy
 Le ultime 3 copie, sul telefono, con la data. Usale se il file di backup si rovina. ||| Die letzten 3 Kopien auf dem Handy, mit Datum. Nutze sie, wenn die Backup-Datei beschädigt ist.
@@ -1264,7 +1264,7 @@ Non riesco a scrivere in quella cartella. Prova con un'altra, oppure usa «Espor
 Ogni volta che fai un backup tengo sul telefono una copia di riserva con la data nel nome, le ultime 3. Servono se il file principale si rovina. ||| Bei jedem Backup behalte ich auf dem Handy eine Reservekopie mit Datum im Namen, die letzten 3. Sie helfen, wenn die Hauptdatei beschädigt wird.
 Quando parte ||| Wann es startet
 Remindella funziona senza account: promemoria, persone e cose stanno solo su questo telefono. Se lo perdi o lo cambi, senza un backup li perdi. ||| Remindella funktioniert ohne Konto: Erinnerungen, Personen und Dinge sind nur auf diesem Handy. Wenn du es verlierst oder wechselst, sind sie ohne Backup weg.
-Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Dati e backup. ||| Speichere das Backup in Drive (oder online): Wenn du dein Handy wechselst oder verlierst, ist alles wieder da. Mach es gleich unten oder später in Einstellungen › Daten und Backup.
+Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Backup. ||| Speichere das Backup in Drive (oder online): Wenn du dein Handy wechselst oder verlierst, ist alles wieder da. Mach es gleich unten oder später in Einstellungen › Backup.
 Salvale su Drive ||| Speichere sie in Drive
 Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per cambiare cartella. ||| Ich speichere hier jedes Backup mit Datum im Namen und behalte die letzten 3 Kopien. Tippe, um den Ordner zu ändern.
 Scegli quale ripristinare: ti chiedo conferma prima di sostituire i dati. ||| Wähle, welche wiederhergestellt wird: Ich frage nach, bevor ich die Daten ersetze.
@@ -1763,3 +1763,20 @@ Oggi hai %1$s cose. ||| Heute hast du %1$s Sachen.
 Oggi hai 1 cosa. ||| Heute hast du 1 Sache.
 Oggi niente in programma. ||| Heute nichts geplant.
 Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home. ||| Kacheln, um Wecker, Timer, Notizen, Karten und Tränke von der Startseite zu öffnen.
+Accendi solo quello che userai: il resto non compare nell'app. Potrai cambiare idea quando vuoi nelle Impostazioni. ||| Schalte nur ein, was du nutzen wirst: Der Rest erscheint nicht in der App. Du kannst es jederzeit in den Einstellungen ändern.
+Altro sul backup ||| Mehr zum Backup
+Cartella «%1$s» ||| Ordner „%1$s“
+File «%1$s» ||| Datei „%1$s“
+Il backup va qui ||| Das Backup kommt hierhin
+Importa da un calendario, cestino e pulizia ||| Aus einem Kalender importieren, Papierkorb und Aufräumen
+Non hai scelto dove salvarlo ||| Du hast noch nicht gewählt, wo es gespeichert wird
+Non l'hai ancora fatto ||| Noch nicht gemacht
+Per ora resta sul telefono, in Download/Remindella: se cambi telefono lo perdi. ||| Vorerst bleibt es auf dem Handy, in Download/Remindella: Wenn du das Handy wechselst, ist es weg.
+Ripristina un backup ||| Backup wiederherstellen
+Salva il backup ora ||| Backup jetzt speichern
+Scegli ||| Wählen
+Su %1$s ||| Auf %1$s
+Ti ricorda di bere acqua ||| Erinnert dich ans Wassertrinken
+Ultimo: %1$s ||| Zuletzt: %1$s
+questo telefono ||| diesem Handy
+Dati ||| Daten

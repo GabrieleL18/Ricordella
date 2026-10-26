@@ -936,7 +936,7 @@ Esportare e importare i dati ||| Exporting and importing your data
 Ho letto e accetto i termini d'uso, la limitazione di responsabilità e l'informativa privacy. ||| I have read and accept the terms of use, the limitation of liability and the privacy notice.
 I dati vivono solo sul telefono ||| Your data lives only on the phone
 Il riconoscimento automatico può sbagliare e le date calcolate dall'app (ricorrenze, feste, chilometri) vanno verificate con le fonti ufficiali. ||| Automatic recognition can make mistakes, and dates calculated by the app (recurrences, holidays, mileage) should be checked against official sources.
-Impostazioni › Dati e backup › Esporta backup crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.⏎⏎ ||| Settings › Data and backup › Export backup creates a .zip file with reminders, things, people, photos and settings: you can overwrite it, save a new version or share it. Automatic backup updates it by itself at the chosen time.⏎⏎
+Impostazioni › Backup › Salva il backup ora crea un file .zip con promemoria, cose, persone, foto e impostazioni: puoi sovrascriverlo, salvarne una nuova versione o condividerlo. Il backup automatico lo aggiorna da solo all'orario scelto.⏎⏎ ||| Settings › Backup › Save backup now creates a .zip file with reminders, things, people, photos and settings: you can overwrite it, save a new version or share it. Automatic backup updates it by itself at the chosen time.⏎⏎
 Informativa privacy ||| Privacy notice
 L'app è fornita gratuitamente «così com'è», senza garanzia che funzioni sempre e senza errori.  ||| The app is provided free of charge "as is", with no guarantee that it always works or is free of errors. 
 Le informazioni le controlli tu ||| You check the information
@@ -947,10 +947,10 @@ Non accetto ||| I don't accept
 Non ancora accettati. ||| Not accepted yet.
 Non ci sono account né copie sul cloud, e i dati sono esclusi dal backup automatico di Android.  ||| There are no accounts or cloud copies, and the data is excluded from Android's automatic backup. 
 Per le scadenze importanti (pagamenti, documenti, visite, farmaci) non affidarti soltanto all'app. ||| For important deadlines (payments, documents, appointments, medicines) don't rely on the app alone.
-Per ripristinare: Impostazioni › Dati e backup › Importa backup e scegli il file. I dati presenti vengono sostituiti.  ||| To restore: Settings › Data and backup › Import backup and pick the file. The current data is replaced. 
+Per ripristinare: Impostazioni › Backup › Ripristina un backup e scegli il file. I dati presenti vengono sostituiti.  ||| To restore: Settings › Backup › Restore a backup and pick the file. The current data is replaced. 
 Per usare Remindella devi accettare i termini. Puoi rileggerli con calma o chiudere l'app. ||| To use Remindella you need to accept the terms. You can read them again calmly or close the app.
 Prima di iniziare, leggi come funziona e cosa può e non può fare l'app. ||| Before you start, read how it works and what the app can and can't do.
-Puoi cancellare tutto da Impostazioni › Dati e backup › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| You can erase everything from Settings › Data and backup › Delete all data or by uninstalling the app. Questions: 
+Puoi cancellare tutto da Impostazioni › Dati › Elimina tutti i dati o disinstallando l'app. Per domande:  ||| You can erase everything from Settings › Data › Delete all data or by uninstalling the app. Questions: 
 Puoi usarla per scopi personali e familiari; non usarla per attività illecite né per conservare dati di altre persone senza averne il diritto. ||| You may use it for personal and family purposes; don't use it for unlawful activities or to store other people's data without the right to do so.
 Questi termini possono cambiare: in quel caso l'app te li riproporrà da accettare.  ||| These terms may change: if they do, the app will ask you to accept them again. 
 Remindella non chiede account, non ha accesso a Internet, non mostra pubblicità, non raccoglie statistiche e non invia i tuoi dati allo sviluppatore.  ||| Remindella requires no account, has no Internet access, shows no ads, collects no statistics and doesn't send your data to the developer. 
@@ -1331,7 +1331,7 @@ I backup tornano nel file scelto o in Download/Remindella. ||| Backups go back t
 I tuoi dati sono sul telefono ||| Your data is on the phone
 Il backup automatico parte da solo all'orario e con la frequenza che scegli nelle Impostazioni. Prima di un ripristino ti chiedo sempre conferma. ||| The automatic backup runs by itself at the time and frequency you choose in Settings. Before a restore I always ask for confirmation.
 Il mio consiglio ||| My advice
-In Impostazioni › Dati e backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione. ||| In Settings › Data and backup choose a folder on Drive: each backup goes there in a dated file and copies beyond the last 3 are deleted automatically. If Drive doesn't appear among the folders, use "Export backup" and choose Drive as the destination.
+In Impostazioni › Backup scegli una cartella su Drive: ogni backup finisce lì in un file con la data e le copie oltre le ultime 3 si cancellano da sole. Se Drive non compare tra le cartelle, usa «Esporta backup» e scegli Drive come destinazione. ||| In Settings › Backup choose a folder on Drive: each backup goes there in a dated file and copies beyond the last 3 are deleted automatically. If Drive doesn't appear among the folders, use "Export backup" and choose Drive as the destination.
 Installa Remindella, apri Impostazioni › Importa backup e scegli l'ultimo file dalla cartella su Drive: ritrovi tutto com'era. ||| Install Remindella, open Settings › Import backup and pick the latest file from the Drive folder: you'll find everything as it was.
 Le copie sul telefono ||| Copies on the phone
 Le ultime 3 copie, sul telefono, con la data. Usale se il file di backup si rovina. ||| The last 3 copies, on the phone, with the date. Use them if the backup file gets damaged.
@@ -1339,7 +1339,7 @@ Non riesco a scrivere in quella cartella. Prova con un'altra, oppure usa «Espor
 Ogni volta che fai un backup tengo sul telefono una copia di riserva con la data nel nome, le ultime 3. Servono se il file principale si rovina. ||| Every time you back up I keep a reserve copy on the phone with the date in its name, the last 3. They're useful if the main file gets damaged.
 Quando parte ||| When it runs
 Remindella funziona senza account: promemoria, persone e cose stanno solo su questo telefono. Se lo perdi o lo cambi, senza un backup li perdi. ||| Remindella works without an account: reminders, people and things are only on this phone. If you lose or change it, without a backup you lose them.
-Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Dati e backup. ||| Save the backup on Drive (or online): if you change or lose your phone you'll find everything. Do it right below, or later in Settings › Data and backup.
+Salva il backup su Drive (o online): se cambi o perdi il telefono ritrovi tutto. Lo fai subito qui sotto, oppure dopo in Impostazioni › Backup. ||| Save the backup on Drive (or online): if you change or lose your phone you'll find everything. Do it right below, or later in Settings › Backup.
 Salvale su Drive ||| Save them on Drive
 Salvo qui ogni backup con la data nel nome e tengo le ultime 3 copie. Tocca per cambiare cartella. ||| I save every backup here with the date in its name and keep the last 3 copies. Tap to change folder.
 Scegli quale ripristinare: ti chiedo conferma prima di sostituire i dati. ||| Choose which one to restore: I'll ask for confirmation before replacing the data.
@@ -1838,3 +1838,19 @@ Oggi hai %1$s cose. ||| You have %1$s things today.
 Oggi hai 1 cosa. ||| You have 1 thing today.
 Oggi niente in programma. ||| Nothing planned today.
 Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home. ||| Tiles to open Alarms, Timers, Notes, Cards and Potions from Home.
+Accendi solo quello che userai: il resto non compare nell'app. Potrai cambiare idea quando vuoi nelle Impostazioni. ||| Turn on only what you'll use: the rest won't appear in the app. You can change your mind anytime in Settings.
+Altro sul backup ||| More about backup
+Cartella «%1$s» ||| Folder “%1$s”
+File «%1$s» ||| File “%1$s”
+Il backup va qui ||| Backups go here
+Importa da un calendario, cestino e pulizia ||| Import from a calendar, trash and cleanup
+Non hai scelto dove salvarlo ||| You haven't chosen where to save it
+Non l'hai ancora fatto ||| Not done yet
+Per ora resta sul telefono, in Download/Remindella: se cambi telefono lo perdi. ||| For now it stays on the phone, in Download/Remindella: if you change phone you lose it.
+Ripristina un backup ||| Restore a backup
+Salva il backup ora ||| Save backup now
+Scegli ||| Choose
+Su %1$s ||| On %1$s
+Ti ricorda di bere acqua ||| Reminds you to drink water
+Ultimo: %1$s ||| Last: %1$s
+questo telefono ||| this phone
