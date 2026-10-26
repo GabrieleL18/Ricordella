@@ -1826,3 +1826,7 @@ Domenica alle 19 ti dico cosa arriva la settimana dopo. ||| On Sunday at 7 pm I 
 La prossima settimana: 1 cosa ||| Next week: 1 thing
 La prossima settimana: %1$s cose ||| Next week: %1$s things
 e altre %1$s ||| and %1$s more
+Già passati ||| Already past
+Non avvisarmi ||| Don't notify me
+Più avanti ||| Later
+Prossimi 7 giorni ||| Next 7 days

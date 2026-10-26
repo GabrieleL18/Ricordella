@@ -1754,4 +1754,8 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "La prossima settimana: 1 cosa" to "Nächste Woche: 1 Sache",
     "La prossima settimana: %1\$s cose" to "Nächste Woche: %1\$s Sachen",
     "e altre %1\$s" to "und %1\$s weitere",
+    "Già passati" to "Schon vorbei",
+    "Non avvisarmi" to "Nicht benachrichtigen",
+    "Più avanti" to "Später",
+    "Prossimi 7 giorni" to "Nächste 7 Tage",
 )

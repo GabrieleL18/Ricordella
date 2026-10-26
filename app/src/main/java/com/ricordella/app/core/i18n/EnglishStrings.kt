@@ -1786,4 +1786,8 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "La prossima settimana: 1 cosa" to "Next week: 1 thing",
     "La prossima settimana: %1\$s cose" to "Next week: %1\$s things",
     "e altre %1\$s" to "and %1\$s more",
+    "Già passati" to "Already past",
+    "Non avvisarmi" to "Don't notify me",
+    "Più avanti" to "Later",
+    "Prossimi 7 giorni" to "Next 7 days",
 )

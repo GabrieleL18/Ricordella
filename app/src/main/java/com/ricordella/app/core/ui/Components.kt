@@ -344,6 +344,7 @@ fun <T> DropdownField(
     optionLabel: (T) -> String,
     onSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
+    optionIcon: ((T) -> ImageVector)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }, modifier = modifier) {
@@ -352,6 +353,7 @@ fun <T> DropdownField(
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
+            leadingIcon = optionIcon?.let { icon -> { Icon(icon(selected), contentDescription = null) } },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -361,6 +363,7 @@ fun <T> DropdownField(
             options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(optionLabel(option)) },
+                    leadingIcon = optionIcon?.let { icon -> { Icon(icon(option), contentDescription = null) } },
                     onClick = {
                         onSelected(option)
                         expanded = false

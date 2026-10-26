@@ -20,7 +20,11 @@ import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.SortByAlpha
 import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material.icons.rounded.History
+import com.ricordella.app.core.ui.SectionHeader
+import com.ricordella.app.domain.date.ReminderTimeline
+import com.ricordella.app.domain.model.Reminder
+import java.time.LocalDateTime
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import com.ricordella.app.core.ui.HappyWizard
@@ -181,7 +185,14 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             item(key = "search") {
-                SearchField(value = state.query, onValueChange = viewModel::onQueryChange, placeholder = tr("Cerca promemoria, cose, persone"))
+                // I filtri stanno nella barra di ricerca: una riga in meno prima dei promemoria.
+                SearchField(value = state.query, onValueChange = viewModel::onQueryChange, placeholder = tr("Cerca promemoria, cose, persone"), extraTrailing = {
+                    IconButton(onClick = { showFilters = true }) {
+                        BadgedBox(badge = { if (state.filter.activeCount > 0) Badge { Text("${state.filter.activeCount}") } }) {
+                            Icon(Icons.Rounded.Tune, contentDescription = tr("Filtri e ordine"))
+                        }
+                    }
+                })
             }
             item(key = "scope") {
                 IconChipRow {
@@ -190,8 +201,8 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     }
                 }
             }
-            item(key = "active-filters") {
-                ActiveFilters(state, viewModel, onOpen = { showFilters = true })
+            if (state.filter.activeCount > 0 || state.filter.sortOrder != ReminderSortOrder.DATE_ASC) {
+                item(key = "active-filters") { ActiveFilters(state, viewModel) }
             }
             if (!state.isLoading && state.reminders.isEmpty()) {
                 item(key = "empty") {
@@ -207,18 +218,27 @@ fun ReminderListScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     )
                 }
             }
-            items(state.reminders, key = { it.reminder.id }) { entry ->
-                ReminderCard(
-                    entry = entry,
-                    now = state.now,
-                    onClick = { navigator.openReminder(entry.reminder.id) },
-                    onToggleComplete = {
-                        viewModel.onToggleComplete(entry)
-                        if (entry.reminder.status == ReminderStatus.ACTIVE) scope.launch { snackbar.offerReopen(entry) { viewModel.onReopen(entry.reminder.id) } }
-                    },
-                    occurrenceDate = state.occurrenceDates[entry.reminder.id] ?: entry.reminder.dueDate,
-                    modifier = Modifier.animateItem(),
-                )
+            // In ordine di data la lista si divide per tempo (Scaduti, Oggi, Domani...); con altri ordini o un periodo resta unica.
+            val grouped = state.filter.sortOrder == ReminderSortOrder.DATE_ASC && state.filter.period.kind == PeriodKind.ALL &&
+                state.filter.scope != ReminderListScope.COMPLETED
+            val groups = if (grouped) state.reminders.groupBy { listGroup(it.reminder, state.now) }.toSortedMap() else sortedMapOf(ListGroup.NONE to state.reminders)
+            groups.forEach { (group, entries) ->
+                if (group != ListGroup.NONE) item(key = "group-${group.name}") {
+                    SectionHeader(trf("%1\$s · %2\$s", group.label, entries.size), Modifier.animateItem(), icon = group.icon, tone = group.tone())
+                }
+                items(entries, key = { it.reminder.id }) { entry ->
+                    ReminderCard(
+                        entry = entry,
+                        now = state.now,
+                        onClick = { navigator.openReminder(entry.reminder.id) },
+                        onToggleComplete = {
+                            viewModel.onToggleComplete(entry)
+                            if (entry.reminder.status == ReminderStatus.ACTIVE) scope.launch { snackbar.offerReopen(entry) { viewModel.onReopen(entry.reminder.id) } }
+                        },
+                        occurrenceDate = state.occurrenceDates[entry.reminder.id] ?: entry.reminder.dueDate,
+                        modifier = Modifier.animateItem(),
+                    )
+                }
             }
         }
     }
@@ -269,20 +289,66 @@ private fun PeriodFilter(period: ReminderPeriod, viewModel: ReminderListViewMode
 private val ReminderFilter.activeCount: Int
     get() = listOfNotNull(personId, itemId, category, type, priority).size + if (period.kind != PeriodKind.ALL) 1 else 0
 
+/** Gruppi della lista in ordine di data: si mostrano in quest'ordine. */
+internal enum class ListGroup { OVERDUE, TODAY, TOMORROW, WEEK, LATER, PAST, DONE, NONE }
+
+/** In che gruppo cade un promemoria adesso. Le feste passate (che non scadono) vanno in "Già passati". */
+internal fun listGroup(reminder: Reminder, now: LocalDateTime): ListGroup {
+    val today = now.toLocalDate()
+    val days = ReminderTimeline.daysUntil(reminder.dueDate, today)
+    return when {
+        reminder.status != ReminderStatus.ACTIVE -> ListGroup.DONE
+        ReminderTimeline.isOverdue(reminder, now) -> ListGroup.OVERDUE
+        ReminderTimeline.isOngoing(reminder, today) -> ListGroup.TODAY
+        days < 0 -> ListGroup.PAST
+        days == 1L -> ListGroup.TOMORROW
+        days <= ReminderTimeline.NEXT_DAYS_LIMIT -> ListGroup.WEEK
+        else -> ListGroup.LATER
+    }
+}
+
+private val ListGroup.label: String
+    get() = when (this) {
+        ListGroup.OVERDUE -> tr("Scaduti")
+        ListGroup.TODAY -> tr("Oggi")
+        ListGroup.TOMORROW -> tr("Domani")
+        ListGroup.WEEK -> tr("Prossimi 7 giorni")
+        ListGroup.LATER -> tr("Più avanti")
+        ListGroup.PAST -> tr("Già passati")
+        ListGroup.DONE, ListGroup.NONE -> tr("Completati")
+    }
+
+private val ListGroup.icon: ImageVector
+    get() = when (this) {
+        ListGroup.OVERDUE -> Icons.Rounded.Whatshot
+        ListGroup.TODAY -> Icons.Rounded.WbSunny
+        ListGroup.TOMORROW, ListGroup.WEEK -> Icons.Rounded.Upcoming
+        ListGroup.LATER -> Icons.Rounded.CalendarMonth
+        ListGroup.PAST -> Icons.Rounded.History
+        ListGroup.DONE, ListGroup.NONE -> Icons.Rounded.TaskAlt
+    }
+
+@Composable
+private fun ListGroup.tone(): Tone = with(MaterialTheme.ricordellaColors) {
+    when (this@tone) {
+        ListGroup.OVERDUE -> coral
+        ListGroup.TODAY -> pear
+        ListGroup.TOMORROW, ListGroup.WEEK -> lavender
+        ListGroup.LATER, ListGroup.PAST -> cyan
+        ListGroup.DONE, ListGroup.NONE -> mint
+    }
+}
+
 /**
- * Riga sotto lo stato: il pulsante "Filtri" (con il numero di quelli attivi) e ogni filtro
- * attivo come pillola con la X per toglierlo. Così si vede sempre cosa si sta guardando.
+ * Riga sotto lo stato, solo se c'è qualche filtro: ogni filtro attivo come pillola con la X per toglierlo.
+ * Così si vede sempre cosa si sta guardando. I filtri si aprono dall'icona nella ricerca.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActiveFilters(state: ReminderListUiState, viewModel: ReminderListViewModel, onOpen: () -> Unit) {
+private fun ActiveFilters(state: ReminderListUiState, viewModel: ReminderListViewModel) {
     val filter = state.filter
     val colors = MaterialTheme.ricordellaColors
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), itemVerticalAlignment = Alignment.CenterVertically) {
-        FilledTonalButton(onClick = onOpen) {
-            Icon(Icons.Rounded.Tune, contentDescription = null, modifier = Modifier.size(18.dp))
-            Text(if (filter.activeCount == 0) tr("Filtri e ordine") else trf("Filtri · %1\$s", filter.activeCount), modifier = Modifier.padding(start = 6.dp))
-        }
         if (filter.period.kind != PeriodKind.ALL) {
             val label = if (filter.period.kind == PeriodKind.YEAR) trf("Anno %1\$s", filter.period.anchor.year) else DateTexts.monthTitle(YearMonth.from(filter.period.anchor))
             RemovableFilter(label, Icons.Rounded.CalendarMonth, colors.lavender) { viewModel.onPeriodKind(PeriodKind.ALL) }

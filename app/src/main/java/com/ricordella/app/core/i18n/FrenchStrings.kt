@@ -1754,4 +1754,8 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "La prossima settimana: 1 cosa" to "La semaine prochaine : 1 chose",
     "La prossima settimana: %1\$s cose" to "La semaine prochaine : %1\$s choses",
     "e altre %1\$s" to "et %1\$s autres",
+    "Già passati" to "Déjà passés",
+    "Non avvisarmi" to "Ne pas me prévenir",
+    "Più avanti" to "Plus tard",
+    "Prossimi 7 giorni" to "7 prochains jours",
 )

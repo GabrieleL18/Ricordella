@@ -1,6 +1,5 @@
 package com.ricordella.app.feature.reminders
 
-import androidx.compose.foundation.horizontalScroll
 import com.ricordella.app.domain.model.MoneyKind
 import com.ricordella.app.domain.model.Person
 import com.ricordella.app.feature.items.parseCents
@@ -35,10 +34,8 @@ import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.FilterChipDefaults
 import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.core.ui.icon
-import com.ricordella.app.core.ui.tone
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.HorizontalDivider
@@ -131,15 +128,15 @@ fun ReminderEditScreen(onBack: () -> Unit) {
                 .padding(horizontal = RicordellaDimensions.screenPadding, vertical = RicordellaDimensions.spaceS),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
         ) {
-            TypeChooser(form.type, viewModel::onTypeChange)
-            BasicFields(form, people, viewModel::update, viewModel::onMoneyKind)
+            // In vista solo l'essenziale: cosa, quando, ogni quanto, quando avvisare. Il resto sta in "Altre opzioni".
+            BasicFields(form, people, viewModel::update, viewModel::onMoneyKind, viewModel::onTypeChange)
             if (form.type == ReminderType.VACATION) {
                 TripFields(form.trip, onChange = { trip -> viewModel.update { it.copy(trip = trip) } })
             }
-            val settings = com.ricordella.app.core.ui.LocalAppSettings.current
-            if (!form.isAlarm && !form.isPayment && (form.appointment != null || settings.shows(com.ricordella.app.domain.model.AppSection.APPOINTMENTS))) {
-                AppointmentFields(form.appointment, onChange = { info -> viewModel.update { it.copy(appointment = info) } })
-            }
+            // Per le sveglie la ripetizione si sceglie coi giorni; per i pagamenti sta nella loro sezione.
+            if (!form.isAlarm && !form.isPayment) RecurrenceFields(form, viewModel::update)
+            // La sveglia suona sempre all'orario: niente da scegliere.
+            if (!form.isAlarm) NotifyField(form, viewModel::update)
             TextButton(onClick = { viewModel.update { it.copy(showAdvanced = !it.showAdvanced) } }) {
                 Icon(if (form.showAdvanced) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null)
                 Text(if (form.showAdvanced) tr("Nascondi opzioni") else tr("Altre opzioni"), modifier = Modifier.padding(start = 8.dp))
@@ -158,27 +155,33 @@ fun ReminderEditScreen(onBack: () -> Unit) {
     }
 }
 
-/** Il tipo si sceglie per primo, in una sola riga che scorre. */
+/** Il tipo arriva già dal "+": qui è una tendina, per cambiarlo se serve. */
 @Composable
-private fun TypeChooser(current: ReminderType, onChange: (ReminderType) -> Unit) {
-    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS)) {
-        val settings = com.ricordella.app.core.ui.LocalAppSettings.current
-        // Il tipo attuale resta sempre, anche se la sua sezione è spenta.
-        ReminderType.entries.filter { it == current || (it != ReminderType.ALARM && optionalSection(it)?.let(settings::shows) != false) }.forEach { type ->
-            val tone = type.tone
-            FilterChip(
-                selected = current == type,
-                onClick = { onChange(type) },
-                label = { Text(type.label) },
-                leadingIcon = { Icon(type.icon, contentDescription = null, modifier = Modifier.size(18.dp)) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = tone.container,
-                    selectedLabelColor = tone.content,
-                    selectedLeadingIconColor = tone.content,
-                ),
-            )
-        }
-    }
+private fun TypePicker(current: ReminderType, onChange: (ReminderType) -> Unit) {
+    val settings = com.ricordella.app.core.ui.LocalAppSettings.current
+    // Il tipo attuale resta sempre, anche se la sua sezione è spenta.
+    DropdownField(
+        label = tr("Tipo"),
+        options = ReminderType.entries.filter { it == current || (it != ReminderType.ALARM && optionalSection(it)?.let(settings::shows) != false) },
+        selected = current,
+        optionLabel = { it.label },
+        optionIcon = { it.icon },
+        onSelected = onChange,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+/** Quando avvisare, in una sola tendina: "Non avvisarmi" spegne la notifica. */
+@Composable
+private fun NotifyField(form: ReminderForm, update: ((ReminderForm) -> ReminderForm) -> Unit) {
+    DropdownField(
+        label = tr("Avvisami"),
+        options = listOf<Int?>(null) + (NotifyOffsetPresets + form.notifyOffsetMinutes).distinct().sorted(),
+        selected = form.notifyOffsetMinutes.takeIf { form.notificationsEnabled },
+        optionLabel = { it?.let(::notifyOffsetLabel) ?: tr("Non avvisarmi") },
+        onSelected = { value -> update { it.copy(notificationsEnabled = value != null, notifyOffsetMinutes = value ?: it.notifyOffsetMinutes) } },
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -187,6 +190,7 @@ private fun BasicFields(
     people: List<Person>,
     update: ((ReminderForm) -> ReminderForm) -> Unit,
     onMoneyKind: (MoneyKind) -> Unit,
+    onTypeChange: (ReminderType) -> Unit,
 ) {
     OutlinedTextField(
         value = form.title,
@@ -220,6 +224,10 @@ private fun BasicFields(
     if (form.timeError) {
         Text(tr("La sveglia ha bisogno di un orario."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
     }
+    if (form.time == null && !form.isAlarm) {
+        Text(tr("Senza orario il promemoria vale per tutto il giorno."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+    TypePicker(form.type, onTypeChange)
     if (form.isAlarm) {
         AlarmFields(form, update)
         PeopleChooser(tr("Per chi suona *"), people, form.personIds, form.personError) { ids -> update { it.copy(personIds = ids) } }
@@ -259,9 +267,6 @@ private fun BasicFields(
     if (form.endDateError) {
         Text(tr("L'ultimo giorno deve venire dopo il primo."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
     }
-    if (form.time == null && !form.isAlarm) {
-        Text(tr("Senza orario il promemoria vale per tutto il giorno."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
 }
 
 /** Persone da scegliere con un tocco (chip): sempre visibili nei moduli dove una persona è obbligatoria. */
@@ -290,10 +295,9 @@ private fun AdvancedFields(form: ReminderForm, people: List<Person>, viewModel: 
     var showPeoplePicker by rememberSaveable { mutableStateOf(false) }
     var showItemPicker by rememberSaveable { mutableStateOf(false) }
 
-    // Per le sveglie la ripetizione si sceglie coi giorni; per i pagamenti sta nella loro sezione.
-    if (!form.isAlarm && !form.isPayment) {
-        SectionHeader(tr("Ricorrenza"))
-        RecurrenceFields(form, update)
+    val settings = com.ricordella.app.core.ui.LocalAppSettings.current
+    if (!form.isAlarm && !form.isPayment && (form.appointment != null || settings.shows(com.ricordella.app.domain.model.AppSection.APPOINTMENTS))) {
+        AppointmentFields(form.appointment, onChange = { info -> update { it.copy(appointment = info) } })
     }
 
     SectionHeader(tr("Priorità"))
@@ -355,22 +359,6 @@ private fun AdvancedFields(form: ReminderForm, people: List<Person>, viewModel: 
                 modifier = Modifier.weight(1f),
             )
         }
-    }
-
-    SectionHeader(tr("Notifica"))
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(tr("Avvisami"), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-        Switch(checked = form.notificationsEnabled, onCheckedChange = { value -> update { it.copy(notificationsEnabled = value) } })
-    }
-    if (form.notificationsEnabled) {
-        val offsets = (NotifyOffsetPresets + form.notifyOffsetMinutes).distinct().sorted()
-        DropdownField(
-            label = tr("Quando"),
-            options = offsets,
-            selected = form.notifyOffsetMinutes,
-            optionLabel = ::notifyOffsetLabel,
-            onSelected = { value -> update { it.copy(notifyOffsetMinutes = value) } },
-        )
     }
 
     HorizontalDivider(Modifier.padding(vertical = RicordellaDimensions.spaceS))

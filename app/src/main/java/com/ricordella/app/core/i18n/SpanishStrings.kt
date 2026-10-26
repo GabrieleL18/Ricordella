@@ -1754,4 +1754,8 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "La prossima settimana: 1 cosa" to "La próxima semana: 1 cosa",
     "La prossima settimana: %1\$s cose" to "La próxima semana: %1\$s cosas",
     "e altre %1\$s" to "y %1\$s más",
+    "Già passati" to "Ya pasados",
+    "Non avvisarmi" to "No avisarme",
+    "Più avanti" to "Más adelante",
+    "Prossimi 7 giorni" to "Próximos 7 días",
 )

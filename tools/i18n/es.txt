@@ -1751,3 +1751,7 @@ Domenica alle 19 ti dico cosa arriva la settimana dopo. ||| El domingo a las 19 
 La prossima settimana: 1 cosa ||| La próxima semana: 1 cosa
 La prossima settimana: %1$s cose ||| La próxima semana: %1$s cosas
 e altre %1$s ||| y %1$s más
+Già passati ||| Ya pasados
+Non avvisarmi ||| No avisarme
+Più avanti ||| Más adelante
+Prossimi 7 giorni ||| Próximos 7 días
