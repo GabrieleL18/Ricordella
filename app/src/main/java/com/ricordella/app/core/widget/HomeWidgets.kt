@@ -246,7 +246,7 @@ class TimerWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        private const val REQUEST_OPEN = 2_400
+        private const val REQUEST_OPEN = 2_600
 
         fun requestUpdate(context: Context) = requestUpdate(context, TimerWidgetProvider::class.java)
     }
@@ -512,7 +512,7 @@ class AgendaWidgetProvider : AppWidgetProvider() {
         private const val ACTION_NEXT = "com.ricordella.app.widget.AGENDA_NEXT"
         private const val ACTION_TODAY = "com.ricordella.app.widget.AGENDA_TODAY"
         private const val ACTION_TOGGLE = "com.ricordella.app.widget.AGENDA_TOGGLE"
-        private const val REQUEST_OPEN = 2_300
+        private const val REQUEST_OPEN = 2_700
         const val PREFS = "agenda_widget"
         const val KEY_OFFSET = "day_offset"
 

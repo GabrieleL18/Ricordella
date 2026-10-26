@@ -36,7 +36,10 @@ class AppNavigator(private val navController: NavController) {
     fun editAlarm(id: String) = navController.navigate(AlarmEditRoute(id)) { launchSingleTop = true }
     fun openAlarms() = navController.navigate(AlarmsRoute) { launchSingleTop = true }
     fun openTimers() = navController.navigate(TimersRoute) { launchSingleTop = true }
-    fun openCards(open: String? = null, link: String? = null) = navController.navigate(CardsRoute(open, link)) { launchSingleTop = true }
+    // Con una carta da mostrare (widget) o da importare si riapre una schermata nuova: quella già aperta li ignorerebbe.
+    fun openCards(open: String? = null, link: String? = null) = navController.navigate(CardsRoute(open, link)) {
+        if (open == null && link == null) launchSingleTop = true else popUpTo<CardsRoute> { inclusive = true }
+    }
     fun openNotes() = navController.navigate(NotesRoute) { launchSingleTop = true }
     fun openNote(id: String) = navController.navigate(NoteRoute(id)) { launchSingleTop = true }
     fun newNote(list: Boolean = false, prices: Boolean = false, drawing: Boolean = false) =

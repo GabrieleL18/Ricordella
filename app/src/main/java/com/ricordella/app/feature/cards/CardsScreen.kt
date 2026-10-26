@@ -42,6 +42,8 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.CreditCard
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.PictureAsPdf
@@ -127,8 +129,8 @@ internal fun AppSettings.cardColor(category: String): Long {
     return cardColors[category] ?: CalendarPalette[(categories.indexOf(category).takeIf { it >= 0 } ?: categories.size) % CalendarPalette.size]
 }
 
-/** Oltre questo numero di carte, una categoria mostra le prime e un "Mostra altre". */
-private const val COLLAPSED_COUNT = 3
+/** Oltre questo numero di carte, una categoria mostra le prime e un "Mostra altre" (a blocchi 4, per non lasciare un posto vuoto). */
+private fun collapsedCount(grid: Boolean) = if (grid) 4 else 3
 
 /** Un gruppo dell'elenco: le preferite, una categoria o le carte senza categoria. */
 private data class CardGroup(val key: String, val title: String, val color: Long?, val favorites: Boolean, val cards: List<LoyaltyCard>)
@@ -448,9 +450,10 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                     groups.forEach { group ->
                         if (group.title.isNotEmpty()) item(key = "h/${group.key}") { GroupHeader(group) }
                         // Una sola carta in più non vale un "Mostra altre": si ripiega solo se ne restano almeno due. Cercando, si vede tutto.
-                        val collapsible = group.cards.size > COLLAPSED_COUNT + 1 && !searching
+                        val collapsed = collapsedCount(settings.cardsGrid)
+                        val collapsible = group.cards.size > collapsed + 1 && !searching
                         val open = !collapsible || group.key in expanded
-                        val visible = if (open) group.cards else group.cards.take(COLLAPSED_COUNT)
+                        val visible = if (open) group.cards else group.cards.take(collapsed)
                         // A blocchi: due carte per riga (l'ultima, se dispari, lascia il posto vuoto).
                         (if (settings.cardsGrid) visible.chunked(2) else visible.map { listOf(it) }).forEach { line ->
                             item(key = "c/${line.first().id}") {
@@ -465,8 +468,8 @@ fun CardsScreen(onBack: () -> Unit, openId: String? = null, importLink: String? 
                             }
                         }
                         if (collapsible) item(key = "m/${group.key}") {
-                            TextButton(onClick = { expanded = if (open) expanded - group.key else expanded + group.key }) {
-                                Text(if (open) tr("Mostra meno") else trf("Mostra altre %1\$s", group.cards.size - COLLAPSED_COUNT))
+                            MoreCardsButton(open, group.cards.size - collapsed, cardTone(group.color)) {
+                                expanded = if (open) expanded - group.key else expanded + group.key
                             }
                         }
                     }
@@ -625,7 +628,34 @@ private fun GroupHeader(group: CardGroup) {
         if (group.favorites) Icon(Icons.Rounded.Star, contentDescription = null, tint = MaterialTheme.ricordellaColors.pear.solid, modifier = Modifier.size(16.dp))
         else Box(Modifier.size(12.dp).background(group.color?.let(::Color) ?: MaterialTheme.ricordellaColors.lavender.solid, CircleShape))
         Text(group.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("${group.cards.size}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            if (group.cards.size == 1) tr("1 carta") else trf("%1\$s carte", group.cards.size),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** "Mostra altre N carte" largo quanto l'elenco e del colore della categoria, così si vede che il gruppo continua. */
+@Composable
+private fun MoreCardsButton(open: Boolean, hidden: Int, tone: Tone, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(tone.container)
+            .clickable(onClick = onClick)
+            .padding(vertical = RicordellaDimensions.spaceM),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(if (open) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, contentDescription = null, tint = tone.content)
+        Text(
+            if (open) tr("Mostra meno") else trf("Mostra altre %1\$s carte", hidden),
+            style = MaterialTheme.typography.labelLarge,
+            color = tone.content,
+            modifier = Modifier.padding(start = 6.dp),
+        )
     }
 }
 

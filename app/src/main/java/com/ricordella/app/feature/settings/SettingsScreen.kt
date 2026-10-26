@@ -97,7 +97,14 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Upload
+import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.widget.Toast
+import androidx.compose.material3.Slider
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -308,6 +315,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 NotificationPermissionRow(onChanged = viewModel::onNotificationSettingsChanged)
                 ExactAlarmRow(onChanged = viewModel::onNotificationSettingsChanged)
                 com.ricordella.app.core.ui.NotificationHealthRows()
+                NotificationVolumeRow()
                 SettingRow(
                     icon = Icons.AutoMirrored.Rounded.VolumeUp,
                     title = tr("Suono e vibrazione"),
@@ -768,6 +776,59 @@ private fun ExactAlarmRow(onChanged: () -> Unit) {
             )
         },
     )
+}
+
+/**
+ * Volume delle notifiche: è quello del telefono (Android non dà un volume a parte ai canali di un'app),
+ * qui a portata di mano; lasciando il cursore si sente il suono dei promemoria a quel volume.
+ */
+@Composable
+private fun NotificationVolumeRow() {
+    val context = LocalContext.current
+    val audio = remember { context.getSystemService(AudioManager::class.java) }
+    val stream = AudioManager.STREAM_NOTIFICATION
+    val min = audio.getStreamMinVolume(stream)
+    val max = audio.getStreamMaxVolume(stream)
+    var level by remember { mutableFloatStateOf(audio.getStreamVolume(stream).toFloat()) }
+    // Può cambiare anche dai tasti laterali mentre si è fuori dall'app.
+    LifecycleResumeEffect(Unit) {
+        level = audio.getStreamVolume(stream).toFloat()
+        onPauseOrDispose { }
+    }
+    ListItem(
+        headlineContent = { Text(tr("Volume notifiche")) },
+        supportingContent = {
+            Column {
+                Text(tr("È il volume delle notifiche del telefono. Lascia il cursore per sentire il suono."))
+                Slider(
+                    value = level,
+                    onValueChange = { level = it },
+                    valueRange = min.toFloat()..max.toFloat(),
+                    steps = (max - min - 1).coerceAtLeast(0),
+                    enabled = !audio.isVolumeFixed && max > min,
+                    onValueChangeFinished = {
+                        // Con "Non disturbare" il sistema può rifiutare il cambio: si avvisa invece di chiudere l'app.
+                        runCatching { audio.setStreamVolume(stream, Math.round(level), 0) }
+                            .onFailure { Toast.makeText(context, tr("Il telefono non permette di cambiarlo adesso: forse è attivo \"Non disturbare\"."), Toast.LENGTH_LONG).show() }
+                        level = audio.getStreamVolume(stream).toFloat()
+                        playNotificationSound(context, audio)
+                    },
+                )
+            }
+        },
+        leadingContent = {
+            Icon(if (level > min) Icons.AutoMirrored.Rounded.VolumeUp else Icons.AutoMirrored.Rounded.VolumeOff, contentDescription = null)
+        },
+    )
+}
+
+/** Il suono dei promemoria, sullo stesso flusso delle notifiche. */
+private fun playNotificationSound(context: Context, audio: AudioManager) {
+    val attributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+    MediaPlayer.create(context, com.ricordella.app.R.raw.notification_magic, attributes, audio.generateAudioSessionId())?.apply {
+        setOnCompletionListener { it.release() }
+        start()
+    }
 }
 
 private fun openChannelSettings(context: Context) {
