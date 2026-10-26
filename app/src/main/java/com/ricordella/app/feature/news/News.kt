@@ -43,6 +43,10 @@ import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -86,6 +90,17 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 17,
+            versionName = "0.11.0",
+            date = java.time.LocalDate.of(2026, 10, 26),
+            items = listOf(
+                NewsItem(Icons.Rounded.Home, { it.pear }, tr("Una Home più chiara"), tr("In cima una frase su com'è la giornata, poi Scaduti, Oggi e le prossime 5 cose. Un solo avviso alla volta.")),
+                NewsItem(Icons.Rounded.NotificationsActive, { it.cyan }, tr("Promemoria più semplici"), tr("Nel modulo vedi subito titolo, data, ripetizione e avviso; la lista è divisa in Scaduti, Oggi, Domani e più avanti.")),
+                NewsItem(Icons.Rounded.Add, { it.lavender }, tr("Il «+» impara da te"), tr("In cima trovi le 4 cose che aggiungi più spesso, le altre sono sotto «Altro».")),
+                NewsItem(Icons.Rounded.Settings, { it.mint }, tr("Impostazioni in ordine"), tr("Notifiche, sezioni e backup per primi. Vedi sempre dove va il backup, con il nome del file o della cartella.")),
+            ),
+        ),
         NewsRelease(
             versionCode = 16,
             versionName = "0.10.0",

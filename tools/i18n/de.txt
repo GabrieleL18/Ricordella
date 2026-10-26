@@ -1780,3 +1780,11 @@ Ti ricorda di bere acqua ||| Erinnert dich ans Wassertrinken
 Ultimo: %1$s ||| Zuletzt: %1$s
 questo telefono ||| diesem Handy
 Dati ||| Daten
+Una Home più chiara ||| Eine klarere Startseite
+In cima una frase su com'è la giornata, poi Scaduti, Oggi e le prossime 5 cose. Un solo avviso alla volta. ||| Oben ein Satz zu deinem Tag, dann Überfällig, Heute und die nächsten 5 Sachen. Immer nur ein Hinweis.
+Promemoria più semplici ||| Einfachere Erinnerungen
+Nel modulo vedi subito titolo, data, ripetizione e avviso; la lista è divisa in Scaduti, Oggi, Domani e più avanti. ||| Im Formular siehst du sofort Titel, Datum, Wiederholung und Benachrichtigung; die Liste ist in Überfällig, Heute, Morgen und Später aufgeteilt.
+Il «+» impara da te ||| Das „+“ lernt von dir
+In cima trovi le 4 cose che aggiungi più spesso, le altre sono sotto «Altro». ||| Oben findest du die 4 Dinge, die du am häufigsten hinzufügst, die anderen unter „Sonstiges“.
+Impostazioni in ordine ||| Aufgeräumte Einstellungen
+Notifiche, sezioni e backup per primi. Vedi sempre dove va il backup, con il nome del file o della cartella. ||| Benachrichtigungen, Bereiche und Backup zuerst. Du siehst immer, wohin das Backup geht, mit Datei- oder Ordnername.

@@ -1783,4 +1783,12 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Ultimo: %1\$s" to "Última: %1\$s",
     "questo telefono" to "este móvil",
     "Dati" to "Datos",
+    "Una Home più chiara" to "Un Inicio más claro",
+    "In cima una frase su com'è la giornata, poi Scaduti, Oggi e le prossime 5 cose. Un solo avviso alla volta." to "Arriba una frase sobre tu día, luego Vencidos, Hoy y las próximas 5 cosas. Un solo aviso a la vez.",
+    "Promemoria più semplici" to "Recordatorios más sencillos",
+    "Nel modulo vedi subito titolo, data, ripetizione e avviso; la lista è divisa in Scaduti, Oggi, Domani e più avanti." to "En el formulario ves enseguida título, fecha, repetición y aviso; la lista se divide en Vencidos, Hoy, Mañana y más adelante.",
+    "Il «+» impara da te" to "El «+» aprende de ti",
+    "In cima trovi le 4 cose che aggiungi più spesso, le altre sono sotto «Altro»." to "Arriba encuentras las 4 cosas que añades más a menudo, las demás están en «Otro».",
+    "Impostazioni in ordine" to "Ajustes ordenados",
+    "Notifiche, sezioni e backup per primi. Vedi sempre dove va il backup, con il nome del file o della cartella." to "Notificaciones, secciones y copia primero. Siempre ves dónde va la copia, con el nombre del archivo o la carpeta.",
 )

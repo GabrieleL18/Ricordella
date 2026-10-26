@@ -1814,4 +1814,12 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Ti ricorda di bere acqua" to "Reminds you to drink water",
     "Ultimo: %1\$s" to "Last: %1\$s",
     "questo telefono" to "this phone",
+    "Una Home più chiara" to "A clearer Home",
+    "In cima una frase su com'è la giornata, poi Scaduti, Oggi e le prossime 5 cose. Un solo avviso alla volta." to "At the top one sentence about your day, then Overdue, Today and the next 5 things. One notice at a time.",
+    "Promemoria più semplici" to "Simpler reminders",
+    "Nel modulo vedi subito titolo, data, ripetizione e avviso; la lista è divisa in Scaduti, Oggi, Domani e più avanti." to "The form shows title, date, repeat and notification right away; the list is split into Overdue, Today, Tomorrow and later.",
+    "Il «+» impara da te" to "The “+” learns from you",
+    "In cima trovi le 4 cose che aggiungi più spesso, le altre sono sotto «Altro»." to "At the top you'll find the 4 things you add most often, the others are under “Other”.",
+    "Impostazioni in ordine" to "Tidier Settings",
+    "Notifiche, sezioni e backup per primi. Vedi sempre dove va il backup, con il nome del file o della cartella." to "Notifications, sections and backup first. You always see where the backup goes, with the file or folder name.",
 )

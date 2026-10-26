@@ -1783,4 +1783,12 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Ultimo: %1\$s" to "Dernière : %1\$s",
     "questo telefono" to "ce téléphone",
     "Dati" to "Données",
+    "Una Home più chiara" to "Un Accueil plus clair",
+    "In cima una frase su com'è la giornata, poi Scaduti, Oggi e le prossime 5 cose. Un solo avviso alla volta." to "En haut une phrase sur ta journée, puis En retard, Aujourd'hui et les 5 prochaines choses. Un seul avis à la fois.",
+    "Promemoria più semplici" to "Des rappels plus simples",
+    "Nel modulo vedi subito titolo, data, ripetizione e avviso; la lista è divisa in Scaduti, Oggi, Domani e più avanti." to "Le formulaire montre tout de suite titre, date, répétition et notification ; la liste est divisée en En retard, Aujourd'hui, Demain et plus tard.",
+    "Il «+» impara da te" to "Le « + » apprend de toi",
+    "In cima trovi le 4 cose che aggiungi più spesso, le altre sono sotto «Altro»." to "En haut tu trouves les 4 choses que tu ajoutes le plus souvent, les autres sont sous « Autre ».",
+    "Impostazioni in ordine" to "Des réglages en ordre",
+    "Notifiche, sezioni e backup per primi. Vedi sempre dove va il backup, con il nome del file o della cartella." to "Notifications, sections et sauvegarde d'abord. Tu vois toujours où va la sauvegarde, avec le nom du fichier ou du dossier.",
 )
