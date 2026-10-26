@@ -1,13 +1,9 @@
 package com.ricordella.app.domain.date
 
-import com.ricordella.app.domain.model.OdometerStatus
-import com.ricordella.app.domain.model.Priority
 import com.ricordella.app.domain.model.Reminder
 import com.ricordella.app.domain.model.ReminderStatus
 import com.ricordella.app.domain.model.ReminderTimeStatus
-import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.isMultiDay
-import com.ricordella.app.domain.model.odometerStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -23,8 +19,6 @@ object ReminderTimeline {
 
     const val NEXT_DAYS_LIMIT = 7L
     const val NEXT_WEEKS_LIMIT = 30L
-    private const val URGENT_ATTENTION_DAYS = 7L
-    private const val DEADLINE_ATTENTION_DAYS = 14L
 
     fun timeStatus(reminder: Reminder, now: LocalDateTime): ReminderTimeStatus = when (reminder.status) {
         ReminderStatus.COMPLETED -> ReminderTimeStatus.COMPLETED
@@ -58,21 +52,6 @@ object ReminderTimeline {
             days <= NEXT_WEEKS_LIMIT -> TimeHorizon.NEXT_WEEKS
             else -> TimeHorizon.LATER
         }
-    }
-
-    /**
-     * Un promemoria "richiede attenzione" se è scaduto, se è urgente e vicino,
-     * se è una scadenza (garanzia, pagamento, ...) vicina, o se la scadenza a km è prossima.
-     */
-    fun needsAttention(entry: ReminderWithLinks, now: LocalDateTime): Boolean {
-        val reminder = entry.reminder
-        if (reminder.status != ReminderStatus.ACTIVE) return false
-        if (isOverdue(reminder, now)) return true
-        val days = daysUntil(reminder.dueDate, now.toLocalDate())
-        val odometer = entry.odometerStatus
-        return (reminder.priority == Priority.URGENT && days <= URGENT_ATTENTION_DAYS) ||
-            (reminder.type.isDeadlineLike && days in 1..DEADLINE_ATTENTION_DAYS) ||
-            (odometer != null && odometer != OdometerStatus.FAR)
     }
 
     fun daysUntil(date: LocalDate, today: LocalDate): Long = ChronoUnit.DAYS.between(today, date)

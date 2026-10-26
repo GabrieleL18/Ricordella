@@ -1758,4 +1758,13 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Non avvisarmi" to "Nicht benachrichtigen",
     "Più avanti" to "Später",
     "Prossimi 7 giorni" to "Nächste 7 Tage",
+    "%1\$s sono scadute." to "%1\$s sind überfällig.",
+    "1 è scaduta." to "1 ist überfällig.",
+    "Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Öffne die Tränke über das Bereichsmenü oben (die kleinen Quadrate): Wähle, wie viel Wasser du am Tag trinken willst und wie oft du erinnert wirst. ",
+    "In alto le cose scadute, poi la tua giornata e le prossime in arrivo. " to "Oben das Überfällige, dann dein Tag und was als Nächstes kommt. ",
+    "Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io." to "In den nächsten Tagen gibt es nichts zu merken. Schreib unten zum Beispiel „Zahnarzt morgen um 9“: Ich kümmere mich darum.",
+    "Oggi hai %1\$s cose." to "Heute hast du %1\$s Sachen.",
+    "Oggi hai 1 cosa." to "Heute hast du 1 Sache.",
+    "Oggi niente in programma." to "Heute nichts geplant.",
+    "Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home." to "Kacheln, um Wecker, Timer, Notizen, Karten und Tränke von der Startseite zu öffnen.",
 )

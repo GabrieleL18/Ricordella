@@ -512,7 +512,7 @@ fun WidgetIllustration() {
 val SectionTutorialPages: List<TutorialPage> get() = listOf(
     TutorialPage(
         tr("Home: cosa ricordare oggi"),
-        tr("In alto trovi quello che richiede attenzione, poi le cose di oggi e quelle in arrivo. ") +
+        tr("In alto le cose scadute, poi la tua giornata e le prossime in arrivo. ") +
             tr("Tocca il cerchio per completare: se qualcosa è scaduto la palla si riempie di fumo rosso."),
     ) { HomeIllustration() },
     TutorialPage(
@@ -533,7 +533,7 @@ val SectionTutorialPages: List<TutorialPage> get() = listOf(
     ) { PeopleIllustration() },
     TutorialPage(
         tr("Pozioni: bevi abbastanza"),
-        tr("Apri le Pozioni dal riquadro con la goccia in Home o dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. ") +
+        tr("Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. ") +
             tr("A ogni bicchiere tocca +: il mago si riempie e gli avvisi si fermano quando hai raggiunto l'obiettivo."),
     ) { PotionsIllustration() },
     TutorialPage(

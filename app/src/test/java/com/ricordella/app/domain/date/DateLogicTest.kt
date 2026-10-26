@@ -47,16 +47,6 @@ class ReminderTimelineTest {
         assertEquals(TimeHorizon.NEXT_WEEKS, ReminderTimeline.horizon(reminder(today.plusDays(8)), now))
         assertEquals(TimeHorizon.LATER, ReminderTimeline.horizon(reminder(today.plusDays(31)), now))
     }
-
-    @Test
-    fun `richiedono attenzione - scaduti, urgenti e scadenze vicine`() {
-        val today = now.toLocalDate()
-        assertTrue(ReminderTimeline.needsAttention(entry(reminder(today.minusDays(1))), now))
-        assertTrue(ReminderTimeline.needsAttention(entry(reminder(today.plusDays(5)).copy(priority = Priority.URGENT)), now))
-        assertTrue(ReminderTimeline.needsAttention(entry(reminder(today.plusDays(5)).copy(type = ReminderType.WARRANTY)), now))
-        assertFalse(ReminderTimeline.needsAttention(entry(reminder(today.plusDays(5))), now))
-        assertFalse(ReminderTimeline.needsAttention(entry(reminder(today.plusDays(20)).copy(type = ReminderType.WARRANTY)), now))
-    }
 }
 
 class RelativeDateDescriberTest {

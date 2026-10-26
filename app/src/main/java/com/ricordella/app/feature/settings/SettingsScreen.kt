@@ -283,7 +283,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenResolutions: (year: Int) -> Unit, o
                 SettingRow(
                     icon = Icons.Rounded.Apps,
                     title = tr("Sezioni extra in Home"),
-                    subtitle = tr("Sveglie, Note e Pozioni a portata di tocco nella Home."),
+                    subtitle = tr("Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home."),
                     trailing = {
                         Switch(checked = settings.showExtrasOnHome, onCheckedChange = { value -> viewModel.update { it.copy(showExtrasOnHome = value) } })
                     },

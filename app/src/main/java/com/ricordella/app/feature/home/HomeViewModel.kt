@@ -41,19 +41,17 @@ import kotlinx.coroutines.flow.update
 data class HomeUiState(
     val isLoading: Boolean = true,
     val now: LocalDateTime = LocalDateTime.now(),
-    val attention: List<ReminderWithLinks> = emptyList(),
+    /** Solo le cose davvero passate e non fatte. */
+    val overdue: List<ReminderWithLinks> = emptyList(),
     val today: List<ReminderWithLinks> = emptyList(),
     val upcoming: List<ReminderWithLinks> = emptyList(),
-    val hasMoreUpcoming: Boolean = false,
-    /** C'è almeno un promemoria scaduto e non completato: la palla si riempie di fumo rosso. */
-    val hasOverdue: Boolean = false,
     /** È passato l'intervallo scelto dall'ultimo backup. */
     val backupDue: Boolean = false,
     val backupIntervalDays: Int = 1,
     /** Giorni dall'ultimo backup riuscito, se sono più di [Housekeeping.STALE_BACKUP_DAYS] (anche con il backup automatico). */
     val backupStaleDays: Int = 0,
 ) {
-    val isEmpty: Boolean get() = attention.isEmpty() && today.isEmpty() && upcoming.isEmpty()
+    val isEmpty: Boolean get() = overdue.isEmpty() && today.isEmpty() && upcoming.isEmpty()
 }
 
 /** Esito delle azioni di backup dalla Home. */
@@ -261,23 +259,22 @@ class HomeViewModel(
     private fun buildState(entries: List<ReminderWithLinks>, now: LocalDateTime): HomeUiState {
         val today = now.toLocalDate()
         val sorted = entries.sortedWith(compareBy(ReminderTimeline.chronologicalOrder) { it.reminder })
-        val (attention, others) = sorted.partition { ReminderTimeline.needsAttention(it, now) }
+        // Tre gruppi con regole ovvie: scaduti, oggi, i prossimi. Urgenza e scadenze si vedono sulla scheda.
+        val (overdue, others) = sorted.partition { ReminderTimeline.isOverdue(it.reminder, now) }
         val todayItems = others.filter { ReminderTimeline.isOngoing(it.reminder, today) }
         val upcoming = others.filter { it.reminder.dueDate.isAfter(today) }
         return HomeUiState(
             isLoading = false,
             now = now,
-            attention = attention,
+            overdue = overdue,
             today = todayItems,
             upcoming = upcoming.take(UPCOMING_SHOWN),
-            hasMoreUpcoming = upcoming.size > UPCOMING_SHOWN,
-            hasOverdue = attention.any { ReminderTimeline.isOverdue(it.reminder, now) },
         )
     }
 
     private companion object {
         const val HORIZON_DAYS = 60L
         const val MAX_LOADED = 300
-        const val UPCOMING_SHOWN = 8
+        const val UPCOMING_SHOWN = 5
     }
 }

@@ -27,16 +27,6 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,25 +47,22 @@ import com.ricordella.app.core.ui.offerReopen
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.EventAvailable
 import androidx.compose.material.icons.automirrored.rounded.EventNote
 import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.WbSunny
-import androidx.compose.material.icons.rounded.WbTwilight
-import androidx.compose.material.icons.rounded.Bedtime
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
+import androidx.compose.material.icons.rounded.Whatshot
+import com.ricordella.app.core.ui.rememberNotificationChecks
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -97,8 +84,6 @@ import com.ricordella.app.core.ui.MascotState
 import com.ricordella.app.core.ui.PushButton
 import com.ricordella.app.core.ui.ReminderCard
 import com.ricordella.app.core.ui.ReminderDateMode
-import com.ricordella.app.core.ui.RevealTracker
-import com.ricordella.app.core.ui.RicordellaMotion
 import com.ricordella.app.core.ui.SectionHeader
 import com.ricordella.app.core.ui.TopLevelScaffold
 import com.ricordella.app.core.ui.appViewModel
@@ -112,8 +97,6 @@ import com.ricordella.app.core.ui.theme.ricordellaColors
 import com.ricordella.app.domain.model.ReminderWithLinks
 import com.ricordella.app.domain.model.ReminderOccurrence
 import com.ricordella.app.feature.calendar.DayTimeline
-import com.ricordella.app.feature.calendar.LiveTime
-import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
@@ -153,13 +136,20 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
 
     val listState = rememberLazyListState()
-    // Posizione delle intestazioni nella lista: serve ai pulsanti del recap per saltare alla sezione.
     val showExtras = LocalAppSettings.current.showExtrasOnHome
-    // Prima di "Da guardare": saluto, inserimento rapido, permesso (+ extra, + stato vuoto).
-    val attentionAt = 3 + (if (showExtras) 1 else 0) + (if (!state.isLoading && state.isEmpty) 1 else 0)
-    val todayAt = attentionAt + if (state.attention.isNotEmpty()) 1 + state.attention.size else 0
-    val upcomingAt = todayAt + 2
-    val goTo: (Int) -> Unit = { index -> scope.launch { listState.animateScrollToItem(index) } }
+    // Un solo avviso alla volta, il più importante: notifiche, poi backup, poi buoni propositi.
+    val granted = rememberNotificationsGranted()
+    var healthHidden by rememberSaveable { mutableStateOf(false) }
+    val broken = rememberNotificationChecks().filter { it.critical && !it.ok }.takeIf { !healthHidden }.orEmpty()
+    var staleHidden by rememberSaveable { mutableStateOf(false) }
+    val stale = state.backupStaleDays > 0 && !staleHidden
+    val notice = when {
+        !granted.value -> Notice.PERMISSION
+        broken.isNotEmpty() -> Notice.HEALTH
+        state.backupDue || stale -> Notice.BACKUP
+        resolutions != null -> Notice.RESOLUTIONS
+        else -> null
+    }
 
     TopLevelScaffold(title = tr("Remindella"), navigator = navigator, onAdd = onAdd, snackbarHostState = snackbar, brandTitle = true) { padding ->
         LazyColumn(
@@ -173,20 +163,22 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             ),
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
-            item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0), onAttention = { goTo(attentionAt) }, onToday = { goTo(todayAt) }, onUpcoming = { goTo(upcomingAt) }) }
-            item(key = "quick-entry") {
-                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
+            item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
+            // Le notifiche che non arrivano vanno sistemate subito: in cima.
+            if (notice == Notice.PERMISSION || notice == Notice.HEALTH) item(key = "notice-top") {
+                Box(Modifier.animateItem()) {
+                    if (notice == Notice.PERMISSION) NotificationPermissionCard { granted.value = it }
+                    else com.ricordella.app.core.ui.NotificationHealthCard(broken, onLater = { healthHidden = true })
+                }
             }
             if (showExtras) item(key = "extras") { HomeExtras(navigator) }
-            item(key = "permission") { NotificationPermissionCard() }
-            item(key = "notificationHealth") { com.ricordella.app.core.ui.NotificationHealthCard() }
 
             if (!state.isLoading && state.isEmpty) {
                 item(key = "empty") {
                     EmptyState(
                         icon = Icons.Rounded.EventAvailable,
                         title = tr("Niente all'orizzonte"),
-                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sopra «dentista domani alle 9»: ci penso io."),
+                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io."),
                         actionLabel = tr("Aggiungi"),
                         onAction = onAdd,
                         modifier = Modifier.animateItem(),
@@ -195,12 +187,12 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 }
             }
 
-            if (state.attention.isNotEmpty()) {
-                item(key = "attention-header") {
-                    SectionHeader(tr("Da guardare"), icon = Icons.Rounded.Bolt, tone = colors.coral, modifier = Modifier.animateItem())
+            if (state.overdue.isNotEmpty()) {
+                item(key = "overdue-header") {
+                    SectionHeader(tr("Scaduti"), icon = Icons.Rounded.Whatshot, tone = colors.coral, modifier = Modifier.animateItem())
                 }
             }
-            itemsIndexed(state.attention, key = { _, it -> "attention-" + it.reminder.id }) { index, entry ->
+            itemsIndexed(state.overdue, key = { _, it -> "overdue-" + it.reminder.id }) { index, entry ->
                 ReminderCard(
                     entry = entry,
                     now = state.now,
@@ -208,13 +200,13 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     onToggleComplete = { complete(entry) },
                     dateMode = ReminderDateMode.RELATIVE,
                     highlighted = true,
-                    modifier = Modifier.animateItem().reveal(tracker, "attention-" + entry.reminder.id, index + 1),
+                    modifier = Modifier.animateItem().reveal(tracker, "overdue-" + entry.reminder.id, index + 1),
                 )
             }
 
-            if (!state.isLoading) {
+            if (!state.isLoading && !state.isEmpty) {
                 item(key = "today-header") {
-                    SectionHeader(tr("La tua giornata"), icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
+                    SectionHeader(tr("Oggi"), icon = Icons.Rounded.WbSunny, tone = colors.pear, modifier = Modifier.animateItem())
                 }
                 item(key = "today-timeline") {
                     val today = state.now.toLocalDate()
@@ -228,6 +220,10 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         modifier = Modifier.animateItem().reveal(tracker, "today-timeline", 2),
                     )
                 }
+            }
+            // Prima si guarda cosa c'è da fare, poi si aggiunge: per questo sta sotto la giornata.
+            item(key = "quick-entry") {
+                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.animateItem().padding(vertical = RicordellaDimensions.spaceXs))
             }
 
             if (state.upcoming.isNotEmpty()) {
@@ -248,19 +244,17 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                 }
             }
 
-            // Avvisi di servizio in fondo: non coprono il contenuto.
-            item(key = "backup") {
-                var staleHidden by rememberSaveable { mutableStateOf(false) }
-                val stale = state.backupStaleDays > 0 && !staleHidden
+            // Backup e buoni propositi in fondo: non coprono il contenuto.
+            if (notice == Notice.BACKUP) item(key = "backup") {
                 BackupDueCard(
-                    visible = state.backupDue || stale,
                     intervalDays = state.backupIntervalDays,
                     staleDays = if (stale && !state.backupDue) state.backupStaleDays else 0,
                     onExport = { showBackupChoices = true },
                     onLater = { if (state.backupDue) viewModel.onPostponeBackup() else staleHidden = true },
+                    modifier = Modifier.animateItem(),
                 )
             }
-            resolutions?.let { (prompt, year) ->
+            if (notice == Notice.RESOLUTIONS) resolutions?.let { (prompt, year) ->
                 item(key = "resolutions") {
                     ResolutionsCard(
                         prompt = prompt,
@@ -309,42 +303,39 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
     }
 }
 
-@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+/** Data, saluto e una frase concreta su oggi. Le sezioni sotto dicono il resto. */
 @Composable
-private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier, onAttention: () -> Unit, onToday: () -> Unit, onUpcoming: () -> Unit) {
-    val colors = MaterialTheme.ricordellaColors
-    Column(modifier.padding(top = RicordellaDimensions.spaceS, bottom = RicordellaDimensions.spaceS)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                DayPill(state.now)
-                Text(greeting(state.now.hour), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 6.dp))
-                val count = state.attention.size
-                val subtitle = when {
-                    state.isLoading -> " "
-                    count == 0 && state.today.isEmpty() -> tr("Tutto sotto controllo. Goditi la giornata.")
-                    count == 0 -> tr("Niente di urgente: solo le cose di oggi.")
-                    // Il numero lo dicono già le pillole qui sotto.
-                    else -> tr("Qualcosa richiede attenzione: parti da «Da guardare».")
-                }
-                Text(subtitle, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            // Con qualcosa di scaduto torna la sfera col fumo rosso; altrimenti il mago.
-            if (state.hasOverdue) CrystalBallMascot(size = 92.dp, state = mascot, overdue = true)
-            else HappyWizard(size = 92.dp, waving = true, magic = mascot.sparks)
+private fun Greeting(state: HomeUiState, mascot: MascotState, modifier: Modifier = Modifier) {
+    Row(modifier.padding(top = RicordellaDimensions.spaceS, bottom = RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                DateTexts.weekdayAndDay(state.now.toLocalDate()).replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(greeting(state.now.hour), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 2.dp))
+            Text(if (state.isLoading) " " else summary(state.today.size, state.overdue.size), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        if (!state.isLoading && !state.isEmpty) {
-            // A capo se, in una lingua con parole lunghe, le pillole non entrano in una riga.
-            androidx.compose.foundation.layout.FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-                verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-                modifier = Modifier.padding(top = RicordellaDimensions.spaceM),
-            ) {
-                CountPill(state.attention.size, tr("da guardare"), Icons.Rounded.Bolt, colors.coral, onClick = onAttention)
-                CountPill(state.today.size, tr("oggi"), Icons.Rounded.WbSunny, colors.pear, onClick = onToday)
-                CountPill(state.upcoming.size, tr("in arrivo"), Icons.AutoMirrored.Rounded.EventNote, colors.lavender, plus = state.hasMoreUpcoming, onClick = onUpcoming)
-            }
-        }
+        // Con qualcosa di scaduto torna la sfera col fumo rosso; altrimenti il mago.
+        if (state.overdue.isNotEmpty()) CrystalBallMascot(size = 92.dp, state = mascot, overdue = true)
+        else HappyWizard(size = 92.dp, waving = true, magic = mascot.sparks)
     }
+}
+
+/** "Oggi hai 3 cose. 1 è scaduta." */
+internal fun summary(today: Int, overdue: Int): String {
+    val first = when {
+        today == 0 && overdue == 0 -> tr("Tutto sotto controllo. Goditi la giornata.")
+        today == 0 -> tr("Oggi niente in programma.")
+        today == 1 -> tr("Oggi hai 1 cosa.")
+        else -> trf("Oggi hai %1\$s cose.", today)
+    }
+    val second = when (overdue) {
+        0 -> null
+        1 -> tr("1 è scaduta.")
+        else -> trf("%1\$s sono scadute.", overdue)
+    }
+    return listOfNotNull(first, second).joinToString(" ")
 }
 
 private fun greeting(hour: Int): String = when (hour) {
@@ -353,64 +344,8 @@ private fun greeting(hour: Int): String = when (hour) {
     else -> tr("Buonasera")
 }
 
-/** Giorno e ora in una pillola: l'icona segue il momento della giornata, i due punti lampeggiano. */
-@Composable
-private fun DayPill(now: java.time.LocalDateTime) {
-    val tone = when (now.hour) {
-        in 5..17 -> MaterialTheme.ricordellaColors.pear
-        else -> MaterialTheme.ricordellaColors.lavender
-    }
-    val icon = when (now.hour) {
-        in 5..8 -> Icons.Rounded.WbTwilight
-        in 9..17 -> Icons.Rounded.WbSunny
-        in 18..20 -> Icons.Rounded.WbTwilight
-        else -> Icons.Rounded.Bedtime
-    }
-    Surface(color = tone.container, contentColor = tone.content, shape = CircleShape) {
-        Row(
-            modifier = Modifier.padding(start = 10.dp, end = 12.dp, top = 5.dp, bottom = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
-            Text(DateTexts.weekdayAndDay(now.toLocalDate()).replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.labelLarge)
-            Text("·", style = MaterialTheme.typography.labelLarge)
-            LiveTime(now, MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), tone.content)
-        }
-    }
-}
-
-/** Contatore a pillola: il numero scorre verso l'alto quando cambia. */
-@Composable
-private fun CountPill(count: Int, label: String, icon: ImageVector, tone: Tone, plus: Boolean = false, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        color = tone.container,
-        contentColor = tone.content,
-        shape = CircleShape,
-        modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = if (plus) trf("%1\$s o più %2\$s", count, label) else "$count $label" },
-    ) {
-        Row(
-            modifier = Modifier.padding(start = 10.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
-            AnimatedContent(
-                targetState = count,
-                transitionSpec = {
-                    val up = targetState > initialState
-                    (slideInVertically(tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseOut)) { if (up) it else -it } + fadeIn()) togetherWith
-                        (slideOutVertically(tween(RicordellaMotion.SHORT, easing = RicordellaMotion.EaseIn)) { if (up) -it else it } + fadeOut())
-                },
-                label = "count-$label",
-            ) { value ->
-                Text(if (plus) "$value+" else "$value", style = MaterialTheme.typography.titleMedium)
-            }
-            Text(label, style = MaterialTheme.typography.labelLarge)
-        }
-    }
-}
+/** Avviso mostrato in Home: uno alla volta, nell'ordine di importanza. */
+private enum class Notice { PERMISSION, HEALTH, BACKUP, RESOLUTIONS }
 
 /** Buoni propositi: a gennaio l'invito a scriverli, a fine anno il recap di quelli rispettati. */
 @Composable
@@ -458,89 +393,82 @@ private fun ResolutionsCard(
 
 /** Scaduto l'intervallo scelto: invito ad aggiornare il backup, che sovrascrive il precedente. */
 @Composable
-private fun BackupDueCard(visible: Boolean, intervalDays: Int, staleDays: Int, onExport: () -> Unit, onLater: () -> Unit) {
+private fun BackupDueCard(intervalDays: Int, staleDays: Int, onExport: () -> Unit, onLater: () -> Unit, modifier: Modifier = Modifier) {
     val tone = if (staleDays > 0) MaterialTheme.ricordellaColors.coral else MaterialTheme.ricordellaColors.mint
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + expandVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseOut)),
-        exit = fadeOut(tween(RicordellaMotion.SHORT)) + shrinkVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseInOut)),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = RicordellaDimensions.spaceS)
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = RicordellaDimensions.spaceS)
-                .background(tone.container, MaterialTheme.shapes.large)
-                .padding(RicordellaDimensions.spaceL),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-                Icon(Icons.Rounded.CloudUpload, contentDescription = null, tint = tone.content)
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        if (staleDays > 0) tr("Il backup è vecchio") else tr("È ora di aggiornare il backup"),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = tone.content,
-                    )
-                    Text(
-                        if (staleDays > 0) trf("L'ultimo backup risale a %1\$s giorni fa: se perdi il telefono perdi i dati dopo quella data.", staleDays) else when (intervalDays) {
-                            1 -> tr("Aggiorna il backup di oggi: sovrascrivo quello precedente.")
-                            7 -> tr("È passata una settimana: aggiorno il backup sovrascrivendo il precedente.")
-                            30 -> tr("È passato un mese: aggiorno il backup sovrascrivendo il precedente.")
-                            365 -> tr("È passato un anno: aggiorno il backup sovrascrivendo il precedente.")
-                            else -> tr("Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente.")
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = tone.content,
-                    )
-                }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+            Icon(Icons.Rounded.CloudUpload, contentDescription = null, tint = tone.content)
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (staleDays > 0) tr("Il backup è vecchio") else tr("È ora di aggiornare il backup"),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = tone.content,
+                )
+                Text(
+                    if (staleDays > 0) trf("L'ultimo backup risale a %1\$s giorni fa: se perdi il telefono perdi i dati dopo quella data.", staleDays) else when (intervalDays) {
+                        1 -> tr("Aggiorna il backup di oggi: sovrascrivo quello precedente.")
+                        7 -> tr("È passata una settimana: aggiorno il backup sovrascrivendo il precedente.")
+                        30 -> tr("È passato un mese: aggiorno il backup sovrascrivendo il precedente.")
+                        365 -> tr("È passato un anno: aggiorno il backup sovrascrivendo il precedente.")
+                        else -> tr("Sono passati 3 mesi: aggiorno il backup sovrascrivendo il precedente.")
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = tone.content,
+                )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
-                PushButton(tr("Aggiorna ora"), onClick = onExport, modifier = Modifier.weight(1f))
-                TextButton(onClick = onLater) { Text(tr("Più tardi")) }
-            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS), verticalAlignment = Alignment.CenterVertically) {
+            PushButton(tr("Aggiorna ora"), onClick = onExport, modifier = Modifier.weight(1f))
+            TextButton(onClick = onLater) { Text(tr("Più tardi")) }
         }
     }
 }
 
-/** Invito a concedere il permesso di notifica (Android 13+), finché non è concesso. */
+/** Permesso di notifica (Android 13+): prima di Android 13 c'è sempre. Si ricontrolla tornando nell'app. */
 @Composable
-private fun NotificationPermissionCard() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+private fun rememberNotificationsGranted(): MutableState<Boolean> {
     val context = LocalContext.current
-    fun isGranted() = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-    var granted by remember { mutableStateOf(isGranted()) }
+    fun isGranted() = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+    val granted = remember { mutableStateOf(isGranted()) }
     LifecycleResumeEffect(Unit) {
-        granted = isGranted()
+        granted.value = isGranted()
         onPauseOrDispose { }
     }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
-    val tone = MaterialTheme.ricordellaColors.pear
+    return granted
+}
 
-    AnimatedVisibility(
-        visible = !granted,
-        enter = fadeIn(),
-        exit = fadeOut(tween(RicordellaMotion.SHORT)) + shrinkVertically(tween(RicordellaMotion.LONG, easing = RicordellaMotion.EaseInOut)),
+/** Invito a concedere il permesso di notifica, finché non è concesso. */
+@Composable
+private fun NotificationPermissionCard(onResult: (Boolean) -> Unit) {
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission(), onResult)
+    val tone = MaterialTheme.ricordellaColors.pear
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(tone.container, MaterialTheme.shapes.large)
-                .padding(RicordellaDimensions.spaceL),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-                Icon(Icons.Rounded.NotificationsOff, contentDescription = null, tint = tone.content)
-                Column(Modifier.weight(1f)) {
-                    Text(tr("Le notifiche sono spente"), style = MaterialTheme.typography.titleMedium, color = tone.content)
-                    Text(
-                        tr("Accendile e ti avviso io, anche con l'app chiusa."),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = tone.content,
-                    )
-                }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+            Icon(Icons.Rounded.NotificationsOff, contentDescription = null, tint = tone.content)
+            Column(Modifier.weight(1f)) {
+                Text(tr("Le notifiche sono spente"), style = MaterialTheme.typography.titleMedium, color = tone.content)
+                Text(
+                    tr("Accendile e ti avviso io, anche con l'app chiusa."),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = tone.content,
+                )
             }
-            PushButton(tr("Accendi le notifiche"), onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
         }
+        PushButton(tr("Accendi le notifiche"), onClick = { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -1758,4 +1758,13 @@ internal val SpanishStrings: Map<String, String> = hashMapOf(
     "Non avvisarmi" to "No avisarme",
     "Più avanti" to "Más adelante",
     "Prossimi 7 giorni" to "Próximos 7 días",
+    "%1\$s sono scadute." to "%1\$s están vencidas.",
+    "1 è scaduta." to "1 está vencida.",
+    "Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Abre las Pociones desde el menú de secciones de arriba (los cuadraditos): elige cuánta agua beber al día y cada cuánto recordártelo. ",
+    "In alto le cose scadute, poi la tua giornata e le prossime in arrivo. " to "Arriba lo vencido, luego tu día y lo próximo que llega. ",
+    "Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io." to "No hay nada que recordar en los próximos días. Prueba a escribir abajo «dentista mañana a las 9»: yo me ocupo.",
+    "Oggi hai %1\$s cose." to "Hoy tienes %1\$s cosas.",
+    "Oggi hai 1 cosa." to "Hoy tienes 1 cosa.",
+    "Oggi niente in programma." to "Nada previsto para hoy.",
+    "Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home." to "Recuadros para abrir Alarmas, Temporizadores, Notas, Tarjetas y Pociones desde Inicio.",
 )

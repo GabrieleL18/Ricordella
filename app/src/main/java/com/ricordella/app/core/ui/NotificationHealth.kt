@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
@@ -128,33 +126,29 @@ fun NotificationHealthRows() {
     }
 }
 
-/** Scheda in Home: compare solo se Android ha tolto qualcosa che fa saltare o ritardare i promemoria. */
+/** Scheda in Home quando Android ha tolto qualcosa che fa saltare o ritardare i promemoria ([broken]). */
 @Composable
-fun NotificationHealthCard() {
+fun NotificationHealthCard(broken: List<NotificationCheck>, onLater: () -> Unit) {
     val context = LocalContext.current
     val tone = MaterialTheme.ricordellaColors.coral
-    var hidden by rememberSaveable { mutableStateOf(false) }
-    val broken = rememberNotificationChecks().filter { it.critical && !it.ok }
-    AnimatedVisibility(visible = broken.isNotEmpty() && !hidden) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(bottom = RicordellaDimensions.spaceS)
-                .background(tone.container, MaterialTheme.shapes.large)
-                .padding(RicordellaDimensions.spaceL),
-            verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
-                Icon(Icons.Rounded.Warning, contentDescription = null, tint = tone.content)
-                Text(tr("Qualche promemoria potrebbe non arrivare"), style = MaterialTheme.typography.titleMedium, color = tone.content)
-            }
-            broken.forEach { check ->
-                Text(check.title + ": " + check.problemText, style = MaterialTheme.typography.bodyMedium, color = tone.content)
-            }
-            Row {
-                TextButton(onClick = { context.open(broken.first().fix) }) { Text(tr("Risolvi")) }
-                TextButton(onClick = { hidden = true }) { Text(tr("Più tardi")) }
-            }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = RicordellaDimensions.spaceS)
+            .background(tone.container, MaterialTheme.shapes.large)
+            .padding(RicordellaDimensions.spaceL),
+        verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceM)) {
+            Icon(Icons.Rounded.Warning, contentDescription = null, tint = tone.content)
+            Text(tr("Qualche promemoria potrebbe non arrivare"), style = MaterialTheme.typography.titleMedium, color = tone.content)
+        }
+        broken.forEach { check ->
+            Text(check.title + ": " + check.problemText, style = MaterialTheme.typography.bodyMedium, color = tone.content)
+        }
+        Row {
+            TextButton(onClick = { context.open(broken.first().fix) }) { Text(tr("Risolvi")) }
+            TextButton(onClick = onLater) { Text(tr("Più tardi")) }
         }
     }
 }

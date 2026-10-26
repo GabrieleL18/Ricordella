@@ -172,7 +172,7 @@ data class AppSettings(
     /** Cosa si condivide nel file condiviso (vedi [ShareScope]). */
     val shareScope: ShareScope = ShareScope(),
     /** In Home i collegamenti alle sezioni extra (Sveglie, Note, Pozioni). */
-    val showExtrasOnHome: Boolean = true,
+    val showExtrasOnHome: Boolean = false,
     /** La sezione Ciclo (dati sulla salute) si apre solo con lo sblocco del telefono. */
     val lockCycle: Boolean = false,
     /** Note e liste della spesa. */

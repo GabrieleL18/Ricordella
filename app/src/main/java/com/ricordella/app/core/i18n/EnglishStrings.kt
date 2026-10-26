@@ -1790,4 +1790,13 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Non avvisarmi" to "Don't notify me",
     "Più avanti" to "Later",
     "Prossimi 7 giorni" to "Next 7 days",
+    "%1\$s sono scadute." to "%1\$s are overdue.",
+    "1 è scaduta." to "1 is overdue.",
+    "Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Open Potions from the sections menu at the top (the little squares): choose how much water to drink each day and how often to be reminded. ",
+    "In alto le cose scadute, poi la tua giornata e le prossime in arrivo. " to "At the top what's overdue, then your day and what's coming next. ",
+    "Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io." to "Nothing to remember in the next few days. Try typing below “dentist tomorrow at 9”: I'll take care of it.",
+    "Oggi hai %1\$s cose." to "You have %1\$s things today.",
+    "Oggi hai 1 cosa." to "You have 1 thing today.",
+    "Oggi niente in programma." to "Nothing planned today.",
+    "Riquadri per aprire Sveglie, Timer, Note, Carte e Pozioni dalla Home." to "Tiles to open Alarms, Timers, Notes, Cards and Potions from Home.",
 )
