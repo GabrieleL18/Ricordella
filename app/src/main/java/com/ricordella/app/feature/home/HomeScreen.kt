@@ -164,6 +164,9 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(RicordellaDimensions.spaceS),
         ) {
             item(key = "greeting") { Greeting(state, mascot, Modifier.reveal(tracker, "greeting", 0)) }
+            item(key = "quick-entry") {
+                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.padding(vertical = RicordellaDimensions.spaceXs))
+            }
             // Le notifiche che non arrivano vanno sistemate subito: in cima.
             if (notice == Notice.PERMISSION || notice == Notice.HEALTH) item(key = "notice-top") {
                 Box(Modifier.animateItem()) {
@@ -178,7 +181,7 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                     EmptyState(
                         icon = Icons.Rounded.EventAvailable,
                         title = tr("Niente all'orizzonte"),
-                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io."),
+                        message = tr("Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sopra «dentista domani alle 9»: ci penso io."),
                         actionLabel = tr("Aggiungi"),
                         onAction = onAdd,
                         modifier = Modifier.animateItem(),
@@ -220,10 +223,6 @@ fun HomeScreen(navigator: AppNavigator, onAdd: () -> Unit) {
                         modifier = Modifier.animateItem().reveal(tracker, "today-timeline", 2),
                     )
                 }
-            }
-            // Prima si guarda cosa c'è da fare, poi si aggiunge: per questo sta sotto la giornata.
-            item(key = "quick-entry") {
-                QuickEntryBar(state.now, onAdd = viewModel::onQuickAdd, onEdit = { navigator.newReminder(quickText = it) }, modifier = Modifier.animateItem().padding(vertical = RicordellaDimensions.spaceXs))
             }
 
             if (state.upcoming.isNotEmpty()) {

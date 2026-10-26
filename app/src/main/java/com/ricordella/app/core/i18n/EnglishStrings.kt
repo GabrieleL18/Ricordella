@@ -1794,7 +1794,6 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "1 è scaduta." to "1 is overdue.",
     "Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Open Potions from the sections menu at the top (the little squares): choose how much water to drink each day and how often to be reminded. ",
     "In alto le cose scadute, poi la tua giornata e le prossime in arrivo. " to "At the top what's overdue, then your day and what's coming next. ",
-    "Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io." to "Nothing to remember in the next few days. Try typing below “dentist tomorrow at 9”: I'll take care of it.",
     "Oggi hai %1\$s cose." to "You have %1\$s things today.",
     "Oggi hai 1 cosa." to "You have 1 thing today.",
     "Oggi niente in programma." to "Nothing planned today.",

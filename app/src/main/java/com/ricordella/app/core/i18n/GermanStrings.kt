@@ -1762,7 +1762,6 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "1 è scaduta." to "1 ist überfällig.",
     "Apri le Pozioni dal menu delle sezioni in alto (i quadratini): scegli quanta acqua bere al giorno e ogni quanto ricordartelo. " to "Öffne die Tränke über das Bereichsmenü oben (die kleinen Quadrate): Wähle, wie viel Wasser du am Tag trinken willst und wie oft du erinnert wirst. ",
     "In alto le cose scadute, poi la tua giornata e le prossime in arrivo. " to "Oben das Überfällige, dann dein Tag und was als Nächstes kommt. ",
-    "Nei prossimi giorni non c'è nulla da ricordare. Prova a scrivere qui sotto «dentista domani alle 9»: ci penso io." to "In den nächsten Tagen gibt es nichts zu merken. Schreib unten zum Beispiel „Zahnarzt morgen um 9“: Ich kümmere mich darum.",
     "Oggi hai %1\$s cose." to "Heute hast du %1\$s Sachen.",
     "Oggi hai 1 cosa." to "Heute hast du 1 Sache.",
     "Oggi niente in programma." to "Heute nichts geplant.",
