@@ -1591,7 +1591,12 @@ Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri
 Digita il numero stampato sulla tessera ||| Gib die auf der Karte aufgedruckte Nummer ein
 Preferite ||| Favoriten
 Preferita ||| Favorit
-Mostra altre %1$s ||| %1$s weitere zeigen
+Mostra altre %1$s carte ||| %1$s weitere Karten zeigen
+%1$s carte ||| %1$s Karten
+1 carta ||| 1 Karte
+Volume notifiche ||| Benachrichtigungslautstärke
+È il volume delle notifiche del telefono. Lascia il cursore per sentire il suono. ||| Das ist die Benachrichtigungslautstärke des Telefons. Lass den Regler los, um den Ton zu hören.
+Il telefono non permette di cambiarlo adesso: forse è attivo "Non disturbare". ||| Das Telefon erlaubt das gerade nicht: Vielleicht ist „Bitte nicht stören“ an.
 Mostra meno ||| Weniger zeigen
 Togli dai preferiti ||| Aus Favoriten entfernen
 Aggiungi ai preferiti ||| Zu Favoriten hinzufügen
@@ -1722,3 +1727,11 @@ Scansiona un'altra ||| Noch eine scannen
 Carta senza nome ||| Unbenannte Karte
 
 Scegli la data ||| Datum wählen
+Tante carte in una volta ||| Viele Karten auf einmal
+Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine. ||| Scanne deine Karten nacheinander oder wähle mehrere Fotos auf einmal: Wir schlagen die Namen vor, du korrigierst sie am Ende.
+Sveglia a schermo bloccato ||| Wecker auf dem Sperrbildschirm
+La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono. ||| Der Wecker erscheint im Vollbild und du stoppst oder verschiebst ihn, ohne das Telefon zu entsperren.
+Ciclo protetto ||| Geschützter Zyklus
+Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN. ||| Wenn du willst, öffnet sich der Bereich Zyklus nur mit Fingerabdruck, Gesicht oder PIN.
+Notifiche sotto controllo ||| Benachrichtigungen im Griff
+Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria. ||| Stell die Benachrichtigungslautstärke in den Einstellungen ein; die App warnt dich, wenn etwas deine Erinnerungen blockiert.

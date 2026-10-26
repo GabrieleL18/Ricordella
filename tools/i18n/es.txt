@@ -1591,7 +1591,12 @@ Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri
 Digita il numero stampato sulla tessera ||| Escribe el número impreso en la tarjeta
 Preferite ||| Favoritas
 Preferita ||| Favorita
-Mostra altre %1$s ||| Mostrar %1$s más
+Mostra altre %1$s carte ||| Mostrar %1$s tarjetas más
+%1$s carte ||| %1$s tarjetas
+1 carta ||| 1 tarjeta
+Volume notifiche ||| Volumen de notificaciones
+È il volume delle notifiche del telefono. Lascia il cursore per sentire il suono. ||| Es el volumen de notificaciones del teléfono. Suelta el control para oír el sonido.
+Il telefono non permette di cambiarlo adesso: forse è attivo "Non disturbare". ||| El teléfono no lo permite ahora: quizá está activado «No molestar».
 Mostra meno ||| Mostrar menos
 Togli dai preferiti ||| Quitar de favoritas
 Aggiungi ai preferiti ||| Añadir a favoritas
@@ -1722,3 +1727,11 @@ Scansiona un'altra ||| Escanear otra
 Carta senza nome ||| Tarjeta sin nombre
 
 Scegli la data ||| Elegir la fecha
+Tante carte in una volta ||| Muchas tarjetas a la vez
+Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine. ||| Escanea las tarjetas una tras otra o elige varias fotos a la vez: te proponemos el nombre y lo corriges al final.
+Sveglia a schermo bloccato ||| Alarma con la pantalla bloqueada
+La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono. ||| La alarma aparece a pantalla completa y la detienes o la pospones sin desbloquear el teléfono.
+Ciclo protetto ||| Ciclo protegido
+Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN. ||| Si quieres, la sección Ciclo solo se abre con huella, rostro o PIN.
+Notifiche sotto controllo ||| Notificaciones bajo control
+Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria. ||| Ajusta el volumen de las notificaciones en los Ajustes y la app te avisa si algo bloquea tus recordatorios.

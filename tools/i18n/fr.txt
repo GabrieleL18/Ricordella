@@ -1591,7 +1591,12 @@ Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri
 Digita il numero stampato sulla tessera ||| Saisis le numéro imprimé sur la carte
 Preferite ||| Favorites
 Preferita ||| Favorite
-Mostra altre %1$s ||| Afficher %1$s de plus
+Mostra altre %1$s carte ||| Afficher %1$s autres cartes
+%1$s carte ||| %1$s cartes
+1 carta ||| 1 carte
+Volume notifiche ||| Volume des notifications
+È il volume delle notifiche del telefono. Lascia il cursore per sentire il suono. ||| C'est le volume des notifications du téléphone. Relâchez le curseur pour entendre le son.
+Il telefono non permette di cambiarlo adesso: forse è attivo "Non disturbare". ||| Le téléphone ne le permet pas pour l'instant : « Ne pas déranger » est peut-être activé.
 Mostra meno ||| Afficher moins
 Togli dai preferiti ||| Retirer des favorites
 Aggiungi ai preferiti ||| Ajouter aux favorites
@@ -1722,3 +1727,11 @@ Scansiona un'altra ||| En scanner une autre
 Carta senza nome ||| Carte sans nom
 
 Scegli la data ||| Choisir la date
+Tante carte in una volta ||| Plein de cartes d'un coup
+Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine. ||| Scannez vos cartes l'une après l'autre ou choisissez plusieurs photos à la fois : nous proposons les noms, vous les corrigez à la fin.
+Sveglia a schermo bloccato ||| Réveil sur l'écran verrouillé
+La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono. ||| Le réveil s'affiche en plein écran et vous l'arrêtez ou le reportez sans déverrouiller le téléphone.
+Ciclo protetto ||| Cycle protégé
+Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN. ||| Si vous le souhaitez, la section Cycle ne s'ouvre qu'avec l'empreinte, le visage ou le code PIN.
+Notifiche sotto controllo ||| Notifications sous contrôle
+Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria. ||| Réglez le volume des notifications dans les Paramètres ; l'app vous prévient si quelque chose bloque vos rappels.

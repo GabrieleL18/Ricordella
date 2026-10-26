@@ -1666,7 +1666,12 @@ Aggiungi le tessere di negozi e supermercati: le scansioni una volta e le mostri
 Digita il numero stampato sulla tessera ||| Type the number printed on the card
 Preferite ||| Favourites
 Preferita ||| Favourite
-Mostra altre %1$s ||| Show %1$s more
+Mostra altre %1$s carte ||| Show %1$s more cards
+%1$s carte ||| %1$s cards
+1 carta ||| 1 card
+Volume notifiche ||| Notification volume
+È il volume delle notifiche del telefono. Lascia il cursore per sentire il suono. ||| It's your phone's notification volume. Release the slider to hear the sound.
+Il telefono non permette di cambiarlo adesso: forse è attivo "Non disturbare". ||| Your phone won't allow this right now: "Do Not Disturb" may be on.
 Mostra meno ||| Show less
 Togli dai preferiti ||| Remove from favourites
 Aggiungi ai preferiti ||| Add to favourites
@@ -1797,3 +1802,11 @@ Scansiona un'altra ||| Scan another
 Carta senza nome ||| Unnamed card
 
 Scegli la data ||| Pick a date
+Tante carte in una volta ||| Lots of cards at once
+Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine. ||| Scan your cards one after another or pick several photos together: we suggest the names and you fix them at the end.
+Sveglia a schermo bloccato ||| Alarm on the lock screen
+La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono. ||| The alarm shows full screen and you can stop or snooze it without unlocking your phone.
+Ciclo protetto ||| Protected cycle
+Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN. ||| If you like, the Cycle section only opens with your fingerprint, face or PIN.
+Notifiche sotto controllo ||| Notifications under control
+Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria. ||| Set the notification volume in Settings, and the app warns you if something is blocking your reminders.

@@ -1730,4 +1730,12 @@ internal val GermanStrings: Map<String, String> = hashMapOf(
     "Scansiona un'altra" to "Noch eine scannen",
     "Carta senza nome" to "Unbenannte Karte",
     "Scegli la data" to "Datum wählen",
+    "Tante carte in una volta" to "Viele Karten auf einmal",
+    "Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine." to "Scanne deine Karten nacheinander oder wähle mehrere Fotos auf einmal: Wir schlagen die Namen vor, du korrigierst sie am Ende.",
+    "Sveglia a schermo bloccato" to "Wecker auf dem Sperrbildschirm",
+    "La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono." to "Der Wecker erscheint im Vollbild und du stoppst oder verschiebst ihn, ohne das Telefon zu entsperren.",
+    "Ciclo protetto" to "Geschützter Zyklus",
+    "Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN." to "Wenn du willst, öffnet sich der Bereich Zyklus nur mit Fingerabdruck, Gesicht oder PIN.",
+    "Notifiche sotto controllo" to "Benachrichtigungen im Griff",
+    "Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria." to "Stell die Benachrichtigungslautstärke in den Einstellungen ein; die App warnt dich, wenn etwas deine Erinnerungen blockiert.",
 )

@@ -1762,4 +1762,12 @@ internal val EnglishStrings: Map<String, String> = hashMapOf(
     "Scansiona un'altra" to "Scan another",
     "Carta senza nome" to "Unnamed card",
     "Scegli la data" to "Pick a date",
+    "Tante carte in una volta" to "Lots of cards at once",
+    "Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine." to "Scan your cards one after another or pick several photos together: we suggest the names and you fix them at the end.",
+    "Sveglia a schermo bloccato" to "Alarm on the lock screen",
+    "La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono." to "The alarm shows full screen and you can stop or snooze it without unlocking your phone.",
+    "Ciclo protetto" to "Protected cycle",
+    "Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN." to "If you like, the Cycle section only opens with your fingerprint, face or PIN.",
+    "Notifiche sotto controllo" to "Notifications under control",
+    "Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria." to "Set the notification volume in Settings, and the app warns you if something is blocking your reminders.",
 )

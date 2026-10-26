@@ -40,6 +40,7 @@ import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.Euro
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Widgets
@@ -85,6 +86,17 @@ class NewsRelease(val versionCode: Int, val versionName: String, val items: List
  */
 val AllNews: List<NewsRelease>
     get() = listOf(
+        NewsRelease(
+            versionCode = 16,
+            versionName = "0.10.0",
+            date = java.time.LocalDate.of(2026, 10, 26),
+            items = listOf(
+                NewsItem(Icons.Rounded.CreditCard, { it.lavender }, tr("Tante carte in una volta"), tr("Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine.")),
+                NewsItem(Icons.Rounded.Alarm, { it.coral }, tr("Sveglia a schermo bloccato"), tr("La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono.")),
+                NewsItem(Icons.Rounded.Shield, { it.mint }, tr("Ciclo protetto"), tr("Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN.")),
+                NewsItem(Icons.Rounded.Notifications, { it.cyan }, tr("Notifiche sotto controllo"), tr("Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria.")),
+            ),
+        ),
         NewsRelease(
             versionCode = 13,
             versionName = "0.9.0",

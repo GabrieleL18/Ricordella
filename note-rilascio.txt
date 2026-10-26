@@ -1,25 +1,45 @@
 <it-IT>
-Correzioni:
-• Carte: risolto l'arresto dell'app aprendo la fotocamera per scansionare una carta (versione Store)
-• Novità della 0.9: invio delle carte, condivisione Drive più precisa, scelta delle sezioni all'avvio
+Novità della 0.10:
+• Carte: aggiungine tante in una volta, con la fotocamera o da più foto
+• Widget Carte: un tocco apre la carta giusta; categorie più chiare
+• Sveglia a schermo bloccato: la fermi o la posticipi senza sbloccare
+• Ciclo protetto con impronta, volto o PIN
+• Volume delle notifiche nelle Impostazioni e avviso se qualcosa blocca i promemoria
+• Dopo un errore puoi inviarci il rapporto per email
 </it-IT>
 <en-US>
-Fixes:
-• Cards: fixed the app crashing when opening the camera to scan a card
-• New in 0.9: send cards, more precise Drive sharing, pick your sections at first setup
+New in 0.10:
+• Cards: add lots at once, with the camera or from several photos
+• Cards widget: one tap opens the right card; clearer categories
+• Alarm on the lock screen: stop or snooze it without unlocking
+• Cycle protected with fingerprint, face or PIN
+• Notification volume in Settings and a warning if something blocks your reminders
+• After a crash you can email us the report
 </en-US>
 <de-DE>
-Korrekturen:
-• Karten: Absturz beim Öffnen der Kamera zum Scannen einer Karte behoben
-• Neu in 0.9: Karten senden, genaueres Teilen über Drive, Bereiche bei der Einrichtung wählen
+Neu in 0.10:
+• Karten: viele auf einmal hinzufügen, mit der Kamera oder aus mehreren Fotos
+• Karten-Widget: ein Tippen öffnet die richtige Karte; übersichtlichere Kategorien
+• Wecker auf dem Sperrbildschirm: stoppen oder verschieben ohne Entsperren
+• Zyklus geschützt mit Fingerabdruck, Gesicht oder PIN
+• Benachrichtigungslautstärke in den Einstellungen und Hinweis, wenn etwas Erinnerungen blockiert
+• Nach einem Absturz kannst du uns den Bericht per E-Mail senden
 </de-DE>
 <fr-FR>
-Corrections :
-• Cartes : correction du plantage à l'ouverture de l'appareil photo pour scanner une carte
-• Nouveau en 0.9 : envoi de cartes, partage Drive plus précis, choix des sections au démarrage
+Nouveau en 0.10 :
+• Cartes : ajoutez-en plein d'un coup, avec l'appareil photo ou depuis plusieurs photos
+• Widget Cartes : un appui ouvre la bonne carte ; catégories plus claires
+• Réveil sur l'écran verrouillé : arrêtez-le ou reportez-le sans déverrouiller
+• Cycle protégé par empreinte, visage ou code PIN
+• Volume des notifications dans les Paramètres et alerte si quelque chose bloque les rappels
+• Après un plantage, vous pouvez nous envoyer le rapport par e-mail
 </fr-FR>
 <es-ES>
-Correcciones:
-• Tarjetas: corregido el cierre de la app al abrir la cámara para escanear una tarjeta
-• Novedades de la 0.9: envío de tarjetas, compartir en Drive con más precisión, elegir secciones al empezar
+Novedades de la 0.10:
+• Tarjetas: añade muchas a la vez, con la cámara o desde varias fotos
+• Widget Tarjetas: un toque abre la tarjeta correcta; categorías más claras
+• Alarma con la pantalla bloqueada: detenla o posponla sin desbloquear
+• Ciclo protegido con huella, rostro o PIN
+• Volumen de notificaciones en los Ajustes y aviso si algo bloquea los recordatorios
+• Tras un cierre inesperado puedes enviarnos el informe por email
 </es-ES>

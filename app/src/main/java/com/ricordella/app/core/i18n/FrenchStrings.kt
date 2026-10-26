@@ -1730,4 +1730,12 @@ internal val FrenchStrings: Map<String, String> = hashMapOf(
     "Scansiona un'altra" to "En scanner une autre",
     "Carta senza nome" to "Carte sans nom",
     "Scegli la data" to "Choisir la date",
+    "Tante carte in una volta" to "Plein de cartes d'un coup",
+    "Inquadra le tessere una dopo l'altra o scegli più foto insieme: il nome lo proponiamo noi e lo correggi alla fine." to "Scannez vos cartes l'une après l'autre ou choisissez plusieurs photos à la fois : nous proposons les noms, vous les corrigez à la fin.",
+    "Sveglia a schermo bloccato" to "Réveil sur l'écran verrouillé",
+    "La sveglia compare a tutto schermo e la fermi o la posticipi senza sbloccare il telefono." to "Le réveil s'affiche en plein écran et vous l'arrêtez ou le reportez sans déverrouiller le téléphone.",
+    "Ciclo protetto" to "Cycle protégé",
+    "Se vuoi, la sezione Ciclo si apre solo con impronta, volto o PIN." to "Si vous le souhaitez, la section Cycle ne s'ouvre qu'avec l'empreinte, le visage ou le code PIN.",
+    "Notifiche sotto controllo" to "Notifications sous contrôle",
+    "Regoli il volume delle notifiche dalle Impostazioni e l'app ti avvisa se qualcosa blocca i promemoria." to "Réglez le volume des notifications dans les Paramètres ; l'app vous prévient si quelque chose bloque vos rappels.",
 )
